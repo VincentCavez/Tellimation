@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tellimations Animation Test</title>
+  <style>
+    body {
+      background: #1a1a2e;
+      color: #e0e0e0;
+      font-family: monospace;
+      margin: 2rem;
+    }
+    h1 { color: #66ccff; }
+    h2 { color: #88ddaa; margin-top: 1.5rem; }
+    canvas {
+      border: 2px solid #444;
+      display: block;
+      margin-bottom: 1rem;
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    button {
+      background: #2a2a4e;
+      color: #e0e0e0;
+      border: 1px solid #555;
+      padding: 0.5rem 1rem;
+      font-family: monospace;
+      font-size: 0.9rem;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    button:hover { background: #3a3a6e; }
+    button:disabled { opacity: 0.4; cursor: not-allowed; }
+    select {
+      background: #2a2a4e;
+      color: #e0e0e0;
+      border: 1px solid #555;
+      padding: 0.5rem;
+      font-family: monospace;
+      border-radius: 4px;
+    }
+    #log {
+      background: #0d0d1a;
+      padding: 1rem;
+      border-radius: 4px;
+      max-height: 300px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      font-size: 0.85rem;
+    }
+    .log-ok { color: #4caf50; }
+    .log-info { color: #66ccff; }
+    .log-warn { color: #ffaa33; }
+    #status {
+      padding: 0.5rem 1rem;
+      margin-bottom: 1rem;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    .status-idle { background: #1a3a1a; color: #4caf50; }
+    .status-playing { background: #3a3a1a; color: #ffcc00; }
+  </style>
+</head>
+<body>
+  <h1>Tellimations Animation Test</h1>
+
+  <h2>Scene (280x180 @ 3x)</h2>
+  <canvas id="scene"></canvas>
+
+  <div id="status" class="status-idle">Idle</div>
+
+  <h2>Target Entity</h2>
+  <div class="controls">
+    <select id="target">
+      <option value="cat">cat (orange cat)</option>
+      <option value="mushroom">mushroom (red mushroom)</option>
+      <option value="tree_01">tree_01 (pine tree)</option>
+    </select>
+  </div>
+
+  <h2>Fallback Animations</h2>
+  <div class="controls">
+    <button onclick="playAnim('colorPop')">colorPop</button>
+    <button onclick="playAnim('shake')">shake</button>
+    <button onclick="playAnim('pulse')">pulse</button>
+    <button onclick="playAnim('isolate')">isolate</button>
+    <button onclick="playAnim('bounce')">bounce</button>
+    <button onclick="runner.stop()" style="background:#4a2020;">Stop</button>
+  </div>
+
+  <h2>Custom Code</h2>
+  <div class="controls">
+    <button onclick="playCustom()">Play Custom Animation</button>
+    <button onclick="runVerification()">Run Snapshot/Restore Test</button>
+  </div>
+  <textarea id="customCode" rows="8" cols="80" style="background:#0d0d1a;color:#e0e0e0;border:1px solid #555;font-family:monospace;font-size:0.85rem;padding:0.5rem;width:100%;box-sizing:border-box;">function animate(buf, PW, PH, t) {
+  // Example: spin all entity pixels' hue
+  for (var i = 0; i < buf.length; i++) {
+    var e = buf[i].e;
+    if (e !== 'sky' && e !== 'ground' && e !== '') {
+      var shift = Math.sin(t * Math.PI * 4) * 50;
+      buf[i].r = Math.min(255, Math.max(0, Math.round(buf[i]._r + shift)));
+      buf[i].g = Math.min(255, Math.max(0, Math.round(buf[i]._g - shift * 0.5)));
+      buf[i].b = Math.min(255, Math.max(0, Math.round(buf[i]._b + shift * 0.3)));
+    }
+  }
+}</textarea>
+
+  <h2>Log</h2>
+  <div id="log"></div>
+
+  <script src="engine.js"></script>
+  <script src="animations.js"></script>
+  <script>
+    // -- Setup ---------------------------------------------------------------
+    const buf = new PixelBuffer(280, 180);
+    const canvas = document.getElementById('scene');
+    const renderer = new Renderer(canvas, buf, 3);
+    const runner = new AnimationRunner(buf, renderer);
+    const logEl = document.getElementById('log');
+    const statusEl = document.getElementById('status');
+
+    function log(msg, cls = 'log-info') {
+      const line = document.createElement('div');
+      line.className = cls;
+      line.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      logEl.prepend(line);
+    }
+
+    function updateStatus() {
+      if (runner.isPlaying) {
+        statusEl.textContent = 'Playing...';
+        statusEl.className = 'status-playing';
+      } else {
+        statusEl.textContent = 'Idle';
+        statusEl.className = 'status-idle';
+      }
+    }
+
+    // -- Draw scene ----------------------------------------------------------
+    function drawScene() {
+      buf.clear();
+      renderer.drawBackground('forest');
+
+      // Cat (entity: cat)
+      // Body
+      buf.ellip(80, 140, 14, 10, 230, 140, 30, 'cat.body');
+      // Head
+      buf.circ(68, 126, 8, 230, 140, 30, 'cat.head');
+      // Ears
+      buf.tri(61, 126, 63, 115, 66, 123, 230, 140, 30, 'cat.head.ears.left');
+      buf.tri(70, 123, 73, 115, 75, 126, 230, 140, 30, 'cat.head.ears.right');
+      // Eyes
+      buf.circ(65, 125, 1, 0, 180, 0, 'cat.head.eyes.left');
+      buf.circ(71, 125, 1, 0, 180, 0, 'cat.head.eyes.right');
+      // Tail
+      buf.arc(96, 132, 10, Math.PI * 0.8, Math.PI * 1.6, 230, 140, 30, 'cat.tail');
+      // Legs
+      buf.rect(72, 148, 3, 6, 200, 120, 20, 'cat.legs.front');
+      buf.rect(86, 148, 3, 6, 200, 120, 20, 'cat.legs.back');
+
+      // Mushroom (entity: mushroom)
+      buf.rect(185, 145, 4, 10, 220, 200, 170, 'mushroom.stem');
+      buf.ellip(187, 142, 10, 6, 200, 30, 30, 'mushroom.cap');
+      buf.circ(183, 140, 1, 255, 255, 255, 'mushroom.cap.spot1');
+      buf.circ(190, 139, 1, 255, 255, 255, 'mushroom.cap.spot2');
+
+      // Tree (entity: tree_01)
+      buf.rect(240, 110, 6, 25, 100, 70, 30, 'tree_01.trunk');
+      buf.tri(220, 115, 266, 115, 243, 75, 34, 120, 34, 'tree_01.foliage');
+
+      renderer.render();
+    }
+
+    drawScene();
+    log('Scene drawn: cat, mushroom, tree_01');
+
+    // -- Snapshot integrity check data  --------------------------------------
+    function captureState() {
+      // Capture a subset of pixel values for verification
+      const checks = [];
+      const positions = [
+        { x: 80, y: 140, label: 'cat.body center' },
+        { x: 187, y: 142, label: 'mushroom.cap center' },
+        { x: 243, y: 90, label: 'tree_01.foliage center' },
+        { x: 140, y: 50, label: 'sky' },
+        { x: 140, y: 160, label: 'ground' },
+      ];
+      for (const pos of positions) {
+        const p = buf.getPixel(pos.x, pos.y);
+        checks.push({ ...pos, r: p.r, g: p.g, b: p.b, e: p.e });
+      }
+      return checks;
+    }
+
+    function verifyState(before, label) {
+      const after = captureState();
+      let allMatch = true;
+      for (let i = 0; i < before.length; i++) {
+        const b = before[i], a = after[i];
+        if (b.r !== a.r || b.g !== a.g || b.b !== a.b) {
+          log(`FAIL ${label}: pixel at (${b.x},${b.y}) [${b.label}] changed: ` +
+              `(${b.r},${b.g},${b.b}) -> (${a.r},${a.g},${a.b})`, 'log-warn');
+          allMatch = false;
+        }
+      }
+      if (allMatch) {
+        log(`PASS ${label}: all pixels restored correctly`, 'log-ok');
+      }
+      return allMatch;
+    }
+
+    // -- Play animations -----------------------------------------------------
+    async function playAnim(name) {
+      const target = document.getElementById('target').value;
+      const code = FallbackAnimations[name](target);
+      log(`Playing ${name} on "${target}" (1200ms)...`);
+      const before = captureState();
+      updateStatus();
+
+      // Use a polling interval to update status
+      const poll = setInterval(updateStatus, 100);
+
+      await runner.play(code, 1200);
+
+      clearInterval(poll);
+      updateStatus();
+      log(`${name} finished.`);
+      verifyState(before, `${name} restore`);
+    }
+
+    async function playCustom() {
+      const code = document.getElementById('customCode').value;
+      log('Playing custom animation (1500ms)...');
+      const before = captureState();
+      updateStatus();
+      const poll = setInterval(updateStatus, 100);
+
+      await runner.play(code, 1500);
+
+      clearInterval(poll);
+      updateStatus();
+      log('Custom animation finished.');
+      verifyState(before, 'custom restore');
+    }
+
+    // -- Automated verification  ---------------------------------------------
+    async function runVerification() {
+      log('--- Running automated snapshot/restore verification ---');
+      const target = document.getElementById('target').value;
+      const anims = ['colorPop', 'shake', 'pulse', 'isolate', 'bounce'];
+      let allPassed = true;
+
+      for (const name of anims) {
+        const code = FallbackAnimations[name](target);
+        const before = captureState();
+        log(`  Testing ${name}...`);
+        await runner.play(code, 400); // fast for testing
+        if (!verifyState(before, name)) {
+          allPassed = false;
+        }
+      }
+
+      if (allPassed) {
+        log('=== ALL SNAPSHOT/RESTORE TESTS PASSED ===', 'log-ok');
+      } else {
+        log('=== SOME TESTS FAILED ===', 'log-warn');
+      }
+    }
+  </script>
+</body>
+</html>

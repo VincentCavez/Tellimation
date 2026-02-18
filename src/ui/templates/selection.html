@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tellimations - Choose a Story</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="selection-container">
+    <div class="sel-title" id="sel-title">Let's tell a <span class="accent">story</span> together!</div>
+    <div class="sel-sub" id="sel-sub">Pick a scene to begin your adventure</div>
+
+    <div class="thumbnails" id="thumbnails">
+      <!-- Skeleton loaders shown while scenes generate -->
+      <div class="thumbnail-card skeleton-card">
+        <div class="skeleton-canvas"></div>
+        <div class="skeleton-text"></div>
+        <div class="skeleton-text-2"></div>
+      </div>
+      <div class="thumbnail-card skeleton-card">
+        <div class="skeleton-canvas"></div>
+        <div class="skeleton-text"></div>
+        <div class="skeleton-text-2"></div>
+      </div>
+      <div class="thumbnail-card skeleton-card">
+        <div class="skeleton-canvas"></div>
+        <div class="skeleton-text"></div>
+        <div class="skeleton-text-2"></div>
+      </div>
+    </div>
+
+    <div class="more-wrap">
+      <button class="btn btn-ghost" id="btn-one-more" style="display:none">
+        + I want to see one more
+      </button>
+    </div>
+  </div>
+
+  <script src="/static/engine.js"></script>
+  <script src="/static/scene_picker.js"></script>
+  <script>
+    (function() {
+      const apiKey = sessionStorage.getItem('api_key');
+      const participantId = sessionStorage.getItem('participant_id');
+      if (!apiKey || !participantId) {
+        window.location.href = '/';
+        return;
+      }
+
+      const container = document.getElementById('thumbnails');
+      const btnOneMore = document.getElementById('btn-one-more');
+      const selTitle = document.getElementById('sel-title');
+      const selSub = document.getElementById('sel-sub');
+      let branches = [];
+      let fromDisk = false;
+
+      // Connect WebSocket
+      const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const ws = new WebSocket(
+        protocol + '//' + location.host + '/ws'
+        + '?api_key=' + encodeURIComponent(apiKey)
+        + '&participant_id=' + encodeURIComponent(participantId)
+      );
+
+      ws.onopen = function() {
+        // Request initial scenes
+        ws.send(JSON.stringify({ type: 'generate_initial_scenes' }));
+      };
+
+      ws.onmessage = function(event) {
+        const msg = JSON.parse(event.data);
+
+        if (msg.type === 'initial_scenes') {
+          branches = msg.scenes;
+          fromDisk = !!msg.from_disk;
+          if (fromDisk) {
+            selTitle.innerHTML = 'Welcome back! <span class="accent">Continue</span> a story';
+            selSub.textContent = 'Pick a previous story to continue, or start a new one';
+          }
+          renderThumbnails(branches);
+          btnOneMore.style.display = fromDisk ? 'none' : '';
+        }
+
+        if (msg.type === 'one_more_scene') {
+          branches.push(msg.scene);
+          renderThumbnails(branches);
+        }
+
+        if (msg.type === 'error') {
+          console.error('Server error:', msg.message);
+          container.innerHTML = '<p style="color:var(--red)">' + msg.message + '</p>';
+        }
+      };
+
+      ws.onerror = function() {
+        container.innerHTML = '<p style="color:var(--red)">Connection error. Please reload.</p>';
+      };
+
+      function renderThumbnails(scenes) {
+        container.innerHTML = '';
+        scenes.forEach(function(scene, index) {
+          const card = ScenePicker.createThumbnailCard(scene, 1.5);
+          card.addEventListener('click', function() {
+            selectScene(index);
+          });
+          container.appendChild(card);
+        });
+      }
+
+      function selectScene(index) {
+        var scene = branches[index];
+        // Store chosen scene and go to story page
+        sessionStorage.setItem('chosen_scene', JSON.stringify(scene));
+        sessionStorage.setItem('scene_index', String(index));
+        // Store story_index if it came from disk
+        if (scene._story_index) {
+          sessionStorage.setItem('story_index', String(scene._story_index));
+        } else {
+          sessionStorage.removeItem('story_index');
+        }
+        ws.send(JSON.stringify({ type: 'select_scene', index: index }));
+        window.location.href = '/story';
+      }
+
+      btnOneMore.addEventListener('click', function() {
+        btnOneMore.disabled = true;
+        btnOneMore.textContent = 'Generating...';
+        ws.send(JSON.stringify({ type: 'generate_one_more' }));
+        // Re-enable after response
+        var origHandler = ws.onmessage;
+        ws.onmessage = function(event) {
+          origHandler(event);
+          var msg = JSON.parse(event.data);
+          if (msg.type === 'one_more_scene' || msg.type === 'error') {
+            btnOneMore.disabled = false;
+            btnOneMore.textContent = '+ I want to see one more';
+          }
+        };
+      });
+    })();
+  </script>
+</body>
+</html>

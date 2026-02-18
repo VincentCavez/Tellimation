@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tellimations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="login-wrapper">
+    <div class="login-card">
+      <div class="login-logo">
+        <span class="t2">Tell</span><span class="t3">imations</span>
+      </div>
+      <div class="login-sub">AI-powered storytelling for speech therapy</div>
+
+      <div class="field">
+        <label for="api-key">Gemini API Key</label>
+        <input type="password" id="api-key" placeholder="AIza..." autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="participant">Participant Number</label>
+        <input type="text" id="participant" placeholder="e.g. P012">
+      </div>
+      <div class="login-btn-wrap">
+        <button class="btn btn-red" id="btn-ok">Let's go!</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    const btnOk = document.getElementById('btn-ok');
+    const apiKeyInput = document.getElementById('api-key');
+    const participantInput = document.getElementById('participant');
+
+    function proceed() {
+      const apiKey = apiKeyInput.value.trim();
+      const participant = participantInput.value.trim();
+      if (!apiKey) { apiKeyInput.focus(); return; }
+      if (!participant) { participantInput.focus(); return; }
+      sessionStorage.setItem('api_key', apiKey);
+      sessionStorage.setItem('participant_id', participant);
+      window.location.href = '/selection';
+    }
+
+    btnOk.addEventListener('click', proceed);
+    participantInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') proceed();
+    });
+    apiKeyInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') participantInput.focus();
+    });
+  </script>
+</body>
+</html>

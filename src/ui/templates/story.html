@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tellimations - Story</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="story-container">
+    <!-- Scene label -->
+    <div class="story-scene-label">Scene <span id="scene-num">1</span></div>
+
+    <!-- Main scene canvas -->
+    <div class="scene-canvas-wrapper">
+      <canvas id="scene-canvas"></canvas>
+    </div>
+
+    <!-- Transcription display (main box) -->
+    <div class="transcription-box" id="transcription-box">
+      <span class="transcription-text" id="transcription-feedback"></span>
+    </div>
+
+    <!-- Push-to-talk hint -->
+    <div class="ptt-hint" id="ptt-hint">
+      Hold <kbd>Space</kbd> to speak
+    </div>
+
+    <!-- Branch picker (hidden until scene complete) -->
+    <div class="branch-picker" id="branch-picker" style="display:none">
+      <h2>What happens next?</h2>
+      <div class="thumbnails" id="branch-thumbnails">
+        <div class="loading-overlay">
+          <div class="loading-dots">
+            <span></span><span></span><span></span><span></span>
+          </div>
+          <div class="loading-text">Creating new scenes...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/engine.js"></script>
+  <script src="/static/animations.js"></script>
+  <script src="/static/scene_picker.js"></script>
+  <script src="/static/narration.js"></script>
+  <script>
+    (function() {
+      const apiKey = sessionStorage.getItem('api_key');
+      const participantId = sessionStorage.getItem('participant_id');
+      if (!apiKey || !participantId) {
+        window.location.href = '/';
+        return;
+      }
+
+      var sceneNumber = 1;
+
+      // -- Engine setup --
+      const canvas = document.getElementById('scene-canvas');
+      const buf = new PixelBuffer(PW, PH);
+      const renderer = new Renderer(canvas, buf);
+      const animRunner = new AnimationRunner(buf, renderer);
+
+      // -- Load initial scene from sessionStorage --
+      const chosenScene = JSON.parse(sessionStorage.getItem('chosen_scene') || 'null');
+      if (chosenScene) {
+        renderScene(chosenScene);
+      }
+
+      function renderScene(scene) {
+        buf.clear();
+
+        // Execute carried-over sprites (from story_state stored server-side)
+        var spriteCode = scene.sprite_code || {};
+        var manifest = scene.manifest || {};
+        var carriedOver = scene.carried_over_entities || [];
+
+        // Draw all sprite code entries
+        for (var eid in spriteCode) {
+          if (spriteCode.hasOwnProperty(eid)) {
+            executeSpriteCode(spriteCode[eid], buf);
+          }
+        }
+
+        renderer.render();
+      }
+
+      // -- WebSocket --
+      const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const ws = new WebSocket(
+        protocol + '//' + location.host + '/ws'
+        + '?api_key=' + encodeURIComponent(apiKey)
+        + '&participant_id=' + encodeURIComponent(participantId)
+      );
+
+      var storyIndex = parseInt(sessionStorage.getItem('story_index') || '0', 10);
+
+      ws.onopen = function() {
+        // Send the chosen scene so the server can initialize the narration loop
+        // (the previous WS connection was closed on navigation from /selection)
+        if (chosenScene) {
+          ws.send(JSON.stringify({
+            type: 'init_scene',
+            scene: chosenScene,
+            story_index: storyIndex || 0,
+          }));
+        }
+      };
+
+      ws.onmessage = function(event) {
+        var msg = JSON.parse(event.data);
+
+        switch (msg.type) {
+          case 'transcription':
+            handleTranscription(msg);
+            break;
+
+          case 'animation':
+            handleAnimation(msg);
+            break;
+
+          case 'scene_complete':
+            handleSceneComplete();
+            break;
+
+          case 'branches':
+            handleBranches(msg.scenes);
+            break;
+
+          case 'new_scene':
+            handleNewScene(msg.scene);
+            break;
+
+          case 'error':
+            console.error('Server error:', msg.message);
+            break;
+        }
+      };
+
+      // -- Transcription feedback --
+      var feedbackEl = document.getElementById('transcription-feedback');
+
+      function handleTranscription(msg) {
+        feedbackEl.textContent = msg.transcription || '';
+      }
+
+      // -- Animation playback --
+      function handleAnimation(msg) {
+        animRunner.play(msg.code, msg.duration_ms || 1200);
+      }
+
+      // -- Scene complete → show branch picker --
+      var branchPicker = document.getElementById('branch-picker');
+      var branchThumbnails = document.getElementById('branch-thumbnails');
+      var transcriptionBox = document.getElementById('transcription-box');
+      var pttHint = document.getElementById('ptt-hint');
+
+      function handleSceneComplete() {
+        // Disable push-to-talk
+        transcriptionBox.style.display = 'none';
+        pttHint.style.display = 'none';
+        // Show branch picker with loading state
+        branchPicker.style.display = '';
+        branchThumbnails.innerHTML =
+          '<div class="loading-overlay">' +
+          '<div class="loading-dots"><span></span><span></span><span></span><span></span></div>' +
+          '<div class="loading-text">Creating new scenes...</div>' +
+          '</div>';
+        // Request branches from server
+        ws.send(JSON.stringify({ type: 'generate_branches' }));
+      }
+
+      // -- Branch selection --
+      var currentBranches = [];
+
+      function handleBranches(scenes) {
+        currentBranches = scenes;
+        branchThumbnails.innerHTML = '';
+        scenes.forEach(function(scene, index) {
+          var card = ScenePicker.createThumbnailCard(scene, 1.5);
+          card.addEventListener('click', function() {
+            selectBranch(index);
+          });
+          branchThumbnails.appendChild(card);
+        });
+      }
+
+      function selectBranch(index) {
+        var scene = currentBranches[index];
+        // Hide branch picker, show PTT
+        branchPicker.style.display = 'none';
+        transcriptionBox.style.display = '';
+        pttHint.style.display = '';
+        feedbackEl.textContent = '';
+        // Update scene number
+        sceneNumber++;
+        document.getElementById('scene-num').textContent = sceneNumber;
+        // Render the new scene
+        renderScene(scene);
+        // Notify server
+        ws.send(JSON.stringify({ type: 'select_branch', index: index }));
+      }
+
+      function handleNewScene(scene) {
+        renderScene(scene);
+      }
+
+      // -- Push-to-talk (narration.js handles MediaRecorder + space bar) --
+      var pttHintEl = document.getElementById('ptt-hint');
+      NarrationClient.init(ws, transcriptionBox, feedbackEl, pttHintEl);
+    })();
+  </script>
+</body>
+</html>

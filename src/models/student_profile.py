@@ -1,0 +1,123 @@
+from __future__ import annotations
+
+from typing import Dict, List
+
+from pydantic import BaseModel, Field
+
+
+class Discrepancy(BaseModel):
+    type: str
+    entity_id: str
+    sub_entity: str = ""
+    details: str = ""
+    severity: float = 0.5
+
+
+class StudentProfile(BaseModel):
+    error_counts: Dict[str, int] = Field(default_factory=dict)
+    error_trend: Dict[str, str] = Field(default_factory=dict)
+    difficult_entities: List[str] = Field(default_factory=list)
+    strong_areas: List[str] = Field(default_factory=list)
+    scenes_completed: int = 0
+    corrections_after_animation: int = 0
+    total_utterances: int = 0
+
+    _recent_errors: Dict[str, List[int]] = {}
+
+    def model_post_init(self, __context: object) -> None:
+        self._recent_errors = {}
+
+    def record_errors(self, discrepancies: List[Discrepancy]) -> None:
+        self.total_utterances += 1
+        entity_hit: Dict[str, int] = {}
+        for d in discrepancies:
+            error_type = d.type
+            self.error_counts[error_type] = self.error_counts.get(error_type, 0) + 1
+            entity_hit[d.entity_id] = entity_hit.get(d.entity_id, 0) + 1
+            if error_type not in self._recent_errors:
+                self._recent_errors[error_type] = []
+            self._recent_errors[error_type].append(1)
+
+        for eid, count in entity_hit.items():
+            if count >= 2 and eid not in self.difficult_entities:
+                self.difficult_entities.append(eid)
+
+        # Record a 0 for error types seen before but absent in this utterance
+        for error_type in list(self._recent_errors.keys()):
+            if not any(d.type == error_type for d in discrepancies):
+                self._recent_errors[error_type].append(0)
+
+    def update_trends(self) -> None:
+        window = 5
+        self.error_trend = {}
+        for error_type, history in self._recent_errors.items():
+            if len(history) < window:
+                self.error_trend[error_type] = "insufficient_data"
+                continue
+            recent = history[-window:]
+            older = (
+                history[-2 * window : -window]
+                if len(history) >= 2 * window
+                else history[: len(history) - window]
+            )
+            if not older:
+                self.error_trend[error_type] = "insufficient_data"
+                continue
+            recent_rate = sum(recent) / len(recent)
+            older_rate = sum(older) / len(older)
+            if recent_rate < older_rate - 0.15:
+                self.error_trend[error_type] = "decreasing"
+            elif recent_rate > older_rate + 0.15:
+                self.error_trend[error_type] = "increasing"
+            else:
+                self.error_trend[error_type] = "stable"
+
+        self.strong_areas = []
+        if self.total_utterances >= 3:
+            for error_type, count in self.error_counts.items():
+                rate = count / self.total_utterances
+                if rate < 0.1:
+                    self.strong_areas.append(error_type)
+
+    def get_weak_areas(self) -> List[str]:
+        if self.total_utterances == 0:
+            return []
+        error_rates = {
+            et: count / self.total_utterances
+            for et, count in self.error_counts.items()
+        }
+        sorted_types = sorted(error_rates, key=lambda k: error_rates[k], reverse=True)
+        return [et for et in sorted_types if error_rates[et] > 0.2]
+
+    def to_prompt_context(self) -> str:
+        lines = ["## Student Profile"]
+        lines.append(f"Utterances so far: {self.total_utterances}")
+        lines.append(f"Scenes completed: {self.scenes_completed}")
+        if self.error_counts:
+            lines.append(
+                "Error counts: "
+                + ", ".join(
+                    f"{k}={v}"
+                    for k, v in sorted(
+                        self.error_counts.items(), key=lambda x: x[1], reverse=True
+                    )
+                )
+            )
+        weak = self.get_weak_areas()
+        if weak:
+            lines.append(f"Weak areas (high error rate): {', '.join(weak)}")
+        if self.strong_areas:
+            lines.append(
+                f"Strong areas (low error rate): {', '.join(self.strong_areas)}"
+            )
+        if self.error_trend:
+            trends = ", ".join(f"{k}: {v}" for k, v in self.error_trend.items())
+            lines.append(f"Trends: {trends}")
+        if self.difficult_entities:
+            lines.append(
+                f"Difficult entities: {', '.join(self.difficult_entities)}"
+            )
+        lines.append(
+            f"Corrections after animation: {self.corrections_after_animation}"
+        )
+        return "\n".join(lines)

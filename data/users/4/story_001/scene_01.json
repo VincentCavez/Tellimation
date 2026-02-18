@@ -1,0 +1,169 @@
+{
+  "narrative_text": "Deep in the Glowing Grove, a curious young fox named Pip discovers a mysterious, shimmering lantern hanging from an ancient, mossy tree. What happens when Pip reaches out to touch the light?",
+  "branch_summary": "A brave fox finds a magical lantern in a glowing forest.",
+  "scene_description": "A dense, enchanted forest at twilight where the air is filled with floating specks of golden pollen. The lighting is a mix of deep indigo shadows and warm, bioluminescent amber glows emanating from the flora. The composition features a large, gnarled ancient tree on the right side, with the main character centered, creating a sense of discovery and wonder. The color palette consists of midnight blue, moss green, and radiant gold.",
+  "manifest": {
+    "scene_id": "scene_01",
+    "entities": [
+      {
+        "id": "fox_01",
+        "type": "fox",
+        "properties": {
+          "color": "vibrant burnt orange with a cream-colored chest and black 'stockings' on the legs",
+          "size": "medium, about the height of a low bush",
+          "texture": "thick, velvety fur with a very bushy, white-tipped tail",
+          "pattern": "solid orange with distinct white and black patches",
+          "distinctive_features": "large, expressive amber eyes and extra-long whiskers that seem to twitch"
+        },
+        "position": {
+          "x": 120,
+          "y": 110,
+          "spatial_ref": null
+        },
+        "emotion": "curious",
+        "pose": "standing on three legs with the right front paw slightly lifted, head tilted upward looking at the lantern",
+        "carried_over": false
+      },
+      {
+        "id": "tree_01",
+        "type": "ancient tree",
+        "properties": {
+          "color": "deep charcoal bark covered in patches of neon-green moss",
+          "size": "large, spanning the full height of the frame on the right side",
+          "texture": "rough, craggy bark with spiral-shaped knots",
+          "pattern": "interlocking vertical grooves and glowing mossy veins",
+          "distinctive_features": "a sturdy, low-hanging branch that curves downward like a welcoming arm"
+        },
+        "position": {
+          "x": 220,
+          "y": 85,
+          "spatial_ref": null
+        },
+        "emotion": null,
+        "pose": "rooted firmly, branches swaying slightly toward the center",
+        "carried_over": false
+      },
+      {
+        "id": "lantern_01",
+        "type": "magical lantern",
+        "properties": {
+          "color": "polished brass frame with a pulsing honey-gold light inside",
+          "size": "small, roughly the size of the fox's head",
+          "texture": "smooth metallic frame with translucent, frosted glass panes",
+          "pattern": "intricate filigree carvings of stars on the metal top",
+          "distinctive_features": "emits tiny, floating sparkles that drift downward"
+        },
+        "position": {
+          "x": 190,
+          "y": 60,
+          "spatial_ref": "tree_01"
+        },
+        "emotion": null,
+        "pose": "hanging by a silver chain from the low branch of the tree",
+        "carried_over": false
+      }
+    ],
+    "relations": [
+      {
+        "entity_a": "lantern_01",
+        "entity_b": "tree_01",
+        "type": "spatial",
+        "preposition": "under"
+      },
+      {
+        "entity_a": "fox_01",
+        "entity_b": "lantern_01",
+        "type": "spatial",
+        "preposition": "beside"
+      }
+    ],
+    "actions": [
+      {
+        "entity_id": "fox_01",
+        "verb": "inspect",
+        "tense": "present",
+        "manner": "cautiously"
+      }
+    ]
+  },
+  "neg": {
+    "targets": [
+      {
+        "id": "t1_fox_description",
+        "entity_id": "fox_01",
+        "components": {
+          "identity": true,
+          "descriptors": [
+            "burnt orange",
+            "white-tipped",
+            "velvety"
+          ],
+          "spatial": null,
+          "action": "inspecting",
+          "temporal": "present"
+        },
+        "priority": 1.0,
+        "tolerance": 0.8
+      },
+      {
+        "id": "t2_lantern_spatial",
+        "entity_id": "lantern_01",
+        "components": {
+          "identity": true,
+          "descriptors": [
+            "glowing",
+            "gold"
+          ],
+          "spatial": "under the branch",
+          "action": null,
+          "temporal": null
+        },
+        "priority": 0.9,
+        "tolerance": 0.7
+      },
+      {
+        "id": "t3_tree_descriptors",
+        "entity_id": "tree_01",
+        "components": {
+          "identity": true,
+          "descriptors": [
+            "ancient",
+            "mossy",
+            "dark"
+          ],
+          "spatial": "beside the fox",
+          "action": null,
+          "temporal": null
+        },
+        "priority": 0.8,
+        "tolerance": 0.8
+      }
+    ],
+    "error_exclusions": [
+      {
+        "entity_id": "fox_01",
+        "excluded": [
+          "PROPERTY_TEMPERATURE",
+          "PROPERTY_WEIGHT"
+        ],
+        "reason": "Fox has no temperature or weight attributes defined in this scene."
+      },
+      {
+        "entity_id": "lantern_01",
+        "excluded": [
+          "QUANTITY"
+        ],
+        "reason": "There is only one lantern, making quantity descriptors redundant."
+      }
+    ],
+    "min_coverage": 0.7,
+    "skill_coverage_check": "PASS"
+  },
+  "sprite_code": {
+    "bg": "for(var y=0;y<85;y++) for(var x=0;x<PW;x++){ var g=y/85; px(x,y, Math.floor(15+g*30), Math.floor(25+g*55), Math.floor(55+g*85), 'sky'); } for(var y=85;y<PH;y++) for(var x=0;x<PW;x++){ var n=Math.sin(x*0.15+y*0.2)*5; var gr=Math.floor(45+n+Math.random()*10); px(x,y, Math.floor(gr*0.4), Math.floor(gr*0.9), Math.floor(gr*0.45), 'ground'); } for(var i=0;i<60;i++){ var sx=Math.floor(Math.random()*PW), sy=Math.floor(Math.random()*80); px(sx,sy, 255,220,100, 'sky.pollen'); }",
+    "fox_01": "const eid = 'fox_01'; const cx = 120, cy = 110; ellip(cx, cy, 12, 7, 180,65,35, eid+'.body'); ellip(cx, cy, 10, 6, 210,85,45, eid+'.body'); ellip(cx-6, cy+1, 5, 5, 245,230,200, eid+'.body.chest'); circ(cx-10, cy-5, 7, 200,75,40, eid+'.head'); circ(cx-10, cy-5, 6, 225,100,55, eid+'.head'); ellip(cx-15, cy-3, 4, 3, 245,235,210, eid+'.head.snout'); px(cx-18, cy-4, 30,20,15, eid+'.head.nose'); tri(cx-15,cy-10, cx-14,cy-17, cx-11,cy-10, 190,70,35, eid+'.head.ears.left'); tri(cx-14,cy-11, cx-14,cy-15, cx-12,cy-11, 240,210,180, eid+'.head.ears.left'); tri(cx-7,cy-10, cx-6,cy-17, cx-3,cy-10, 190,70,35, eid+'.head.ears.right'); tri(cx-6,cy-11, cx-6,cy-15, cx-4,cy-11, 240,210,180, eid+'.head.ears.right'); circ(cx-12, cy-7, 2, 100,60,20, eid+'.head.eyes.left'); circ(cx-12, cy-7, 1, 255,180,40, eid+'.head.eyes.left'); px(cx-13, cy-8, 255,255,255, eid+'.head.eyes.left'); circ(cx-7, cy-7, 2, 100,60,20, eid+'.head.eyes.right'); circ(cx-7, cy-7, 1, 255,180,40, eid+'.head.eyes.right'); px(cx-8, cy-8, 255,255,255, eid+'.head.eyes.right'); line(cx-18, cy-2, cx-25, cy-3, 40,30,20, eid+'.head.whiskers'); line(cx-18, cy-1, cx-25, cy, 40,30,20, eid+'.head.whiskers'); rect(cx-7, cy+6, 2, 8, 30,25,25, eid+'.legs.front_left'); rect(cx-3, cy+3, 2, 6, 30,25,25, eid+'.legs.front_right'); rect(cx+4, cy+6, 2, 8, 30,25,25, eid+'.legs.back_left'); rect(cx+8, cy+6, 2, 8, 30,25,25, eid+'.legs.back_right'); ellip(cx+16, cy, 9, 5, 195,75,35, eid+'.tail'); ellip(cx+16, cy, 7, 4, 220,100,50, eid+'.tail'); ellip(cx+22, cy-1, 4, 3, 245,240,230, eid+'.tail.tip');",
+    "tree_01": "const eid = 'tree_01'; const cx = 240, cy = 180; rect(cx-20, 0, 40, PH, 35,35,45, eid+'.trunk'); rect(cx-15, 0, 30, PH, 50,50,60, eid+'.trunk'); for(var i=0;i<15;i++){ circ(cx-15+Math.random()*30, Math.random()*PH, 2+Math.random()*4, 90,180,50, eid+'.moss'); } thickLine(cx-15, 75, 170, 55, 4, 45,45,55, eid+'.branch'); thickLine(cx-15, 75, 170, 55, 2, 60,60,70, eid+'.branch'); for(var i=0;i<10;i++){ line(cx-10, 20+i*15, cx-5, 25+i*15, 30,30,40, eid+'.bark_texture'); } circ(cx-10, 100, 5, 30,30,40, eid+'.knots'); circ(cx-10, 100, 3, 45,45,55, eid+'.knots'); for(var i=0;i<20;i++){ px(cx-18+Math.random()*36, 50+Math.random()*100, 120,220,80, eid+'.moss_veins'); }",
+    "lantern_01": "const eid = 'lantern_01'; const cx = 190, cy = 60; line(cx, cy-15, cx, cy-25, 180,180,190, eid+'.chain'); circ(cx, cy, 12, 255,220,100, eid+'.glow'); circ(cx, cy, 8, 255,240,150, eid+'.glow'); rect(cx-6, cy-8, 12, 16, 170,120,40, eid+'.frame'); rect(cx-5, cy-7, 10, 14, 255,245,180, eid+'.glass'); line(cx-6, cy-8, cx+6, cy-8, 190,145,55, eid+'.frame.top'); line(cx-6, cy+8, cx+6, cy+8, 190,145,55, eid+'.frame.bottom'); tri(cx-7, cy-8, cx, cy-14, cx+7, cy-8, 180,130,45, eid+'.top'); px(cx, cy-11, 255,255,200, eid+'.top.highlight'); for(var i=0;i<8;i++){ px(cx-10+Math.random()*20, cy+10+Math.random()*15, 255,225,120, eid+'.sparkles'); }"
+  },
+  "carried_over_entities": []
+}
