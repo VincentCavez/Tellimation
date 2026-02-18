@@ -1,12 +1,13 @@
-"""System prompt for scene generation via Gemini 3 Flash.
+"""System prompt for scene generation via Gemini.
 
-When use_reference_images=True (default), the pipeline uses:
-  - MANIFEST_SYSTEM_PROMPT (Step 1: manifest + NEG, no sprite code)
-  - SCENE_IMAGE_PROMPT_TEMPLATE (Step 2: reference illustration prompt)
-  - sprite_prompt.SPRITE_SYSTEM_PROMPT (Step 3: sprite code from image + manifest)
+Pipeline (use_reference_images=True):
+  Step 1: MANIFEST_SYSTEM_PROMPT (manifest + NEG, Gemini 3 Flash)
+  Step 2a: BACKGROUND_IMAGE_PROMPT (background image, Gemini 2.5 Flash Image)
+  Step 2b: ENTITY_IMAGE_PROMPT (per-entity image, Gemini 2.5 Flash Image × N)
+  Step 3: MASK_SYSTEM_PROMPT (sub-entity ID mask, Gemini 3 Flash)
 
-When use_reference_images=False (legacy), the pipeline uses:
-  - SCENE_SYSTEM_PROMPT (all-in-one: manifest + NEG + sprite code)
+Legacy (use_reference_images=False):
+  SCENE_SYSTEM_PROMPT (all-in-one: manifest + NEG + sprite code)
 """
 
 # ---------------------------------------------------------------------------
@@ -20,12 +21,12 @@ that creates pixel-art scenes for children (age 7-11) to narrate.
 # Task
 
 Generate a scene MANIFEST and NEG (Narrative Expectation Graph) as structured JSON. \
-Your job is Step 1 of a 3-step pipeline:
+Your job is Step 1 of a multi-step pipeline:
 
 1. **YOU (Step 1):** Manifest + NEG — define WHAT is in the scene, WHERE everything \
-is, and what the child should narrate.
-2. **Step 2 (later):** A reference illustration is generated from your descriptions.
-3. **Step 3 (later):** Sprite code is generated from the illustration + your manifest.
+is, the size of each entity, and what the child should narrate.
+2. **Step 2 (later):** Individual pixel art images are generated for each entity + background.
+3. **Step 3 (later):** Pixels are extracted from the images and assembled into the scene.
 
 Because your descriptions are the SOLE input for visual generation in later steps, \
 entity descriptions must be EXTREMELY rich, specific, and unambiguous. Vague or \
@@ -59,7 +60,9 @@ and spatial layout. This will be used to generate a reference illustration.>",
         "position": {"x": <int 0-279>, "y": <int 0-179>, "spatial_ref": "<on/under/beside entity_id or null>"},
         "emotion": "<emotion or null>",
         "pose": "<description of the entity's physical pose, stance, or orientation>",
-        "carried_over": <true if entity existed in previous scene, false if new>
+        "carried_over": <true if entity existed in previous scene, false if new>,
+        "width_hint": <int — estimated pixel width of this entity on the 280x180 canvas>,
+        "height_hint": <int — estimated pixel height of this entity>
       }
     ],
     "relations": [
@@ -105,6 +108,26 @@ and spatial layout. This will be used to generate a reference illustration.>",
 - At least 1 action for the main character.
 - Every entity MUST have a `pose` describing its physical stance or orientation.
 
+# Size hints (width_hint and height_hint)
+
+Every entity MUST include `width_hint` and `height_hint` — the estimated pixel \
+dimensions of the entity on the 280×180 canvas. These are used to generate \
+correctly-sized sprite images. Use these guidelines:
+
+- **Characters** (animals, people): width 40-60, height 50-70
+- **Trees**: width 60-90, height 70-100
+- **Small objects** (flowers, mushrooms, items): width 16-30, height 16-30
+- **Medium objects** (rocks, stumps, bushes): width 30-60, height 24-50
+- **Large objects** (houses, vehicles): width 60-100, height 50-90
+
+The position `(x, y)` should be the approximate CENTER of the entity on the canvas. \
+The entity's bounding box will span from `(x - width_hint/2, y - height_hint/2)` \
+to `(x + width_hint/2, y + height_hint/2)`.
+
+For characters standing on the ground, `y` should be roughly at the character's \
+vertical center (NOT the feet). Example: a 30px tall character at ground level \
+(ground line ~y=130) should have y ≈ 115.
+
 # CRITICAL: Entity description richness
 
 Your entity descriptions are the foundation for ALL visual generation downstream. \
@@ -133,9 +156,9 @@ yellow-green leaf tips"
 
 The canvas is 280 x 180 pixels. Ground line at approximately y=85.
 
-- Characters: 20-35px tall, feet touching ground (position y ~ 100-130).
-- Trees: 30-45px tall, trunk base on ground.
-- Small objects: 5-15px.
+- Characters: 40-70px tall, feet touching ground (position y ~ 100-145).
+- Trees: 60-100px tall, trunk base on ground.
+- Small objects: 16-30px.
 - Spread entities across the full 280px width.
 - Create DEPTH: some objects further back (smaller, higher y on ground).
 
@@ -190,39 +213,30 @@ For the first scene, all entities are new, `carried_over_entities` is empty.
 """
 
 # ---------------------------------------------------------------------------
-# Step 2 prompt: Reference illustration generation
+# Step 2a prompt: Background-only illustration generation
 # ---------------------------------------------------------------------------
 
-SCENE_IMAGE_PROMPT_TEMPLATE = """\
-Create a flat, simple, side-view scene illustration in a low-resolution pixel art \
-style. The image will be used as a COLOR AND COMPOSITION REFERENCE for generating \
-actual pixel art code, so clarity of shapes and colors is critical.
+BACKGROUND_IMAGE_PROMPT_TEMPLATE = """\
+Create a pixel art BACKGROUND ONLY — no characters, no objects, no entities. \
+Just the environment and atmosphere. Classic retro game style (SNES / GBA era).
 
-## Scene
+## Scene environment
 {scene_description}
 
-## Characters and Objects
-{entity_descriptions}
-
 ## Style Guidelines — CRITICAL
-- **Flat side-view** (like a 2D platformer): no perspective, no 3/4 angle
-- **Simple geometric shapes**: circles for heads, ellipses for bodies, triangles for ears/beaks
-- **Solid, saturated colors** with clear color boundaries between body parts — \
-  NO gradients, NO textures, NO complex shading, NO outlines
-- Each entity uses 2-3 distinct solid color zones (e.g., dark body, lighter belly, \
-  accent features) — these color zones must be clearly separated so they can be \
-  sampled and reproduced as layered geometric primitives
-- **Sky as a simple gradient** (light at top, deeper at bottom), **ground as a \
-  flat textured area** — keep background simple so entities stand out
-- Entities must be **well-separated** with clear spacing — no overlapping
-- Characters should be **20-30% of scene height**, positioned on the ground line
-- The ground line should be around 60% from the top of the image
-- **Emphasize distinctive features** with exaggerated size: a cat's ears should \
-  be pointy and prominent, a fish's tail should be large and visible, \
-  a robot's antenna should clearly stick out
-- Maintain the exact **poses and spatial relationships** described above
-- The overall feel should be **warm, friendly, child-appropriate**
+- **Classic pixel art style**: chunky, blocky pixels with visible individual pixels.
+- **Flat side-view** (like a 2D platformer): no perspective.
+- **Ground line at ~60% from top**. Sky above, ground below.
+- **Rich atmospheric gradients**: sky with color variation (lighter at horizon, \
+  darker above). Ground with rich texture (grass, sand, stone, water, etc.).
+- **Atmospheric details**: clouds, stars, sun glow, distant mountains, etc.
+- **NO characters or objects** — purely the background environment.
+- **Warm, friendly, child-appropriate** feel.
+- DO NOT use outlines — let color contrast define shapes.
 """
+
+# Legacy scene image prompt (kept for backward compatibility)
+SCENE_IMAGE_PROMPT_TEMPLATE = BACKGROUND_IMAGE_PROMPT_TEMPLATE
 
 # ---------------------------------------------------------------------------
 # Legacy all-in-one prompt (used when use_reference_images=False)
@@ -512,9 +526,9 @@ circ(cx-5, groundY-30, 4, 77, 160, 77, eid+'.canopy'); // highlight
 
 ## 7. Scale and positioning
 
-- Characters: 20-35px tall, feet touching ground (y ≈ 100-130).
-- Trees: 30-45px tall, trunk base on ground.
-- Small objects (mushrooms, flowers, rocks): 5-15px.
+- Characters: 40-70px tall, feet touching ground (y ≈ 100-145).
+- Trees: 60-100px tall, trunk base on ground.
+- Small objects (mushrooms, flowers, rocks): 16-30px.
 - Spread entities across the full 280px width for composition.
 - The scene must have DEPTH: place some objects further back (smaller, higher y) \
   and some closer (larger, lower y).
@@ -1125,7 +1139,7 @@ When drawing an entity type not covered by these blueprints:
 - [ ] Single-pixel details: whiskers, moss, cracks, spots, reflections
 - [ ] Cohesive palette: 3-4 shades per material, warm natural tones
 - [ ] Proper depth: entities spread across canvas, varied sizes
-- [ ] Characters 20-35px tall, feet near y=100-130 on the ground
+- [ ] Characters 40-70px tall, feet near y=100-145 on the ground
 - [ ] Follow the entity blueprint if one exists for this entity type
 - [ ] At least 8 distinct sub-entity IDs per entity
 

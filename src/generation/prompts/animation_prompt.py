@@ -30,11 +30,16 @@ Each element `buf[i]` is an object with these fields:
 - `r`, `g`, `b` — current color channels (0-255), mutable
 - `e` — entity ID string (e.g. "rabbit_01.body", "tree_02.trunk"), read-only
 - `_r`, `_g`, `_b` — **original** color channels (snapshot taken before animation), read-only
+- `_br`, `_bg`, `_bb` — **background** color channels (the scene background color at this pixel position), read-only
 
 The original colors `_r`, `_g`, `_b` are always available. Use them as the \
 baseline to compute animated colors. Before each frame the engine restores \
 pixels from the snapshot, so your function always receives original values \
 in `r`, `g`, `b` — you overwrite them for the current frame.
+
+The background colors `_br`, `_bg`, `_bb` store the background layer color \
+at each pixel position (sky, ground, etc.), BEFORE any entity was drawn. \
+Use these to erase entity pixels when moving them (see below).
 
 # Coordinate helpers
 
@@ -132,6 +137,54 @@ dissolves to nothing.
 - **Sprouting**: natural growth marker (leaf, sprout) appears at the \
 location of the missing information.
 
+# CRITICAL: Moving entity pixels
+
+When an animation MOVES entity pixels (shift, bounce, shake, settle, drift, \
+decomposition, etc.), you MUST follow this 3-step pattern to avoid ghost \
+duplicates at the original position:
+
+1. **Collect** target entity pixels into a temporary array (index + original colors from `_r`, `_g`, `_b`)
+2. **Blank** original positions by restoring background colors: \
+`buf[idx].r = buf[idx]._br; buf[idx].g = buf[idx]._bg; buf[idx].b = buf[idx]._bb;`
+3. **Redraw** pixels at the new shifted position using the saved original colors
+
+If you skip step 2, the entity will appear BOTH at the original position AND \
+at the new position (duplication artifact). NEVER skip the blanking step. \
+NEVER use `r=0, g=0, b=0` (black) for blanking — always use `_br, _bg, _bb` \
+to reveal the background underneath.
+
+```javascript
+// Correct pattern for moving entity pixels:
+var pixels = [];
+for (var i = 0; i < buf.length; i++) {
+  if (buf[i].e === prefix || buf[i].e.startsWith(prefix + '.')) {
+    pixels.push({i: i, r: buf[i]._r, g: buf[i]._g, b: buf[i]._b, e: buf[i].e});
+  }
+}
+// Step 2: blank originals with background
+for (var j = 0; j < pixels.length; j++) {
+  var idx = pixels[j].i;
+  buf[idx].r = buf[idx]._br;
+  buf[idx].g = buf[idx]._bg;
+  buf[idx].b = buf[idx]._bb;
+}
+// Step 3: redraw at new position
+for (var j = 0; j < pixels.length; j++) {
+  var p = pixels[j];
+  var x = p.i % PW;
+  var y = Math.floor(p.i / PW);
+  var nx = x + dx, ny = y + dy;  // your offset
+  if (nx >= 0 && nx < PW && ny >= 0 && ny < PH) {
+    var ni = ny * PW + nx;
+    buf[ni].r = p.r; buf[ni].g = p.g; buf[ni].b = p.b;
+  }
+}
+```
+
+This pattern applies to ANY animation that changes pixel positions. Animations \
+that only modify color/brightness in place (colorPop, pulse, isolate) do NOT \
+need this pattern.
+
 # Output JSON schema
 
 Return ONLY valid JSON (no markdown fences, no commentary):
@@ -172,7 +225,7 @@ Entity: rabbit_01
 ```json
 {
   "animation_type": "vibrating_pulse",
-  "code": "function animate(buf, PW, PH, t) {\\n  const prefix = 'rabbit_01';\\n  const amp = 2 * Math.sin(t * Math.PI) * Math.sin(t * Math.PI * 20);\\n  const dx = Math.round(amp);\\n  const copy = [];\\n  for (let i = 0; i < buf.length; i++) {\\n    if (buf[i].e === prefix || buf[i].e.startsWith(prefix + '.')) {\\n      const x = i % PW;\\n      const y = Math.floor(i / PW);\\n      copy.push({x: x, y: y, r: buf[i]._r, g: buf[i]._g, b: buf[i]._b, e: buf[i].e});\\n      buf[i].r = buf[i]._r;\\n      buf[i].g = buf[i]._g;\\n      buf[i].b = buf[i]._b;\\n    }\\n  }\\n  for (const p of copy) {\\n    const nx = p.x + dx;\\n    if (nx >= 0 && nx < PW) {\\n      const ni = p.y * PW + nx;\\n      buf[ni].r = p.r;\\n      buf[ni].g = p.g;\\n      buf[ni].b = p.b;\\n    }\\n  }\\n}",
+  "code": "function animate(buf, PW, PH, t) {\\n  const prefix = 'rabbit_01';\\n  const amp = 2 * Math.sin(t * Math.PI) * Math.sin(t * Math.PI * 20);\\n  const dx = Math.round(amp);\\n  if (dx === 0) return;\\n  const copy = [];\\n  for (let i = 0; i < buf.length; i++) {\\n    if (buf[i].e === prefix || buf[i].e.startsWith(prefix + '.')) {\\n      copy.push({i: i, x: i % PW, y: Math.floor(i / PW), r: buf[i]._r, g: buf[i]._g, b: buf[i]._b});\\n    }\\n  }\\n  for (const p of copy) {\\n    buf[p.i].r = buf[p.i]._br;\\n    buf[p.i].g = buf[p.i]._bg;\\n    buf[p.i].b = buf[p.i]._bb;\\n  }\\n  for (const p of copy) {\\n    const nx = p.x + dx;\\n    if (nx >= 0 && nx < PW) {\\n      const ni = p.y * PW + nx;\\n      buf[ni].r = p.r;\\n      buf[ni].g = p.g;\\n      buf[ni].b = p.b;\\n    }\\n  }\\n}",
   "duration_ms": 1000
 }
 ```
@@ -185,7 +238,7 @@ Entity: cat_01
 ```json
 {
   "animation_type": "settle",
-  "code": "function animate(buf, PW, PH, t) {\\n  const prefix = 'cat_01';\\n  const drop = Math.round(6 * Math.sin(t * Math.PI));\\n  const copy = [];\\n  for (let i = 0; i < buf.length; i++) {\\n    if (buf[i].e === prefix || buf[i].e.startsWith(prefix + '.')) {\\n      const x = i % PW;\\n      const y = Math.floor(i / PW);\\n      copy.push({x: x, y: y, r: buf[i]._r, g: buf[i]._g, b: buf[i]._b, e: buf[i].e});\\n    }\\n  }\\n  for (const p of copy) {\\n    const ny = p.y + drop;\\n    if (ny >= 0 && ny < PH) {\\n      const ni = ny * PW + p.x;\\n      buf[ni].r = p.r;\\n      buf[ni].g = p.g;\\n      buf[ni].b = p.b;\\n    }\\n  }\\n}",
+  "code": "function animate(buf, PW, PH, t) {\\n  const prefix = 'cat_01';\\n  const drop = Math.round(6 * Math.sin(t * Math.PI));\\n  if (drop === 0) return;\\n  const copy = [];\\n  for (let i = 0; i < buf.length; i++) {\\n    if (buf[i].e === prefix || buf[i].e.startsWith(prefix + '.')) {\\n      copy.push({i: i, x: i % PW, y: Math.floor(i / PW), r: buf[i]._r, g: buf[i]._g, b: buf[i]._b});\\n    }\\n  }\\n  for (const p of copy) {\\n    buf[p.i].r = buf[p.i]._br;\\n    buf[p.i].g = buf[p.i]._bg;\\n    buf[p.i].b = buf[p.i]._bb;\\n  }\\n  for (const p of copy) {\\n    const ny = p.y + drop;\\n    if (ny >= 0 && ny < PH) {\\n      const ni = ny * PW + p.x;\\n      buf[ni].r = p.r;\\n      buf[ni].g = p.g;\\n      buf[ni].b = p.b;\\n    }\\n  }\\n}",
   "duration_ms": 1200
 }
 ```

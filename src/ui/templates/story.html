@@ -72,19 +72,45 @@
       function renderScene(scene) {
         buf.clear();
 
-        // Execute carried-over sprites (from story_state stored server-side)
         var spriteCode = scene.sprite_code || {};
-        var manifest = scene.manifest || {};
-        var carriedOver = scene.carried_over_entities || [];
+        var bgEntry = spriteCode.bg || null;
 
-        // Draw all sprite code entries
+        // Collect non-bg entity IDs
+        var entityEids = [];
         for (var eid in spriteCode) {
-          if (spriteCode.hasOwnProperty(eid)) {
-            executeSpriteCode(spriteCode[eid], buf);
+          if (spriteCode.hasOwnProperty(eid) && eid !== 'bg') {
+            entityEids.push(eid);
           }
         }
 
-        renderer.render();
+        function renderEntitiesAndFlush() {
+          buf.snapshotBackground();
+          for (var i = 0; i < entityEids.length; i++) {
+            try {
+              renderSpriteEntry(entityEids[i], spriteCode[entityEids[i]], buf);
+            } catch (e) {
+              console.warn('[renderScene] Failed to render', entityEids[i], e);
+            }
+          }
+          renderer.render();
+        }
+
+        // Render background first (may be async for image_background format)
+        if (bgEntry && bgEntry.format === 'image_background') {
+          var p = executeImageBackground(bgEntry, buf);
+          if (p && typeof p.then === 'function') {
+            p.then(renderEntitiesAndFlush);
+          } else {
+            renderEntitiesAndFlush();
+          }
+        } else {
+          if (bgEntry) {
+            try { renderSpriteEntry('bg', bgEntry, buf); } catch (e) {
+              console.warn('[renderScene] Failed to render bg', e);
+            }
+          }
+          renderEntitiesAndFlush();
+        }
       }
 
       // -- WebSocket --

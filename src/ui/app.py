@@ -32,6 +32,10 @@ from src.persistence import (
     create_story,
 )
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(name)s %(levelname)s %(message)s",
+)
 logger = logging.getLogger(__name__)
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -144,6 +148,8 @@ class SessionState:
         self.current_story_index: int = 0
         # Reference images extracted from generated scenes (parallel to branches)
         self.branch_images: Dict[int, bytes] = {}
+        # Entity images extracted from generated scenes (parallel to branches)
+        self.branch_entity_images: Dict[int, Dict[str, bytes]] = {}
 
 
 # ---------------------------------------------------------------------------
@@ -253,15 +259,15 @@ async def _handle_generate_initial(
     session: SessionState,
     websocket: WebSocket,
 ) -> None:
-    """Generate 3 initial scene candidates, or return existing stories."""
+    """Generate 2 initial scene candidates, or return existing stories."""
     try:
         pid = session.participant_id
         existing_count = story_count(pid)
 
-        # If participant already has >= 3 stories, send them instead of generating
-        if existing_count >= 3:
+        # If participant already has >= 2 stories, send them instead of generating
+        if existing_count >= 2:
             existing_scenes = load_story_first_scenes(pid)
-            if len(existing_scenes) >= 3:
+            if len(existing_scenes) >= 2:
                 session.branches = existing_scenes
                 await websocket.send_json({
                     "type": "initial_scenes",
@@ -270,30 +276,67 @@ async def _handle_generate_initial(
                 })
                 return
 
-        # Otherwise generate fresh scenes
-        tasks = []
-        for seed in range(1, 4):
-            tasks.append(
-                generate_scene(
-                    api_key=session.api_key,
-                    story_state=None,
-                    student_profile=session.student_profile,
-                    seed_index=seed,
-                    commit_to_state=False,
-                )
+        # Generate fresh scenes in PARALLEL with progress
+        total_scenes = 2
+        session.branch_images = {}
+        session.branch_entity_images = {}
+
+        # Notify client that generation is starting
+        await websocket.send_json({
+            "type": "generation_progress",
+            "scene_index": 0,
+            "total_scenes": total_scenes,
+            "status": "generating",
+        })
+
+        # Build progress callbacks — each scene sends its own progress
+        def _make_progress_cb(seed: int):
+            async def progress_cb(step_name: str) -> None:
+                await websocket.send_json({
+                    "type": "generation_step",
+                    "scene_index": seed,
+                    "total_scenes": total_scenes,
+                    "step": step_name,
+                })
+            return progress_cb
+
+        # Launch all scenes in parallel (like generate_branches)
+        tasks = [
+            generate_scene(
+                api_key=session.api_key,
+                story_state=None,
+                student_profile=session.student_profile,
+                seed_index=seed,
+                commit_to_state=False,
+                progress_callback=_make_progress_cb(seed),
             )
+            for seed in range(1, total_scenes + 1)
+        ]
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
-        scenes = []
-        session.branch_images = {}
-        for r in results:
-            if isinstance(r, Exception):
-                logger.warning("Initial scene generation failed: %s", r)
+        # Collect results, skipping failures
+        scenes: List[Dict[str, Any]] = []
+        for i, result in enumerate(results):
+            if isinstance(result, Exception):
+                logger.warning("Initial scene %d generation failed: %s", i + 1, result)
                 continue
-            img = _pop_reference_image(r)
+            img = _pop_reference_image(result)
             if img:
                 session.branch_images[len(scenes)] = img
-            scenes.append(r)
+            ent_imgs = _pop_entity_images(result)
+            if ent_imgs:
+                session.branch_entity_images[len(scenes)] = ent_imgs
+            scenes.append(result)
+
+        # Save each scene immediately as its own story folder
+        for i, scene in enumerate(scenes):
+            story_idx, _ = create_story(pid)
+            ref_img = session.branch_images.get(i)
+            ent_imgs = session.branch_entity_images.get(i)
+            save_scene(pid, story_idx, scene,
+                       reference_image=ref_img, entity_images=ent_imgs)
+            # Tag with story index so _handle_select_scene won't re-create
+            scene["_story_index"] = story_idx
 
         session.branches = scenes
         await websocket.send_json({"type": "initial_scenes", "scenes": scenes})
@@ -315,9 +358,20 @@ async def _handle_generate_one_more(
             story_state=session.story_state if session.story_state.scenes else StoryState(),
             student_profile=session.student_profile,
         )
+        idx = len(session.branches)
         img = _pop_reference_image(scene)
         if img:
-            session.branch_images[len(session.branches)] = img
+            session.branch_images[idx] = img
+        ent_imgs = _pop_entity_images(scene)
+        if ent_imgs:
+            session.branch_entity_images[idx] = ent_imgs
+
+        # Save immediately as a new story folder
+        story_idx, _ = create_story(session.participant_id)
+        save_scene(session.participant_id, story_idx, scene,
+                   reference_image=img, entity_images=ent_imgs)
+        scene["_story_index"] = story_idx
+
         session.branches.append(scene)
         await websocket.send_json({"type": "one_more_scene", "scene": scene})
 
@@ -341,8 +395,9 @@ async def _handle_select_scene(
     scene = session.branches[index]
     session.current_scene = scene
 
-    # Retrieve the reference image for this branch (if any)
+    # Retrieve the reference image and entity images for this branch (if any)
     ref_image = session.branch_images.pop(index, None)
+    ent_images = session.branch_entity_images.pop(index, None)
 
     # Check if this is an existing story loaded from disk
     story_idx = scene.pop("_story_index", None)
@@ -353,7 +408,11 @@ async def _handle_select_scene(
         # New story — create a story folder and persist the first scene
         story_idx, _ = create_story(session.participant_id)
         session.current_story_index = story_idx
-        save_scene(session.participant_id, story_idx, scene, reference_image=ref_image)
+        save_scene(
+            session.participant_id, story_idx, scene,
+            reference_image=ref_image,
+            entity_images=ent_images,
+        )
 
     # Commit to story state
     session.story_state.add_scene(
@@ -386,9 +445,8 @@ async def _handle_binary(
             "transcription": result.transcription,
             "scene_progress": session.narration_loop.scene_progress,
         })
-        # Persist profile periodically (every 5 utterances)
-        if session.student_profile.total_utterances % 5 == 0:
-            save_student_profile(session.participant_id, session.student_profile)
+        # Persist profile after every utterance
+        save_student_profile(session.participant_id, session.student_profile)
     except Exception as e:
         logger.exception("Audio processing error")
         await websocket.send_json({"type": "error", "message": str(e)})
@@ -422,10 +480,14 @@ async def _handle_generate_branches(
             student_profile=session.student_profile,
         )
         session.branch_images = {}
+        session.branch_entity_images = {}
         for i, b in enumerate(branches):
             img = _pop_reference_image(b)
             if img:
                 session.branch_images[i] = img
+            ent_imgs = _pop_entity_images(b)
+            if ent_imgs:
+                session.branch_entity_images[i] = ent_imgs
         session.branches = branches
         await websocket.send_json({"type": "branches", "scenes": branches})
 
@@ -449,12 +511,17 @@ async def _handle_select_branch(
     scene = session.branches[index]
     session.current_scene = scene
 
-    # Retrieve the reference image for this branch (if any)
+    # Retrieve the reference image and entity images for this branch (if any)
     ref_image = session.branch_images.pop(index, None)
+    ent_images = session.branch_entity_images.pop(index, None)
 
     # Persist the scene to the current story folder
     if session.current_story_index:
-        save_scene(session.participant_id, session.current_story_index, scene, reference_image=ref_image)
+        save_scene(
+            session.participant_id, session.current_story_index, scene,
+            reference_image=ref_image,
+            entity_images=ent_images,
+        )
 
     # Commit to story state
     session.story_state.add_scene(
@@ -485,6 +552,16 @@ def _pop_reference_image(scene: Dict[str, Any]) -> Optional[bytes]:
     so we pop them out and return them separately.
     """
     return scene.pop("_reference_image_bytes", None)
+
+
+def _pop_entity_images(scene: Dict[str, Any]) -> Optional[Dict[str, bytes]]:
+    """Extract and remove entity image bytes from a scene dict.
+
+    Entity images are binary PNG data (one per entity) attached by the
+    pipeline for debugging/persistence.  They cannot be JSON-serialized,
+    so we pop them before sending over WebSocket.
+    """
+    return scene.pop("_entity_image_bytes", None)
 
 
 def _init_narration_loop(

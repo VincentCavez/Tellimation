@@ -1,0 +1,27 @@
+{
+  "narrative_text": "A cat on a wall.",
+  "branch_summary": "Cat story",
+  "manifest": {
+    "scene_id": "scene_01",
+    "entities": [
+      {
+        "id": "cat_01",
+        "type": "cat",
+        "properties": {},
+        "position": {
+          "x": 50,
+          "y": 50
+        }
+      }
+    ],
+    "relations": [],
+    "actions": []
+  },
+  "neg": {
+    "targets": [],
+    "error_exclusions": [],
+    "min_coverage": 0.7
+  },
+  "sprite_code": {},
+  "carried_over_entities": []
+}

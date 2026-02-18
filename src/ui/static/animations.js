@@ -174,21 +174,12 @@ function animate(buf, PW, PH, t) {
     }
   }
 
-  // Clear originals first, then redraw shifted
+  // Blank original positions — restore background color underneath
   for (var j = 0; j < pixels.length; j++) {
     var idx = pixels[j];
-    buf[idx].r = buf[idx]._r;
-    buf[idx].g = buf[idx]._g;
-    buf[idx].b = buf[idx]._b;
-  }
-
-  // Blank the target region
-  for (var j = 0; j < pixels.length; j++) {
-    var idx = pixels[j];
-    var x = idx % PW;
-    var y = (idx - x) / PW;
-    // Restore underlying background color at original position
-    buf[idx].r = 0; buf[idx].g = 0; buf[idx].b = 0;
+    buf[idx].r = buf[idx]._br || 0;
+    buf[idx].g = buf[idx]._bg || 0;
+    buf[idx].b = buf[idx]._bb || 0;
   }
 
   // Redraw shifted
@@ -286,10 +277,12 @@ function animate(buf, PW, PH, t) {
   // Sort by y ascending (for upward shift, process top-to-bottom)
   pixels.sort(function(a, b) { return a - b; });
 
-  // Blank original positions
+  // Blank original positions — restore background color underneath
   for (var j = 0; j < pixels.length; j++) {
     var idx = pixels[j];
-    buf[idx].r = 0; buf[idx].g = 0; buf[idx].b = 0;
+    buf[idx].r = buf[idx]._br || 0;
+    buf[idx].g = buf[idx]._bg || 0;
+    buf[idx].b = buf[idx]._bb || 0;
   }
 
   // Redraw shifted vertically

@@ -19,7 +19,7 @@ class PixelBuffer {
 
   clear() {
     for (let i = 0; i < this.data.length; i++) {
-      this.data[i] = { r: 0, g: 0, b: 0, e: '' };
+      this.data[i] = { r: 0, g: 0, b: 0, e: '', _br: 0, _bg: 0, _bb: 0 };
     }
   }
 
@@ -226,6 +226,15 @@ class PixelBuffer {
     return { x1, y1, x2, y2 };
   }
 
+  snapshotBackground() {
+    for (let i = 0; i < this.data.length; i++) {
+      const p = this.data[i];
+      p._br = p.r;
+      p._bg = p.g;
+      p._bb = p.b;
+    }
+  }
+
   snapshot() {
     for (let i = 0; i < this.data.length; i++) {
       const p = this.data[i];
@@ -386,9 +395,138 @@ function executeSpriteCode(code, pixelBuffer) {
 }
 
 // ---------------------------------------------------------------------------
+// executePaletteSprite — render a palette-indexed pixel grid with entity masks
+// ---------------------------------------------------------------------------
+
+function _normalizeGrid(val) {
+  if (Array.isArray(val)) return val.join('');
+  return (typeof val === 'string') ? val : '';
+}
+
+function executePaletteSprite(spriteData, pixelBuffer) {
+  const { x, y, width, height, palette, sub_entities } = spriteData;
+  const pixels = _normalizeGrid(spriteData.pixels);
+  const mask = _normalizeGrid(spriteData.mask);
+  const rootId = spriteData.rootId || '';
+  if (!pixels || !palette) return;
+
+  for (let row = 0; row < height; row++) {
+    for (let col = 0; col < width; col++) {
+      const idx = row * width + col;
+      if (idx >= pixels.length) continue;
+      const palIdx = parseInt(pixels[idx], 16);
+      if (palIdx === 0) continue; // transparent
+      const colorIdx = palIdx - 1; // palette is 1-indexed (0=transparent)
+      if (colorIdx < 0 || colorIdx >= palette.length) continue;
+      const color = palette[colorIdx];
+      let entityId = rootId;
+      if (mask && idx < mask.length) {
+        const maskIdx = parseInt(mask[idx], 16);
+        if (maskIdx > 0 && sub_entities && maskIdx - 1 < sub_entities.length) {
+          entityId = sub_entities[maskIdx - 1];
+        }
+      }
+      pixelBuffer._set(x + col, y + row, color[0], color[1], color[2], entityId);
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// executeRawSprite — render a raw_sprite with direct RGB pixels + entity masks
+// ---------------------------------------------------------------------------
+
+function executeRawSprite(spriteData, pixelBuffer) {
+  const { x, y, w, h, pixels, mask } = spriteData;
+  if (!pixels || !w || !h) return;
+
+  for (let row = 0; row < h; row++) {
+    for (let col = 0; col < w; col++) {
+      const idx = row * w + col;
+      if (idx >= pixels.length) continue;
+      const px = pixels[idx];
+      if (px === null || px === undefined) continue; // transparent
+      const entityId = (mask && idx < mask.length && mask[idx]) || '';
+      pixelBuffer._set(x + col, y + row, px[0], px[1], px[2], entityId);
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// executeImageBackground — render a base64 PNG directly into the pixel buffer
+// ---------------------------------------------------------------------------
+
+function executeImageBackground(spriteData, pixelBuffer) {
+  // This is async because Image loading is async in browsers.
+  // For synchronous rendering (e.g. thumbnails), we use a fallback.
+  // The caller should await the returned Promise if possible.
+  var b64 = spriteData.image_base64;
+  var bx = spriteData.x || 0;
+  var by = spriteData.y || 0;
+  var bw = spriteData.width || pixelBuffer.width;
+  var bh = spriteData.height || pixelBuffer.height;
+
+  if (!b64) return Promise.resolve();
+
+  return new Promise(function(resolve) {
+    var img = new Image();
+    img.onload = function() {
+      // Draw to an offscreen canvas to read pixel data
+      var offCanvas = document.createElement('canvas');
+      offCanvas.width = bw;
+      offCanvas.height = bh;
+      var offCtx = offCanvas.getContext('2d');
+      offCtx.imageSmoothingEnabled = false;
+      offCtx.drawImage(img, 0, 0, bw, bh);
+      var imgData = offCtx.getImageData(0, 0, bw, bh);
+      var px = imgData.data;
+
+      for (var row = 0; row < bh; row++) {
+        for (var col = 0; col < bw; col++) {
+          var srcIdx = (row * bw + col) * 4;
+          pixelBuffer._set(
+            bx + col, by + row,
+            px[srcIdx], px[srcIdx + 1], px[srcIdx + 2],
+            'bg'
+          );
+        }
+      }
+      resolve();
+    };
+    img.onerror = function() {
+      console.warn('[executeImageBackground] Failed to load background image');
+      resolve();
+    };
+    img.src = 'data:image/png;base64,' + b64;
+  });
+}
+
+// ---------------------------------------------------------------------------
+// renderSpriteEntry — detect format and dispatch to the right renderer
+// ---------------------------------------------------------------------------
+
+function renderSpriteEntry(eid, entry, pixelBuffer) {
+  if (typeof entry === 'string') {
+    executeSpriteCode(entry, pixelBuffer);
+  } else if (entry && entry.format === 'raw_sprite') {
+    executeRawSprite(entry, pixelBuffer);
+  } else if (entry && entry.format === 'palette_grid') {
+    entry.rootId = eid;
+    executePaletteSprite(entry, pixelBuffer);
+  } else if (entry && entry.format === 'image_background') {
+    // Returns a Promise — caller should handle async if needed
+    return executeImageBackground(entry, pixelBuffer);
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Exports
 // ---------------------------------------------------------------------------
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { PixelBuffer, Renderer, EntityRegistry, executeSpriteCode, PW, PH };
+  module.exports = {
+    PixelBuffer, Renderer, EntityRegistry,
+    executeSpriteCode, executePaletteSprite, executeRawSprite,
+    executeImageBackground, renderSpriteEntry,
+    PW, PH
+  };
 }

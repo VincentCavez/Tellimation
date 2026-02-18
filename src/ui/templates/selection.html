@@ -13,24 +13,15 @@
     <div class="sel-title" id="sel-title">Let's tell a <span class="accent">story</span> together!</div>
     <div class="sel-sub" id="sel-sub">Pick a scene to begin your adventure</div>
 
-    <div class="thumbnails" id="thumbnails">
-      <!-- Skeleton loaders shown while scenes generate -->
-      <div class="thumbnail-card skeleton-card">
-        <div class="skeleton-canvas"></div>
-        <div class="skeleton-text"></div>
-        <div class="skeleton-text-2"></div>
+    <!-- Progress bar shown during generation -->
+    <div class="progress-container" id="progress-container">
+      <div class="progress-bar-wrap">
+        <div class="progress-bar" id="progress-bar"></div>
       </div>
-      <div class="thumbnail-card skeleton-card">
-        <div class="skeleton-canvas"></div>
-        <div class="skeleton-text"></div>
-        <div class="skeleton-text-2"></div>
-      </div>
-      <div class="thumbnail-card skeleton-card">
-        <div class="skeleton-canvas"></div>
-        <div class="skeleton-text"></div>
-        <div class="skeleton-text-2"></div>
-      </div>
+      <div class="progress-label" id="progress-label">Preparing your stories...</div>
     </div>
+
+    <div class="thumbnails" id="thumbnails" style="display:none"></div>
 
     <div class="more-wrap">
       <button class="btn btn-ghost" id="btn-one-more" style="display:none">
@@ -54,8 +45,57 @@
       const btnOneMore = document.getElementById('btn-one-more');
       const selTitle = document.getElementById('sel-title');
       const selSub = document.getElementById('sel-sub');
+      const progressContainer = document.getElementById('progress-container');
+      const progressBar = document.getElementById('progress-bar');
+      const progressLabel = document.getElementById('progress-label');
       let branches = [];
       let fromDisk = false;
+
+      // Step weights for progress calculation (% within a single scene)
+      var stepWeights = {
+        manifest: 20,
+        images: 45,
+        masks: 85,
+        assembly: 95
+      };
+
+      var stepLabels = {
+        manifest: 'Imagining a story...',
+        images: 'Drawing the scene...',
+        masks: 'Adding details...',
+        assembly: 'Almost ready...'
+      };
+
+      // Track per-scene progress for parallel generation
+      var sceneProgressMap = {};
+
+      function updateProgress(sceneIndex, totalScenes, stepName) {
+        // Store progress for this scene (scenes advance independently)
+        sceneProgressMap[sceneIndex] = stepWeights[stepName] || 0;
+
+        // Overall progress = average across all scenes
+        var total = 0;
+        for (var key in sceneProgressMap) {
+          total += sceneProgressMap[key];
+        }
+        var overallPct = Math.min(total / totalScenes, 99);
+
+        progressBar.style.width = overallPct + '%';
+        var label = stepLabels[stepName] || 'Working...';
+        progressLabel.textContent = label;
+      }
+
+      function showProgress() {
+        progressContainer.style.display = '';
+        container.style.display = 'none';
+        progressBar.style.width = '2%';
+        progressLabel.textContent = 'Preparing your stories...';
+      }
+
+      function hideProgress() {
+        progressContainer.style.display = 'none';
+        container.style.display = '';
+      }
 
       // Connect WebSocket
       const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -66,12 +106,23 @@
       );
 
       ws.onopen = function() {
+        showProgress();
         // Request initial scenes
         ws.send(JSON.stringify({ type: 'generate_initial_scenes' }));
       };
 
       ws.onmessage = function(event) {
         const msg = JSON.parse(event.data);
+
+        if (msg.type === 'generation_progress') {
+          // Scene generation started
+          updateProgress(msg.scene_index, msg.total_scenes, 'manifest');
+        }
+
+        if (msg.type === 'generation_step') {
+          // Pipeline step completed
+          updateProgress(msg.scene_index, msg.total_scenes, msg.step);
+        }
 
         if (msg.type === 'initial_scenes') {
           branches = msg.scenes;
@@ -80,6 +131,7 @@
             selTitle.innerHTML = 'Welcome back! <span class="accent">Continue</span> a story';
             selSub.textContent = 'Pick a previous story to continue, or start a new one';
           }
+          hideProgress();
           renderThumbnails(branches);
           btnOneMore.style.display = fromDisk ? 'none' : '';
         }
@@ -91,11 +143,15 @@
 
         if (msg.type === 'error') {
           console.error('Server error:', msg.message);
+          hideProgress();
+          container.style.display = '';
           container.innerHTML = '<p style="color:var(--red)">' + msg.message + '</p>';
         }
       };
 
       ws.onerror = function() {
+        hideProgress();
+        container.style.display = '';
         container.innerHTML = '<p style="color:var(--red)">Connection error. Please reload.</p>';
       };
 

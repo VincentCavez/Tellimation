@@ -209,8 +209,9 @@ class TestWebSocket:
             ws.send_json({"type": "unknown_type"})
             # The connection stays open (no error response for unknown types)
 
+    @patch("src.ui.app.story_count", return_value=0)
     @patch("src.ui.app.generate_scene")
-    def test_generate_initial_scenes(self, mock_gen, client):
+    def test_generate_initial_scenes(self, mock_gen, mock_count, client):
         scene = {
             "narrative_text": "A rabbit in a forest.",
             "branch_summary": "A brave rabbit.",
@@ -225,7 +226,7 @@ class TestWebSocket:
             "carried_over_entities": [],
         }
 
-        # generate_scene is async, return the scene for all 3 calls
+        # generate_scene is async, return the scene for all 2 calls
         async def fake_gen(**kwargs):
             return scene
 
@@ -233,9 +234,12 @@ class TestWebSocket:
 
         with client.websocket_connect("/ws?api_key=testkey&participant_id=P01") as ws:
             ws.send_json({"type": "generate_initial_scenes"})
+            # Consume progress messages until we get initial_scenes
             msg = ws.receive_json()
+            while msg["type"] in ("generation_progress", "generation_step"):
+                msg = ws.receive_json()
             assert msg["type"] == "initial_scenes"
-            assert len(msg["scenes"]) == 3
+            assert len(msg["scenes"]) == 2
             assert msg["scenes"][0]["narrative_text"] == "A rabbit in a forest."
 
     @patch("src.ui.app.generate_scene")

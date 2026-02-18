@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from pydantic import BaseModel, Field
 
@@ -9,7 +9,7 @@ from src.models.scene import SceneManifest
 
 class ActiveEntity(BaseModel):
     type: str
-    sprite_code: str = ""
+    sprite_code: Union[str, Dict[str, Any]] = ""
     first_appeared: str = ""
     last_position: Dict = Field(default_factory=dict)
 
@@ -27,7 +27,7 @@ class StoryState(BaseModel):
         narrative_text: str,
         manifest: Dict,
         neg: Dict,
-        sprite_code: Optional[Dict[str, str]] = None,
+        sprite_code: Optional[Dict[str, Any]] = None,
     ) -> None:
         self.scenes.append({
             "scene_id": scene_id,
@@ -46,7 +46,7 @@ class StoryState(BaseModel):
                         first_appeared=scene_id,
                     )
 
-    def get_entity_sprite(self, entity_id: str) -> Optional[str]:
+    def get_entity_sprite(self, entity_id: str) -> Optional[Union[str, Dict[str, Any]]]:
         entity = self.active_entities.get(entity_id)
         if entity is None:
             return None

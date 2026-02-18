@@ -19,6 +19,8 @@ class Entity(BaseModel):
     emotion: Optional[str] = None
     pose: Optional[str] = None
     carried_over: bool = False
+    width_hint: Optional[int] = None
+    height_hint: Optional[int] = None
 
 
 class Relation(BaseModel):

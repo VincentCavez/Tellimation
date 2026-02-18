@@ -1,0 +1,15 @@
+{
+  "error_counts": {
+    "ACTION": 1,
+    "SPATIAL": 1,
+    "PROPERTY_COLOR": 1
+  },
+  "error_trend": {},
+  "difficult_entities": [
+    "turtle_01"
+  ],
+  "strong_areas": [],
+  "scenes_completed": 0,
+  "corrections_after_animation": 0,
+  "total_utterances": 1
+}

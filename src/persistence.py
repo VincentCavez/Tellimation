@@ -141,6 +141,7 @@ def save_scene(
     story_index: int,
     scene_data: Dict[str, Any],
     reference_image: Optional[bytes] = None,
+    entity_images: Optional[Dict[str, bytes]] = None,
 ) -> None:
     """Save a scene (manifest + NEG + sprites + metadata) to a story folder.
 
@@ -152,6 +153,10 @@ def save_scene(
         - branch_summary
         - scene_description
         - carried_over_entities
+
+    Optionally saves:
+        - reference_image: background PNG bytes
+        - entity_images: dict mapping entity_id -> PNG bytes (for debugging)
     """
     sdir = _story_dir(participant_id, story_index)
     scene_id = scene_data.get("manifest", {}).get("scene_id", "unknown")
@@ -167,6 +172,13 @@ def save_scene(
     if reference_image:
         img_path = sdir / f"{scene_id}_ref.png"
         img_path.write_bytes(reference_image)
+
+    # Save entity images if provided (for debugging)
+    if entity_images:
+        for eid, img_bytes in entity_images.items():
+            img_path = sdir / f"{scene_id}_{eid}.png"
+            img_path.write_bytes(img_bytes)
+            logger.debug("Saved entity image %s for scene %s", eid, scene_id)
 
     logger.debug(
         "Saved scene %s to story_%03d for %s",
