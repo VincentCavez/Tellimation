@@ -6,9 +6,29 @@ storytelling system that uses pixel-art scenes.
 
 # Task
 
-Given an error type detected in a child's narration and the target entity, \
-generate JavaScript animation code that visually scaffolds the correct answer. \
-The animation should be gentle, playful, and age-appropriate (ages 7-11).
+Given an error detected in a child's narration, the target entity, and the \
+specific discrepancy (what the child said vs. scene truth), generate \
+JavaScript animation code that visually reveals the correct answer through \
+cartoon physics. The animation should make the child think "Oh, it's not X, \
+it's Y" without any words — purely through visual behavior.
+
+The animation must be **semantically unique** to each situation. Do NOT \
+apply generic effects. Instead, design an animation that directly \
+illustrates the contrast between the child's claim and the scene truth.
+
+# Animation Design Philosophy
+
+Five meta-principles guide all animations:
+
+1. **The object resists the false claim** — it briefly attempts to become \
+what was claimed, fails, and snaps back to its truth.
+2. **The true property intensifies** — the actual state becomes more \
+saturated, more extreme, undeniable.
+3. **Contrast is made visible** — juxtaposition, comparison, before/after \
+to highlight the difference.
+4. **Physics demonstrates truth** — gravity, magnetism, force, resistance, \
+flow all visualize the actual state.
+5. **The body/object performs its truth** — through behavior, not symbols.
 
 # Animation function signature
 
@@ -49,93 +69,178 @@ const x = i % PW;
 const y = Math.floor(i / PW);
 ```
 
-# Entity prefix matching
+# Sub-entity targeting
 
-Use `buf[i].e.startsWith(prefix)` to target entity pixels:
-- `buf[i].e.startsWith('rabbit_01')` — ALL rabbit pixels
-- `buf[i].e.startsWith('rabbit_01.head')` — head + ears + eyes + nose
-- `buf[i].e.startsWith('rabbit_01.head.ears')` — both ears only
+Each pixel carries a hierarchical entity ID in `buf[i].e`, such as:
+- `rabbit_01.body` — torso
+- `rabbit_01.head.ears.left` — left ear specifically
+- `rabbit_01.legs.front_left` — front left leg
 
-IMPORTANT: always add a dot boundary check if needed to avoid false positives:
+Use prefix matching to target at any granularity:
 ```javascript
 buf[i].e === 'rabbit_01' || buf[i].e.startsWith('rabbit_01.')
 ```
 
-# Animation Grammar
+Leverage sub-entity IDs for **precise, part-level animations**: twist an \
+ear, bob a head, wiggle legs, brighten just the eyes. The more specific \
+the targeting, the more expressive and clear the animation.
 
-Choose the most semantically appropriate animation for the error type from \
-this grammar. Each category lists candidate animations:
+# Animation Grammar — Cartoon Physics Responses
+
+Each error type has a core principle and a repertoire of responses. \
+Choose the response that best illustrates the SPECIFIC discrepancy \
+(what the child said vs. what's true). Every situation is unique — \
+design accordingly.
 
 ## SPATIAL errors (prepositions, location)
-- **Transparency Reveal**: occluding object becomes translucent to show \
-actual spatial relationship. Fade alpha of occluder while keeping target solid.
-- **Settle**: object sinks into its actual position with soft bounce. \
-Shift y-coordinates with easing: drop down then bounce back.
+Core: Spatial truth is revealed by exaggerating the actual spatial \
+relationship — making containment more containing, distance more distant, \
+contact more tangible.
 
-## PROPERTY_COLOR errors (wrong/missing color descriptor)
-- **Color Pop**: desaturate everything except the target entity to \
-emphasize its actual color. Target can glow or pulse.
+Responses: The reference object becomes translucent or lifts to reveal \
+what's beneath. The object settles more firmly into its actual position \
+with satisfying weight. The container shows its emptiness or its \
+fullness. The actual distance stretches to show a visible gap, or \
+objects magnetically snap together. A plumb line drops, gravity arrows \
+appear to demonstrate which is truly higher. The scene rotates slightly \
+to reveal true depth order.
 
-## PROPERTY_SIZE errors (wrong/missing size descriptor)
-- **Scale Strain**: entity briefly attempts the claimed (wrong) size, \
-fails, and returns to actual size with a wobble.
+## PROPERTY errors (PROPERTY_COLOR, PROPERTY_SIZE, PROPERTY_WEIGHT, PROPERTY_TEMPERATURE, PROPERTY_STATE)
+Core: The object tries to become what was claimed and fails, then \
+settles firmly into what it actually is. The actual property intensifies \
+to the point of undeniability.
 
-## PROPERTY_WEIGHT errors (wrong/missing weight descriptor)
-- **Weight Response**: environmental surface sags for heavy entities, \
-or entity drifts upward for light ones.
-
-## PROPERTY_TEMPERATURE errors (wrong/missing temperature descriptor)
-- **Emanation**: particle-like pixel effects radiating from the entity. \
-Steam particles for hot, frost/ice pixels for cold, sparkles for new.
-
-## PROPERTY_STATE errors (wrong/missing state descriptor)
-- **Physiological Tell**: small involuntary vital sign (blink, tear, \
-tail wag) revealing actual state.
+PROPERTY_COLOR: Target entity's actual color pulses and glows while \
+surroundings desaturate. The color becomes undeniable.
+PROPERTY_SIZE: Object attempts to inflate/compress, strains, then \
+springs back to actual size. Surrounding objects loom by comparison.
+PROPERTY_WEIGHT: Breeze catches a light object (drifts up). Surface \
+sags under heavy object (cracks, strain). Character near it struggles \
+or lifts effortlessly.
+PROPERTY_TEMPERATURE: Frost forms for cold, steam rises for hot, heat \
+waves shimmer, icicles appear. Nearby objects react (wilt, shiver).
+PROPERTY_STATE: Vital signs display (eyes snap open, sleep deepens \
+with ZZZs, sadness shows through tears/slump, courage through puffed \
+chest).
+Texture: Something pokes soft objects (they squish). Hard objects \
+bounce impacts with stars. Open things yawn wider, closed things \
+seal tighter.
 
 ## TEMPORAL errors (tense, time)
-- **Afterimage/Rewind**: ghost duplicate in previous action pose fades \
-while character remains in current state. Offset a faint copy.
-- **Anticipation Hold**: character frozen in "about to act" pose. \
-Slight tremble or coiled posture.
-- **Melting**: visual distortion indicating tense inconsistency. \
-Pixels droop downward gradually.
+Core: Time is visualized through motion residue (past), immediate \
+presence (present), and coiled potential (future).
+
+Past action: Ghostly afterimages trail and fade. Dust settles. \
+The character is in post-action pose.
+Future action: Anticipation pose — coiled, tense, ready. Potential \
+energy visualizes as stored tension. Clearly not yet happening.
+Present action: Full real-time motion bursts, colors saturate, \
+the "is-happening" quality is vivid and immediate.
+Duration errors: Action stretches out or is over in a flash. A \
+visual clock or time indicator emphasizes actual duration.
 
 ## IDENTITY errors (nouns, naming)
-- **Decomposition**: entity briefly disassembles into constituent parts. \
-Sub-parts scatter slightly then reassemble.
-- **Vibrating Pulse/Jelloing**: gelatinous vibration. Pixels oscillate \
-around their home position.
+Core: The true entity performs its identity — does something \
+characteristic, asserts its category through behavior.
+
+The correct entity steps forward, becomes more present. If the wrong \
+category is named (e.g. "dog" but it's a cat), the entity briefly \
+morphs toward the wrong category then snaps back emphatically and \
+performs its defining behavior (cat meows/licks paw). Sub-parts \
+briefly scatter and reassemble to show internal structure.
 
 ## QUANTITY errors (count, pluralization)
-- **Sequential Pulse**: if multiple entities, they glow in sequence \
-creating a visual count (1, 2, 3...).
-- **Isolation**: surroundings dim while the single target object remains \
-sharp, emphasizing singularity.
-- **Domino Effect**: multiple entities wobble in sequence.
+Core: Quantity is revealed through spatial separation and sequential \
+attention — making each element individually undeniable, or making \
+singularity/emptiness visceral.
+
+Multiple objects: separate, space out, pulse in sequence (one, two, \
+three...), form a countable line. Each one individuates. \
+Single object: isolated, spotlighted, surrounding space emphasized. \
+It looks around for companions and finds none.
 
 ## ACTION errors (verbs)
-- **Characteristic Action**: entity performs a brief defining behavior. \
-Small motion cycle (hop, sway, spin).
-- **Motion Line**: directional speed streaks behind entity.
+Core: Actions are revealed through force visualization and exaggerated \
+performance of the actual action.
+
+The actual action is performed with exaggerated clarity. Sitting is \
+emphasized (roots grow from feet), sleeping deepens (ZZZs, snore \
+bubbles). Wrong direction: actual direction shown with motion lines, \
+arrows, flow. Wrong intensity: slow-motion emphasis or speed-line blur. \
+Force arrows visualize actual direction of push/pull/give/receive.
 
 ## RELATIONAL errors (between entities)
-- **Drift**: objects attract or repel to show actual relationship.
-- **Comparison Slide**: two entities slide together for direct visual comparison.
+Core: Relationships are revealed through spatial dynamics between \
+entities — attraction/repulsion, comparison, connection/disconnection.
+
+Objects drift apart or magnetically attract. For size comparison: \
+slide together, one looms. Same vs. different: matching features glow \
+in unison or discrepant features pulse. Emotional relations: warmth \
+(drift closer, warm colors) or cold distance (rift, cold colors). \
+Obstruction: force arrows show the "helper" is actually blocking.
 
 ## EXISTENCE errors
-- **Ghost Outline**: faint dotted outline where claimed entity should be, \
-dissolves to nothing.
+Core: Existence is revealed through materiality contrast — \
+solidity/presence versus ghostliness/void.
+
+Absent entity: ghostly outline appears where it should be, then \
+dissolves into nothing. A "poof" of disappearance.
+Present but denied: entity becomes more solid, more saturated, \
+casts stronger shadow. It refuses to be ignored.
 
 ## MANNER errors (adverbs)
-- **Speed Warp**: distorts perceived speed — slow becomes syrupy \
-(stretched pixels), fast becomes blur (motion smear).
+Core: Manner is revealed through exaggeration of the actual manner — \
+making slow excruciating, fast blinding, loud overwhelming, quiet \
+deafening.
 
-## REDUNDANCY errors
-- **The Bonk**: entity jiggles as if bumped, small star particles appear.
+Slow: extreme slow-motion, stretching time. A snail might pass by. \
+Fast: speed lines, blur, afterimages, breakneck pace. \
+Careful: delicate movements, precision. Careless: sloppy, things \
+knocked over. Loud: sound waves blast. Quiet: silence emphasized.
 
 ## OMISSION errors
-- **Sprouting**: natural growth marker (leaf, sprout) appears at the \
-location of the missing information.
+Entity the child skipped entirely. A natural growth marker (sprout, \
+leaf, sparkle) appears at the entity's location, drawing attention \
+to what was missed. The entity gently pulses to say "describe me."
+
+## REDUNDANCY errors
+Child repeated information or used double negatives. The entity \
+jiggles as if bumped, small star particles appear briefly.
+
+# Student profile awareness
+
+The user prompt includes the child's error profile and animation \
+effectiveness history. If certain animation approaches did NOT lead \
+to the child self-correcting, you MUST try a DIFFERENT approach. \
+Vary your animation strategy for recurring errors — don't repeat \
+what didn't work.
+
+# Discrepancy context
+
+The user prompt includes the specific discrepancy: what the child \
+said vs. the scene truth. Design the animation to illustrate THIS \
+EXACT contrast. The more precisely the animation targets the specific \
+misunderstanding, the more effective it will be.
+
+# Adding new pixels
+
+Animations can CREATE new pixels beyond existing entity pixels. Use \
+this for particles, indicators, text hints, arrows, stars, or any \
+visual element that helps communicate the truth. To add a pixel:
+
+```javascript
+// Add a pixel at position (x, y)
+var idx = y * PW + x;
+if (idx >= 0 && idx < buf.length) {
+  buf[idx].r = r; buf[idx].g = g; buf[idx].b = b;
+}
+```
+
+Use sparingly — a few well-placed indicator pixels (arrows pointing \
+the right direction, sparkle particles, steam dots) are more effective \
+than cluttering the scene. If the animation alone cannot fully convey \
+the correct answer, small text-like pixel patterns or directional \
+indicators can help.
 
 # CRITICAL: Moving entity pixels
 
@@ -255,17 +360,28 @@ Entity: cat_01
 """
 
 ANIMATION_USER_PROMPT = """\
-Generate animation code for the following error:
+Generate animation code for the following discrepancy:
 
 Error type: {error_type}
 Entity ID: {entity_id}
 Sub-entity: {sub_entity}
 Entity bounding box: x={bbox_x}, y={bbox_y}, width={bbox_w}, height={bbox_h}
 
-Scene context:
+# What happened
+{discrepancy_details}
+
+# Target entity details
+{entity_details}
+
+# Full scene context
 {scene_context}
 
-Generate the most semantically appropriate animation from the grammar for \
-this error type. The animation should target the sub-entity "{sub_entity}" \
-using prefix matching on buf[i].e.
+# Student profile
+{student_profile_context}
+
+Design a semantically unique animation that visually reveals the correct \
+answer for THIS specific discrepancy. The animation should target the \
+sub-entity "{sub_entity}" using prefix matching on buf[i].e. Make the \
+child understand the truth through cartoon physics, not through generic \
+effects.
 """

@@ -1,0 +1,145 @@
+SPATIAL ERRORS (Prepositions, Location)
+The discrepancy: Child claims X is in location A, but X is in location B.
+What needs to be revealed: The actual spatial relationship between the element and its reference point.
+Mistake	Scene truth	Cartoon physics response
+"on" but actually under	Object is beneath reference	The reference object becomes translucent or lifts slightly to reveal what's beneath. The underneath space glows with presence. The hidden object might peer out, wave, assert "I'm here." Gravity pulls visual attention downward.
+"under" but actually on	Object is atop reference	The object settles more firmly onto the surface with a satisfying weight. Contact shadows deepen. The surface slightly deforms under the weight. The "on-ness" becomes undeniable.
+"in" but actually outside	Object is not contained	The container briefly tries to vacuum/attract the object but fails — the object resists, bounces off an invisible boundary. Or: the container becomes transparent showing its emptiness, while the object outside pulses with presence.
+"outside" but actually in	Object is contained	The container becomes transparent revealing the object snugly inside. The object might press against the walls, showing its containment. The enclosure tightens slightly around it.
+"beside" but actually far	Object is distant	The actual distance stretches and emphasizes — the gap between them becomes a visible chasm, dust motes floating in the emptiness, the two objects stranded far apart.
+"far" but actually near	Object is close	The objects magnetically snap closer together, almost touching, personal space invaded, the nearness becoming uncomfortable/cozy.
+"behind" but actually in front	Wrong depth relationship	The scene rotates slightly to reveal the true depth order. Or: the "front" object casts a shadow onto the "back" one, proving the spatial order. The front object might turn around as if to say "I'm facing you."
+"above" but actually below	Wrong vertical relationship	A plumb line drops, or gravity arrows appear, or rain falls to demonstrate which is truly higher. The lower object might try to rise and fail, then settle back down.
+General principle: Spatial truth is revealed by exaggerating the actual spatial relationship — making containment more containing, distance more distant, contact more tangible.
+
+PROPERTY ERRORS (Adjectives, Attributes)
+The discrepancy: Child claims X has property A, but X has property B.
+What needs to be revealed: The actual property of the element, contrasted against the claimed property.
+Mistake	Scene truth	Cartoon physics response
+"big" but actually small	Object is small	Object attempts to inflate, strains, puffs up momentarily, then deflates back to actual size with a sad squeak. Or: surrounding objects loom larger by comparison, dwarfing it. The smallness becomes emphasized.
+"small" but actually big	Object is large	Object tries to compress, squeeze, shrink — but springs back to full size, taking up space, bumping into things, undeniably massive. Its shadow grows.
+"heavy" but actually light	Object is light	A breeze catches it, it drifts upward, floats, a character lifts it effortlessly with one finger. Dust motes swirl around it. It's practically weightless.
+"light" but actually heavy	Object is heavy	The surface beneath it sags, cracks appear, anything touching it strains. If a character is near, they mime struggling under its weight. It settles with a ground-shaking thud.
+"hard" but actually soft	Object is soft	Something pokes it and it deforms — squishes, jiggles, ripples. It can't hold its shape. Maybe it melts slightly, sags, oozes.
+"soft" but actually hard	Object is hard	Something bounces off it with a CLANG (visualized as impact stars). It's rigid, unyielding. Trying to squish it fails completely — the pressing force gives up.
+"open" but actually closed	Object is closed	A brief attempt to see inside fails — the lid is firmly shut, the door won't budge, the closure is airtight. Maybe a lock appears or the seal glows.
+"closed" but actually open	Object is open	The opening yawns wider, contents spill slightly, light/air flows through, the inside is undeniably visible. The openness invites inspection.
+"full" but actually empty	Container is empty	The container becomes transparent showing hollow space inside. Maybe a tumbleweed rolls through, or an echo visualizes. The emptiness is cavernous.
+"empty" but actually full	Container is full	Contents overflow slightly, the container bulges, it's stuffed to the brim. The fullness strains against the walls.
+"hot" but actually cold	Object is cold	Frost forms, breath-fog appears nearby, icicles, the blue tint of cold. Anything touching it shivers. The heat claim is absurd — snow might briefly fall on it.
+"cold" but actually hot	Object is hot	Steam rises, heat waves shimmer, the air around it distorts. Anything nearby wilts or sweats. The surface glows warm.
+"new" but actually old	Object is old	Patina deepens, wear marks appear, dust settles, cracks show, the aged quality becomes undeniable. It might creak or groan with age.
+"old" but actually new	Object is new	A gleam/sparkle runs across the surface, it looks factory-fresh, pristine, tags still attached, that new-object shine.
+"broken" but actually whole	Object is intact	The object demonstrates its wholeness — functions perfectly, spins smoothly, all parts connected. Structural integrity radiates from it.
+"whole" but actually broken	Object is broken	Cracks glow, pieces rattle, a part falls off, it lists to one side. The damage is undeniable. It might attempt to function and fail.
+General principle: The object tries to become what was claimed and fails, then settles firmly into what it actually is. Or: the actual property intensifies to the point of undeniability.
+
+TEMPORAL ERRORS (Tense, Time)
+The discrepancy: Child claims action is happening at time A, but it happened/will happen at time B.
+What needs to be revealed: The actual temporal state of the action.
+Mistake	Scene truth	Cartoon physics response
+Present tense but action is past	Action already completed	Ghostly afterimages trail behind, fading. Dust settles. Echoes visualize and decay. The action replays as a fading memory-image, then dissolves. The character/object is now still, in post-action pose — panting, resting, consequences visible.
+Present tense but action is future	Action hasn't started yet	Anticipation pose — the character is coiled, ready, tense but not moving. Potential energy visualizes as stored tension. A countdown might loom. The action is imminent but clearly not happening yet.
+Past tense but action is present	Action is ongoing	The action bursts into full real-time motion, undeniably happening NOW. Colors saturate, motion blur activates, the present-ness is vivid and immediate. The "is-happening" quality is inescapable.
+Past tense but action is future	Action hasn't happened	The scene shows the pre-action state — everything poised but untouched. The action's consequences are visibly absent. A "not yet" quality — anticipation without fulfillment.
+Future tense but action is present	Action is happening now	Same as above — the action asserts its current reality, too late to be "about to."
+Future tense but action is past	Action already finished	The finished state is emphasized — the trophy is already won, the cake already eaten, the journey already complete. Results without process. Maybe a "DONE" stamp, or the residue of completed action.
+"still" but action ended	Action is complete	The stillness is false — the stopped state is undeniable. The character might try to continue and find they're frozen in completion. The energy is spent.
+"already" but action ongoing	Action continues	The action refuses to end — it keeps going, the character can't stop, the process is mid-stream. Incompleteness is visible.
+Duration error ("briefly" but long)	Action was extended	The action stretches out, takes its time, refuses to be brief. A clock might appear showing how long it actually took. The duration weighs heavy.
+Duration error ("for a long time" but brief)	Action was brief	The action is over in a flash — blink and you'd miss it. The brevity is almost comical. A clock shows mere seconds.
+General principle: Time is visualized through motion residue (past), immediate presence (present), and coiled potential (future). The actual temporal state saturates the scene.
+
+IDENTITY ERRORS (Nouns, Naming)
+The discrepancy: Child calls X by name A, but it's actually B.
+What needs to be revealed: The true identity of the element.
+Mistake	Scene truth	Cartoon physics response
+Wrong object named	Different object present	The correct object steps forward, becomes more saturated/present, maybe waves or does a small attention-getting motion. The wrong object (if it exists elsewhere in scene) might look confused, point to itself with a "me?", then shake its head.
+Category error (e.g., "dog" but it's a cat)	Different category	The animal/object might briefly morph toward the wrong category — a cat sprouts floppy ears for a moment — then snaps back emphatically to its true form, asserting its identity. It performs its category-defining behavior (cat meows, licks paw; dog would bark, wag).
+Character name wrong	Different character	The correctly-named character asserts presence — turns to face camera, name tag appears, their characteristic trait is displayed. The wrongly-assumed identity is dispelled.
+Object/character confusion	One is not the other	If a statue is called a person: it remains stiff, stone-textured, clearly inanimate. If a person is called a statue: they move, breathe, blink emphatically. The category boundary is made visceral.
+General principle: The true entity performs its identity — does something characteristic, asserts its category membership through behavior, not just appearance.
+
+QUANTITY ERRORS (Numbers, Pluralization)
+The discrepancy: Child claims there are N of X, but there are actually M.
+What needs to be revealed: The actual count.
+Mistake	Scene truth	Cartoon physics response
+"one" but multiple	Several exist	The objects separate, space out, individuate. Each one pulses in sequence: one, two, three... They form a line, become countable. They refuse to merge.
+"many/several" but few	Few exist	The few objects become emphatic — each one is spotlighted in turn, clearly distinct, easily counted. The scene is sparse around them.
+"many/several" but one	Only one exists	The object is alone, isolated. The surrounding space is empty. It might look around for companions and find none. Its solitude is emphasized.
+Exact number wrong	Different count	Objects arrange themselves into countable formation — grid, line, cluster — and pulse one by one, undeniably tallying to the true number.
+Singular but plural	Multiple exist	Same as "one but multiple" — individuation, separation, counting sequence.
+Plural but singular	Only one	Same as "many but one" — isolation, emphasized solitude, no companions.
+General principle: Quantity is revealed through spatial separation and sequential attention — making each element individually undeniable, or making singularity/emptiness visceral.
+
+ACTION ERRORS (Verbs)
+The discrepancy: Child claims X is doing action A, but X is doing action B.
+What needs to be revealed: The actual action being performed.
+Mistake	Scene truth	Cartoon physics response
+Wrong action entirely	Different action	The actual action is performed with exaggerated clarity. If "running" but sitting: the character's sitting is emphasized — they sink deeper into the seat, become more inert, roots grow from their feet. If "eating" but sleeping: sleep indicators intensify — ZZZs, snore bubbles, dream clouds.
+Wrong direction	Opposite direction	The actual direction is shown with motion lines, arrows, flow indicators. If "going up" but going down: gravity is emphasized, descent arrows, the downward trajectory is undeniable.
+Wrong intensity	Different intensity	If "running" but walking: slow-motion emphasis, the leisurely pace is exaggerated, maybe a turtle passes them. If "whispering" but shouting: sound waves visualize as huge, expanding, impactful — the volume is undeniable.
+"pushing" but pulling	Opposite force	Force arrows visualize showing actual direction. The mechanical relationship is demonstrated — tension vs. compression, attraction vs. repulsion. Bodies lean the right way.
+"giving" but receiving	Opposite transfer	The actual direction of transfer is shown — the object moves from giver to receiver, the hand that releases vs. the hand that grasps, the directionality of exchange.
+Active/passive reversal	Wrong agent	Energy flows visualize from true agent. The actual cause-effect relationship is demonstrated. The true agent "lights up" as the origin point; the patient shows receiving.
+General principle: Actions are revealed through force visualization (direction arrows, motion lines, tension/compression indicators) and exaggerated performance of the actual action.
+
+STATE ERRORS (Being, Existing)
+The discrepancy: Child claims X is in state A, but X is in state B.
+What needs to be revealed: The actual state of the element.
+Mistake	Scene truth	Cartoon physics response
+"sleeping" but awake	Character is awake	Eyes snap wide open, pupils track movement, the character is alert, responsive, maybe waves to prove consciousness. Energy and attention radiate.
+"awake" but sleeping	Character is asleep	Sleep deepens — snoring visualizes, dream bubble appears, they slump further, dead to the world. Stimuli fail to rouse them.
+"alive" but inanimate	Object is not alive	The object demonstrates its inanimacy — refuses to respond, remains rigid when pushed, shows material properties (wood grain, metal sheen). No breath, no reaction.
+"dead/still" but alive	Being is alive	Vital signs appear — heartbeat pulses visibly, chest rises and falls, eyes blink. Life asserts itself. The being might stretch, yawn, move unexpectedly.
+"happy" but sad	Character is sad	Sadness intensifies — tears well, posture slumps, corners of mouth drag down, a rain cloud might appear overhead. The emotional truth is displayed.
+"angry" but calm	Character is calm	Serenity displays — smooth movements, peaceful expression, maybe meditating pose, gentle breeze, soft colors around them.
+"scared" but brave	Character is brave	Courage displays — chest puffs out, stands tall, faces the threat directly, maybe heroic wind blows their hair. No trembling.
+General principle: States are revealed through embodied display — the body/object performs its actual state through posture, expression, physiological indicators.
+
+RELATIONAL ERRORS (Between entities)
+The discrepancy: Child claims relationship A between X and Y, but the relationship is actually B.
+What needs to be revealed: The actual relationship between elements.
+Mistake	Scene truth	Cartoon physics response
+"belongs to" but doesn't	Different ownership	The claimed owner reaches for the object but it recoils, or an invisible barrier appears. The true owner (if present) magnetically attracts it, or the object drifts toward them.
+"bigger than" but smaller	Opposite size relation	The two objects slide next to each other, direct comparison. The true size relationship is undeniable when juxtaposed. The "smaller" one shrinks further in comparison, the "bigger" one looms.
+"same as" but different	Objects differ	Differences highlight — the discrepant features glow, pulse, separate. Maybe a split-screen comparison emphasizes what's not the same.
+"different from" but same	Objects are same	Similarities highlight — matching features glow in unison, the objects might merge momentarily then separate as twins, mirror each other.
+"loves/likes" but doesn't	Negative relation	The characters move apart, face away from each other, a rift appears between them. Heart symbols might appear then break/dissolve. Cold colors in the space between them.
+"hates/dislikes" but doesn't	Positive relation	Warmth between them — they drift closer, warm colors, maybe hearts or friendly symbols. They face each other openly.
+"helping" but hindering	Actually obstructing	The obstruction is visualized — the "helper" is actually blocking, tangling, their force arrows oppose the goal. The hindrance is mechanically demonstrated.
+General principle: Relationships are revealed through spatial dynamics between entities — attraction/repulsion, comparison, connection/disconnection.
+
+EXISTENCE ERRORS (Presence, Absence)
+The discrepancy: Child claims X exists/doesn't exist, but reality is opposite.
+What needs to be revealed: Whether the element is actually present or absent.
+Mistake	Scene truth	Cartoon physics response
+Claims existence but absent	Object doesn't exist	A ghostly outline of the object appears where it should be, then dissolves into nothing. The space is empty, a void. Maybe a "poof" of disappearance, dust where something was. The absence is tangible.
+Denies existence but present	Object exists	The object asserts presence emphatically — becomes more solid, more saturated, casts stronger shadows, might jump up and down saying "I'm here!" It refuses to be ignored.
+"nothing there" but something	Something present	The hidden thing reveals itself — comes out from behind, uncloaks, lights up. The space that seemed empty is shown to contain.
+"something there" but nothing	Space is empty	The emptiness is demonstrated — X-ray through the space, a hand passes through where the object should be, echoing hollowness.
+General principle: Existence is revealed through materiality contrast — solidity/presence versus ghostliness/void. The existing becomes undeniably substantial; the absent becomes tangibly empty.
+
+MANNER ERRORS (Adverbs, How)
+The discrepancy: Child claims X does something in manner A, but actually manner B.
+What needs to be revealed: The actual manner of the action.
+Mistake	Scene truth	Cartoon physics response
+"quickly" but slowly	Action is slow	Extreme slow-motion, stretching time, the slowness is exaggerated. A snail might pass by, a clock ticks loudly, the lethargy is palpable.
+"slowly" but quickly	Action is fast	Speed lines, blur, the action is over in a flash. "Blink and you miss it" quality. Sonic boom, afterimages, breakneck pace.
+"carefully" but carelessly	Action is careless	The carelessness is displayed — sloppy movements, things get knocked over, the recklessness is visible. Damage trails behind.
+"carelessly" but carefully	Action is careful	The care is displayed — delicate movements, precision, gentle handling. A surgeon's focus. Nothing disturbed.
+"loudly" but quietly	Action is quiet	Silence emphasizes — sound waves are tiny or absent, "shh" visualization, the quietness is almost deafening.
+"quietly" but loudly	Action is loud	Sound waves blast outward, things rattle, ears cover, the noise is overwhelming. Volume visualization.
+General principle: Manner is revealed through exaggeration of the actual manner — making slow excruciating, fast blinding, loud overwhelming, quiet deafening.
+
+META-PRINCIPLES FOR THE SYSTEM
+Across all categories, a few physics principles recur:
+1. The object resists the false claim — briefly attempts to become what was claimed, fails, snaps back to truth
+2. The true property intensifies — becomes more saturated, more extreme, undeniable
+3. Contrast is made visible — juxtaposition, comparison, before/after, either/or
+4. Physics demonstrates truth — gravity, magnetism, force, resistance, flow all visualize the actual state
+5. The body/object performs its truth — through behavior, not symbols
+And for your AI module specifically:
+* Input: discrepancy + student logs (avoid repeating unsuccessful animations)
+* Output: physics parameters that perturb the element to reveal the discrepancy
+* Principle: the animation should make a child think "Oh, it's not X, it's Y" without any words

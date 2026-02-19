@@ -21,6 +21,7 @@ class AnimationCommand(BaseModel):
     entity_id: str
     sub_entity: str
     error_type: str
+    discrepancy_details: str = ""
     cached: bool = False
     animation: Optional[CachedAnimation] = None
 
@@ -63,6 +64,7 @@ def dispatch(
             entity_id=d.entity_id,
             sub_entity=d.sub_entity or d.entity_id,
             error_type=d.type,
+            discrepancy_details=d.details,
             cached=cached_anim is not None,
             animation=cached_anim,
         ))

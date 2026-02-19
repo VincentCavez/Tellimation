@@ -1,0 +1,87 @@
+{
+  "error_counts": {
+    "PROPERTY_COLOR": 7,
+    "ACTION": 5,
+    "SPATIAL": 3,
+    "OMISSION": 3,
+    "EXISTENCE": 1,
+    "PROPERTY_STATE": 4
+  },
+  "error_trend": {},
+  "difficult_entities": [
+    "fox_01",
+    "key_01"
+  ],
+  "strong_areas": [],
+  "scenes_completed": 0,
+  "corrections_after_animation": 2,
+  "total_utterances": 6,
+  "animation_history": [
+    {
+      "entity_id": "tree_01",
+      "error_type": "OMISSION",
+      "animation_type": "tree_01",
+      "corrected": false
+    },
+    {
+      "entity_id": "key_01",
+      "error_type": "SPATIAL",
+      "animation_type": "key_01.spatial",
+      "corrected": true
+    },
+    {
+      "entity_id": "tree_01",
+      "error_type": "OMISSION",
+      "animation_type": "tree_01",
+      "corrected": false
+    },
+    {
+      "entity_id": "fox_01",
+      "error_type": "ACTION",
+      "animation_type": "fox_01.action",
+      "corrected": false
+    },
+    {
+      "entity_id": "tree_01",
+      "error_type": "OMISSION",
+      "animation_type": "tree_01",
+      "corrected": true
+    },
+    {
+      "entity_id": "fox_01",
+      "error_type": "EXISTENCE",
+      "animation_type": "social_relation",
+      "corrected": false
+    },
+    {
+      "entity_id": "fox_01",
+      "error_type": "ACTION",
+      "animation_type": "fox_01.action",
+      "corrected": false
+    },
+    {
+      "entity_id": "tree_01",
+      "error_type": "PROPERTY_STATE",
+      "animation_type": "tree_01.descriptors",
+      "corrected": false
+    },
+    {
+      "entity_id": "fox_01",
+      "error_type": "PROPERTY_STATE",
+      "animation_type": "fox_01.state",
+      "corrected": false
+    },
+    {
+      "entity_id": "fox_01",
+      "error_type": "ACTION",
+      "animation_type": "fox_01.action",
+      "corrected": false
+    },
+    {
+      "entity_id": "fox_01",
+      "error_type": "PROPERTY_STATE",
+      "animation_type": "fox_01.state",
+      "corrected": false
+    }
+  ]
+}

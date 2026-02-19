@@ -100,9 +100,16 @@ class NarrationLoop:
         self.student_profile.record_errors(result.discrepancies)
 
         # 3. Update narration state
+        prev_satisfied = set(self.satisfied_targets)
         self.narration_history = result.updated_history
         self._merge_satisfied_targets(result.satisfied_targets)
         self.scene_progress = max(self.scene_progress, result.scene_progress)
+
+        # 3b. Track corrections — newly satisfied targets may indicate
+        #     the child corrected after a previous animation
+        newly_satisfied = set(self.satisfied_targets) - prev_satisfied
+        if newly_satisfied:
+            self._record_corrections_for_targets(newly_satisfied)
 
         # 4. Dispatch
         entity_bounds = self._compute_entity_bounds()
@@ -126,6 +133,10 @@ class NarrationLoop:
                     "sub_entity": cmd.sub_entity,
                     "error_type": cmd.error_type,
                 })
+                # Record animation played for effectiveness tracking
+                self.student_profile.record_animation(
+                    cmd.entity_id, cmd.error_type, animation.generated_for
+                )
 
         # 7. Scene complete?
         if self.is_scene_complete():
@@ -197,6 +208,31 @@ class NarrationLoop:
     # Internals
     # ------------------------------------------------------------------
 
+    def _record_corrections_for_targets(self, newly_satisfied: set) -> None:
+        """Check if animations were played for newly satisfied targets and record corrections.
+
+        When a target becomes satisfied, it may indicate the child corrected
+        after seeing an animation. We look through the NEG to find which
+        entity each target refers to, then check if we played an animation
+        for that entity.
+        """
+        # Build a map: target_id -> entity_id from the NEG
+        target_entities: Dict[str, str] = {}
+        for target in self.neg.targets:
+            target_entities[target.id] = target.entity_id
+
+        for target_id in newly_satisfied:
+            entity_id = target_entities.get(target_id, "")
+            if not entity_id:
+                continue
+            # Check animation history for any animation on this entity
+            for entry in reversed(self.student_profile.animation_history):
+                if entry["entity_id"] == entity_id and not entry["corrected"]:
+                    self.student_profile.record_correction(
+                        entity_id, entry["error_type"]
+                    )
+                    break
+
     def _merge_satisfied_targets(self, new_targets: List[str]) -> None:
         """Merge newly satisfied targets into the cumulative set."""
         existing = set(self.satisfied_targets)
@@ -249,6 +285,8 @@ class NarrationLoop:
                 entity_bounds=bounds,
                 scene_context=scene_context,
                 animation_cache=self.animation_cache,
+                student_profile=self.student_profile,
+                discrepancy_details=cmd.discrepancy_details,
             )
             return animation
         except Exception:

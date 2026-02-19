@@ -114,13 +114,20 @@ class TestPromptContent:
         ]:
             assert error_type in ANIMATION_SYSTEM_PROMPT
 
-    def test_system_prompt_contains_animation_names(self):
-        for name in [
-            "Color Pop", "Settle", "Scale Strain",
-            "Afterimage", "Decomposition", "Sequential Pulse",
-            "Speed Warp", "Sprouting",
+    def test_system_prompt_contains_animation_concepts(self):
+        """The prompt must describe key animation concepts for each error type."""
+        for concept in [
+            "desaturate",       # PROPERTY_COLOR response
+            "inflate",          # PROPERTY_SIZE response
+            "frost",            # PROPERTY_TEMPERATURE response
+            "afterimage",       # TEMPORAL response
+            "pulse",            # QUANTITY response
+            "motion lines",     # ACTION response
+            "ghostly outline",  # EXISTENCE response
         ]:
-            assert name in ANIMATION_SYSTEM_PROMPT
+            assert concept.lower() in ANIMATION_SYSTEM_PROMPT.lower(), (
+                f"Missing concept: {concept}"
+            )
 
     def test_system_prompt_contains_examples(self):
         # At least the 3 required examples
@@ -137,6 +144,9 @@ class TestPromptContent:
         assert "{sub_entity}" in ANIMATION_USER_PROMPT
         assert "{bbox_x}" in ANIMATION_USER_PROMPT
         assert "{scene_context}" in ANIMATION_USER_PROMPT
+        assert "{discrepancy_details}" in ANIMATION_USER_PROMPT
+        assert "{student_profile_context}" in ANIMATION_USER_PROMPT
+        assert "{entity_details}" in ANIMATION_USER_PROMPT
 
 
 # ---------------------------------------------------------------------------

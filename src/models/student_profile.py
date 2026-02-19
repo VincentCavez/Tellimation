@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, List
+from typing import Any, Dict, List
 
 from pydantic import BaseModel, Field
 
@@ -21,6 +21,7 @@ class StudentProfile(BaseModel):
     scenes_completed: int = 0
     corrections_after_animation: int = 0
     total_utterances: int = 0
+    animation_history: List[Dict[str, Any]] = Field(default_factory=list)
 
     _recent_errors: Dict[str, List[int]] = {}
 
@@ -79,6 +80,36 @@ class StudentProfile(BaseModel):
                 if rate < 0.1:
                     self.strong_areas.append(error_type)
 
+    def record_animation(
+        self, entity_id: str, error_type: str, animation_type: str
+    ) -> None:
+        """Record that an animation was played for a discrepancy."""
+        self.animation_history.append({
+            "entity_id": entity_id,
+            "error_type": error_type,
+            "animation_type": animation_type,
+            "corrected": False,
+        })
+
+    def record_correction(self, entity_id: str, error_type: str) -> None:
+        """Mark the most recent animation for this entity/error as corrected."""
+        for entry in reversed(self.animation_history):
+            if (
+                entry["entity_id"] == entity_id
+                and entry["error_type"] == error_type
+                and not entry["corrected"]
+            ):
+                entry["corrected"] = True
+                self.corrections_after_animation += 1
+                break
+
+    def get_unsuccessful_animations(self) -> List[Dict[str, Any]]:
+        """Return animation entries where the child did NOT correct after."""
+        return [
+            entry for entry in self.animation_history
+            if not entry["corrected"]
+        ]
+
     def get_weak_areas(self) -> List[str]:
         if self.total_utterances == 0:
             return []
@@ -120,4 +151,19 @@ class StudentProfile(BaseModel):
         lines.append(
             f"Corrections after animation: {self.corrections_after_animation}"
         )
+        # Animation effectiveness — help Gemini avoid unsuccessful patterns
+        unsuccessful = self.get_unsuccessful_animations()
+        if unsuccessful:
+            # Group by error_type → animation_type for a compact summary
+            failed_by_type: Dict[str, List[str]] = {}
+            for entry in unsuccessful:
+                et = entry["error_type"]
+                at = entry.get("animation_type", "unknown")
+                if et not in failed_by_type:
+                    failed_by_type[et] = []
+                if at not in failed_by_type[et]:
+                    failed_by_type[et].append(at)
+            lines.append("Animations that did NOT lead to correction (avoid these approaches):")
+            for et, anim_types in failed_by_type.items():
+                lines.append(f"  {et}: {', '.join(anim_types)}")
         return "\n".join(lines)

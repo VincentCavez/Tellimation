@@ -5,5 +5,6 @@
   "strong_areas": [],
   "scenes_completed": 0,
   "corrections_after_animation": 0,
-  "total_utterances": 0
+  "total_utterances": 0,
+  "animation_history": []
 }
