@@ -2,7 +2,7 @@
 
 This module provides prompt templates for:
   - ENTITY_IMAGE_PROMPT: Gemini 2.5 Flash Image — generate one entity on red chroma key
-  - BACKGROUND_IMAGE_PROMPT: Gemini 2.5 Flash Image — generate full 280x180 background
+  - BACKGROUND_IMAGE_PROMPT: Gemini 2.5 Flash Image — generate full 560x360 background
   - MASK_SYSTEM_PROMPT / MASK_USER_PROMPT: Gemini 3 Flash — assign sub-entity IDs to pixels
 """
 
@@ -31,6 +31,16 @@ SOLID BRIGHT RED (#FF0000) background. The red must be perfectly uniform \
 - **NO other elements**: no ground, no shadow, no text, no decorations. \
   ONLY the sprite on solid red.
 
+## ISOLATION — This sprite is generated COMPLETELY ALONE
+- Generate ONLY the described entity. Nothing else exists in this image.
+- Do NOT draw any environmental context: no ground, no trees, no rocks, no bark, \
+  no branches, no roots, no walls, no surfaces, no other objects.
+- If the description mentions a pose "against" or "on" something, IGNORE the surface — \
+  only draw the entity's body in that posture.
+- If the subject is "beside" or "on top of" something, do NOT include that something.
+- The entity floats on the red background. There is NOTHING for it to lean on, sit on, \
+  or attach to. Draw only the entity's own body/form.
+
 ## CRITICAL
 - The background MUST be perfectly solid #FF0000 (bright red).
 - Any pixel that is NOT part of the sprite must be exactly #FF0000.
@@ -38,7 +48,7 @@ SOLID BRIGHT RED (#FF0000) background. The red must be perfectly uniform \
 """
 
 # ---------------------------------------------------------------------------
-# Background image generation (Gemini 2.5 Flash Image, 280x180 scene)
+# Background image generation (Gemini 2.5 Flash Image, 560x360 scene)
 # ---------------------------------------------------------------------------
 
 BACKGROUND_IMAGE_PROMPT = """\

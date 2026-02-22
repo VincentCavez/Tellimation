@@ -234,16 +234,25 @@ class TestWebSocket:
 
         with client.websocket_connect("/ws?api_key=testkey&participant_id=P01") as ws:
             ws.send_json({"type": "generate_initial_scenes"})
-            # Consume progress messages until we get initial_scenes
+            # Consume messages until we get initial_scenes_done
+            scenes = []
             msg = ws.receive_json()
-            while msg["type"] in ("generation_progress", "generation_step"):
+            while msg["type"] not in ("initial_scenes_done", "initial_scenes"):
+                if msg["type"] == "scene_ready":
+                    scenes.append(msg["scene"])
                 msg = ws.receive_json()
-            assert msg["type"] == "initial_scenes"
-            assert len(msg["scenes"]) == 2
-            assert msg["scenes"][0]["narrative_text"] == "A rabbit in a forest."
+            # Streaming mode: we get scene_ready × 2 then initial_scenes_done
+            if msg["type"] == "initial_scenes_done":
+                assert len(scenes) == 2
+                assert scenes[0]["narrative_text"] == "A rabbit in a forest."
+            else:
+                # Backward compat (from-disk case)
+                assert len(msg["scenes"]) == 2
+                assert msg["scenes"][0]["narrative_text"] == "A rabbit in a forest."
 
+    @patch("src.ui.app.generate_masks_for_scene")
     @patch("src.ui.app.generate_scene")
-    def test_select_scene_commits_to_state(self, mock_gen, client):
+    def test_select_scene_commits_to_state(self, mock_gen, mock_masks, client):
         scene = {
             "narrative_text": "A cat on a wall.",
             "branch_summary": "Cat story",
@@ -268,12 +277,19 @@ class TestWebSocket:
         async def fake_gen(**kwargs):
             return scene
 
+        async def fake_masks(*args, **kwargs):
+            return scene
+
         mock_gen.side_effect = fake_gen
+        mock_masks.side_effect = fake_masks
 
         with client.websocket_connect("/ws?api_key=testkey&participant_id=P01") as ws:
             # Generate initial scenes first
             ws.send_json({"type": "generate_initial_scenes"})
-            ws.receive_json()  # initial_scenes response
+            # Consume all streaming messages
+            msg = ws.receive_json()
+            while msg["type"] not in ("initial_scenes_done", "initial_scenes"):
+                msg = ws.receive_json()
 
             # Select scene 0
             ws.send_json({"type": "select_scene", "index": 0})

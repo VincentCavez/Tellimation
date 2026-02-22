@@ -1,0 +1,79 @@
+{
+  "error_counts": {
+    "PROPERTY_COLOR": 4,
+    "OMISSION": 4,
+    "PROPERTY_STATE": 1,
+    "IDENTITY": 2,
+    "SPATIAL": 1
+  },
+  "error_trend": {},
+  "difficult_entities": [
+    "starfish_01"
+  ],
+  "strong_areas": [],
+  "scenes_completed": 0,
+  "corrections_after_animation": 1,
+  "total_utterances": 5,
+  "animation_history": [
+    {
+      "entity_id": "starfish_01",
+      "error_type": "OMISSION",
+      "animation_type": "starfish_01",
+      "corrected": false
+    },
+    {
+      "entity_id": "chest_01",
+      "error_type": "PROPERTY_COLOR",
+      "animation_type": "chest_01.descriptors",
+      "corrected": false
+    },
+    {
+      "entity_id": "chest_01",
+      "error_type": "PROPERTY_COLOR",
+      "animation_type": "chest_01.descriptors",
+      "corrected": true
+    },
+    {
+      "entity_id": "starfish_01",
+      "error_type": "OMISSION",
+      "animation_type": "starfish_01",
+      "corrected": false
+    },
+    {
+      "entity_id": "starfish_01",
+      "error_type": "OMISSION",
+      "animation_type": "starfish_01",
+      "corrected": false
+    },
+    {
+      "entity_id": "chest_01",
+      "error_type": "PROPERTY_STATE",
+      "animation_type": "chest_01.descriptors",
+      "corrected": false
+    },
+    {
+      "entity_id": "starfish_01",
+      "error_type": "IDENTITY",
+      "animation_type": "starfish_01.identity",
+      "corrected": false
+    },
+    {
+      "entity_id": "starfish_01",
+      "error_type": "SPATIAL",
+      "animation_type": "starfish_01.spatial",
+      "corrected": false
+    },
+    {
+      "entity_id": "starfish_01",
+      "error_type": "IDENTITY",
+      "animation_type": "starfish_01.identity",
+      "corrected": false
+    },
+    {
+      "entity_id": "dragon_01",
+      "error_type": "OMISSION",
+      "animation_type": "dragon_01",
+      "corrected": false
+    }
+  ]
+}

@@ -5,17 +5,17 @@
 var ScenePicker = (function() {
   'use strict';
 
-  // Thumbnails are 1/2 the full scene size (280x180 → 140x90).
+  // Thumbnails are 1/4 the full scene size (560x360 → 140x90).
   // We render sprites at full resolution then downsample by averaging
-  // each 2x2 block of pixels, so nothing gets cropped.
+  // each 4x4 block of pixels, so nothing gets cropped.
   var THUMB_PW = 140;
   var THUMB_PH = 90;
   var THUMB_SCALE = 1.5;
-  var DOWNSAMPLE_FACTOR = 2;
+  var DOWNSAMPLE_FACTOR = 4;
 
   /**
-   * Downsample a full-resolution PixelBuffer (PW×PH) to half size (THUMB_PW×THUMB_PH)
-   * by averaging every 2×2 block of pixels.
+   * Downsample a full-resolution PixelBuffer (PW×PH) to 1/4 size (THUMB_PW×THUMB_PH)
+   * by averaging every 4×4 block of pixels.
    */
   function downsampleBuffer(fullBuf) {
     var thumbBuf = new PixelBuffer(THUMB_PW, THUMB_PH);
@@ -97,7 +97,7 @@ var ScenePicker = (function() {
           console.warn('[ScenePicker] Failed to render sprite for', entityEids[i], e);
         }
       }
-      // Downsample 280x180 → 140x90 by averaging 2x2 blocks
+      // Downsample 560x360 → 140x90 by averaging 4x4 blocks
       var thumbBuf = downsampleBuffer(fullBuf);
       var thumbRenderer = new Renderer(canvas, thumbBuf, scale);
       thumbRenderer.render();

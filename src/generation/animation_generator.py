@@ -2,19 +2,18 @@
 
 from __future__ import annotations
 
-import json
-import re
 from typing import Any, Dict, List, Optional
 
 from google import genai
 from google.genai import types
 
-from src.models.animation_cache import AnimationCache, CachedAnimation
-from src.models.student_profile import StudentProfile
 from src.generation.prompts.animation_prompt import (
     ANIMATION_SYSTEM_PROMPT,
     ANIMATION_USER_PROMPT,
 )
+from src.generation.utils import extract_json as _extract_json
+from src.models.animation_cache import AnimationCache, CachedAnimation
+from src.models.student_profile import StudentProfile
 
 MODEL_ID = "gemini-3-flash-preview"
 
@@ -132,15 +131,6 @@ def _format_entity_details(
             lines.append(f"  {act.get('verb', '?')}{manner_str}")
 
     return "\n".join(lines)
-
-
-def _extract_json(text: str) -> Dict[str, Any]:
-    """Extract JSON from LLM response, handling markdown fences."""
-    cleaned = text.strip()
-    fence_match = re.search(r"```(?:json)?\s*\n?(.*?)\n?\s*```", cleaned, re.DOTALL)
-    if fence_match:
-        cleaned = fence_match.group(1).strip()
-    return json.loads(cleaned)
 
 
 def _validate_animation_response(data: Dict[str, Any]) -> CachedAnimation:

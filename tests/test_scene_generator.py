@@ -13,6 +13,7 @@ from src.models.story_state import ActiveEntity, StoryState
 from src.models.student_profile import StudentProfile
 from src.generation.scene_generator import (
     _build_continuation_prompt,
+    _build_entity_description,
     _build_initial_prompt,
     _build_scene_image_prompt,
     _dechroma_pixel,
@@ -26,8 +27,10 @@ from src.generation.scene_generator import (
     _generate_manifest,
     _generate_background_image,
     _assemble_sprite_code,
+    _compute_entity_positions,
     _build_fallback_mask,
     _is_chroma_background,
+    _sanitize_for_isolation,
     _validate_scene_response,
     generate_scene,
     IMAGE_MODEL_ID,
@@ -124,6 +127,8 @@ FAKE_INITIAL_RESPONSE = {
         "tree_01": "const eid='tree_01';\nrect(218,110,5,25,100,70,30,eid+'.trunk');\nrect(219,115,3,5,90,60,25,eid+'.trunk.bark');\ntri(200,115,240,115,220,75,34,120,34,eid+'.foliage');\ntri(205,100,235,100,220,68,28,110,28,eid+'.foliage.top');\ncirc(210,108,2,40,130,40,eid+'.foliage.leaf1');\ncirc(225,95,2,40,130,40,eid+'.foliage.leaf2');\ncirc(215,80,2,30,110,30,eid+'.foliage.leaf3');\npx(220,112,80,50,20,eid+'.trunk.knot');",
     },
     "carried_over_entities": [],
+    "background_changed": True,
+    "background_description": "A warm sunlit forest clearing with golden dappled light filtering through the canopy, soft mossy ground, and a pale blue sky.",
 }
 
 FAKE_CONTINUATION_RESPONSE = {
@@ -218,6 +223,8 @@ FAKE_CONTINUATION_RESPONSE = {
         "frog_01": "const eid='frog_01';\nellip(150,146,4,3,50,160,50,eid+'.body');\ncirc(147,143,2,50,170,50,eid+'.head');\ncirc(146,141,1,0,0,0,eid+'.head.eyes.left');\ncirc(149,141,1,0,0,0,eid+'.head.eyes.right');\npx(147,144,30,130,30,eid+'.head.mouth');\nrect(146,149,2,2,40,140,40,eid+'.legs.front');\nrect(152,149,2,2,40,140,40,eid+'.legs.back');\npx(148,148,60,180,60,eid+'.body.belly');",
     },
     "carried_over_entities": ["fox_01", "rock_01"],
+    "background_changed": False,
+    "background_description": "A warm sunlit forest clearing with golden dappled light filtering through the canopy, soft mossy ground, and a pale blue sky.",
 }
 
 
@@ -257,8 +264,8 @@ class TestPromptBuilding:
         assert "arc(" in SCENE_SYSTEM_PROMPT
 
     def test_system_prompt_documents_canvas_size(self):
-        assert "280" in SCENE_SYSTEM_PROMPT
-        assert "180" in SCENE_SYSTEM_PROMPT
+        assert "560" in SCENE_SYSTEM_PROMPT
+        assert "360" in SCENE_SYSTEM_PROMPT
 
     def test_system_prompt_requires_hierarchical_ids(self):
         assert "rabbit_01.body" in SCENE_SYSTEM_PROMPT
@@ -340,27 +347,65 @@ class TestValidation:
         assert result["neg"]["skill_coverage_check"] == "PASS"
         assert "fox_01" in result["sprite_code"]
         assert result["carried_over_entities"] == []
+        assert result["background_changed"] is True
+        assert result["background_description"] != ""
 
     def test_validate_continuation_response(self):
         result = _validate_scene_response(FAKE_CONTINUATION_RESPONSE)
         assert result["manifest"]["scene_id"] == "scene_02"
         assert "fox_01" in result["carried_over_entities"]
         assert "rock_01" in result["carried_over_entities"]
+        assert result["background_changed"] is False
         # New entities have sprite code
         assert "pond_01" in result["sprite_code"]
         assert "frog_01" in result["sprite_code"]
         # Carried-over entities do NOT have sprite code
         assert "fox_01" not in result["sprite_code"]
 
+    def test_validate_background_changed_defaults_true(self):
+        """When background_changed is omitted, default to True (safe)."""
+        data = dict(FAKE_INITIAL_RESPONSE)
+        data.pop("background_changed", None)
+        result = _validate_scene_response(data)
+        assert result["background_changed"] is True
+
+    def test_validate_background_changed_invalid_type(self):
+        """When background_changed is not a bool, default to True."""
+        data = dict(FAKE_INITIAL_RESPONSE)
+        data["background_changed"] = "maybe"
+        result = _validate_scene_response(data)
+        assert result["background_changed"] is True
+
+    def test_validate_background_description_defaults_empty(self):
+        """When background_description is omitted, default to empty string."""
+        data = dict(FAKE_INITIAL_RESPONSE)
+        data.pop("background_description", None)
+        result = _validate_scene_response(data)
+        assert result["background_description"] == ""
+
+    def test_validate_background_description_passthrough(self):
+        """background_description flows through validation."""
+        result = _validate_scene_response(FAKE_INITIAL_RESPONSE)
+        assert "sunlit forest" in result["background_description"]
+
     def test_validate_missing_manifest_raises(self):
         with pytest.raises(ValueError, match="manifest"):
             _validate_scene_response({"neg": {}, "sprite_code": {}})
 
-    def test_validate_missing_neg_raises(self):
-        with pytest.raises(ValueError, match="neg"):
-            _validate_scene_response({
-                "manifest": {"scene_id": "s1", "entities": [], "relations": [], "actions": []},
-            })
+    def test_validate_missing_neg_returns_empty_neg(self):
+        """When NEG is absent (new pipeline), an empty NEG is used."""
+        result = _validate_scene_response({
+            "manifest": {"scene_id": "s1", "entities": [], "relations": [], "actions": []},
+        })
+        assert result["neg"]["targets"] == []
+        assert result["neg"]["min_coverage"] == 0.7
+        assert result["neg"]["skill_coverage_check"] == "PENDING"
+
+    def test_validate_neg_present_is_preserved(self):
+        """When NEG is present, it flows through validation."""
+        result = _validate_scene_response(FAKE_INITIAL_RESPONSE)
+        assert len(result["neg"]["targets"]) > 0
+        assert result["neg"]["skill_coverage_check"] == "PASS"
 
 
 # ---------------------------------------------------------------------------
@@ -487,6 +532,37 @@ class TestGenerateScene:
         assert call_args is not None
         assert call_args.kwargs["model"] == "gemini-3-flash-preview"
 
+    def test_neg_override_injected(self):
+        """When neg_override is provided, it replaces the scene's NEG."""
+        mock_client = _make_mock_client(FAKE_INITIAL_RESPONSE)
+        custom_neg = {
+            "targets": [
+                {
+                    "id": "t_custom",
+                    "entity_id": "fox_01",
+                    "components": {"identity": True},
+                    "priority": 0.5,
+                    "tolerance": 0.5,
+                }
+            ],
+            "error_exclusions": [],
+            "min_coverage": 0.8,
+            "skill_coverage_check": "PASS",
+        }
+
+        with patch("src.generation.scene_generator.genai.Client", return_value=mock_client):
+            result = asyncio.get_event_loop().run_until_complete(
+                generate_scene(
+                    api_key="fake-key",
+                    seed_index=1,
+                    use_reference_images=False,
+                    neg_override=custom_neg,
+                )
+            )
+
+        assert result["neg"]["targets"][0]["id"] == "t_custom"
+        assert result["neg"]["min_coverage"] == 0.8
+
     def test_response_with_markdown_fences_parsed(self):
         """Gemini sometimes wraps JSON in markdown fences."""
         fenced_response = "```json\n" + json.dumps(FAKE_INITIAL_RESPONSE) + "\n```"
@@ -523,20 +599,25 @@ class TestManifestPrompt:
         assert "later step" in MANIFEST_SYSTEM_PROMPT.lower()
 
     def test_manifest_prompt_documents_canvas_size(self):
-        assert "280" in MANIFEST_SYSTEM_PROMPT
-        assert "180" in MANIFEST_SYSTEM_PROMPT
+        assert "560" in MANIFEST_SYSTEM_PROMPT
+        assert "360" in MANIFEST_SYSTEM_PROMPT
 
     def test_manifest_prompt_requires_rich_descriptions(self):
         assert "distinctive_features" in MANIFEST_SYSTEM_PROMPT
         assert "texture" in MANIFEST_SYSTEM_PROMPT
         assert "pose" in MANIFEST_SYSTEM_PROMPT
 
-    def test_manifest_prompt_has_neg_selfcheck(self):
-        assert "skill_coverage_check" in MANIFEST_SYSTEM_PROMPT
-        assert "ENRICH" in MANIFEST_SYSTEM_PROMPT
+    def test_manifest_prompt_does_not_include_neg(self):
+        """MANIFEST_SYSTEM_PROMPT should NOT include NEG — it's generated separately."""
+        assert "skill_coverage_check" not in MANIFEST_SYSTEM_PROMPT
+        assert "error_exclusions" not in MANIFEST_SYSTEM_PROMPT
+        assert '"neg"' not in MANIFEST_SYSTEM_PROMPT
 
     def test_manifest_prompt_has_scene_description_field(self):
         assert "scene_description" in MANIFEST_SYSTEM_PROMPT
+
+    def test_manifest_prompt_has_background_description_field(self):
+        assert "background_description" in MANIFEST_SYSTEM_PROMPT
 
 
 # ---------------------------------------------------------------------------
@@ -608,6 +689,8 @@ FAKE_MANIFEST_RESPONSE = {
         "skill_coverage_check": "PASS",
     },
     "carried_over_entities": [],
+    "background_changed": True,
+    "background_description": "A warm sunlit forest clearing with golden dappled light filtering through the canopy.",
 }
 
 FAKE_SPRITE_CODE_RESPONSE = {
@@ -688,6 +771,25 @@ class TestGenerateManifest:
                 _generate_manifest(mock_client, "test prompt")
             )
 
+    def test_missing_neg_does_not_raise(self):
+        """Manifest without NEG should succeed — NEG is now optional."""
+        response_no_neg = dict(FAKE_MANIFEST_RESPONSE)
+        response_no_neg = {k: v for k, v in response_no_neg.items() if k != "neg"}
+        mock_response = MagicMock()
+        mock_response.text = json.dumps(response_no_neg)
+        mock_models = AsyncMock()
+        mock_models.generate_content = AsyncMock(return_value=mock_response)
+        mock_aio = MagicMock()
+        mock_aio.models = mock_models
+        mock_client = MagicMock()
+        mock_client.aio = mock_aio
+
+        result = asyncio.get_event_loop().run_until_complete(
+            _generate_manifest(mock_client, "test prompt")
+        )
+        assert "manifest" in result
+        assert "neg" not in result  # NEG is absent, not injected by _generate_manifest
+
 
 class TestBuildSceneImagePrompt:
     def test_includes_scene_description(self):
@@ -698,6 +800,31 @@ class TestBuildSceneImagePrompt:
         prompt = _build_scene_image_prompt(FAKE_MANIFEST_RESPONSE)
         assert "BACKGROUND ONLY" in prompt
         assert "no characters" in prompt.lower()
+
+    def test_prefers_background_description(self):
+        """When background_description is present, use it instead of scene_description."""
+        data = dict(FAKE_MANIFEST_RESPONSE)
+        data["background_description"] = "A deep blue night sky with twinkling stars."
+        data["scene_description"] = "A fox sits beside a rock in a moonlit clearing."
+        prompt = _build_scene_image_prompt(data)
+        assert "deep blue night sky" in prompt
+        assert "fox" not in prompt.lower()
+
+    def test_falls_back_to_scene_description(self):
+        """When background_description is empty, fall back to scene_description."""
+        data = dict(FAKE_MANIFEST_RESPONSE)
+        data["background_description"] = ""
+        data["scene_description"] = "A warm sunlit clearing."
+        prompt = _build_scene_image_prompt(data)
+        assert "warm sunlit clearing" in prompt
+
+    def test_falls_back_when_background_description_missing(self):
+        """When background_description key is missing, fall back to scene_description."""
+        data = dict(FAKE_MANIFEST_RESPONSE)
+        data.pop("background_description", None)
+        data["scene_description"] = "Golden meadow at dawn."
+        prompt = _build_scene_image_prompt(data)
+        assert "Golden meadow at dawn" in prompt
 
 
 class TestGenerateBackgroundImage:
@@ -1128,8 +1255,8 @@ class TestExtractBackgroundSprite:
         result = _extract_background_sprite(img_bytes)
 
         assert result["format"] == "image_background"
-        assert result["width"] == 280
-        assert result["height"] == 180
+        assert result["width"] == 560
+        assert result["height"] == 360
         assert result["x"] == 0
         assert result["y"] == 0
 
@@ -1148,7 +1275,7 @@ class TestExtractBackgroundSprite:
         assert decoded[:4] == b'\x89PNG'
 
     def test_downscales_to_canvas_size(self):
-        """Even if input is larger, output should be 280x180."""
+        """Even if input is larger, output should be 560x360 (upscaled from 280x180)."""
         import base64
         from PIL import Image as _Img
         # Create a large image
@@ -1157,13 +1284,13 @@ class TestExtractBackgroundSprite:
         img.save(buf, format="PNG")
 
         result = _extract_background_sprite(buf.getvalue())
-        assert result["width"] == 280
-        assert result["height"] == 180
+        assert result["width"] == 560
+        assert result["height"] == 360
 
         # Decode and verify actual dimensions
         decoded = base64.b64decode(result["image_base64"])
         out_img = _Img.open(io.BytesIO(decoded))
-        assert out_img.size == (280, 180)
+        assert out_img.size == (560, 360)
 
 
 class TestFallbackMask:
@@ -1285,7 +1412,7 @@ class TestAssembleSpriteCode:
         bg_sprite = {
             "format": "image_background",
             "x": 0, "y": 0,
-            "width": 280, "height": 180,
+            "width": 560, "height": 360,
             "image_base64": "iVBORw0KGgoAAAANS...",  # truncated, just needs to exist
         }
         entity_sprites = {
@@ -1311,8 +1438,9 @@ class TestAssembleSpriteCode:
             }
         }
 
+        entity_positions = _compute_entity_positions(manifest_data)
         result = _assemble_sprite_code(
-            bg_sprite, entity_sprites, entity_masks, manifest_data
+            bg_sprite, entity_sprites, entity_masks, entity_positions
         )
 
         assert "bg" in result
@@ -1336,7 +1464,8 @@ class TestAssembleSpriteCode:
                 ]
             }
         }
-        result = _assemble_sprite_code(None, entity_sprites, {}, manifest_data)
+        entity_positions = _compute_entity_positions(manifest_data)
+        result = _assemble_sprite_code(None, entity_sprites, {}, entity_positions)
         assert result["obj_01"]["x"] == 95   # 100 - 10//2
         assert result["obj_01"]["y"] == 95   # 100 - 10//2
 
@@ -1436,6 +1565,7 @@ class TestPipelineIntegration:
         assert result["manifest"]["scene_id"] == "scene_01"
         assert len(result["narrative_text"]) > 0
         assert result["scene_description"] != ""
+        assert "background_description" in result
 
         # Should have sprite_code with bg and entities
         sc = result["sprite_code"]
@@ -1468,7 +1598,7 @@ class TestPipelineIntegration:
         assert mock_client.aio.models.generate_content.call_count == 6
 
     def test_pipeline_falls_back_on_manifest_error(self):
-        """If manifest generation fails, should fall back to legacy."""
+        """If manifest generation fails on all retries, should fall back to legacy."""
         fail_then_succeed_count = {"n": 0}
         legacy_resp = MagicMock()
         legacy_resp.text = json.dumps(FAKE_INITIAL_RESPONSE)
@@ -1476,7 +1606,8 @@ class TestPipelineIntegration:
         async def fail_then_legacy(*args, **kwargs):
             idx = fail_then_succeed_count["n"]
             fail_then_succeed_count["n"] += 1
-            if idx == 0:
+            # Fail on the first 2 calls (manifest retries), succeed on 3rd (legacy)
+            if idx < 2:
                 raise RuntimeError("Manifest generation failed")
             return legacy_resp
 
@@ -1518,3 +1649,181 @@ class TestPipelineIntegration:
         assert len(state.scenes) == 1
         assert state.scenes[0]["scene_id"] == "scene_01"
         assert "fox_01" in state.active_entities
+
+
+# ---------------------------------------------------------------------------
+# _sanitize_for_isolation — strip cross-entity references
+# ---------------------------------------------------------------------------
+
+class TestSanitizeForIsolation:
+    """Test _sanitize_for_isolation strips cross-entity references."""
+
+    def test_empty_string(self):
+        assert _sanitize_for_isolation("") == ""
+
+    def test_none_returns_none(self):
+        assert _sanitize_for_isolation(None) is None
+
+    def test_no_references_unchanged(self):
+        text = "crouched low with haunches tensed, ready to spring, ears pinned flat"
+        assert _sanitize_for_isolation(text) == text
+
+    def test_strips_against_the_tree_trunk(self):
+        text = "standing on hind legs with front paws resting against the tree trunk, head tilted up"
+        result = _sanitize_for_isolation(text)
+        assert "tree" not in result.lower()
+        assert "head tilted up" in result
+
+    def test_strips_pinned_against_bark(self):
+        text = "pinned flat against the rough bark, fluttering slightly in the breeze"
+        result = _sanitize_for_isolation(text)
+        assert "bark" not in result.lower()
+        assert "fluttering" in result
+
+    def test_strips_sprouting_from_roots(self):
+        text = "sprouting upward from the gnarled roots of the oak"
+        result = _sanitize_for_isolation(text)
+        assert "roots" not in result.lower()
+        assert "oak" not in result.lower()
+
+    def test_strips_stuck_to_tree(self):
+        text = "the map pulses with a soft blue light and is stuck to the tree by a silver pin"
+        result = _sanitize_for_isolation(text)
+        assert "tree" not in result.lower()
+        assert "blue light" in result
+
+    def test_strips_on_the_rock(self):
+        text = "sitting on the mossy rock, tail curled around body"
+        result = _sanitize_for_isolation(text)
+        assert "rock" not in result.lower()
+        assert "tail curled" in result
+
+    def test_strips_beside_the_fence(self):
+        text = "standing upright beside the wooden fence, looking ahead"
+        result = _sanitize_for_isolation(text)
+        assert "fence" not in result.lower()
+        assert "looking ahead" in result
+
+    def test_strips_leaning_against(self):
+        text = "leaning against the tall oak, arms crossed"
+        result = _sanitize_for_isolation(text)
+        assert "oak" not in result.lower()
+        assert "arms crossed" in result
+
+    def test_strips_hanging_from(self):
+        text = "hanging from the branch, swinging gently"
+        result = _sanitize_for_isolation(text)
+        assert "branch" not in result.lower()
+        assert "swinging gently" in result
+
+    def test_preserves_intrinsic_on(self):
+        """'on' as part of intrinsic description should ideally be kept."""
+        text = "standing on hind legs, front paws raised"
+        result = _sanitize_for_isolation(text)
+        # "on hind legs" doesn't match "on the <noun>" pattern
+        assert "hind legs" in result
+
+
+# ---------------------------------------------------------------------------
+# _build_entity_description — sanitized entity descriptions
+# ---------------------------------------------------------------------------
+
+class TestBuildEntityDescription:
+    """Test _build_entity_description sanitizes cross-entity references."""
+
+    def test_basic_entity(self):
+        entity = {
+            "type": "cat",
+            "properties": {
+                "color": "orange",
+                "size": "small",
+                "texture": "fluffy",
+            },
+        }
+        desc = _build_entity_description(entity)
+        assert "orange" in desc
+        assert "cat" in desc
+
+    def test_pose_with_cross_reference_is_sanitized(self):
+        entity = {
+            "type": "fox",
+            "properties": {
+                "color": "orange",
+                "size": "small",
+                "texture": "fluffy",
+            },
+            "pose": "standing on hind legs with paws resting against the tree trunk, head tilted up",
+        }
+        desc = _build_entity_description(entity)
+        assert "fox" in desc
+        assert "tree" not in desc.lower()
+        assert "trunk" not in desc.lower()
+
+    def test_distinctive_features_with_cross_reference_is_sanitized(self):
+        entity = {
+            "type": "map",
+            "properties": {
+                "color": "yellow",
+                "size": "small",
+                "texture": "parchment",
+                "distinctive_features": "stuck to the tree by a silver pin",
+            },
+        }
+        desc = _build_entity_description(entity)
+        assert "map" in desc
+        assert "tree" not in desc.lower()
+
+    def test_clean_pose_preserved(self):
+        entity = {
+            "type": "rabbit",
+            "properties": {
+                "color": "brown",
+                "size": "small",
+                "texture": "fluffy",
+            },
+            "pose": "crouched low, ears pinned flat, ready to spring",
+            "emotion": "alert",
+        }
+        desc = _build_entity_description(entity)
+        assert "crouched low" in desc
+        assert "ears pinned flat" in desc
+        assert "alert" in desc
+
+
+# ---------------------------------------------------------------------------
+# Background carry-over — StoryState stores and retrieves bg
+# ---------------------------------------------------------------------------
+
+class TestBackgroundCarryOver:
+    """Test that backgrounds are stored in StoryState and reusable."""
+
+    def test_story_state_stores_bg(self):
+        """add_scene stores the bg sprite_code entry."""
+        state = StoryState(session_id="s1", participant_id="P01")
+        fake_bg = {
+            "format": "image_background",
+            "x": 0, "y": 0,
+            "width": 560, "height": 360,
+            "image_base64": "AAAA",
+        }
+        state.add_scene(
+            scene_id="scene_01",
+            narrative_text="test",
+            manifest=FAKE_INITIAL_RESPONSE["manifest"],
+            neg=FAKE_INITIAL_RESPONSE["neg"],
+            sprite_code={"bg": fake_bg, "fox_01": "some code"},
+        )
+        stored = state.get_entity_sprite("bg")
+        assert stored is not None
+        assert stored["format"] == "image_background"
+        assert stored["image_base64"] == "AAAA"
+
+    def test_story_state_no_bg_returns_none(self):
+        """get_entity_sprite returns None when no bg stored."""
+        state = StoryState(session_id="s1", participant_id="P01")
+        assert state.get_entity_sprite("bg") is None
+
+    def test_validate_background_changed_false_passthrough(self):
+        """background_changed=false flows through validation."""
+        result = _validate_scene_response(FAKE_CONTINUATION_RESPONSE)
+        assert result["background_changed"] is False

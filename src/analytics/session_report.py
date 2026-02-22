@@ -1,4 +1,4 @@
-"""Post-session analytics: SLP report generation via Gemini 3 Flash."""
+"""Post-session analytics: SLP report generation via Gemini 3.1 Pro."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from google.genai import types
 
 from src.models.student_profile import StudentProfile
 
-MODEL_ID = "gemini-3-flash-preview"
+MODEL_ID = "gemini-3.1-pro-preview"
 
 # ---------------------------------------------------------------------------
 # Prompt

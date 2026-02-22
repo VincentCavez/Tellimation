@@ -30,8 +30,8 @@
     </div>
   </div>
 
-  <script src="/static/engine.js"></script>
-  <script src="/static/scene_picker.js"></script>
+  <script src="/static/engine.js?v=2"></script>
+  <script src="/static/scene_picker.js?v=2"></script>
   <script>
     (function() {
       const apiKey = sessionStorage.getItem('api_key');
@@ -51,8 +51,20 @@
       let branches = [];
       let fromDisk = false;
 
+      // Track which scene indices have masks ready (clickable)
+      var masksReadySet = {};
+      // Map from scene index to its DOM card element
+      var cardElements = {};
+      // Timestamp when each card was appended (for minimum loading display)
+      var cardAppendedAt = {};
+      // Minimum time (ms) the loading state must be visible
+      var MIN_LOADING_MS = 1500;
+      // Queue of mask-ready events that arrived before the minimum delay
+      var pendingMaskReady = {};
+
       // Step weights for progress calculation (% within a single scene)
       var stepWeights = {
+        starting: 5,
         manifest: 20,
         images: 45,
         masks: 85,
@@ -60,6 +72,7 @@
       };
 
       var stepLabels = {
+        starting: 'Getting creative...',
         manifest: 'Imagining a story...',
         images: 'Drawing the scene...',
         masks: 'Adding details...',
@@ -124,7 +137,40 @@
           updateProgress(msg.scene_index, msg.total_scenes, msg.step);
         }
 
+        if (msg.type === 'scene_ready') {
+          // A single scene just finished generating — show it immediately (greyed out)
+          branches.push(msg.scene);
+          container.style.display = '';
+          appendThumbnail(msg.scene, branches.length - 1, false);
+        }
+
+        if (msg.type === 'masks_ready') {
+          // Masks generated for a scene — enable clicking
+          // Enforce minimum loading display time so the user sees the greyed-out state
+          var appearedAt = cardAppendedAt[msg.index];
+          if (appearedAt) {
+            var elapsed = Date.now() - appearedAt;
+            if (elapsed < MIN_LOADING_MS) {
+              (function(idx) {
+                setTimeout(function() { enableThumbnail(idx); }, MIN_LOADING_MS - elapsed);
+              })(msg.index);
+            } else {
+              enableThumbnail(msg.index);
+            }
+          } else {
+            // Card not yet shown — queue it
+            pendingMaskReady[msg.index] = true;
+          }
+        }
+
+        if (msg.type === 'initial_scenes_done') {
+          // All scenes finished generating
+          hideProgress();
+          btnOneMore.style.display = '';
+        }
+
         if (msg.type === 'initial_scenes') {
+          // Backward compat: bulk delivery (from-disk case)
           branches = msg.scenes;
           fromDisk = !!msg.from_disk;
           if (fromDisk) {
@@ -132,13 +178,14 @@
             selSub.textContent = 'Pick a previous story to continue, or start a new one';
           }
           hideProgress();
-          renderThumbnails(branches);
+          renderThumbnails(branches, true); // from-disk = masks already ready
           btnOneMore.style.display = fromDisk ? 'none' : '';
         }
 
         if (msg.type === 'one_more_scene') {
           branches.push(msg.scene);
-          renderThumbnails(branches);
+          var newIdx = msg.index !== undefined ? msg.index : branches.length - 1;
+          appendThumbnail(msg.scene, newIdx, false);
         }
 
         if (msg.type === 'error') {
@@ -155,18 +202,64 @@
         container.innerHTML = '<p style="color:var(--red)">Connection error. Please reload.</p>';
       };
 
-      function renderThumbnails(scenes) {
-        container.innerHTML = '';
-        scenes.forEach(function(scene, index) {
-          const card = ScenePicker.createThumbnailCard(scene, 1.5);
-          card.addEventListener('click', function() {
+      function appendThumbnail(scene, index, ready) {
+        var card = ScenePicker.createThumbnailCard(scene, 1.5);
+
+        // Add a loading overlay with a spinning circle
+        var overlay = document.createElement('div');
+        overlay.className = 'thumb-loading-overlay';
+        var spinner = document.createElement('div');
+        spinner.className = 'thumb-spinner';
+        overlay.appendChild(spinner);
+        card.appendChild(overlay);
+
+        if (ready) {
+          // Already ready (from disk) — no loading state
+          masksReadySet[index] = true;
+          card.classList.remove('loading');
+          overlay.style.display = 'none';
+        } else {
+          card.classList.add('loading');
+          cardAppendedAt[index] = Date.now();
+        }
+
+        card.addEventListener('click', function() {
+          if (masksReadySet[index]) {
             selectScene(index);
-          });
-          container.appendChild(card);
+          }
+        });
+
+        cardElements[index] = card;
+        container.appendChild(card);
+
+        // If masks_ready arrived before scene_ready, schedule enable with min delay
+        if (!ready && pendingMaskReady[index]) {
+          delete pendingMaskReady[index];
+          setTimeout(function() { enableThumbnail(index); }, MIN_LOADING_MS);
+        }
+      }
+
+      function enableThumbnail(index) {
+        masksReadySet[index] = true;
+        var card = cardElements[index];
+        if (card) {
+          card.classList.remove('loading');
+          // Hide the loading overlay
+          var overlay = card.querySelector('.thumb-loading-overlay');
+          if (overlay) overlay.style.display = 'none';
+        }
+      }
+
+      function renderThumbnails(scenes, ready) {
+        container.innerHTML = '';
+        cardElements = {};
+        scenes.forEach(function(scene, index) {
+          appendThumbnail(scene, index, !!ready);
         });
       }
 
       function selectScene(index) {
+        if (!masksReadySet[index]) return; // safety check
         var scene = branches[index];
         // Store chosen scene and go to story page
         sessionStorage.setItem('chosen_scene', JSON.stringify(scene));

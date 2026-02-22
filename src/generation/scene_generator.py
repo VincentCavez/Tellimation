@@ -2,9 +2,10 @@
 
 Supports two modes:
   - use_reference_images=True (default): 5-step pipeline
-      1. Generate manifest + NEG (text-only, Gemini 3 Flash)
-      2a. Generate background image (Gemini 2.5 Flash Image) → downscale → base64 PNG
-      2b. Generate entity images × N (Gemini 2.5 Flash Image, on red #FF0000 chroma-key) → Pillow chroma key → raw pixels
+      1. Generate manifest (text-only, Gemini 3 Flash) — NEG is optional here,
+         generated separately by neg_generator.py
+      2a. Generate background image (Gemini image model) → downscale → base64 PNG
+      2b. Generate entity images × N (Gemini image model, on red #FF0000 chroma-key) → Pillow chroma key → raw pixels
       3. Generate masks (Gemini 3 Flash, receives entity images) → sub-entity IDs per pixel (RLE)
       4. Assembly → {bg: image_background, entity_01: raw_sprite, ...}
   - use_reference_images=False (legacy): single-call all-in-one
@@ -40,33 +41,24 @@ from src.generation.prompts.sprite_prompt import (
     MASK_SYSTEM_PROMPT,
     MASK_USER_PROMPT,
 )
+from src.generation.utils import (
+    extract_json as _extract_json,
+    get_response_text as _get_response_text,
+)
 
 logger = logging.getLogger(__name__)
 
 MODEL_ID = "gemini-3-flash-preview"
-IMAGE_MODEL_ID = "gemini-2.5-flash-image"
+IMAGE_MODEL_ID = "gemini-3-pro-image-preview"
 
+# Timeouts (seconds) for individual LLM calls to prevent indefinite hangs
+MANIFEST_TIMEOUT = 30   # text-only call, should be fast
+IMAGE_TIMEOUT = 25      # image generation is inherently slow
+MASK_TIMEOUT = 20       # text + small image input
 
-# ---------------------------------------------------------------------------
-# Response text extraction (avoids thought_signature warnings)
-# ---------------------------------------------------------------------------
-
-def _get_response_text(response: Any) -> str:
-    """Extract text from a Gemini response, skipping thinking/signature parts.
-
-    When thinking_config is enabled, response.text triggers a warning about
-    non-text parts (thought, thought_signature).  This helper accesses the
-    parts directly and concatenates only the text ones.
-    """
-    if response.candidates and response.candidates[0].content:
-        text_parts = []
-        for part in response.candidates[0].content.parts:
-            if hasattr(part, "text") and part.text is not None:
-                text_parts.append(part.text)
-        if text_parts:
-            return "".join(text_parts)
-    # Fallback: let the SDK handle it (may warn, but at least doesn't crash)
-    return response.text
+# Retry counts per call type
+MANIFEST_MAX_RETRIES = 2  # manifest is non-optional, retry on failure
+IMAGE_MAX_RETRIES = 2     # retry entity/background images on timeout or error
 
 
 # ---------------------------------------------------------------------------
@@ -128,87 +120,26 @@ def _build_continuation_prompt(
     )
 
 
-# ---------------------------------------------------------------------------
-# JSON extraction and validation
-# ---------------------------------------------------------------------------
-
-def _extract_json(text: str) -> Dict[str, Any]:
-    """Extract JSON from LLM response, handling markdown fences and trailing text.
-
-    The model sometimes outputs valid JSON followed by extra commentary or
-    duplicate JSON blocks (especially with high thinking budgets).  This
-    helper tries several strategies:
-
-    1. Strip markdown fences and parse.
-    2. If that fails with "Extra data", use json.JSONDecoder to parse only
-       the first complete JSON object and ignore the rest.
-    3. Regex-extract the first ``{...}`` block (greedy, brace-balanced).
-    """
-    # Strip markdown code fences if present
-    cleaned = text.strip()
-    fence_match = re.search(r"```(?:json)?\s*\n?(.*?)\n?\s*```", cleaned, re.DOTALL)
-    if fence_match:
-        cleaned = fence_match.group(1).strip()
-
-    # Strategy 1: plain parse
-    try:
-        return json.loads(cleaned)
-    except json.JSONDecodeError as first_err:
-        # Strategy 2: parse only the first JSON value (ignores trailing data)
-        try:
-            decoder = json.JSONDecoder()
-            obj, _ = decoder.raw_decode(cleaned)
-            if isinstance(obj, dict):
-                return obj
-        except (json.JSONDecodeError, ValueError):
-            pass
-
-        # Strategy 3: find the first brace-balanced {...} substring
-        start = cleaned.find("{")
-        if start != -1:
-            depth = 0
-            in_string = False
-            escape_next = False
-            for i in range(start, len(cleaned)):
-                ch = cleaned[i]
-                if escape_next:
-                    escape_next = False
-                    continue
-                if ch == "\\":
-                    escape_next = True
-                    continue
-                if ch == '"':
-                    in_string = not in_string
-                    continue
-                if in_string:
-                    continue
-                if ch == "{":
-                    depth += 1
-                elif ch == "}":
-                    depth -= 1
-                    if depth == 0:
-                        try:
-                            return json.loads(cleaned[start : i + 1])
-                        except json.JSONDecodeError:
-                            break
-
-        # Nothing worked — raise the original error
-        raise first_err
-
-
 def _validate_scene_response(data: Dict[str, Any]) -> Dict[str, Any]:
-    """Validate and normalize the LLM response into canonical form."""
+    """Validate and normalize the LLM response into canonical form.
+
+    NEG is optional — when the manifest is generated without NEG (new
+    pipeline), the NEG is produced separately by neg_generator.py.
+    If NEG is present, it is validated and included; if absent, an
+    empty NEG is used as placeholder.
+    """
     # Validate manifest
     manifest_data = data.get("manifest")
     if not manifest_data:
         raise ValueError("Response missing 'manifest' field")
     manifest = SceneManifest.model_validate(manifest_data)
 
-    # Validate NEG
+    # Validate NEG (optional — may be absent in new pipeline)
     neg_data = data.get("neg")
-    if not neg_data:
-        raise ValueError("Response missing 'neg' field")
-    neg = NEG.model_validate(neg_data)
+    if neg_data:
+        neg = NEG.model_validate(neg_data)
+    else:
+        neg = NEG()
 
     # Normalize sprite_code
     sprite_code = data.get("sprite_code", {})
@@ -220,55 +151,88 @@ def _validate_scene_response(data: Dict[str, Any]) -> Dict[str, Any]:
     if not isinstance(carried_over, list):
         carried_over = []
 
+    # Normalize background_changed (default True = safe, always regenerate)
+    background_changed = data.get("background_changed", True)
+    if not isinstance(background_changed, bool):
+        background_changed = True
+
     return {
         "narrative_text": data.get("narrative_text", ""),
         "branch_summary": data.get("branch_summary", ""),
         "scene_description": data.get("scene_description", ""),
+        "background_description": data.get("background_description", ""),
         "manifest": manifest.model_dump(),
         "neg": neg.model_dump(),
         "sprite_code": sprite_code,
         "carried_over_entities": carried_over,
+        "background_changed": background_changed,
     }
 
 
 # ---------------------------------------------------------------------------
-# Step 1: Manifest + NEG generation (text-only)
+# Step 1: Manifest generation (text-only, NEG optional)
 # ---------------------------------------------------------------------------
 
 async def _generate_manifest(
     client: Any,
     user_prompt: str,
 ) -> Dict[str, Any]:
-    """Step 1: Generate manifest + NEG (no sprite code).
+    """Step 1: Generate manifest (no sprite code).
+
+    NEG is optional — in the new pipeline, NEG is generated separately
+    by neg_generator.py. If the LLM includes a NEG (legacy prompt or
+    fallback), it is validated but not required.
+
+    Retries up to MANIFEST_MAX_RETRIES times with timeout. This is the only
+    non-optional step — if it fails after all retries, the exception propagates
+    and the pipeline falls back to legacy mode.
 
     Returns:
         Raw parsed dict with narrative_text, branch_summary, scene_description,
-        manifest, neg, carried_over_entities.
+        manifest, (optionally neg), carried_over_entities.
     """
-    response = await client.aio.models.generate_content(
-        model=MODEL_ID,
-        contents=user_prompt,
-        config=types.GenerateContentConfig(
-            system_instruction=MANIFEST_SYSTEM_PROMPT,
-            thinking_config=types.ThinkingConfig(thinking_budget=1024),
-            temperature=0.9,
-            response_mime_type="application/json",
-        ),
-    )
-    data = _extract_json(_get_response_text(response))
+    last_exc: Optional[Exception] = None
+    for attempt in range(1, MANIFEST_MAX_RETRIES + 1):
+        try:
+            response = await asyncio.wait_for(
+                client.aio.models.generate_content(
+                    model=MODEL_ID,
+                    contents=user_prompt,
+                    config=types.GenerateContentConfig(
+                        system_instruction=MANIFEST_SYSTEM_PROMPT,
+                        thinking_config=types.ThinkingConfig(thinking_budget=1024),
+                        temperature=0.9,
+                        response_mime_type="application/json",
+                    ),
+                ),
+                timeout=MANIFEST_TIMEOUT,
+            )
+            data = _extract_json(_get_response_text(response))
 
-    # Validate manifest and NEG
-    manifest_data = data.get("manifest")
-    if not manifest_data:
-        raise ValueError("Manifest response missing 'manifest' field")
-    SceneManifest.model_validate(manifest_data)
+            # Validate manifest (required)
+            manifest_data = data.get("manifest")
+            if not manifest_data:
+                raise ValueError("Manifest response missing 'manifest' field")
+            SceneManifest.model_validate(manifest_data)
 
-    neg_data = data.get("neg")
-    if not neg_data:
-        raise ValueError("Manifest response missing 'neg' field")
-    NEG.model_validate(neg_data)
+            # Validate NEG if present (optional)
+            neg_data = data.get("neg")
+            if neg_data:
+                NEG.model_validate(neg_data)
 
-    return data
+            return data
+
+        except asyncio.TimeoutError:
+            logger.warning("[manifest] Attempt %d/%d timed out after %ds",
+                           attempt, MANIFEST_MAX_RETRIES, MANIFEST_TIMEOUT)
+            last_exc = asyncio.TimeoutError(
+                f"Manifest generation timed out after {MANIFEST_TIMEOUT}s")
+        except Exception as exc:
+            logger.warning("[manifest] Attempt %d/%d failed: %s",
+                           attempt, MANIFEST_MAX_RETRIES, exc)
+            last_exc = exc
+
+    raise last_exc  # type: ignore[misc]
 
 
 # ---------------------------------------------------------------------------
@@ -276,10 +240,17 @@ async def _generate_manifest(
 # ---------------------------------------------------------------------------
 
 def _build_scene_image_prompt(manifest_data: Dict[str, Any]) -> str:
-    """Build the prompt for generating a background-only illustration."""
-    scene_desc = manifest_data.get("scene_description", "")
+    """Build the prompt for generating a background-only illustration.
+
+    Prefers ``background_description`` (entity-free) over ``scene_description``
+    to avoid drawing entities in the background that will be composited separately.
+    """
+    bg_desc = manifest_data.get("background_description", "")
+    if not bg_desc:
+        # Fallback: use scene_description if background_description is missing
+        bg_desc = manifest_data.get("scene_description", "")
     return BACKGROUND_IMAGE_PROMPT_TEMPLATE.format(
-        scene_description=scene_desc,
+        scene_description=bg_desc,
     )
 
 
@@ -287,15 +258,59 @@ def _build_scene_image_prompt(manifest_data: Dict[str, Any]) -> str:
 # Step 2b: Generate individual entity images (Gemini 2.5 Flash Image)
 # ---------------------------------------------------------------------------
 
+# Pattern matching cross-entity references in pose/feature descriptions.
+# Matches phrases like "against the tree trunk", "on the rock", "from the oak",
+# "of the tall oak", etc. that would cause the image model to draw other entities.
+_CROSS_ENTITY_RE = re.compile(
+    r"""\b
+    (against|on|upon|beside|under|beneath|below|above|from|near|
+     of|into|onto|atop|off|behind|inside|within|along|around|over|
+     next\s+to|in\s+front\s+of|on\s+top\s+of|attached\s+to|
+     resting\s+on|resting\s+against|leaning\s+against|leaning\s+on|
+     stuck\s+to|pinned\s+to|nailed\s+to|hanging\s+from|
+     growing\s+from|sprouting\s+from|emerging\s+from)
+    \s+(?:the|a|an)\s+
+    [\w\s,'-]{1,40}?           # noun phrase (up to ~40 chars)
+    (?=\s*[.,;!?]|\s*$|\s+(?:and|with|while|but|looking|head|tail|ears|body))
+    """,
+    re.IGNORECASE | re.VERBOSE,
+)
+
+
+def _sanitize_for_isolation(text: str) -> str:
+    """Remove references to other entities from a description field.
+
+    Strips phrases like 'against the tree', 'on the rock', 'from the oak'
+    that would cause the image model to draw other scene elements.
+
+    This is a safety net for when the LLM still includes cross-entity
+    references despite prompt instructions to avoid them.
+    """
+    if not text:
+        return text
+    text = _CROSS_ENTITY_RE.sub("", text)
+    # Clean up leftover artifacts: double spaces, dangling commas/periods
+    text = re.sub(r"\s{2,}", " ", text)
+    text = re.sub(r",\s*,", ",", text)
+    text = re.sub(r"\.\s*\.", ".", text)
+    text = re.sub(r"^\s*[,;]\s*", "", text)
+    return text.strip().rstrip(",").strip()
+
+
 def _build_entity_description(entity: Dict[str, Any]) -> str:
-    """Build a rich text description of an entity for image generation."""
+    """Build a rich text description of an entity for image generation.
+
+    Sanitizes ``pose`` and ``distinctive_features`` to remove cross-entity
+    references that would cause the image model to draw other scene elements
+    (e.g. a tree trunk behind the fox, bark behind the map).
+    """
     props = entity.get("properties", {})
     etype = entity.get("type", "entity")
     size = props.get("size", "")
     color = props.get("color", "")
     texture = props.get("texture", "")
     pattern = props.get("pattern", "")
-    distinctive = props.get("distinctive_features", "")
+    distinctive = _sanitize_for_isolation(props.get("distinctive_features", ""))
 
     desc = f"A {size} {color} {texture} {etype}".strip()
     if pattern:
@@ -303,7 +318,9 @@ def _build_entity_description(entity: Dict[str, Any]) -> str:
     if entity.get("emotion"):
         desc += f", looking {entity['emotion']}"
     if entity.get("pose"):
-        desc += f", {entity['pose']}"
+        sanitized_pose = _sanitize_for_isolation(entity["pose"])
+        if sanitized_pose:
+            desc += f", {sanitized_pose}"
     if distinctive:
         desc += f". {distinctive}"
     return desc
@@ -317,39 +334,48 @@ async def _generate_entity_image(
     """Generate a single entity image on red chroma-key background.
 
     Uses Gemini 2.5 Flash Image to produce a pixel art sprite
-    on solid #FF0000 red background.
+    on solid #FF0000 red background. Retries up to IMAGE_MAX_RETRIES
+    times on failure or timeout.
 
     Returns:
-        PNG image bytes, or None if generation fails.
+        PNG image bytes, or None if generation fails after all retries.
     """
     entity_desc = _build_entity_description(entity)
     prompt = ENTITY_IMAGE_PROMPT.format(entity_description=entity_desc)
+    eid = entity["id"]
 
-    try:
-        response = await client.aio.models.generate_content(
-            model=IMAGE_MODEL_ID,
-            contents=prompt,
-            config=types.GenerateContentConfig(
-                response_modalities=["IMAGE"],
-                image_config=types.ImageConfig(
-                    aspect_ratio="1:1",
+    for attempt in range(1, IMAGE_MAX_RETRIES + 1):
+        try:
+            response = await asyncio.wait_for(
+                client.aio.models.generate_content(
+                    model=IMAGE_MODEL_ID,
+                    contents=prompt,
+                    config=types.GenerateContentConfig(
+                        response_modalities=["IMAGE"],
+                        image_config=types.ImageConfig(
+                            aspect_ratio="1:1",
+                        ),
+                    ),
                 ),
-            ),
-        )
+                timeout=IMAGE_TIMEOUT,
+            )
 
-        if response.candidates and response.candidates[0].content:
-            for part in response.candidates[0].content.parts:
-                if part.inline_data is not None:
-                    logger.info("[entity-image] %s: got image (%d bytes)",
-                                entity["id"], len(part.inline_data.data))
-                    return part.inline_data.data
+            if response.candidates and response.candidates[0].content:
+                for part in response.candidates[0].content.parts:
+                    if part.inline_data is not None:
+                        logger.info("[entity-image] %s: got image (%d bytes)",
+                                    eid, len(part.inline_data.data))
+                        return part.inline_data.data
 
-        logger.warning("[entity-image] %s: no image data returned", entity["id"])
-        return None
+            logger.warning("[entity-image] %s: attempt %d/%d no image data returned",
+                           eid, attempt, IMAGE_MAX_RETRIES)
 
-    except Exception as exc:
-        logger.warning("[entity-image] %s: generation failed: %s", entity["id"], exc)
-        return None
+        except Exception as exc:
+            logger.warning("[entity-image] %s: attempt %d/%d failed: %s",
+                           eid, attempt, IMAGE_MAX_RETRIES, exc)
+
+    logger.warning("[entity-image] %s: all %d attempts exhausted", eid, IMAGE_MAX_RETRIES)
+    return None
 
 
 async def _generate_entity_images_parallel(
@@ -379,7 +405,15 @@ async def _generate_entity_images_parallel(
         _generate_entity_image(client, ent, scene_desc)
         for ent in entities_to_generate
     ]
-    results = await asyncio.gather(*tasks, return_exceptions=True)
+
+    try:
+        results = await asyncio.wait_for(
+            asyncio.gather(*tasks, return_exceptions=True),
+            timeout=IMAGE_TIMEOUT * IMAGE_MAX_RETRIES + 5,
+        )
+    except asyncio.TimeoutError:
+        logger.warning("[entity-images] Global timeout — returning empty")
+        return {}
 
     entity_images: Dict[str, bytes] = {}
     for ent, result in zip(entities_to_generate, results):
@@ -552,8 +586,12 @@ def _extract_background_sprite(image_bytes: bytes) -> Dict[str, Any]:
     we skip palette quantization entirely and just downscale + encode as
     base64 PNG.  The client renders it directly to the pixel buffer.
 
-    1. Open image and downscale to 280×180 with nearest-neighbor
-    2. Re-encode as PNG and base64
+    1. Open image and downscale to 280×180 with nearest-neighbor (preserves pixelated look)
+    2. Upscale to 560×360 with nearest-neighbor (each pixel becomes a 2×2 block)
+    3. Re-encode as PNG and base64
+
+    The two-step resize keeps the background's pixelated aesthetic while
+    matching the 560×360 pixel buffer used by the client.
 
     Returns:
         Dict with format="image_background", width, height, image_base64.
@@ -563,8 +601,10 @@ def _extract_background_sprite(image_bytes: bytes) -> Dict[str, Any]:
     img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
     logger.info("[extract-bg] Original: %dx%d", img.width, img.height)
 
-    # Downscale to canvas size
+    # Step 1: Downscale to 280×180 (keeps pixelated look from generation)
     img = img.resize((280, 180), Image.NEAREST)
+    # Step 2: Upscale to 560×360 via nearest-neighbor (each pixel → 2×2 block)
+    img = img.resize((560, 360), Image.NEAREST)
 
     # Re-encode as PNG
     out = io.BytesIO()
@@ -572,15 +612,15 @@ def _extract_background_sprite(image_bytes: bytes) -> Dict[str, Any]:
     png_bytes = out.getvalue()
 
     b64 = base64.b64encode(png_bytes).decode("ascii")
-    logger.info("[extract-bg] image_background: 280x180, %d bytes PNG, %d chars base64",
+    logger.info("[extract-bg] image_background: 560x360, %d bytes PNG, %d chars base64",
                 len(png_bytes), len(b64))
 
     return {
         "format": "image_background",
         "x": 0,
         "y": 0,
-        "width": 280,
-        "height": 180,
+        "width": 560,
+        "height": 360,
         "image_base64": b64,
     }
 
@@ -694,15 +734,18 @@ async def _generate_mask_for_entity(
     ]
 
     try:
-        response = await client.aio.models.generate_content(
-            model=MODEL_ID,
-            contents=contents,
-            config=types.GenerateContentConfig(
-                system_instruction=system_text,
-                thinking_config=types.ThinkingConfig(thinking_budget=1024),
-                temperature=0.3,
-                response_mime_type="application/json",
+        response = await asyncio.wait_for(
+            client.aio.models.generate_content(
+                model=MODEL_ID,
+                contents=contents,
+                config=types.GenerateContentConfig(
+                    system_instruction=system_text,
+                    thinking_config=types.ThinkingConfig(thinking_budget=256),
+                    temperature=0.3,
+                    response_mime_type="application/json",
+                ),
             ),
+            timeout=MASK_TIMEOUT,
         )
 
         data = _extract_json(_get_response_text(response))
@@ -838,7 +881,18 @@ async def _generate_masks_parallel(
         return {}
 
     logger.info("[masks] Generating masks for %d entities in parallel...", len(tasks))
-    results = await asyncio.gather(*tasks, return_exceptions=True)
+
+    try:
+        results = await asyncio.wait_for(
+            asyncio.gather(*tasks, return_exceptions=True),
+            timeout=MASK_TIMEOUT + 5,  # small buffer over individual timeouts
+        )
+    except asyncio.TimeoutError:
+        logger.warning("[masks] Global mask generation timed out, using fallback masks")
+        return {
+            eid: _build_fallback_mask(eid, entity_sprites[eid]["pixels"])
+            for eid in entity_ids
+        }
 
     masks: Dict[str, List[Optional[str]]] = {}
     for eid, result in zip(entity_ids, results):
@@ -877,47 +931,77 @@ async def _generate_background_image(
 
     Generates at 16:9 aspect ratio then downscales to 280×180
     (canvas size) using nearest-neighbor for pixel-art aesthetic.
+    Retries up to IMAGE_MAX_RETRIES times on failure or timeout.
 
     Returns:
-        PNG image bytes at 280×180, or None if generation fails.
+        PNG image bytes at 280×180, or None if generation fails after all retries.
     """
     prompt = _build_scene_image_prompt(manifest_data)
 
-    try:
-        response = await client.aio.models.generate_content(
-            model=IMAGE_MODEL_ID,
-            contents=prompt,
-            config=types.GenerateContentConfig(
-                response_modalities=["IMAGE"],
-                image_config=types.ImageConfig(
-                    aspect_ratio="16:9",
+    for attempt in range(1, IMAGE_MAX_RETRIES + 1):
+        try:
+            response = await asyncio.wait_for(
+                client.aio.models.generate_content(
+                    model=IMAGE_MODEL_ID,
+                    contents=prompt,
+                    config=types.GenerateContentConfig(
+                        response_modalities=["IMAGE"],
+                        image_config=types.ImageConfig(
+                            aspect_ratio="16:9",
+                        ),
+                    ),
                 ),
-            ),
-        )
+                timeout=IMAGE_TIMEOUT,
+            )
 
-        if response.candidates and response.candidates[0].content:
-            for part in response.candidates[0].content.parts:
-                if part.inline_data is not None:
-                    raw_bytes = part.inline_data.data
-                    return _downscale_to_canvas(raw_bytes)
+            if response.candidates and response.candidates[0].content:
+                for part in response.candidates[0].content.parts:
+                    if part.inline_data is not None:
+                        raw_bytes = part.inline_data.data
+                        return _downscale_to_canvas(raw_bytes)
 
-        logger.warning("[bg-image] No image data returned")
-        return None
+            logger.warning("[bg-image] Attempt %d/%d: no image data returned",
+                           attempt, IMAGE_MAX_RETRIES)
 
-    except Exception as exc:
-        logger.warning("[bg-image] Generation failed: %s", exc)
-        return None
+        except Exception as exc:
+            logger.warning("[bg-image] Attempt %d/%d failed: %s",
+                           attempt, IMAGE_MAX_RETRIES, exc)
+
+    logger.warning("[bg-image] All %d attempts exhausted", IMAGE_MAX_RETRIES)
+    return None
 
 
 # ---------------------------------------------------------------------------
 # Step 4: Assembly — combine background + entity sprites + masks
 # ---------------------------------------------------------------------------
 
+def _compute_entity_positions(manifest_data: Dict[str, Any]) -> Dict[str, Dict[str, int]]:
+    """Extract top-left positions and sizes for all entities in a manifest.
+
+    Returns:
+        Dict mapping entity_id -> {"x": int, "y": int, "w": int, "h": int}.
+    """
+    positions = {}
+    for ent in manifest_data.get("manifest", {}).get("entities", []):
+        eid = ent["id"]
+        pos = ent.get("position", {})
+        w = ent.get("width_hint", 50)
+        h = ent.get("height_hint", 60)
+        # Position is center; compute top-left
+        positions[eid] = {
+            "x": pos.get("x", 0) - w // 2,
+            "y": pos.get("y", 0) - h // 2,
+            "w": w,
+            "h": h,
+        }
+    return positions
+
+
 def _assemble_sprite_code(
     bg_sprite: Optional[Dict[str, Any]],
     entity_sprites: Dict[str, Dict[str, Any]],
     entity_masks: Dict[str, List[Optional[str]]],
-    manifest_data: Dict[str, Any],
+    entity_positions: Dict[str, Dict[str, int]],
 ) -> Dict[str, Any]:
     """Assemble the final sprite_code dict from all pipeline outputs.
 
@@ -932,22 +1016,8 @@ def _assemble_sprite_code(
     if bg_sprite:
         sprite_code["bg"] = bg_sprite
         bg_fmt = bg_sprite.get("format", "unknown")
-        logger.info("[assemble] bg: %s 280x180", bg_fmt)
-
-    # Entity positions from manifest
-    entity_positions = {}
-    for ent in manifest_data.get("manifest", {}).get("entities", []):
-        eid = ent["id"]
-        pos = ent.get("position", {})
-        w = ent.get("width_hint", 50)
-        h = ent.get("height_hint", 60)
-        # Position is center; compute top-left
-        entity_positions[eid] = {
-            "x": pos.get("x", 0) - w // 2,
-            "y": pos.get("y", 0) - h // 2,
-            "w": w,
-            "h": h,
-        }
+        logger.info("[assemble] bg: %s %dx%d", bg_fmt,
+                    bg_sprite.get("width", "?"), bg_sprite.get("height", "?"))
 
     # Entities as raw_sprite
     for eid, sprite in entity_sprites.items():
@@ -1009,7 +1079,9 @@ async def generate_scene(
     commit_to_state: bool = True,
     extra_prompt: str = "",
     use_reference_images: bool = True,
+    skip_masks: bool = False,
     progress_callback: Optional[Callable] = None,
+    neg_override: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """Generate a single scene via Gemini 3 Flash.
 
@@ -1024,8 +1096,15 @@ async def generate_scene(
         extra_prompt: Additional text appended to the user prompt (e.g. branch directive).
         use_reference_images: If True, use 5-step pipeline with reference image.
             If False, use legacy single-call pipeline.
+        skip_masks: If True, skip mask generation (Step 3) and use fallback
+            root-entity-ID masks. Useful for thumbnails where masks aren't
+            needed yet. Masks can be generated later when the scene is selected.
         progress_callback: Optional async callback called after each pipeline step.
-            Receives a step name string: "manifest", "images", "masks", "assembly".
+            Receives a step name string: "starting", "manifest", "images", "masks", "assembly".
+        neg_override: Optional NEG dict to inject into the result. When the
+            NEG is generated separately (by neg_generator.py), pass it here
+            to attach it to the scene. If None and the manifest contains a
+            NEG, the manifest's NEG is used.
 
     Returns:
         Dict with narrative_text, branch_summary, manifest, neg,
@@ -1054,10 +1133,15 @@ async def generate_scene(
 
     if use_reference_images:
         result = await _pipeline_with_reference_image(
-            client, user_prompt, story_state, progress_callback
+            client, user_prompt, story_state, skip_masks, progress_callback
         )
     else:
         result = await _generate_scene_legacy(client, user_prompt)
+
+    # Inject externally-provided NEG if given
+    if neg_override is not None:
+        neg = NEG.model_validate(neg_override)
+        result["neg"] = neg.model_dump()
 
     # Update story_state if provided and commit requested
     if story_state is not None and commit_to_state:
@@ -1072,18 +1156,81 @@ async def generate_scene(
     return result
 
 
+async def generate_masks_for_scene(
+    api_key: str,
+    scene: Dict[str, Any],
+) -> Dict[str, Any]:
+    """Generate masks for a scene that was created with skip_masks=True.
+
+    Retroactively generates sub-entity ID masks for all entities in the
+    scene's sprite_code and updates the scene dict in-place.
+
+    Args:
+        api_key: Gemini API key.
+        scene: Scene dict with sprite_code containing raw_sprite entries
+            that have fallback (root-ID only) masks.
+
+    Returns:
+        The updated scene dict (also modified in-place).
+    """
+    sprite_code = scene.get("sprite_code", {})
+    if not sprite_code:
+        return scene
+
+    client = genai.Client(api_key=api_key)
+    manifest_data = {"manifest": scene.get("manifest", {})}
+
+    # Collect entities that need real masks
+    entity_images: Dict[str, bytes] = {}
+    entity_sprites: Dict[str, Dict[str, Any]] = {}
+
+    for eid, entry in sprite_code.items():
+        if eid == "bg":
+            continue
+        if not isinstance(entry, dict) or entry.get("format") != "raw_sprite":
+            continue
+        # Build the sprite dict expected by mask generation
+        entity_sprites[eid] = {
+            "w": entry["w"],
+            "h": entry["h"],
+            "pixels": entry["pixels"],
+        }
+        # Convert sprite pixels to a small PNG for the mask LLM
+        entity_images[eid] = _sprite_to_png(entity_sprites[eid])
+
+    if not entity_sprites:
+        return scene
+
+    logger.info("[generate-masks] Generating masks for %d entities...",
+                len(entity_sprites))
+    entity_masks = await _generate_masks_parallel(
+        client, entity_images, entity_sprites, manifest_data
+    )
+
+    # Update sprite_code in-place with real masks
+    for eid, mask in entity_masks.items():
+        if eid in sprite_code:
+            sprite_code[eid]["mask"] = mask
+            mask_count = sum(1 for m in mask if m is not None)
+            logger.info("[generate-masks] %s: updated with %d mask entries", eid, mask_count)
+
+    return scene
+
+
 async def _pipeline_with_reference_image(
     client: Any,
     user_prompt: str,
     story_state: Optional[StoryState],
+    skip_masks: bool = False,
     progress_callback: Optional[Callable] = None,
 ) -> Dict[str, Any]:
     """Run the 5-step pipeline:
 
-    Step 1: Manifest + NEG (Gemini 3 Flash, text-only)
-    Step 2a: Background image (Gemini 2.5 Flash Image) -> downscale -> base64 PNG
-    Step 2b: Entity images x N (Gemini 2.5 Flash Image, red #FF0000 chroma-key) -> Pillow chroma key -> raw pixels
+    Step 1: Manifest (Gemini 3 Flash, text-only) — NEG is optional here
+    Step 2a: Background image (Gemini image model) -> downscale -> base64 PNG
+    Step 2b: Entity images x N (Gemini image model, red #FF0000 chroma-key) -> Pillow chroma key -> raw pixels
     Step 3: Mask generation (Gemini 3 Flash, receives entity images) -> sub-entity IDs
+           (skipped when skip_masks=True — uses fallback root-entity-ID masks)
     Step 4: Assembly -> {bg: image_background, entity: raw_sprite, ...}
 
     Steps 2a and 2b run in parallel. Step 3 waits for 2b.
@@ -1097,8 +1244,10 @@ async def _pipeline_with_reference_image(
                 pass  # Don't let callback errors break the pipeline
 
     try:
-        # ── Step 1: Manifest + NEG ──────────────────────────────────────────
-        logger.info("[pipeline] Step 1: Generating manifest + NEG...")
+        await _notify("starting")
+
+        # ── Step 1: Manifest (NEG optional) ──────────────────────────────────
+        logger.info("[pipeline] Step 1: Generating manifest...")
         manifest_data = await _generate_manifest(client, user_prompt)
         scene_desc = manifest_data.get("scene_description", "")
         logger.info("[pipeline] Step 1 done. scene_description=%s", scene_desc[:80])
@@ -1109,18 +1258,42 @@ async def _pipeline_with_reference_image(
             carried_over = []
 
         # ── Step 2a + 2b: Background + Entity images (PARALLEL) ────────────
-        logger.info("[pipeline] Step 2: Generating background + entity images in parallel...")
+        background_changed = manifest_data.get("background_changed", True)
+        reused_bg_sprite: Optional[Dict[str, Any]] = None
 
-        bg_task = _generate_background_image(client, manifest_data)
-        entity_task = _generate_entity_images_parallel(
-            client, manifest_data, carried_over, scene_desc
-        )
+        # Check if we can reuse the background from story_state
+        if not background_changed and story_state is not None:
+            old_bg = story_state.get_entity_sprite("bg")
+            if (old_bg and isinstance(old_bg, dict)
+                    and old_bg.get("format") == "image_background"):
+                reused_bg_sprite = old_bg
+                logger.info("[pipeline] Step 2a: REUSING background "
+                            "(background_changed=false)")
 
-        bg_image_bytes, entity_images = await asyncio.gather(bg_task, entity_task)
+        bg_image_bytes: Optional[bytes] = None
+        if reused_bg_sprite is not None:
+            # Skip background generation, only generate entity images
+            logger.info("[pipeline] Step 2: Generating entity images only "
+                        "(background reused)...")
+            entity_images = await _generate_entity_images_parallel(
+                client, manifest_data, carried_over, scene_desc
+            )
+        else:
+            # Generate both background and entity images in parallel
+            logger.info("[pipeline] Step 2: Generating background + "
+                        "entity images in parallel...")
+            bg_task = _generate_background_image(client, manifest_data)
+            entity_task = _generate_entity_images_parallel(
+                client, manifest_data, carried_over, scene_desc
+            )
+            bg_image_bytes, entity_images = await asyncio.gather(
+                bg_task, entity_task
+            )
 
         if bg_image_bytes:
-            logger.info("[pipeline] Step 2a done. Background: %d bytes", len(bg_image_bytes))
-        else:
+            logger.info("[pipeline] Step 2a done. Background: %d bytes",
+                        len(bg_image_bytes))
+        elif reused_bg_sprite is None:
             logger.warning("[pipeline] Step 2a: No background image generated!")
 
         logger.info("[pipeline] Step 2b done. Entity images: %s",
@@ -1131,7 +1304,10 @@ async def _pipeline_with_reference_image(
 
         # Background -> image_background (base64 PNG, non-interactive)
         bg_sprite: Optional[Dict[str, Any]] = None
-        if bg_image_bytes:
+        if reused_bg_sprite is not None:
+            bg_sprite = reused_bg_sprite
+            logger.info("[pipeline] Using reused background sprite")
+        elif bg_image_bytes:
             logger.info("[pipeline] Extracting background image...")
             bg_sprite = _extract_background_sprite(bg_image_bytes)
 
@@ -1153,34 +1329,63 @@ async def _pipeline_with_reference_image(
             )
 
         # ── Step 3: Mask generation ────────────────────────────────────────
-        logger.info("[pipeline] Step 3: Generating masks for %d entities...",
-                    len(entity_sprites))
-
-        entity_masks = await _generate_masks_parallel(
-            client, entity_images, entity_sprites, manifest_data
-        )
-        logger.info("[pipeline] Step 3 done. Masks: %s",
-                    {eid: sum(1 for m in mask if m is not None)
-                     for eid, mask in entity_masks.items()})
+        if skip_masks:
+            logger.info("[pipeline] Step 3: SKIPPED (skip_masks=True), using fallback masks")
+            entity_masks: Dict[str, List[Optional[str]]] = {
+                eid: _build_fallback_mask(eid, sprite["pixels"])
+                for eid, sprite in entity_sprites.items()
+            }
+        else:
+            logger.info("[pipeline] Step 3: Generating masks for %d entities...",
+                        len(entity_sprites))
+            entity_masks = await _generate_masks_parallel(
+                client, entity_images, entity_sprites, manifest_data
+            )
+            logger.info("[pipeline] Step 3 done. Masks: %s",
+                        {eid: sum(1 for m in mask if m is not None)
+                         for eid, mask in entity_masks.items()})
         await _notify("masks")
 
         # ── Step 4: Assembly ───────────────────────────────────────────────
         logger.info("[pipeline] Step 4: Assembling sprite_code...")
+        entity_positions = _compute_entity_positions(manifest_data)
         sprite_code = _assemble_sprite_code(
-            bg_sprite, entity_sprites, entity_masks, manifest_data
+            bg_sprite, entity_sprites, entity_masks, entity_positions
         )
+
+        # ── Step 4b: Backfill carried-over entities from StoryState ──────
+        if story_state and carried_over:
+            for eid in carried_over:
+                if eid in sprite_code:
+                    continue  # already assembled (shouldn't happen, but safe)
+                old_sprite = story_state.get_entity_sprite(eid)
+                if old_sprite and isinstance(old_sprite, dict):
+                    # Copy sprite data with updated position from new manifest
+                    reused = dict(old_sprite)
+                    pos = entity_positions.get(eid)
+                    if pos:
+                        reused["x"] = pos["x"]
+                        reused["y"] = pos["y"]
+                    sprite_code[eid] = reused
+                    logger.info("[pipeline] Reused carried-over sprite for %s at (%s,%s)",
+                                eid, reused.get("x"), reused.get("y"))
+                else:
+                    logger.warning("[pipeline] Carried-over entity %s has no stored sprite", eid)
+
         logger.info("[pipeline] Step 4 done. %d entries: %s",
                     len(sprite_code), list(sprite_code.keys()))
         await _notify("assembly")
 
         # ── Validate and return ────────────────────────────────────────────
         manifest = SceneManifest.model_validate(manifest_data["manifest"])
-        neg = NEG.model_validate(manifest_data["neg"])
+        neg_data = manifest_data.get("neg")
+        neg = NEG.model_validate(neg_data) if neg_data else NEG()
 
         result = {
             "narrative_text": manifest_data.get("narrative_text", ""),
             "branch_summary": manifest_data.get("branch_summary", ""),
             "scene_description": manifest_data.get("scene_description", ""),
+            "background_description": manifest_data.get("background_description", ""),
             "manifest": manifest.model_dump(),
             "neg": neg.model_dump(),
             "sprite_code": sprite_code,

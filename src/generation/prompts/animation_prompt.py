@@ -35,8 +35,8 @@ flow all visualize the actual state.
 ```javascript
 function animate(buf, PW, PH, t) {
   // buf: flat pixel buffer array, length = PW * PH
-  // PW:  pixel buffer width (280)
-  // PH:  pixel buffer height (180)
+  // PW:  pixel buffer width (560)
+  // PH:  pixel buffer height (360)
   // t:   normalized time, 0.0 (start) to 1.0 (end)
 }
 ```

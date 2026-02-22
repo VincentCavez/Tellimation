@@ -66,55 +66,55 @@
     // -----------------------------------------------------------------------
     // 1. Create buffer and draw a scene
     // -----------------------------------------------------------------------
-    const buf = new PixelBuffer(280, 180);
+    const buf = new PixelBuffer(560, 360);
 
     // Draw background
     const canvas = document.getElementById('scene');
-    const renderer = new Renderer(canvas, buf, 3);
+    const renderer = new Renderer(canvas, buf, 1.5);
     renderer.drawBackground('forest');
 
     // Draw a snowman with hierarchical entity IDs
     // Body (bottom, middle, top)
-    buf.circ(140, 150, 18, 255, 255, 255, 'snowman.body.bottom');
-    buf.circ(140, 124, 14, 255, 255, 255, 'snowman.body.middle');
-    buf.circ(140, 104, 10, 255, 255, 255, 'snowman.head');
+    buf.circ(280, 300, 36, 255, 255, 255, 'snowman.body.bottom');
+    buf.circ(280, 248, 28, 255, 255, 255, 'snowman.body.middle');
+    buf.circ(280, 208, 20, 255, 255, 255, 'snowman.head');
 
     // Eyes
-    buf.circ(136, 101, 1, 0, 0, 0, 'snowman.head.eyes.left');
-    buf.circ(144, 101, 1, 0, 0, 0, 'snowman.head.eyes.right');
+    buf.circ(272, 202, 2, 0, 0, 0, 'snowman.head.eyes.left');
+    buf.circ(288, 202, 2, 0, 0, 0, 'snowman.head.eyes.right');
 
     // Nose (carrot)
-    buf.tri(140, 104, 140, 106, 148, 105, 255, 140, 0, 'snowman.head.nose');
+    buf.tri(280, 208, 280, 212, 296, 210, 255, 140, 0, 'snowman.head.nose');
 
     // Hat
-    buf.rect(131, 90, 18, 3, 40, 40, 40, 'snowman.hat.brim');
-    buf.rect(134, 78, 12, 12, 40, 40, 40, 'snowman.hat.top');
+    buf.rect(262, 180, 36, 6, 40, 40, 40, 'snowman.hat.brim');
+    buf.rect(268, 156, 24, 24, 40, 40, 40, 'snowman.hat.top');
 
     // Buttons on middle
-    buf.circ(140, 120, 1, 0, 0, 0, 'snowman.body.middle.button1');
-    buf.circ(140, 125, 1, 0, 0, 0, 'snowman.body.middle.button2');
-    buf.circ(140, 130, 1, 0, 0, 0, 'snowman.body.middle.button3');
+    buf.circ(280, 240, 2, 0, 0, 0, 'snowman.body.middle.button1');
+    buf.circ(280, 250, 2, 0, 0, 0, 'snowman.body.middle.button2');
+    buf.circ(280, 260, 2, 0, 0, 0, 'snowman.body.middle.button3');
 
     // Arms (lines)
-    buf.line(126, 124, 108, 115, 100, 70, 30, 'snowman.body.arm_left');
-    buf.line(154, 124, 172, 115, 100, 70, 30, 'snowman.body.arm_right');
+    buf.line(252, 248, 216, 230, 100, 70, 30, 'snowman.body.arm_left');
+    buf.line(308, 248, 344, 230, 100, 70, 30, 'snowman.body.arm_right');
 
     // A tree on the right
-    buf.rect(220, 100, 6, 30, 100, 70, 30, 'tree_01.trunk');
-    buf.tri(200, 105, 245, 105, 223, 65, 34, 120, 34, 'tree_01.foliage');
+    buf.rect(440, 200, 12, 60, 100, 70, 30, 'tree_01.trunk');
+    buf.tri(400, 210, 490, 210, 446, 130, 34, 120, 34, 'tree_01.foliage');
 
     // A sun (top-left arc + circle)
-    buf.circ(30, 25, 12, 255, 220, 50, 'sun');
+    buf.circ(60, 50, 24, 255, 220, 50, 'sun');
 
     // Thick line test (scarf)
-    buf.thickLine(130, 112, 155, 118, 3, 200, 30, 30, 'snowman.scarf');
+    buf.thickLine(260, 224, 310, 236, 6, 200, 30, 30, 'snowman.scarf');
 
     // Arc test (rainbow fragment)
-    buf.arc(200, 40, 25, Math.PI, Math.PI * 1.5, 255, 0, 0, 'rainbow.red');
-    buf.arc(200, 40, 27, Math.PI, Math.PI * 1.5, 255, 165, 0, 'rainbow.orange');
+    buf.arc(400, 80, 50, Math.PI, Math.PI * 1.5, 255, 0, 0, 'rainbow.red');
+    buf.arc(400, 80, 54, Math.PI, Math.PI * 1.5, 255, 165, 0, 'rainbow.orange');
 
     // Ellipse test (pond)
-    buf.ellip(70, 155, 25, 8, 50, 100, 200, 'pond');
+    buf.ellip(140, 310, 50, 16, 50, 100, 200, 'pond');
 
     // Render
     renderer.render();
@@ -124,12 +124,12 @@
     // -----------------------------------------------------------------------
 
     // -- PixelBuffer basics --
-    assert(buf.width === 280, 'Buffer width is 280');
-    assert(buf.height === 180, 'Buffer height is 180');
-    assert(buf.data.length === 280 * 180, 'Buffer has 280*180 pixels');
+    assert(buf.width === 560, 'Buffer width is 560');
+    assert(buf.height === 360, 'Buffer height is 360');
+    assert(buf.data.length === 560 * 360, 'Buffer has 560*360 pixels');
 
     // -- getPixel --
-    const snowPx = buf.getPixel(140, 150);
+    const snowPx = buf.getPixel(280, 300);
     assert(snowPx.r === 255 && snowPx.g === 255 && snowPx.b === 255,
       'getPixel on snowman body returns white');
     assert(snowPx.e === 'snowman.body.bottom',
@@ -160,9 +160,9 @@
     // -- getEntityBounds --
     const hatBounds = buf.getEntityBounds('snowman.hat');
     assert(hatBounds !== null, 'getEntityBounds finds snowman.hat');
-    assert(hatBounds.x1 <= 134 && hatBounds.x2 >= 145,
+    assert(hatBounds.x1 <= 268 && hatBounds.x2 >= 290,
       'hat bounds span correct x range');
-    assert(hatBounds.y1 <= 78 && hatBounds.y2 >= 90,
+    assert(hatBounds.y1 <= 156 && hatBounds.y2 >= 180,
       'hat bounds span correct y range');
 
     const noBounds = buf.getEntityBounds('nonexistent');
@@ -170,21 +170,21 @@
 
     // -- snapshot / restore --
     buf.snapshot();
-    const before = buf.getPixel(140, 150);
-    assert(buf.data[150 * 280 + 140]._r === 255, 'snapshot stores _r');
+    const before = buf.getPixel(280, 300);
+    assert(buf.data[300 * 560 + 280]._r === 255, 'snapshot stores _r');
 
     // Mutate a pixel
-    buf.px(140, 150, 0, 0, 0, 'snowman.body.bottom');
-    const after = buf.getPixel(140, 150);
+    buf.px(280, 300, 0, 0, 0, 'snowman.body.bottom');
+    const after = buf.getPixel(280, 300);
     assert(after.r === 0, 'pixel mutated after snapshot');
 
     buf.restore();
-    const restored = buf.getPixel(140, 150);
+    const restored = buf.getPixel(280, 300);
     assert(restored.r === 255, 'restore brings back _r values');
 
     // -- Renderer --
-    assert(canvas.width === 840, 'Canvas width = 280 * 3 = 840');
-    assert(canvas.height === 540, 'Canvas height = 180 * 3 = 540');
+    assert(canvas.width === 840, 'Canvas width = 560 * 1.5 = 840');
+    assert(canvas.height === 540, 'Canvas height = 360 * 1.5 = 540');
 
     // -- EntityRegistry --
     const registry = new EntityRegistry(buf);

@@ -104,6 +104,7 @@ async def generate_branches(
     skill_objectives: Optional[List[str]] = None,
     n_branches: int = 3,
     use_reference_images: bool = True,
+    skip_masks: bool = False,
 ) -> List[Dict[str, Any]]:
     """Generate N candidate next scenes in parallel.
 
@@ -117,6 +118,7 @@ async def generate_branches(
         student_profile: Child's error profile.
         skill_objectives: SKILL objectives for the session.
         n_branches: Number of branches to generate (default 3).
+        skip_masks: If True, skip mask generation for speed (thumbnails).
 
     Returns:
         List of scene dicts, one per branch, each containing
@@ -136,6 +138,7 @@ async def generate_branches(
                 commit_to_state=False,
                 extra_prompt=directive,
                 use_reference_images=use_reference_images,
+                skip_masks=skip_masks,
             )
         )
 
@@ -163,6 +166,7 @@ async def generate_one_more(
     student_profile: Optional[StudentProfile] = None,
     skill_objectives: Optional[List[str]] = None,
     use_reference_images: bool = True,
+    skip_masks: bool = False,
 ) -> Dict[str, Any]:
     """Generate one additional branch (the "I want to see one more" button).
 
@@ -175,6 +179,7 @@ async def generate_one_more(
         story_state: Current cumulative story state.
         student_profile: Child's error profile.
         skill_objectives: SKILL objectives for the session.
+        skip_masks: If True, skip mask generation for speed.
 
     Returns:
         A single scene dict for the new branch.
@@ -193,4 +198,5 @@ async def generate_one_more(
         commit_to_state=False,
         extra_prompt=directive,
         use_reference_images=use_reference_images,
+        skip_masks=skip_masks,
     )

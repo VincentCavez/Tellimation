@@ -1,9 +1,9 @@
 // Tellimations Pixel Art Engine
-// Canvas: 280x180, rendered at 3x scale (840x540) with image-rendering: pixelated
+// Canvas: 560x360, rendered at 1.5x scale (840x540) with image-rendering: pixelated
 
-const PW = 280;
-const PH = 180;
-const DEFAULT_SCALE = 3;
+const PW = 560;
+const PH = 360;
+const DEFAULT_SCALE = 1.5;
 
 // ---------------------------------------------------------------------------
 // PixelBuffer
@@ -460,31 +460,32 @@ function executeImageBackground(spriteData, pixelBuffer) {
   // For synchronous rendering (e.g. thumbnails), we use a fallback.
   // The caller should await the returned Promise if possible.
   var b64 = spriteData.image_base64;
-  var bx = spriteData.x || 0;
-  var by = spriteData.y || 0;
-  var bw = spriteData.width || pixelBuffer.width;
-  var bh = spriteData.height || pixelBuffer.height;
+
+  // Always fill the entire pixel buffer — ignore spriteData.width/height
+  // so that older scenes (280×180) are upscaled to the current buffer size.
+  var targetW = pixelBuffer.width;
+  var targetH = pixelBuffer.height;
 
   if (!b64) return Promise.resolve();
 
   return new Promise(function(resolve) {
     var img = new Image();
     img.onload = function() {
-      // Draw to an offscreen canvas to read pixel data
+      // Draw to an offscreen canvas at the buffer's size (nearest-neighbor)
       var offCanvas = document.createElement('canvas');
-      offCanvas.width = bw;
-      offCanvas.height = bh;
+      offCanvas.width = targetW;
+      offCanvas.height = targetH;
       var offCtx = offCanvas.getContext('2d');
       offCtx.imageSmoothingEnabled = false;
-      offCtx.drawImage(img, 0, 0, bw, bh);
-      var imgData = offCtx.getImageData(0, 0, bw, bh);
+      offCtx.drawImage(img, 0, 0, targetW, targetH);
+      var imgData = offCtx.getImageData(0, 0, targetW, targetH);
       var px = imgData.data;
 
-      for (var row = 0; row < bh; row++) {
-        for (var col = 0; col < bw; col++) {
-          var srcIdx = (row * bw + col) * 4;
+      for (var row = 0; row < targetH; row++) {
+        for (var col = 0; col < targetW; col++) {
+          var srcIdx = (row * targetW + col) * 4;
           pixelBuffer._set(
-            bx + col, by + row,
+            col, row,
             px[srcIdx], px[srcIdx + 1], px[srcIdx + 2],
             'bg'
           );
@@ -505,6 +506,12 @@ function executeImageBackground(spriteData, pixelBuffer) {
 // ---------------------------------------------------------------------------
 
 function renderSpriteEntry(eid, entry, pixelBuffer) {
+  console.log('[renderSpriteEntry]', eid, 'format=', entry && entry.format,
+    entry && entry.format === 'raw_sprite' ?
+      'x=' + entry.x + ' y=' + entry.y + ' w=' + entry.w + ' h=' + entry.h +
+      ' pixels=' + (entry.pixels ? entry.pixels.length : 'none') +
+      ' visible=' + (entry.pixels ? entry.pixels.filter(function(p){return p!==null}).length : 0)
+    : '');
   if (typeof entry === 'string') {
     executeSpriteCode(entry, pixelBuffer);
   } else if (entry && entry.format === 'raw_sprite') {

@@ -15,7 +15,8 @@ from starlette.websockets import WebSocketState
 
 from src.analytics.session_report import generate_report
 from src.generation.branch_generator import generate_branches, generate_one_more
-from src.generation.scene_generator import generate_scene
+from src.generation.neg_generator import generate_neg_for_plot, update_neg_live
+from src.generation.scene_generator import generate_scene, generate_masks_for_scene
 from src.models.animation_cache import AnimationCache
 from src.models.neg import NEG
 from src.models.scene import SceneManifest
@@ -150,6 +151,14 @@ class SessionState:
         self.branch_images: Dict[int, bytes] = {}
         # Entity images extracted from generated scenes (parallel to branches)
         self.branch_entity_images: Dict[int, Dict[str, bytes]] = {}
+        # Background mask generation tasks (index → asyncio.Task)
+        self.mask_tasks: Dict[int, asyncio.Task] = {}
+        # Set of branch indices whose masks are fully generated
+        self.masks_ready: set = set()
+        # NEG map: scene_id -> NEG dict (generated offline, updated live)
+        self.scene_negs: Dict[str, Dict[str, Any]] = {}
+        # Completed scene IDs (for NEG live update context)
+        self.completed_scene_ids: List[str] = []
 
 
 # ---------------------------------------------------------------------------
@@ -252,6 +261,45 @@ async def websocket_endpoint(websocket: WebSocket):
 
 
 # ---------------------------------------------------------------------------
+# Background mask generation
+# ---------------------------------------------------------------------------
+
+
+async def _generate_masks_background(
+    session: SessionState,
+    index: int,
+    websocket: WebSocket,
+) -> None:
+    """Generate masks for a branch scene in the background.
+
+    Called right after a scene is streamed to the client.  When masks
+    are ready, sends a ``masks_ready`` message so the frontend can
+    enable clicking on that thumbnail.
+    """
+    try:
+        scene = session.branches[index]
+        await generate_masks_for_scene(session.api_key, scene)
+        session.masks_ready.add(index)
+        logger.info("Background masks ready for branch %d", index)
+        await websocket.send_json({
+            "type": "masks_ready",
+            "index": index,
+        })
+    except Exception:
+        # If masks fail, still mark as ready so the user isn't stuck.
+        # Fallback masks (root entity IDs) are usable.
+        session.masks_ready.add(index)
+        logger.warning(
+            "Background mask generation failed for branch %d, using fallback",
+            index,
+        )
+        await websocket.send_json({
+            "type": "masks_ready",
+            "index": index,
+        })
+
+
+# ---------------------------------------------------------------------------
 # Message handlers
 # ---------------------------------------------------------------------------
 
@@ -259,7 +307,11 @@ async def _handle_generate_initial(
     session: SessionState,
     websocket: WebSocket,
 ) -> None:
-    """Generate 2 initial scene candidates, or return existing stories."""
+    """Generate 2 initial scene candidates, or return existing stories.
+
+    Scenes are generated in parallel with skip_masks=True for speed,
+    and streamed to the client one-by-one as they complete.
+    """
     try:
         pid = session.participant_id
         existing_count = story_count(pid)
@@ -269,6 +321,8 @@ async def _handle_generate_initial(
             existing_scenes = load_story_first_scenes(pid)
             if len(existing_scenes) >= 2:
                 session.branches = existing_scenes
+                # From-disk scenes already have masks
+                session.masks_ready = set(range(len(existing_scenes)))
                 await websocket.send_json({
                     "type": "initial_scenes",
                     "scenes": existing_scenes,
@@ -300,46 +354,85 @@ async def _handle_generate_initial(
                 })
             return progress_cb
 
-        # Launch all scenes in parallel (like generate_branches)
-        tasks = [
-            generate_scene(
-                api_key=session.api_key,
-                story_state=None,
-                student_profile=session.student_profile,
-                seed_index=seed,
-                commit_to_state=False,
-                progress_callback=_make_progress_cb(seed),
-            )
+        # Launch all scenes in parallel with skip_masks=True (masks deferred)
+        futures = {
+            asyncio.ensure_future(
+                generate_scene(
+                    api_key=session.api_key,
+                    story_state=None,
+                    student_profile=session.student_profile,
+                    seed_index=seed,
+                    commit_to_state=False,
+                    skip_masks=True,
+                    progress_callback=_make_progress_cb(seed),
+                )
+            ): seed
             for seed in range(1, total_scenes + 1)
-        ]
-        results = await asyncio.gather(*tasks, return_exceptions=True)
+        }
 
-        # Collect results, skipping failures
+        # Stream scenes to client as they complete
         scenes: List[Dict[str, Any]] = []
-        for i, result in enumerate(results):
-            if isinstance(result, Exception):
-                logger.warning("Initial scene %d generation failed: %s", i + 1, result)
+        for coro in asyncio.as_completed(futures.keys()):
+            try:
+                result = await coro
+            except Exception as exc:
+                logger.warning("Initial scene generation failed: %s", exc)
                 continue
+
+            idx = len(scenes)
             img = _pop_reference_image(result)
             if img:
-                session.branch_images[len(scenes)] = img
+                session.branch_images[idx] = img
             ent_imgs = _pop_entity_images(result)
             if ent_imgs:
-                session.branch_entity_images[len(scenes)] = ent_imgs
+                session.branch_entity_images[idx] = ent_imgs
+
+            # Save to disk immediately
+            story_idx, _ = create_story(pid)
+            save_scene(pid, story_idx, result,
+                       reference_image=img, entity_images=ent_imgs)
+            result["_story_index"] = story_idx
+
             scenes.append(result)
 
-        # Save each scene immediately as its own story folder
-        for i, scene in enumerate(scenes):
-            story_idx, _ = create_story(pid)
-            ref_img = session.branch_images.get(i)
-            ent_imgs = session.branch_entity_images.get(i)
-            save_scene(pid, story_idx, scene,
-                       reference_image=ref_img, entity_images=ent_imgs)
-            # Tag with story index so _handle_select_scene won't re-create
-            scene["_story_index"] = story_idx
+            # Stream this scene to the client right away
+            await websocket.send_json({
+                "type": "scene_ready",
+                "scene": result,
+                "index": idx,
+                "total": total_scenes,
+            })
+
+            # Fire off mask generation in the background for this scene
+            mask_idx = idx  # capture for closure
+            session.mask_tasks[mask_idx] = asyncio.ensure_future(
+                _generate_masks_background(session, mask_idx, websocket)
+            )
 
         session.branches = scenes
-        await websocket.send_json({"type": "initial_scenes", "scenes": scenes})
+
+        # Generate NEGs for all scenes (offline, parallel to mask generation)
+        try:
+            neg_map = await generate_neg_for_plot(
+                api_key=session.api_key,
+                plot_scenes=scenes,
+            )
+            # Attach NEGs to each scene and store in session
+            for scene in scenes:
+                scene_id = scene.get("manifest", {}).get("scene_id", "")
+                if scene_id in neg_map:
+                    neg_dict = neg_map[scene_id].model_dump()
+                    scene["neg"] = neg_dict
+                    session.scene_negs[scene_id] = neg_dict
+            logger.info("Generated NEGs for %d scenes", len(neg_map))
+        except Exception:
+            logger.warning("NEG generation failed, scenes will use empty NEGs")
+
+        # Final signal: all scenes done
+        await websocket.send_json({
+            "type": "initial_scenes_done",
+            "total": len(scenes),
+        })
 
     except Exception as e:
         logger.exception("Failed to generate initial scenes")
@@ -350,13 +443,14 @@ async def _handle_generate_one_more(
     session: SessionState,
     websocket: WebSocket,
 ) -> None:
-    """Generate one additional scene candidate."""
+    """Generate one additional scene candidate (with skip_masks for speed)."""
     try:
         scene = await generate_one_more(
             api_key=session.api_key,
             existing_branches=session.branches,
             story_state=session.story_state if session.story_state.scenes else StoryState(),
             student_profile=session.student_profile,
+            skip_masks=True,
         )
         idx = len(session.branches)
         img = _pop_reference_image(scene)
@@ -373,7 +467,12 @@ async def _handle_generate_one_more(
         scene["_story_index"] = story_idx
 
         session.branches.append(scene)
-        await websocket.send_json({"type": "one_more_scene", "scene": scene})
+        await websocket.send_json({"type": "one_more_scene", "scene": scene, "index": idx})
+
+        # Fire off mask generation in the background
+        session.mask_tasks[idx] = asyncio.ensure_future(
+            _generate_masks_background(session, idx, websocket)
+        )
 
     except Exception as e:
         logger.exception("Failed to generate one more scene")
@@ -386,7 +485,11 @@ async def _handle_select_scene(
     websocket: WebSocket,
     ws_adapter: _WebSocketAdapter,
 ) -> None:
-    """Handle scene selection from thumbnails."""
+    """Handle scene selection from thumbnails.
+
+    Generates masks in the background (deferred from initial generation)
+    before starting the narration loop.
+    """
     index = data.get("index", 0)
     if index < 0 or index >= len(session.branches):
         await websocket.send_json({"type": "error", "message": "Invalid scene index"})
@@ -414,14 +517,34 @@ async def _handle_select_scene(
             entity_images=ent_images,
         )
 
+    # Wait for masks if the background task is still running
+    if index in session.mask_tasks:
+        mask_task = session.mask_tasks.pop(index)
+        if not mask_task.done():
+            logger.info("Waiting for background mask generation for branch %d", index)
+            try:
+                await mask_task
+            except Exception:
+                logger.warning("Background mask task failed for branch %d", index)
+    elif index not in session.masks_ready:
+        # No background task exists — generate masks now (fallback path)
+        try:
+            await generate_masks_for_scene(session.api_key, scene)
+            session.masks_ready.add(index)
+            logger.info("Masks generated for selected scene")
+        except Exception:
+            logger.warning("Mask generation failed for selected scene, using fallback masks")
+
     # Commit to story state
+    scene_id = scene["manifest"]["scene_id"]
     session.story_state.add_scene(
-        scene_id=scene["manifest"]["scene_id"],
+        scene_id=scene_id,
         narrative_text=scene.get("narrative_text", ""),
         manifest=scene["manifest"],
         neg=scene.get("neg", {}),
         sprite_code=scene.get("sprite_code"),
     )
+    session.completed_scene_ids.append(scene_id)
 
     _init_narration_loop(session, ws_adapter)
 
@@ -472,13 +595,58 @@ async def _handle_generate_branches(
     session: SessionState,
     websocket: WebSocket,
 ) -> None:
-    """Generate 3 branch candidates after scene completion."""
+    """Generate 3 branch candidates after scene completion.
+
+    Uses skip_masks=True for speed — masks are generated later when
+    the child selects a branch.
+
+    Before generating branches, updates NEGs for remaining scenes if
+    the student profile shows error patterns worth adapting to.
+    """
     try:
+        # Update NEGs for remaining scenes based on student profile
+        if session.scene_negs:
+            try:
+                remaining_negs = {
+                    sid: NEG.model_validate(neg_dict)
+                    for sid, neg_dict in session.scene_negs.items()
+                    if sid not in session.completed_scene_ids
+                }
+                if remaining_negs:
+                    updated = await update_neg_live(
+                        api_key=session.api_key,
+                        remaining_negs=remaining_negs,
+                        student_profile=session.student_profile,
+                        completed_scene_ids=session.completed_scene_ids,
+                    )
+                    for sid, neg in updated.items():
+                        session.scene_negs[sid] = neg.model_dump()
+                    logger.info("Updated NEGs for %d remaining scenes", len(updated))
+            except Exception:
+                logger.warning("NEG live update failed, keeping existing NEGs")
+
         branches = await generate_branches(
             api_key=session.api_key,
             story_state=session.story_state,
             student_profile=session.student_profile,
+            skip_masks=True,
         )
+
+        # Generate NEGs for branch scenes
+        try:
+            neg_map = await generate_neg_for_plot(
+                api_key=session.api_key,
+                plot_scenes=branches,
+            )
+            for b in branches:
+                scene_id = b.get("manifest", {}).get("scene_id", "")
+                if scene_id in neg_map:
+                    neg_dict = neg_map[scene_id].model_dump()
+                    b["neg"] = neg_dict
+                    session.scene_negs[scene_id] = neg_dict
+        except Exception:
+            logger.warning("NEG generation for branches failed, using empty NEGs")
+
         session.branch_images = {}
         session.branch_entity_images = {}
         for i, b in enumerate(branches):
@@ -502,7 +670,11 @@ async def _handle_select_branch(
     websocket: WebSocket,
     ws_adapter: _WebSocketAdapter,
 ) -> None:
-    """Handle branch selection on the story page."""
+    """Handle branch selection on the story page.
+
+    Generates masks (deferred from branch generation) before starting
+    the narration loop.
+    """
     index = data.get("index", 0)
     if index < 0 or index >= len(session.branches):
         await websocket.send_json({"type": "error", "message": "Invalid branch index"})
@@ -523,14 +695,34 @@ async def _handle_select_branch(
             entity_images=ent_images,
         )
 
+    # Wait for masks if the background task is still running
+    if index in session.mask_tasks:
+        mask_task = session.mask_tasks.pop(index)
+        if not mask_task.done():
+            logger.info("Waiting for background mask generation for branch %d", index)
+            try:
+                await mask_task
+            except Exception:
+                logger.warning("Background mask task failed for branch %d", index)
+    elif index not in session.masks_ready:
+        # No background task exists — generate masks now (fallback path)
+        try:
+            await generate_masks_for_scene(session.api_key, scene)
+            session.masks_ready.add(index)
+            logger.info("Masks generated for selected branch")
+        except Exception:
+            logger.warning("Mask generation failed for selected branch, using fallback masks")
+
     # Commit to story state
+    scene_id = scene["manifest"]["scene_id"]
     session.story_state.add_scene(
-        scene_id=scene["manifest"]["scene_id"],
+        scene_id=scene_id,
         narrative_text=scene.get("narrative_text", ""),
         manifest=scene["manifest"],
         neg=scene.get("neg", {}),
         sprite_code=scene.get("sprite_code"),
     )
+    session.completed_scene_ids.append(scene_id)
 
     # Persist student profile after each scene progression
     save_student_profile(session.participant_id, session.student_profile)
