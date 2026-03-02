@@ -108,9 +108,9 @@ async def generate_branches(
 ) -> List[Dict[str, Any]]:
     """Generate N candidate next scenes in parallel.
 
-    Each branch receives a different seed_index and branch directive so
-    the three options offer contrasting narrative directions.  None of
-    the branches mutate ``story_state`` (commit_to_state=False).
+    Each branch receives a different branch directive so the three options
+    offer contrasting narrative directions.  None of the branches mutate
+    ``story_state`` (commit_to_state=False).
 
     Args:
         api_key: Gemini API key.
@@ -134,7 +134,6 @@ async def generate_branches(
                 story_state=story_state,
                 student_profile=student_profile,
                 skill_objectives=skill_objectives,
-                seed_index=i,
                 commit_to_state=False,
                 extra_prompt=directive,
                 use_reference_images=use_reference_images,
@@ -170,9 +169,6 @@ async def generate_one_more(
 ) -> Dict[str, Any]:
     """Generate one additional branch (the "I want to see one more" button).
 
-    The seed_index is set to ``len(existing_branches) + 1`` so the LLM
-    produces something different from the existing options.
-
     Args:
         api_key: Gemini API key.
         existing_branches: Already-generated branch dicts.
@@ -194,7 +190,6 @@ async def generate_one_more(
         story_state=story_state,
         student_profile=student_profile,
         skill_objectives=skill_objectives,
-        seed_index=new_index,
         commit_to_state=False,
         extra_prompt=directive,
         use_reference_images=use_reference_images,

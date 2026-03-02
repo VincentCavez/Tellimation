@@ -17,6 +17,7 @@ from src.analytics.session_report import generate_report
 from src.generation.branch_generator import generate_branches, generate_one_more
 from src.generation.neg_generator import generate_neg_for_plot
 from src.generation.scene_generator import (
+    STORY_THEMES,
     generate_scene,
     generate_masks_for_scene,
     generate_features_for_scene,
@@ -275,11 +276,14 @@ def _extract_masks_summary(scene: Dict[str, Any]) -> Dict[str, List[str]]:
 
     Returns:
         Dict mapping entity_id -> sorted list of sub-entity IDs.
-        Example: {"turtle_01": ["turtle_01.body", "turtle_01.head", "turtle_01.shell"]}
+        Example: {
+            "bg": ["bg.ground", "bg.sky", "bg.sky.clouds"],
+            "turtle_01": ["turtle_01.body", "turtle_01.head", "turtle_01.shell"],
+        }
     """
     summary: Dict[str, List[str]] = {}
     for eid, entry in scene.get("sprite_code", {}).items():
-        if eid == "bg" or not isinstance(entry, dict):
+        if not isinstance(entry, dict):
             continue
         mask = entry.get("mask", [])
         unique_ids = sorted(set(m for m in mask if m is not None))
@@ -402,6 +406,10 @@ async def _handle_generate_initial(
                 })
             return progress_cb
 
+        # Pick N random themes from the pool (no duplicates)
+        import random
+        themes = random.sample(STORY_THEMES, min(total_scenes, len(STORY_THEMES)))
+
         # Launch all scenes in parallel with skip_masks=True (masks deferred)
         futures = {
             asyncio.ensure_future(
@@ -409,13 +417,13 @@ async def _handle_generate_initial(
                     api_key=session.api_key,
                     story_state=None,
                     student_profile=session.student_profile,
-                    seed_index=seed,
+                    theme=theme,
                     commit_to_state=False,
                     skip_masks=True,
-                    progress_callback=_make_progress_cb(seed),
+                    progress_callback=_make_progress_cb(idx),
                 )
-            ): seed
-            for seed in range(1, total_scenes + 1)
+            ): idx
+            for idx, theme in enumerate(themes, start=1)
         }
 
         # Stream scenes to client as they complete

@@ -429,8 +429,8 @@ class TestGenerateOneMore:
         assert "neg" in result
         assert "branch_summary" in result
 
-    def test_seed_index_is_n_plus_1(self):
-        """The new branch should get seed_index = len(existing) + 1."""
+    def test_branch_directive_includes_branch_number(self):
+        """The new branch prompt should mention the branch number."""
         state = _make_story_state_with_scene()
         existing = [_make_branch_response(i) for i in range(1, 4)]
 

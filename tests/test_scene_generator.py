@@ -274,11 +274,11 @@ class TestPromptBuilding:
         assert "ONLY for new entities" in SCENE_SYSTEM_PROMPT.lower() or \
                "ONLY for entities with" in SCENE_SYSTEM_PROMPT
 
-    def test_initial_prompt_includes_seed_and_objectives(self):
-        prompt = _build_initial_prompt(["descriptive_adjectives", "spatial_prepositions"], 2)
+    def test_initial_prompt_includes_theme_and_objectives(self):
+        prompt = _build_initial_prompt(["descriptive_adjectives", "spatial_prepositions"], "a sunny beach with tide pools")
         assert "descriptive_adjectives" in prompt
         assert "spatial_prepositions" in prompt
-        assert "2" in prompt
+        assert "a sunny beach with tide pools" in prompt
 
     def test_continuation_prompt_includes_story_context(self):
         state = StoryState(session_id="s1", participant_id="P01")
@@ -416,7 +416,7 @@ class TestGenerateScene:
                     story_state=None,
                     student_profile=None,
                     skill_objectives=["descriptive_adjectives", "spatial_prepositions"],
-                    seed_index=1,
+                    theme="a playground in a park",
                     use_reference_images=False,
                 )
             )
@@ -502,7 +502,7 @@ class TestGenerateScene:
             result = asyncio.get_event_loop().run_until_complete(
                 generate_scene(
                     api_key="fake-key",
-                    seed_index=3,
+                    theme="a farm with animals in the morning",
                     use_reference_images=False,
                 )
             )
@@ -514,7 +514,7 @@ class TestGenerateScene:
 
         with patch("src.generation.scene_generator.genai.Client", return_value=mock_client) as mock_cls:
             asyncio.get_event_loop().run_until_complete(
-                generate_scene(api_key="test-key", seed_index=1, use_reference_images=False)
+                generate_scene(api_key="test-key", theme="a playground in a park", use_reference_images=False)
             )
 
         # Verify Client was created with the API key
@@ -547,7 +547,7 @@ class TestGenerateScene:
             result = asyncio.get_event_loop().run_until_complete(
                 generate_scene(
                     api_key="fake-key",
-                    seed_index=1,
+                    theme="a playground in a park",
                     use_reference_images=False,
                     neg_override=custom_neg,
                 )
@@ -571,7 +571,7 @@ class TestGenerateScene:
 
         with patch("src.generation.scene_generator.genai.Client", return_value=mock_client):
             result = asyncio.get_event_loop().run_until_complete(
-                generate_scene(api_key="fake-key", seed_index=1, use_reference_images=False)
+                generate_scene(api_key="fake-key", theme="a playground in a park", use_reference_images=False)
             )
 
         assert result["manifest"]["scene_id"] == "scene_01"
@@ -1573,7 +1573,7 @@ class TestPipelineIntegration:
                 generate_scene(
                     api_key="fake-key",
                     story_state=None,
-                    seed_index=1,
+                    theme="a playground in a park",
                     use_reference_images=True,
                 )
             )
@@ -1602,7 +1602,7 @@ class TestPipelineIntegration:
                 generate_scene(
                     api_key="fake-key",
                     story_state=None,
-                    seed_index=1,
+                    theme="a playground in a park",
                     use_reference_images=True,
                 )
             )
@@ -1630,7 +1630,7 @@ class TestPipelineIntegration:
                 asyncio.get_event_loop().run_until_complete(
                     generate_scene(
                         api_key="fake-key",
-                        seed_index=1,
+                        theme="a playground in a park",
                         use_reference_images=True,
                     )
                 )
@@ -1644,7 +1644,7 @@ class TestPipelineIntegration:
                 generate_scene(
                     api_key="fake-key",
                     story_state=state,
-                    seed_index=1,
+                    theme="a playground in a park",
                     use_reference_images=True,
                     commit_to_state=True,
                 )

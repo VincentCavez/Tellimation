@@ -60,6 +60,7 @@ MASK_TIMEOUT = 60        # text + image input, needs headroom
 # Retry counts per call type
 MANIFEST_MAX_RETRIES = 2  # manifest is non-optional, retry on failure
 IMAGE_MAX_RETRIES = 2     # retry entity/background images on timeout or error
+MASK_MAX_RETRIES = 2      # retry mask generation on timeout or bad output
 
 # Resolution model (must match engine.js)
 SOURCE_W = 1120   # manifest coordinates, image generation
@@ -70,16 +71,54 @@ ART_H = SOURCE_H // K   # 180
 
 
 # ---------------------------------------------------------------------------
+# Story themes — common, everyday environments for children's stories
+# ---------------------------------------------------------------------------
+
+STORY_THEMES = [
+    "a school classroom during an art lesson",
+    "a sunny beach with tide pools",
+    "a birthday party in a backyard",
+    "a farm with animals in the morning",
+    "a playground in a park",
+    "a kitchen where someone is baking",
+    "a camping trip in the woods",
+    "a pet shop with different animals",
+    "a rainy day at home",
+    "a family picnic by a lake",
+    "a trip to the supermarket",
+    "a garden with flowers and insects",
+    "a library with tall bookshelves",
+    "a snowy day in the neighborhood",
+    "a visit to the dentist",
+    "a swimming pool on a hot day",
+    "a train ride through the countryside",
+    "a treehouse in a big oak tree",
+    "a Saturday morning at the farmers market",
+    "a family road trip stop at a gas station",
+    "a football match at a local field",
+    "a bedtime story in a cozy bedroom",
+    "a school bus ride on Monday morning",
+    "a bakery that just opened for the day",
+    "a fishing trip at a small river",
+    "a winter morning building a snowman",
+    "a veterinary clinic with a sick puppy",
+    "a laundromat on a busy afternoon",
+    "a zoo visit on a spring day",
+    "a bike ride through the neighborhood",
+]
+
+
+# ---------------------------------------------------------------------------
 # Prompt builders (shared between legacy and pipeline)
 # ---------------------------------------------------------------------------
 
 def _build_initial_prompt(
     skill_objectives: List[str],
-    seed_index: int,
+    theme: str,
 ) -> str:
     return INITIAL_SCENE_USER_PROMPT.format(
         skill_objectives=", ".join(skill_objectives),
-        seed_index=seed_index,
+        theme=theme,
     )
 
 
@@ -253,13 +292,40 @@ def _build_scene_image_prompt(manifest_data: Dict[str, Any]) -> str:
 
     Prefers ``background_description`` (entity-free) over ``scene_description``
     to avoid drawing entities in the background that will be composited separately.
+
+    Computes entity ground level from manifest positions so the background
+    image model knows where to place the ground/floor surface.
     """
     bg_desc = manifest_data.get("background_description", "")
     if not bg_desc:
         # Fallback: use scene_description if background_description is missing
         bg_desc = manifest_data.get("scene_description", "")
+
+    # Compute ground level from entity foot positions in manifest
+    entities = manifest_data.get("manifest", {}).get("entities", [])
+    foot_positions: list[int] = []
+    for ent in entities:
+        pos = ent.get("position", {})
+        y_center = pos.get("y", 0)
+        h_hint = ent.get("height_hint", 200)
+        foot_positions.append(y_center + h_hint // 2)
+
+    if foot_positions:
+        avg_foot = sum(foot_positions) // len(foot_positions)
+        pct = round(avg_foot / SOURCE_H * 100)
+        ground_level_hint = (
+            f"Characters will stand with their feet at approximately "
+            f"{pct}% from the top of the image. "
+            f"The ground/floor surface MUST be clearly visible at this level."
+        )
+    else:
+        ground_level_hint = (
+            "The ground or floor should be at approximately 70% from the top."
+        )
+
     return BACKGROUND_IMAGE_PROMPT_TEMPLATE.format(
         scene_description=bg_desc,
+        ground_level_hint=ground_level_hint,
     )
 
 
@@ -818,12 +884,15 @@ async def _generate_mask_for_entity(
 ) -> Optional[List[Optional[str]]]:
     """Generate sub-entity ID mask for one entity's sprite.
 
-    Sends the entity image to Gemini 3 Flash along with the sprite dimensions,
+    Sends the entity image to Gemini along with the sprite dimensions,
     and gets back a mask in RLE format (run-length encoded).
+
+    Retries up to ``MASK_MAX_RETRIES`` times on failure, timeout, or
+    degenerate output (single unique ID).
 
     Returns:
         List of (entity_id string or None) with length sprite_w * sprite_h,
-        or None if generation fails.
+        or None if generation fails after all retries.
     """
     total_pixels = sprite_w * sprite_h
     user_text = MASK_USER_PROMPT.format(
@@ -845,6 +914,168 @@ async def _generate_mask_for_entity(
         user_text,
     ]
 
+    last_error: Optional[str] = None
+
+    for attempt in range(1, MASK_MAX_RETRIES + 1):
+        try:
+            response = await asyncio.wait_for(
+                client.aio.models.generate_content(
+                    model=MASK_MODEL_ID,
+                    contents=contents,
+                    config=types.GenerateContentConfig(
+                        system_instruction=system_text,
+                        thinking_config=types.ThinkingConfig(thinking_budget=1024),
+                        temperature=0.3,
+                        response_mime_type="application/json",
+                    ),
+                ),
+                timeout=MASK_TIMEOUT,
+            )
+
+            # Validate response before extraction
+            if not response.candidates:
+                last_error = "no candidates (prompt_feedback=%s)" % (
+                    getattr(response, 'prompt_feedback', 'N/A'),)
+                logger.warning("[mask] %s: attempt %d/%d — %s",
+                               entity_id, attempt, MASK_MAX_RETRIES, last_error)
+                if attempt < MASK_MAX_RETRIES:
+                    await asyncio.sleep(2)
+                continue
+
+            data = _extract_json(_get_response_text(response))
+            mask_raw = data.get("mask", [])
+
+            if not isinstance(mask_raw, list):
+                last_error = "mask is not a list"
+                logger.warning("[mask] %s: attempt %d/%d — %s",
+                               entity_id, attempt, MASK_MAX_RETRIES, last_error)
+                if attempt < MASK_MAX_RETRIES:
+                    await asyncio.sleep(2)
+                continue
+
+            # Auto-detect format: RLE vs legacy flat
+            if _is_rle_format(mask_raw):
+                logger.info("[mask] %s: attempt %d/%d — RLE format (%d runs)",
+                            entity_id, attempt, MASK_MAX_RETRIES, len(mask_raw))
+                mask = _expand_rle_mask(mask_raw, total_pixels, entity_id, sprite_pixels)
+            else:
+                # Legacy flat format (backward compatibility)
+                logger.info("[mask] %s: attempt %d/%d — flat format (%d elements)",
+                            entity_id, attempt, MASK_MAX_RETRIES, len(mask_raw))
+                mask = []
+                for i in range(total_pixels):
+                    if i < len(mask_raw):
+                        val = mask_raw[i]
+                        if val is None or val == "null":
+                            mask.append(None)
+                        elif isinstance(val, str):
+                            mask.append(val)
+                        else:
+                            mask.append(None)
+                    else:
+                        mask.append(None)
+
+                # Sync mask transparency with pixel transparency
+                for i in range(total_pixels):
+                    if i < len(sprite_pixels) and sprite_pixels[i] is None:
+                        mask[i] = None
+                    elif i < len(sprite_pixels) and sprite_pixels[i] is not None and mask[i] is None:
+                        mask[i] = entity_id
+
+            visible_mask = sum(1 for m in mask if m is not None)
+            unique_ids = set(m for m in mask if m is not None)
+
+            # Quality gate: if only 1 unique ID (= fallback quality), retry
+            if len(unique_ids) <= 1 and attempt < MASK_MAX_RETRIES:
+                logger.warning(
+                    "[mask] %s: attempt %d/%d — only %d unique ID(s), retrying",
+                    entity_id, attempt, MASK_MAX_RETRIES, len(unique_ids))
+                last_error = "degenerate mask (%d unique ID)" % len(unique_ids)
+                await asyncio.sleep(2)
+                continue
+
+            logger.info("[mask] %s: attempt %d/%d — %d masked pixels, "
+                        "%d unique sub-entity IDs",
+                        entity_id, attempt, MASK_MAX_RETRIES,
+                        visible_mask, len(unique_ids))
+
+            # Log each unique sub-entity ID with pixel count
+            from collections import Counter
+            id_counts = Counter(m for m in mask if m is not None)
+            for sub_id, count in sorted(id_counts.items()):
+                logger.info("[mask]   %-40s %5d px", sub_id, count)
+
+            return mask
+
+        except asyncio.TimeoutError:
+            last_error = "TIMEOUT after %ds" % MASK_TIMEOUT
+            logger.warning("[mask] %s: attempt %d/%d — %s",
+                           entity_id, attempt, MASK_MAX_RETRIES, last_error)
+        except json.JSONDecodeError as exc:
+            last_error = "JSON parse failed: %s" % exc
+            logger.warning("[mask] %s: attempt %d/%d — %s",
+                           entity_id, attempt, MASK_MAX_RETRIES, last_error)
+        except Exception as exc:
+            last_error = "%s: %r" % (type(exc).__name__, exc)
+            logger.warning("[mask] %s: attempt %d/%d — %s",
+                           entity_id, attempt, MASK_MAX_RETRIES, last_error)
+
+        # Backoff before retry
+        if attempt < MASK_MAX_RETRIES:
+            await asyncio.sleep(2)
+
+    logger.warning("[mask] %s: all %d attempts exhausted (last: %s)",
+                   entity_id, MASK_MAX_RETRIES, last_error)
+    return None
+
+
+def _build_fallback_mask(
+    entity_id: str,
+    pixels: List[Optional[List[int]]],
+) -> List[Optional[str]]:
+    """Build a simple fallback mask where all visible pixels get the root entity ID."""
+    return [entity_id if p is not None else None for p in pixels]
+
+
+async def _generate_mask_for_background(
+    client: Any,
+    image_bytes: bytes,
+    width: int,
+    height: int,
+) -> Optional[List[str]]:
+    """Generate sub-entity ID mask for the background image.
+
+    Unlike entity masks, background masks have NO transparent pixels —
+    every pixel gets a sub-entity ID starting with ``bg.``.
+
+    Args:
+        client: Gemini API client.
+        image_bytes: PNG image bytes of the background at art-grid resolution.
+        width: Background width in pixels (ART_W = 280).
+        height: Background height in pixels (ART_H = 180).
+
+    Returns:
+        Flat list of ``bg.*`` strings with length ``width * height``,
+        or *None* if generation fails.
+    """
+    from src.generation.prompts.sprite_prompt import (
+        BG_MASK_SYSTEM_PROMPT,
+        BG_MASK_USER_PROMPT,
+    )
+
+    total_pixels = width * height
+    system_text = BG_MASK_SYSTEM_PROMPT.format(
+        width=width, height=height, total_pixels=total_pixels,
+    )
+    user_text = BG_MASK_USER_PROMPT.format(
+        width=width, height=height, total_pixels=total_pixels,
+    )
+
+    contents = [
+        types.Part.from_bytes(data=image_bytes, mime_type="image/png"),
+        user_text,
+    ]
+
     try:
         response = await asyncio.wait_for(
             client.aio.models.generate_content(
@@ -852,7 +1083,7 @@ async def _generate_mask_for_entity(
                 contents=contents,
                 config=types.GenerateContentConfig(
                     system_instruction=system_text,
-                    thinking_config=types.ThinkingConfig(thinking_budget=0),
+                    thinking_config=types.ThinkingConfig(thinking_budget=1024),
                     temperature=0.3,
                     response_mime_type="application/json",
                 ),
@@ -864,62 +1095,53 @@ async def _generate_mask_for_entity(
         mask_raw = data.get("mask", [])
 
         if not isinstance(mask_raw, list):
-            logger.warning("[mask] %s: mask is not a list", entity_id)
+            logger.warning("[bg-mask] mask is not a list")
             return None
 
-        # Auto-detect format: RLE vs legacy flat
-        if _is_rle_format(mask_raw):
-            logger.info("[mask] %s: detected RLE format (%d runs)",
-                        entity_id, len(mask_raw))
-            mask = _expand_rle_mask(mask_raw, total_pixels, entity_id, sprite_pixels)
-        else:
-            # Legacy flat format (backward compatibility)
-            logger.info("[mask] %s: detected legacy flat format (%d elements)",
-                        entity_id, len(mask_raw))
-            mask = []
-            for i in range(total_pixels):
-                if i < len(mask_raw):
-                    val = mask_raw[i]
-                    if val is None or val == "null":
-                        mask.append(None)
-                    elif isinstance(val, str):
-                        mask.append(val)
-                    else:
-                        mask.append(None)
-                else:
-                    mask.append(None)
+        # Expand RLE runs → flat list (no nulls for backgrounds)
+        mask: List[str] = []
+        for item in mask_raw:
+            if not isinstance(item, (list, tuple)) or len(item) < 2:
+                continue
+            sub_id = item[0]
+            count = item[1]
+            if not isinstance(sub_id, str) or not sub_id.startswith("bg."):
+                sub_id = "bg"
+            if not isinstance(count, (int, float)) or count < 1:
+                continue
+            mask.extend([sub_id] * int(count))
 
-            # Sync mask transparency with pixel transparency
-            for i in range(total_pixels):
-                if i < len(sprite_pixels) and sprite_pixels[i] is None:
-                    mask[i] = None
-                elif i < len(sprite_pixels) and sprite_pixels[i] is not None and mask[i] is None:
-                    mask[i] = entity_id
+        # Pad or truncate to exact size
+        if len(mask) < total_pixels:
+            logger.warning("[bg-mask] RLE expanded to %d, expected %d — padding",
+                           len(mask), total_pixels)
+            mask.extend(["bg"] * (total_pixels - len(mask)))
+        if len(mask) > total_pixels:
+            logger.warning("[bg-mask] RLE expanded to %d, expected %d — truncating",
+                           len(mask), total_pixels)
+        mask = mask[:total_pixels]
 
-        visible_mask = sum(1 for m in mask if m is not None)
-        unique_ids = set(m for m in mask if m is not None)
-        logger.info("[mask] %s: %d masked pixels, %d unique sub-entity IDs",
-                    entity_id, visible_mask, len(unique_ids))
+        unique_ids = set(mask)
+        logger.info("[bg-mask] %d pixels, %d unique sub-entity IDs: %s",
+                    len(mask), len(unique_ids), sorted(unique_ids))
 
-        # Log each unique sub-entity ID with pixel count
         from collections import Counter
-        id_counts = Counter(m for m in mask if m is not None)
+        id_counts = Counter(mask)
         for sub_id, count in sorted(id_counts.items()):
-            logger.info("[mask]   %-40s %5d px", sub_id, count)
+            logger.info("[bg-mask]   %-40s %5d px", sub_id, count)
 
         return mask
 
-    except Exception as exc:
-        logger.warning("[mask] %s: generation failed: %s", entity_id, exc)
+    except asyncio.TimeoutError:
+        logger.warning("[bg-mask] TIMEOUT after %ds", MASK_TIMEOUT)
         return None
-
-
-def _build_fallback_mask(
-    entity_id: str,
-    pixels: List[Optional[List[int]]],
-) -> List[Optional[str]]:
-    """Build a simple fallback mask where all visible pixels get the root entity ID."""
-    return [entity_id if p is not None else None for p in pixels]
+    except json.JSONDecodeError as exc:
+        logger.warning("[bg-mask] JSON parse failed: %s", exc)
+        return None
+    except Exception as exc:
+        logger.warning("[bg-mask] generation failed: %s: %r",
+                       type(exc).__name__, exc)
+        return None
 
 
 def _sprite_to_png(sprite: Dict[str, Any]) -> bytes:
@@ -1003,7 +1225,7 @@ async def _generate_masks_parallel(
     try:
         results = await asyncio.wait_for(
             asyncio.gather(*tasks, return_exceptions=True),
-            timeout=MASK_TIMEOUT + 30,  # buffer for semaphore queuing
+            timeout=MASK_TIMEOUT * MASK_MAX_RETRIES + 30,  # accounts for retries
         )
     except asyncio.TimeoutError:
         logger.warning("[masks] Global mask generation timed out, using fallback masks")
@@ -1145,6 +1367,22 @@ def _compute_entity_positions(
             "w": w,
             "h": h,
         }
+
+    # Diagnostic: warn if entity feet are significantly above the canonical
+    # ground line (~70% from top = y≈126 in art-grid).  This helps detect
+    # cases where the LLM placed entities too high and they may appear to float.
+    canonical_ground_art_y = SOURCE_H * 70 // (100 * K)  # ≈126
+    float_threshold = ART_H // 6  # ~30 px
+    for eid, pos in positions.items():
+        foot_y = pos["y"] + pos["h"]
+        if foot_y < canonical_ground_art_y - float_threshold:
+            logger.warning(
+                "[positions] %s: feet at art-y=%d, expected ~%d — "
+                "entity may appear floating (%d px above ground)",
+                eid, foot_y, canonical_ground_art_y,
+                canonical_ground_art_y - foot_y,
+            )
+
     return positions
 
 
@@ -1231,7 +1469,7 @@ async def generate_scene(
     story_state: Optional[StoryState] = None,
     student_profile: Optional[StudentProfile] = None,
     skill_objectives: Optional[List[str]] = None,
-    seed_index: int = 0,
+    theme: str = "",
     commit_to_state: bool = True,
     extra_prompt: str = "",
     use_reference_images: bool = True,
@@ -1246,7 +1484,10 @@ async def generate_scene(
         story_state: Cumulative story state, or None for initial scene.
         student_profile: Child's error profile, or None for initial scene.
         skill_objectives: SKILL objectives for the session.
-        seed_index: Seed for variety (1, 2, 3 for initial thumbnails).
+        theme: Story theme for initial scenes (e.g. "a sunny beach with
+            tide pools"). Ignored for continuation scenes where context
+            comes from story_state.  If empty, a random theme is picked
+            from STORY_THEMES.
         commit_to_state: If True, call story_state.add_scene() with the result.
             Set to False for candidate branches that shouldn't mutate state.
         extra_prompt: Additional text appended to the user prompt (e.g. branch directive).
@@ -1275,7 +1516,9 @@ async def generate_scene(
 
     # Build user prompt
     if story_state is None or len(story_state.scenes) == 0:
-        user_prompt = _build_initial_prompt(skill_objectives, seed_index)
+        import random
+        chosen_theme = theme or random.choice(STORY_THEMES)
+        user_prompt = _build_initial_prompt(skill_objectives, chosen_theme)
     else:
         user_prompt = _build_continuation_prompt(
             story_state, student_profile, skill_objectives
@@ -1318,8 +1561,14 @@ async def generate_masks_for_scene(
 ) -> Dict[str, Any]:
     """Generate masks for a scene that was created with skip_masks=True.
 
-    Retroactively generates sub-entity ID masks for all entities in the
-    scene's sprite_code and updates the scene dict in-place.
+    Retroactively generates sub-entity ID masks for all entities AND the
+    background in the scene's sprite_code.  Updates the scene dict in-place.
+
+    Entity masks use chroma-key based sprite images.  The background mask
+    sends the art-grid PNG directly to the LLM (no chroma-key — every
+    pixel gets a ``bg.*`` ID).
+
+    Both entity masks and the background mask are generated **in parallel**.
 
     Args:
         api_key: Gemini API key.
@@ -1336,7 +1585,9 @@ async def generate_masks_for_scene(
     client = genai.Client(api_key=api_key)
     manifest_data = {"manifest": scene.get("manifest", {})}
 
+    # ------------------------------------------------------------------
     # Collect entities that need real masks
+    # ------------------------------------------------------------------
     entity_images: Dict[str, bytes] = {}
     entity_sprites: Dict[str, Dict[str, Any]] = {}
 
@@ -1345,30 +1596,87 @@ async def generate_masks_for_scene(
             continue
         if not isinstance(entry, dict) or entry.get("format") != "raw_sprite":
             continue
-        # Build the sprite dict expected by mask generation
         entity_sprites[eid] = {
             "w": entry["w"],
             "h": entry["h"],
             "pixels": entry["pixels"],
         }
-        # Convert sprite pixels to a small PNG for the mask LLM
         entity_images[eid] = _sprite_to_png(entity_sprites[eid])
 
-    if not entity_sprites:
-        return scene
-
-    logger.info("[generate-masks] Generating masks for %d entities...",
-                len(entity_sprites))
-    entity_masks = await _generate_masks_parallel(
-        client, entity_images, entity_sprites, manifest_data
+    # ------------------------------------------------------------------
+    # Detect background that needs a mask
+    # ------------------------------------------------------------------
+    bg_entry = sprite_code.get("bg")
+    need_bg_mask = (
+        isinstance(bg_entry, dict)
+        and bg_entry.get("format") == "image_background"
+        and bg_entry.get("image_base64")
+        and not bg_entry.get("mask")
     )
 
-    # Update sprite_code in-place with real masks
-    for eid, mask in entity_masks.items():
-        if eid in sprite_code:
-            sprite_code[eid]["mask"] = mask
-            mask_count = sum(1 for m in mask if m is not None)
-            logger.info("[generate-masks] %s: updated with %d mask entries", eid, mask_count)
+    if not entity_sprites and not need_bg_mask:
+        return scene
+
+    # ------------------------------------------------------------------
+    # Launch entity masks + bg mask in parallel
+    # ------------------------------------------------------------------
+    tasks: List[Any] = []
+
+    # Task 0: entity masks (or None placeholder)
+    if entity_sprites:
+        logger.info("[generate-masks] Generating masks for %d entities...",
+                    len(entity_sprites))
+        tasks.append(
+            _generate_masks_parallel(
+                client, entity_images, entity_sprites, manifest_data
+            )
+        )
+    else:
+        tasks.append(asyncio.sleep(0))  # placeholder
+
+    # Task 1: background mask
+    if need_bg_mask:
+        import base64 as _b64
+        bg_png = _b64.b64decode(bg_entry["image_base64"])
+        bg_w = bg_entry.get("width", ART_W)
+        bg_h = bg_entry.get("height", ART_H)
+        logger.info("[generate-masks] Generating mask for background (%dx%d)...",
+                    bg_w, bg_h)
+        tasks.append(
+            _generate_mask_for_background(client, bg_png, bg_w, bg_h)
+        )
+    else:
+        tasks.append(asyncio.sleep(0))  # placeholder
+
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+
+    # ------------------------------------------------------------------
+    # Apply entity masks
+    # ------------------------------------------------------------------
+    entity_masks = results[0]
+    if isinstance(entity_masks, dict):
+        for eid, mask in entity_masks.items():
+            if eid in sprite_code:
+                sprite_code[eid]["mask"] = mask
+                mask_count = sum(1 for m in mask if m is not None)
+                logger.info("[generate-masks] %s: updated with %d mask entries",
+                            eid, mask_count)
+    elif isinstance(entity_masks, Exception):
+        logger.warning("[generate-masks] Entity mask generation failed: %s",
+                       entity_masks)
+
+    # ------------------------------------------------------------------
+    # Apply background mask
+    # ------------------------------------------------------------------
+    bg_mask_result = results[1]
+    if isinstance(bg_mask_result, list) and bg_mask_result:
+        sprite_code["bg"]["mask"] = bg_mask_result
+        unique_bg = set(bg_mask_result)
+        logger.info("[generate-masks] bg: updated with %d pixels, %d unique IDs",
+                    len(bg_mask_result), len(unique_bg))
+    elif isinstance(bg_mask_result, Exception):
+        logger.warning("[generate-masks] Background mask generation failed: %s",
+                       bg_mask_result)
 
     return scene
 
@@ -1560,7 +1868,7 @@ async def _pipeline_with_reference_image(
                 img_bytes, art_w, art_h
             )
 
-        # ── Step 3: Mask generation ────────────────────────────────────────
+        # ── Step 3: Mask generation (entities + background in parallel) ────
         if skip_masks:
             logger.info("[pipeline] Step 3: SKIPPED (skip_masks=True), using fallback masks")
             entity_masks: Dict[str, List[Optional[str]]] = {
@@ -1568,14 +1876,62 @@ async def _pipeline_with_reference_image(
                 for eid, sprite in entity_sprites.items()
             }
         else:
+            # Launch entity masks + background mask in parallel
+            mask_tasks: List[Any] = []
+
+            # Task 0: entity masks
             logger.info("[pipeline] Step 3: Generating masks for %d entities...",
                         len(entity_sprites))
-            entity_masks = await _generate_masks_parallel(
-                client, entity_images, entity_sprites, manifest_data
+            mask_tasks.append(
+                _generate_masks_parallel(
+                    client, entity_images, entity_sprites, manifest_data
+                )
             )
-            logger.info("[pipeline] Step 3 done. Masks: %s",
-                        {eid: sum(1 for m in mask if m is not None)
-                         for eid, mask in entity_masks.items()})
+
+            # Task 1: background mask (if bg_sprite has base64 data)
+            launch_bg_mask = (
+                bg_sprite is not None
+                and bg_sprite.get("format") == "image_background"
+                and bg_sprite.get("image_base64")
+                and not bg_sprite.get("mask")
+            )
+            if launch_bg_mask:
+                import base64 as _b64
+                bg_png = _b64.b64decode(bg_sprite["image_base64"])
+                bg_w = bg_sprite.get("width", ART_W)
+                bg_h = bg_sprite.get("height", ART_H)
+                logger.info("[pipeline] Step 3: Also generating bg mask (%dx%d)...",
+                            bg_w, bg_h)
+                mask_tasks.append(
+                    _generate_mask_for_background(client, bg_png, bg_w, bg_h)
+                )
+
+            mask_results = await asyncio.gather(*mask_tasks, return_exceptions=True)
+
+            # Entity masks result
+            entity_masks = mask_results[0] if isinstance(mask_results[0], dict) else {
+                eid: _build_fallback_mask(eid, sprite["pixels"])
+                for eid, sprite in entity_sprites.items()
+            }
+            if isinstance(mask_results[0], Exception):
+                logger.warning("[pipeline] Entity mask generation failed: %s",
+                               mask_results[0])
+            else:
+                logger.info("[pipeline] Step 3 done. Masks: %s",
+                            {eid: sum(1 for m in mask if m is not None)
+                             for eid, mask in entity_masks.items()})
+
+            # Background mask result
+            if launch_bg_mask and len(mask_results) > 1:
+                bg_mask_result = mask_results[1]
+                if isinstance(bg_mask_result, list) and bg_mask_result:
+                    bg_sprite["mask"] = bg_mask_result
+                    logger.info("[pipeline] Step 3: bg mask done — %d unique IDs",
+                                len(set(bg_mask_result)))
+                elif isinstance(bg_mask_result, Exception):
+                    logger.warning("[pipeline] Background mask failed: %s",
+                                   bg_mask_result)
+
         await _notify("masks")
 
         # ── Step 4: Assembly ───────────────────────────────────────────────

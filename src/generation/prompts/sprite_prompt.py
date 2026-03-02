@@ -3,7 +3,8 @@
 This module provides prompt templates for:
   - ENTITY_IMAGE_PROMPT: Gemini 3 Pro Image — generate one entity on red chroma key
   - BACKGROUND_IMAGE_PROMPT: Gemini 3 Pro Image — generate full scene background
-  - MASK_SYSTEM_PROMPT / MASK_USER_PROMPT: Gemini 3 Flash — assign sub-entity IDs to pixels
+  - MASK_SYSTEM_PROMPT / MASK_USER_PROMPT: Gemini 3 Flash — assign sub-entity IDs to entity pixels
+  - BG_MASK_SYSTEM_PROMPT / BG_MASK_USER_PROMPT: Gemini 3 Flash — assign sub-entity IDs to background pixels
 """
 
 # ---------------------------------------------------------------------------
@@ -153,5 +154,94 @@ The attached image shows the sprite on a red chroma-key background. \
 Red pixels are transparent (null). All other pixels need a sub-entity ID.
 
 Return the mask as RLE: {{"mask": [[id_or_null, count], [id_or_null, count], ...]}}
+The sum of all counts MUST be exactly {total_pixels}.
+"""
+
+# ---------------------------------------------------------------------------
+# Background mask generation (Gemini 3 Flash, landscape segmentation)
+# ---------------------------------------------------------------------------
+
+BG_MASK_SYSTEM_PROMPT = """\
+You are a background mask generator for a pixel art animation engine. Your job is to \
+assign hierarchical entity IDs to EVERY pixel in a scene background image using \
+**run-length encoding (RLE)**.
+
+You receive:
+1. An image of a full scene background (landscape / environment)
+2. The image dimensions (width × height)
+
+## Output Format: RLE (Run-Length Encoding)
+
+Return a JSON object with a "mask" array of **runs**. Each run is a 2-element array:
+`[sub_entity_id, pixel_count]`
+
+Runs are in **row-major order** (left to right, top to bottom). The sum of all \
+pixel_count values MUST equal exactly {width} × {height} = {total_pixels}.
+
+Example for a 4×4 background (16 pixels total):
+```json
+{{"mask": [["bg.sky", 8], ["bg.mountain", 4], ["bg.ground.grass", 4]]}}
+```
+
+## Hierarchical Entity ID Rules
+
+ALL IDs must start with `bg.` — the root prefix.
+
+**Sky region:**
+- `bg.sky` — plain sky area (gradients, solid color)
+- `bg.sky.clouds` — clouds
+- `bg.sky.sun` or `bg.sky.moon` — celestial bodies
+- `bg.sky.stars` — stars (if visible)
+
+**Ground / terrain:**
+- `bg.ground` — generic ground
+- `bg.ground.grass` — grassy areas
+- `bg.ground.path` — paths, roads
+- `bg.ground.sand` — sandy areas
+- `bg.ground.snow` — snowy ground
+
+**Natural features:**
+- `bg.mountain` — mountains, hills
+- `bg.water` — water bodies (lakes, rivers, ocean)
+- `bg.water.surface` — water surface reflections
+- `bg.trees` — distant trees / forest
+- `bg.trees.canopy` — tree canopy area
+- `bg.trees.trunks` — tree trunk area
+- `bg.rocks` — rock formations
+
+**Structures:**
+- `bg.building` — buildings, houses
+- `bg.fence` — fences, walls
+- `bg.bridge` — bridges
+
+## How to Assign
+
+Look at the background image and identify distinct landscape regions:
+- Top portion → typically sky (clouds, sun, moon, stars)
+- Middle → mountains, hills, distant trees, buildings
+- Bottom → ground (grass, path, sand, water, rocks)
+- Transitions belong to the region they visually resemble most
+
+Scan in row-major order (row 0 left-to-right, then row 1, etc.). \
+Group consecutive pixels with the same sub-entity ID into one run.
+
+## CRITICAL RULES
+- The sum of all counts MUST equal exactly {total_pixels}.
+- EVERY pixel MUST have a sub-entity ID — no null values. Backgrounds have no transparency.
+- All IDs MUST start with the `bg.` prefix.
+- Consecutive pixels with the SAME ID must be merged into a single run.
+- Use at least 3 distinct sub-entity IDs (backgrounds always have sky + ground + something).
+- Prefer broad semantic regions over pixel-level precision.
+"""
+
+BG_MASK_USER_PROMPT = """\
+Assign sub-entity IDs for this background image using RLE (run-length encoding).
+
+Image dimensions: {width} × {height} ({total_pixels} pixels total)
+
+The attached image shows the full scene background (landscape / environment). \
+There are NO transparent pixels — every pixel belongs to a landscape region.
+
+Return the mask as RLE: {{"mask": [["bg.xxx", count], ["bg.yyy", count], ...]}}
 The sum of all counts MUST be exactly {total_pixels}.
 """

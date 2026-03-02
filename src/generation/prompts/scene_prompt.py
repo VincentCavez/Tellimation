@@ -47,11 +47,15 @@ Return ONLY valid JSON (no markdown fences, no commentary) matching this schema:
   "scene_description": "<2-3 sentence rich visual description of the entire scene: \
 setting, lighting/time of day, mood, atmosphere, color palette, composition, \
 and spatial layout. This will be used to generate a reference illustration.>",
-  "background_description": "<1-2 sentence description of ONLY the environment/backdrop: \
-sky, ground, lighting, atmosphere, color palette, distant landscape. \
+  "background_description": "<2-4 sentence description of the environment/backdrop. \
+Start with the environment type: outdoor landscape, themed outdoor location (zoo, playground, \
+market…), or indoor scene. Then describe: sky or ceiling, ground or floor texture and color, \
+lighting, atmosphere, color palette, and any STRUCTURAL background elements (fences, paths, \
+walls, shelves, equipment, signage) that define the setting. \
 Do NOT mention any entities (characters, trees, objects, items) — only the bare \
-environment they exist in. Example: 'A twilight forest clearing with purple-haze sky, \
-amber fireflies, luminous teal moss on the ground, and distant lavender mountains.' >",
+environment they exist in. Example: 'Themed outdoor location. A bright zoo setting with a \
+paved stone walkway, wooden fences lining both sides, and a distant ticket booth. Warm \
+afternoon sunlight, blue sky with scattered white clouds, green hedges behind the fences.' >",
   "manifest": {
     "scene_id": "<scene_XX>",
     "entities": [
@@ -123,7 +127,7 @@ Entities that overflow the canvas edges will be forcibly shifted inward.
 
 For characters standing on the ground, `y` should be roughly at the character's \
 vertical center (NOT the feet). Example: a 120px tall character at ground level \
-(ground line ~y=520) should have y ≈ 460.
+(ground line ~y=500) should have y ≈ 440.
 
 # CRITICAL: Entity description richness
 
@@ -162,9 +166,9 @@ yellow-green leaf tips"
 
 # Canvas dimensions and positioning
 
-The canvas is 1120 x 720 pixels. Ground line at approximately y=340.
+The canvas is 1120 x 720 pixels. Ground line at approximately y=500 (about 70% from top).
 
-- Characters: 160-280px tall, feet touching ground (position y ~ 400-580).
+- Characters: 160-280px tall, feet touching ground (center y ~ 400-540).
 - Trees: 240-400px tall, trunk base on ground.
 - Small objects: 64-120px.
 - Spread entities across the full 1120px width.
@@ -186,16 +190,20 @@ The `scene_description` field must cover:
 The `background_description` field is used to generate the background image \
 SEPARATELY from the entity sprites. It MUST describe ONLY the bare environment:
 
-- Sky (color gradients, clouds, stars, sun/moon)
-- Ground (texture, color — grass, sand, stone, water)
+- Sky or ceiling (color gradients, clouds, stars, sun/moon — or ceiling color/texture)
+- Ground or floor (texture, color — grass, sand, stone, water, tiles, wood)
 - Lighting and atmosphere (time of day, haze, fog, glow)
-- Distant landscape (mountains, horizon, distant forest silhouettes)
+- Distant landscape or room boundaries (mountains, horizon, walls, shelves)
 - Color palette for the environment
+- **Structural background elements** that define the setting: fences, paths, \
+signage, walls, counters, playground equipment, etc. These are FIXED parts of \
+the environment, NOT interactive entities.
 
 It MUST NOT mention ANY entities — no characters, no trees, no objects, no items. \
 Those are rendered separately as sprites on top of the background. If you mention \
 "a large oak tree" in background_description, the tree will appear TWICE (once in \
-the background and once as an entity sprite).
+the background and once as an entity sprite). However, structural elements like \
+fences, paths, buildings in the distance, and walls ARE part of the background.
 
 # Carried-over entities
 
@@ -235,14 +243,22 @@ Just the environment and atmosphere. Clean children's illustration style.
 ## Scene environment
 {scene_description}
 
+## Entity ground level
+{ground_level_hint}
+
 ## Style Guidelines — CRITICAL
 - **Clean children's illustration style**: smooth gradients, clear shapes, \
   warm and friendly. Suitable for ages 7-11.
 - **Flat side-view** (like a 2D storybook): no perspective.
-- **Ground line at ~60% from top**. Sky above, ground below.
-- **Rich atmospheric gradients**: sky with color variation (lighter at horizon, \
-  darker above). Ground with rich texture (grass, sand, stone, water, etc.).
-- **Atmospheric details**: clouds, stars, sun glow, distant mountains, etc.
+- **The ground or floor surface MUST be clearly visible** at the entity ground \
+  level indicated above. Characters will be composited on top of this background \
+  at that level — the surface they stand on must be present there.
+- **Environment-appropriate composition**: \
+  Outdoor scenes: sky above, ground below with rich texture. \
+  Themed locations (zoo, playground, market): include structural background \
+  elements (fences, paths, signage) that define the setting. \
+  Indoor scenes: show walls, ceiling, and floor.
+- **Rich details**: atmospheric gradients, clouds, distant elements, textures.
 - **NO characters or objects** — purely the background environment.
 - **Warm, friendly, child-appropriate** feel.
 """
@@ -1205,8 +1221,10 @@ where the child picks from 3 options.
 
 SKILL objectives for this session: {skill_objectives}
 
-Seed index: {seed_index} (use this to vary the theme — different characters, \
-settings, and moods for each seed).
+Story theme: {theme}
+
+Use this theme as the setting for the scene. Create characters and elements \
+that naturally belong in this environment.
 
 Requirements:
 - Create a fresh, imaginative scene with 1 main character and 2-3 environment elements.
@@ -1215,12 +1233,6 @@ Requirements:
 - All entities are new (carried_over: false, carried_over_entities: []).
 - background_changed: true (initial scene, always needs a new background).
 - Scene ID: "scene_01".
-
-Vary based on seed_index:
-- seed 1: forest/nature theme
-- seed 2: ocean/beach theme
-- seed 3: city/town theme
-- other seeds: surprise me with an unusual setting
 """
 
 CONTINUATION_SCENE_USER_PROMPT = """\

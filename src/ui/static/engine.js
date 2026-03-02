@@ -428,6 +428,7 @@ function executeRawSprite(spriteData, pixelBuffer) {
 function executeImageBackground(spriteData, pixelBuffer) {
   // Async: Image loading is async in browsers.
   var b64 = spriteData.image_base64;
+  var bgMask = spriteData.mask || null;
 
   // Background image is at art-grid resolution — fill the entire buffer
   var targetW = pixelBuffer.width;
@@ -450,11 +451,15 @@ function executeImageBackground(spriteData, pixelBuffer) {
 
       for (var row = 0; row < targetH; row++) {
         for (var col = 0; col < targetW; col++) {
-          var srcIdx = (row * targetW + col) * 4;
+          var bufIdx = row * targetW + col;
+          var srcIdx = bufIdx * 4;
+          // Use per-pixel sub-entity ID from mask, or fallback to 'bg'
+          var entityId = (bgMask && bufIdx < bgMask.length && bgMask[bufIdx])
+            ? bgMask[bufIdx] : 'bg';
           pixelBuffer._set(
             col, row,
             px[srcIdx], px[srcIdx + 1], px[srcIdx + 2],
-            'bg'
+            entityId
           );
         }
       }

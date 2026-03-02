@@ -20,6 +20,7 @@ var NarrationClient = (function() {
   var pendingVoiceTimeout = null;
   var isPlayingVoice = false;
   var voiceQueue = [];  // Queue audio if something is already playing
+  var wordRevealInterval = null;  // Timer for word-by-word TTS text display
 
   /**
    * Initialize the narration client.
@@ -74,11 +75,24 @@ var NarrationClient = (function() {
   // Audio recording (push-to-talk)
   // -----------------------------------------------------------------------
 
+  /**
+   * Cancel any in-progress word-by-word text reveal.
+   */
+  function _cancelWordReveal() {
+    if (wordRevealInterval) {
+      clearInterval(wordRevealInterval);
+      wordRevealInterval = null;
+    }
+  }
+
   function startRecording() {
     if (!stream) return;
 
     isRecording = true;
     audioChunks = [];
+
+    // Stop any ongoing word-by-word TTS text display
+    _cancelWordReveal();
 
     // Update UI
     transcriptionBox.classList.add('recording');
@@ -212,6 +226,7 @@ var NarrationClient = (function() {
 
   /**
    * Decode PCM 16-bit signed mono and play via Web Audio API.
+   * Simultaneously reveals the spoken text word-by-word in feedbackEl.
    */
   function _playPCM(header, arrayBuffer) {
     if (!audioContext) return;
@@ -231,6 +246,33 @@ var NarrationClient = (function() {
     );
     buffer.getChannelData(0).set(float32);
 
+    // --- Word-by-word text reveal ---
+    _cancelWordReveal();
+    var words = (header.text || '').split(/\s+/).filter(Boolean);
+    var durationSec = float32.length / header.sampleRate;
+
+    if (feedbackEl && words.length > 0 && durationSec > 0) {
+      feedbackEl.textContent = '';
+      var wordIndex = 0;
+      var intervalMs = (durationSec / words.length) * 1000;
+
+      // Show the first word immediately
+      feedbackEl.textContent = words[wordIndex];
+      wordIndex++;
+
+      if (words.length > 1) {
+        wordRevealInterval = setInterval(function() {
+          if (wordIndex < words.length) {
+            feedbackEl.textContent += ' ' + words[wordIndex];
+            wordIndex++;
+          } else {
+            clearInterval(wordRevealInterval);
+            wordRevealInterval = null;
+          }
+        }, intervalMs);
+      }
+    }
+
     // Play
     var source = audioContext.createBufferSource();
     source.buffer = buffer;
@@ -239,6 +281,12 @@ var NarrationClient = (function() {
 
     isPlayingVoice = true;
     source.onended = function() {
+      // Flush: ensure all words are visible when audio ends
+      _cancelWordReveal();
+      if (feedbackEl && words.length > 0) {
+        feedbackEl.textContent = words.join(' ');
+      }
+
       isPlayingVoice = false;
       // Play next in queue if any
       if (voiceQueue.length > 0) {
@@ -256,6 +304,7 @@ var NarrationClient = (function() {
    * Clean up resources.
    */
   function destroy() {
+    _cancelWordReveal();
     if (pendingVoiceTimeout) {
       clearTimeout(pendingVoiceTimeout);
       pendingVoiceTimeout = null;

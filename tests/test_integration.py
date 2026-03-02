@@ -406,7 +406,7 @@ class TestEndToEndMocked:
                     story_state=story_state,
                     student_profile=None,
                     skill_objectives=["descriptive_adjectives", "spatial_prepositions"],
-                    seed_index=1,
+                    theme="a playground in a park",
                     commit_to_state=True,
                     use_reference_images=False,
                 )
@@ -722,7 +722,7 @@ class TestEndToEndLive:
                 story_state=None,
                 student_profile=None,
                 skill_objectives=["descriptive_adjectives", "spatial_prepositions"],
-                seed_index=1,
+                theme="a playground in a park",
                 commit_to_state=False,
             )
         )
@@ -765,7 +765,7 @@ class TestEndToEndLive:
                 api_key=api_key,
                 story_state=story_state,
                 skill_objectives=["descriptive_adjectives", "spatial_prepositions"],
-                seed_index=1,
+                theme="a playground in a park",
                 commit_to_state=True,
             )
         )

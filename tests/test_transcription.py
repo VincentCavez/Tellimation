@@ -391,7 +391,7 @@ class TestTranscriptionResultModel:
 
 class TestTranscribeAndDetect:
     def test_parses_response_and_filters_exclusions(self):
-        """Core test: mock Gemini, verify parsing, verify exclusion filtering."""
+        """Core test: mock Gemini, verify parsing — all discrepancies pass through."""
         neg = _make_neg()
         mock_client = _make_mock_client(FAKE_LLM_RESPONSE)
 
@@ -409,19 +409,16 @@ class TestTranscribeAndDetect:
         assert isinstance(result, TranscriptionResult)
         assert result.transcription == "um there is a bunny next to a rock"
 
-        # Original response had 5 discrepancies; 2 should be filtered:
-        # - ACTION on rock_01 (rock_01 has ACTION excluded)
-        # - QUANTITY on rabbit_01 (rabbit_01 has QUANTITY excluded)
-        assert len(result.discrepancies) == 3
+        # All 5 discrepancies from the LLM response pass through
+        # (no error_exclusions filtering)
+        assert len(result.discrepancies) == 5
 
         remaining_types = [(d.entity_id, d.type) for d in result.discrepancies]
         assert ("rabbit_01", "PROPERTY_COLOR") in remaining_types
         assert ("rabbit_01", "PROPERTY_SIZE") in remaining_types
         assert ("rabbit_01", "ACTION") in remaining_types
-
-        # Filtered out:
-        assert ("rock_01", "ACTION") not in remaining_types
-        assert ("rabbit_01", "QUANTITY") not in remaining_types
+        assert ("rock_01", "ACTION") in remaining_types
+        assert ("rabbit_01", "QUANTITY") in remaining_types
 
         # Other fields
         assert result.scene_progress == 0.35
@@ -616,5 +613,5 @@ class TestTranscribeAndDetect:
             )
 
         assert result.transcription == "um there is a bunny next to a rock"
-        # Exclusion filtering still works
-        assert len(result.discrepancies) == 3
+        # All discrepancies pass through (no exclusion filtering)
+        assert len(result.discrepancies) == 5
