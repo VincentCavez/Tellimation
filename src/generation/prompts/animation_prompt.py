@@ -85,127 +85,164 @@ Leverage sub-entity IDs for **precise, part-level animations**: twist an \
 ear, bob a head, wiggle legs, brighten just the eyes. The more specific \
 the targeting, the more expressive and clear the animation.
 
-# Animation Grammar — Cartoon Physics Responses
+The user prompt includes an **entity sprite structure** section listing \
+all REAL sub-entity IDs that exist in the pixel buffer, with their pixel \
+counts, average colors, and bounding boxes. Use ONLY these IDs for \
+prefix matching — do not guess or invent sub-entity names.
 
-Each error type has a core principle and a repertoire of responses. \
-Choose the response that best illustrates the SPECIFIC discrepancy \
-(what the child said vs. what's true). Every situation is unique — \
-design accordingly.
+# Your creative toolkit
+
+You have several tools to communicate the truth to the child. \
+Combine them freely — the best animation is the one that makes \
+the discrepancy instantly obvious, regardless of which tools it uses.
+
+1. **Sub-entity targeting** — animate specific parts (ear, hat, legs, \
+eyes, tail). The more precise, the more expressive.
+2. **Whole-entity manipulation** — move, shake, bounce, rotate, \
+brighten/dim entire entities.
+3. **Cross-entity interaction** — show relationships between multiple \
+entities (drift apart, slide together, one looms over another).
+4. **New visual elements** — create particles, arrows, sparkles, steam, \
+frost, motion lines, indicator dots, glowing outlines — anything that \
+helps communicate the truth.
+5. **Pixel-art symbols** — small pixel-art indicators when the visual \
+alone isn't sufficient (e.g. "?" near a confused entity, directional \
+arrows, count dots, emphasis marks).
+
+These are tools, not rules. Use whatever combination best reveals \
+the specific truth for each specific discrepancy. You are not limited \
+to the examples below — invent new approaches when they serve the \
+communication goal better.
+
+# Animation Grammar — Principles per Error Type
+
+Each error type below describes WHAT must be revealed and WHY. \
+The example approaches are just starting points — you may invent \
+entirely new approaches, combine techniques across error types, \
+or use your creative toolkit in unexpected ways.
+
+Your only constraint: the animation must make the SPECIFIC truth \
+instantly obvious to a 7-11 year old through visual behavior alone.
 
 ## SPATIAL errors (prepositions, location)
-Core: Spatial truth is revealed by exaggerating the actual spatial \
-relationship — making containment more containing, distance more distant, \
-contact more tangible.
+The discrepancy: child described the wrong spatial relationship \
+(wrong preposition, wrong location, missing spatial reference).
+What must be revealed: the ACTUAL spatial relationship between the \
+entity and its reference point — on/under/next to/inside/above.
+Example approaches (non-exhaustive): reference object becomes \
+translucent to reveal what's beneath; entity settles firmly into \
+its actual position; distance stretches or objects snap together; \
+gravity arrows or plumb lines show actual vertical relationship.
 
-Responses: The reference object becomes translucent or lifts to reveal \
-what's beneath. The object settles more firmly into its actual position \
-with satisfying weight. The container shows its emptiness or its \
-fullness. The actual distance stretches to show a visible gap, or \
-objects magnetically snap together. A plumb line drops, gravity arrows \
-appear to demonstrate which is truly higher. The scene rotates slightly \
-to reveal true depth order.
+## PROPERTY_COLOR errors
+The discrepancy: child used the wrong color or omitted the color entirely.
+What must be revealed: the entity's ACTUAL color, unmistakably.
+Example approaches (non-exhaustive): entity's color pulses and glows \
+while surroundings desaturate; a wave of the true color washes over \
+the entity; nearby objects briefly shift to the wrong color then \
+revert, highlighting the contrast.
 
-## PROPERTY errors (PROPERTY_COLOR, PROPERTY_SIZE, PROPERTY_WEIGHT, PROPERTY_TEMPERATURE, PROPERTY_STATE)
-Core: The object tries to become what was claimed and fails, then \
-settles firmly into what it actually is. The actual property intensifies \
-to the point of undeniability.
+## PROPERTY_SIZE errors
+The discrepancy: child used the wrong size descriptor or omitted it.
+What must be revealed: the entity's ACTUAL size relative to its \
+surroundings.
+Example approaches (non-exhaustive): entity attempts to inflate or \
+compress to the claimed size, strains, springs back; nearby objects \
+shift to provide size comparison; a measuring indicator appears briefly.
 
-PROPERTY_COLOR: Target entity's actual color pulses and glows while \
-surroundings desaturate. The color becomes undeniable.
-PROPERTY_SIZE: Object attempts to inflate/compress, strains, then \
-springs back to actual size. Surrounding objects loom by comparison.
-PROPERTY_WEIGHT: Breeze catches a light object (drifts up). Surface \
-sags under heavy object (cracks, strain). Character near it struggles \
-or lifts effortlessly.
-PROPERTY_TEMPERATURE: Frost forms for cold, steam rises for hot, heat \
-waves shimmer, icicles appear. Nearby objects react (wilt, shiver).
-PROPERTY_STATE: Vital signs display (eyes snap open, sleep deepens \
-with ZZZs, sadness shows through tears/slump, courage through puffed \
-chest).
-Texture: Something pokes soft objects (they squish). Hard objects \
-bounce impacts with stars. Open things yawn wider, closed things \
-seal tighter.
+## PROPERTY_WEIGHT errors
+The discrepancy: child used the wrong weight descriptor or omitted it.
+What must be revealed: the entity's ACTUAL weight through physical \
+consequence.
+Example approaches (non-exhaustive): heavy object causes surface to \
+sag; light object drifts upward in a breeze; nearby character \
+struggles or lifts effortlessly.
+
+## PROPERTY_TEMPERATURE errors
+The discrepancy: child used the wrong temperature or omitted it.
+What must be revealed: the entity's ACTUAL temperature through \
+environmental reaction.
+Example approaches (non-exhaustive): frost particles form for cold; \
+steam rises for hot; heat waves shimmer; nearby objects react (wilt, \
+shiver, melt).
+
+## PROPERTY_STATE errors
+The discrepancy: child described the wrong state or omitted it.
+What must be revealed: the entity's ACTUAL state (awake/asleep, \
+happy/sad, open/closed, etc.) through behavior or vital signs.
+Example approaches (non-exhaustive): eyes snap open or close; ZZZ \
+particles for sleep; tears for sadness; texture change (squish for \
+soft, bounce-back for hard).
 
 ## TEMPORAL errors (tense, time)
-Core: Time is visualized through motion residue (past), immediate \
-presence (present), and coiled potential (future).
-
-Past action: Ghostly afterimages trail and fade. Dust settles. \
-The character is in post-action pose.
-Future action: Anticipation pose — coiled, tense, ready. Potential \
-energy visualizes as stored tension. Clearly not yet happening.
-Present action: Full real-time motion bursts, colors saturate, \
-the "is-happening" quality is vivid and immediate.
-Duration errors: Action stretches out or is over in a flash. A \
-visual clock or time indicator emphasizes actual duration.
+The discrepancy: child used the wrong tense or temporal marker.
+What must be revealed: WHETHER the action is in the past, present, \
+or future — the temporal truth.
+Example approaches (non-exhaustive): ghostly afterimages for past \
+actions; anticipation pose (coiled energy) for future; vivid immediate \
+motion for present; dust settling vs. coiled tension.
 
 ## IDENTITY errors (nouns, naming)
-Core: The true entity performs its identity — does something \
-characteristic, asserts its category through behavior.
-
-The correct entity steps forward, becomes more present. If the wrong \
-category is named (e.g. "dog" but it's a cat), the entity briefly \
-morphs toward the wrong category then snaps back emphatically and \
-performs its defining behavior (cat meows/licks paw). Sub-parts \
-briefly scatter and reassemble to show internal structure.
+The discrepancy: child used the wrong noun or a vague pronoun.
+What must be revealed: the entity's TRUE identity and category — what \
+it actually IS.
+Example approaches (non-exhaustive): entity performs its defining \
+behavior (cat licks paw, bird flaps wings); entity briefly morphs \
+toward the wrong category then snaps back emphatically; sub-parts \
+scatter and reassemble to show what makes it what it is.
 
 ## QUANTITY errors (count, pluralization)
-Core: Quantity is revealed through spatial separation and sequential \
-attention — making each element individually undeniable, or making \
-singularity/emptiness visceral.
-
-Multiple objects: separate, space out, pulse in sequence (one, two, \
-three...), form a countable line. Each one individuates. \
-Single object: isolated, spotlighted, surrounding space emphasized. \
-It looks around for companions and finds none.
+The discrepancy: child used the wrong count or singular/plural mismatch.
+What must be revealed: the ACTUAL number of entities present.
+Example approaches (non-exhaustive): objects separate and pulse in \
+sequence (one, two, three…); individual objects individuate and count \
+off; for singular — entity is isolated and spotlighted, empty space \
+emphasized around it.
 
 ## ACTION errors (verbs)
-Core: Actions are revealed through force visualization and exaggerated \
-performance of the actual action.
-
-The actual action is performed with exaggerated clarity. Sitting is \
-emphasized (roots grow from feet), sleeping deepens (ZZZs, snore \
-bubbles). Wrong direction: actual direction shown with motion lines, \
-arrows, flow. Wrong intensity: slow-motion emphasis or speed-line blur. \
-Force arrows visualize actual direction of push/pull/give/receive.
+The discrepancy: child used the wrong verb or omitted the action.
+What must be revealed: the ACTUAL action being performed, unmistakably.
+Example approaches (non-exhaustive): exaggerated performance of the \
+true action; motion lines showing actual direction; force arrows for \
+push/pull; roots growing from feet for "sitting still."
 
 ## RELATIONAL errors (between entities)
-Core: Relationships are revealed through spatial dynamics between \
-entities — attraction/repulsion, comparison, connection/disconnection.
-
-Objects drift apart or magnetically attract. For size comparison: \
-slide together, one looms. Same vs. different: matching features glow \
-in unison or discrepant features pulse. Emotional relations: warmth \
-(drift closer, warm colors) or cold distance (rift, cold colors). \
-Obstruction: force arrows show the "helper" is actually blocking.
+The discrepancy: child described the wrong relationship between entities.
+What must be revealed: the ACTUAL relationship (friendship, helping, \
+bigger/smaller, matching/different).
+Example approaches (non-exhaustive): entities drift apart or attract; \
+comparison slide for size; matching features glow in unison; warmth \
+indicators for closeness, cold distance for separation.
 
 ## EXISTENCE errors
-Core: Existence is revealed through materiality contrast — \
-solidity/presence versus ghostliness/void.
-
-Absent entity: ghostly outline appears where it should be, then \
-dissolves into nothing. A "poof" of disappearance.
-Present but denied: entity becomes more solid, more saturated, \
-casts stronger shadow. It refuses to be ignored.
+The discrepancy: child mentioned an entity that doesn't exist, or \
+denied one that does.
+What must be revealed: the entity's PRESENCE or ABSENCE — whether it \
+is truly there or not.
+Example approaches (non-exhaustive): ghostly outline dissolves for \
+absent entity; present entity becomes more solid and casts shadow; \
+"poof" particles for disappearance.
 
 ## MANNER errors (adverbs)
-Core: Manner is revealed through exaggeration of the actual manner — \
-making slow excruciating, fast blinding, loud overwhelming, quiet \
-deafening.
-
-Slow: extreme slow-motion, stretching time. A snail might pass by. \
-Fast: speed lines, blur, afterimages, breakneck pace. \
-Careful: delicate movements, precision. Careless: sloppy, things \
-knocked over. Loud: sound waves blast. Quiet: silence emphasized.
+The discrepancy: child used the wrong adverb or omitted the manner.
+What must be revealed: the ACTUAL manner of the action (speed, care, \
+intensity).
+Example approaches (non-exhaustive): extreme slow-motion for slow; \
+speed lines and blur for fast; delicate precision for careful; \
+sloppy knock-overs for careless.
 
 ## OMISSION errors
-Entity the child skipped entirely. A natural growth marker (sprout, \
-leaf, sparkle) appears at the entity's location, drawing attention \
-to what was missed. The entity gently pulses to say "describe me."
+The discrepancy: child skipped an entire entity — didn't mention it.
+What must be revealed: the entity's PRESENCE and importance in the scene.
+Example approaches (non-exhaustive): natural growth marker (sprout, \
+sparkle) appears at entity's location; entity gently pulses; attention- \
+drawing particles orbit the overlooked entity.
 
 ## REDUNDANCY errors
-Child repeated information or used double negatives. The entity \
-jiggles as if bumped, small star particles appear briefly.
+The discrepancy: child repeated information or used double negatives.
+What must be revealed: the unnecessary repetition.
+Example approaches (non-exhaustive): entity jiggles as if bumped; \
+small star particles; brief visual stutter echoing the redundancy.
 
 # Student profile awareness
 
@@ -296,7 +333,7 @@ Return ONLY valid JSON (no markdown fences, no commentary):
 
 ```
 {
-  "animation_type": "<name from grammar above>",
+  "animation_type": "<descriptive name — can be from the examples or your own invention>",
   "code": "<JavaScript function body as a string>",
   "duration_ms": <integer, typically 800-2000>
 }
@@ -348,6 +385,17 @@ Entity: cat_01
 }
 ```
 
+# IMPORTANT: Go beyond the examples
+
+The animation grammar above is a STARTING POINT, not a constraint. \
+If you can think of a better way to visually communicate the specific \
+discrepancy — using any combination of sub-entity targeting, entity \
+manipulation, cross-entity interaction, new visual elements, or \
+pixel-art indicators — DO IT.
+
+The child must understand "Oh, it's not X, it's actually Y" through \
+what they SEE. How you achieve that is entirely up to you.
+
 # Guidelines
 
 - Keep the code simple and performant — it runs 60 times/second.
@@ -373,6 +421,9 @@ Entity bounding box: x={bbox_x}, y={bbox_y}, width={bbox_w}, height={bbox_h}
 # Target entity details
 {entity_details}
 
+# Entity sprite structure
+{sprite_info}
+
 # Full scene context
 {scene_context}
 
@@ -380,8 +431,9 @@ Entity bounding box: x={bbox_x}, y={bbox_y}, width={bbox_w}, height={bbox_h}
 {student_profile_context}
 
 Design a semantically unique animation that visually reveals the correct \
-answer for THIS specific discrepancy. The animation should target the \
-sub-entity "{sub_entity}" using prefix matching on buf[i].e. Make the \
-child understand the truth through cartoon physics, not through generic \
-effects.
+answer for THIS specific discrepancy. Use the sub-entity IDs listed in \
+the sprite structure above — these are the REAL IDs present in buf[i].e. \
+Target "{sub_entity}" or any relevant sub-parts using prefix matching. \
+Make the child understand the truth through cartoon physics, not through \
+generic effects.
 """

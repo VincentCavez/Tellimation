@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "tellimations",
+      "runtimeExecutable": "uvicorn",
+      "runtimeArgs": ["src.ui.app:app", "--reload", "--port", "8000"],
+      "port": 8000
+    }
+  ]
+}

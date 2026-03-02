@@ -1,0 +1,26 @@
+{
+  "error_counts": {
+    "IDENTITY": 2,
+    "OMISSION": 2
+  },
+  "error_trend": {},
+  "difficult_entities": [],
+  "strong_areas": [],
+  "scenes_completed": 0,
+  "corrections_after_animation": 0,
+  "total_utterances": 1,
+  "animation_history": [
+    {
+      "entity_id": "crab_01",
+      "error_type": "IDENTITY",
+      "animation_type": "crab_01",
+      "corrected": false
+    },
+    {
+      "entity_id": "tidepool_01",
+      "error_type": "IDENTITY",
+      "animation_type": "tidepool_01",
+      "corrected": false
+    }
+  ]
+}

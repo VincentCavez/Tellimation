@@ -133,6 +133,40 @@ def _format_entity_details(
     return "\n".join(lines)
 
 
+def _format_sprite_info(
+    entity_id: str, sprite_info: Optional[Dict[str, Any]]
+) -> str:
+    """Format sprite structure (sub-entity IDs, per-part stats) for the prompt."""
+    if not sprite_info:
+        return "(no sprite data available)"
+
+    lines = []
+    lines.append(
+        f"Sprite bounding box (art-grid): x={sprite_info['x']}, "
+        f"y={sprite_info['y']}, w={sprite_info['w']}, h={sprite_info['h']}"
+    )
+
+    sub_ids = sprite_info.get("sub_entity_ids", [])
+    if sub_ids:
+        lines.append(f"Available sub-entity IDs ({len(sub_ids)}):")
+        sub_stats = sprite_info.get("sub_entity_stats", {})
+        for sid in sub_ids:
+            stats = sub_stats.get(sid, {})
+            count = stats.get("pixel_count", 0)
+            avg = stats.get("avg_color", (0, 0, 0))
+            bbox = stats.get("bbox", {})
+            color_desc = f"avg rgb({avg[0]},{avg[1]},{avg[2]})"
+            bbox_desc = (
+                f"bbox({bbox.get('x_min', 0)},{bbox.get('y_min', 0)})"
+                f"-({bbox.get('x_max', 0)},{bbox.get('y_max', 0)})"
+            )
+            lines.append(f"  {sid}: {count}px, {color_desc}, {bbox_desc}")
+    else:
+        lines.append("(no sub-entity IDs — mask unavailable)")
+
+    return "\n".join(lines)
+
+
 def _validate_animation_response(data: Dict[str, Any]) -> CachedAnimation:
     """Validate and extract a CachedAnimation from the LLM response."""
     code = data.get("code", "")
@@ -167,6 +201,7 @@ async def generate_animation(
     animation_cache: AnimationCache,
     student_profile: Optional[StudentProfile] = None,
     discrepancy_details: str = "",
+    entity_sprite_info: Optional[Dict[str, Any]] = None,
 ) -> CachedAnimation:
     """Generate or retrieve an animation for an entity/error pair.
 
@@ -185,6 +220,8 @@ async def generate_animation(
         animation_cache: The shared AnimationCache instance.
         student_profile: Child's error profile for animation effectiveness context.
         discrepancy_details: What the child said vs. the scene truth.
+        entity_sprite_info: Sprite structure with sub-entity IDs, per-part stats,
+            and actual bounding box.  Extracted from the pixel mask.
 
     Returns:
         CachedAnimation with code, duration_ms, and generated_for.
@@ -203,6 +240,7 @@ async def generate_animation(
         profile_str = student_profile.to_prompt_context()
 
     details_str = discrepancy_details if discrepancy_details else "(no details)"
+    sprite_info_str = _format_sprite_info(entity_id, entity_sprite_info)
 
     user_prompt = ANIMATION_USER_PROMPT.format(
         error_type=error_type,
@@ -214,6 +252,7 @@ async def generate_animation(
         bbox_h=entity_bounds.get("height", 0),
         discrepancy_details=details_str,
         entity_details=entity_details_str,
+        sprite_info=sprite_info_str,
         scene_context=context_str,
         student_profile_context=profile_str,
     )

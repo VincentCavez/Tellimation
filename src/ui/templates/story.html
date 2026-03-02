@@ -168,6 +168,10 @@
             handleBranches(msg.scenes);
             break;
 
+          case 'story_complete':
+            handleStoryComplete();
+            break;
+
           case 'new_scene':
             handleNewScene(msg.scene);
             break;
@@ -215,6 +219,19 @@
         ws.send(JSON.stringify({ type: 'generate_branches' }));
       }
 
+      function handleStoryComplete() {
+        // Disable push-to-talk
+        transcriptionBox.style.display = 'none';
+        pttHint.style.display = 'none';
+        // Show story complete message instead of branch picker
+        branchPicker.style.display = '';
+        branchThumbnails.innerHTML =
+          '<div style="text-align:center; padding:2rem;">' +
+          '<h2 style="color:#2c3e50; margin-bottom:0.5rem;">The End!</h2>' +
+          '<p style="color:#666; font-size:1.1rem;">Great job telling the story!</p>' +
+          '</div>';
+      }
+
       // -- Branch selection --
       var currentBranches = [];
 
@@ -222,7 +239,7 @@
         currentBranches = scenes;
         branchThumbnails.innerHTML = '';
         scenes.forEach(function(scene, index) {
-          var card = ScenePicker.createThumbnailCard(scene, 1.5);
+          var card = ScenePicker.createThumbnailCard(scene);
           card.addEventListener('click', function() {
             selectBranch(index);
           });

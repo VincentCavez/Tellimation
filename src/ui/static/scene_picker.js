@@ -8,9 +8,9 @@ var ScenePicker = (function() {
   // Thumbnails are 1/2 the art grid (280x180 → 140x90).
   // We render sprites at art-grid resolution then downsample by averaging
   // each 2x2 block of pixels, so nothing gets cropped.
+  // Canvas is rendered at native 1:1 (140×90); CSS handles display scaling.
   var THUMB_PW = 140;
   var THUMB_PH = 90;
-  var THUMB_SCALE = 2;  // integer scale for clean pixel blocks
   var DOWNSAMPLE_FACTOR = 2;
 
   /**
@@ -56,12 +56,13 @@ var ScenePicker = (function() {
   /**
    * Create a thumbnail card element for a scene.
    *
+   * Canvas is rendered at native 1:1 resolution (140×90) and CSS
+   * handles display scaling via image-rendering: pixelated.
+   *
    * @param {Object} scene - Scene data with manifest, sprite_code, branch_summary.
-   * @param {number} [scale=1.5] - Pixel scale for the thumbnail canvas.
    * @returns {HTMLElement} A .thumbnail-card div element.
    */
-  function createThumbnailCard(scene, scale) {
-    scale = scale || THUMB_SCALE;
+  function createThumbnailCard(scene) {
 
     var card = document.createElement('div');
     card.className = 'thumbnail-card';
@@ -99,31 +100,24 @@ var ScenePicker = (function() {
       }
       // Downsample art grid (280x180) → 140x90 by averaging 2x2 blocks
       var thumbBuf = downsampleBuffer(fullBuf);
-      // Thumbnail renderer: canvas = THUMB_PW*scale × THUMB_PH*scale
-      canvas.width = THUMB_PW * scale;
-      canvas.height = THUMB_PH * scale;
+      // Render at native 1:1 resolution — CSS handles display scaling
+      // via image-rendering: pixelated (avoids fractional byte offsets
+      // that caused horizontal striping with non-integer scale factors).
+      canvas.width = THUMB_PW;
+      canvas.height = THUMB_PH;
       canvas.style.imageRendering = 'pixelated';
       canvas.style.imageRendering = 'crisp-edges';
       var thumbCtx = canvas.getContext('2d');
       thumbCtx.imageSmoothingEnabled = false;
-      // Render thumbnail: each thumb pixel = scale×scale block
-      var imgData = thumbCtx.createImageData(THUMB_PW * scale, THUMB_PH * scale);
+      var imgData = thumbCtx.createImageData(THUMB_PW, THUMB_PH);
       var px = imgData.data;
-      var s = scale;
-      for (var row = 0; row < THUMB_PH; row++) {
-        for (var col = 0; col < THUMB_PW; col++) {
-          var p = thumbBuf.data[row * THUMB_PW + col];
-          for (var sdy = 0; sdy < s; sdy++) {
-            var rowOff = ((row * s + sdy) * THUMB_PW * s + col * s) * 4;
-            for (var sdx = 0; sdx < s; sdx++) {
-              var off = rowOff + sdx * 4;
-              px[off] = p.r;
-              px[off + 1] = p.g;
-              px[off + 2] = p.b;
-              px[off + 3] = 255;
-            }
-          }
-        }
+      for (var idx = 0; idx < THUMB_PW * THUMB_PH; idx++) {
+        var p = thumbBuf.data[idx];
+        var off = idx * 4;
+        px[off] = p.r;
+        px[off + 1] = p.g;
+        px[off + 2] = p.b;
+        px[off + 3] = 255;
       }
       thumbCtx.putImageData(imgData, 0, 0);
     }

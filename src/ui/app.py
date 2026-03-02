@@ -48,6 +48,9 @@ BASE_DIR = Path(__file__).resolve().parent
 TEMPLATES_DIR = BASE_DIR / "templates"
 STATIC_DIR = BASE_DIR / "static"
 
+# Maximum number of scenes per story (configurable)
+MAX_SCENES = 5
+
 app = FastAPI(title="Tellimations")
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
@@ -168,6 +171,9 @@ class SessionState:
         self.scene_negs: Dict[str, Dict[str, Any]] = {}
         # Completed scene IDs (for NEG live update context)
         self.completed_scene_ids: List[str] = []
+        # Pre-computed branches (background generation task)
+        self.branch_gen_task: Optional[asyncio.Task] = None
+        self.precomputed_branches: Optional[List[Dict[str, Any]]] = None
 
 
 # ---------------------------------------------------------------------------
@@ -257,6 +263,9 @@ async def websocket_endpoint(websocket: WebSocket):
         except Exception:
             pass
     finally:
+        # Cancel any in-flight branch pre-generation
+        if session.branch_gen_task and not session.branch_gen_task.done():
+            session.branch_gen_task.cancel()
         # Persist student profile on disconnect
         if participant_id:
             try:
@@ -613,6 +622,9 @@ async def _handle_select_scene(
 
     _init_narration_loop(session, ws_adapter)
 
+    # Pre-generate branches in background while child narrates
+    _maybe_pregenerate_branches(session, websocket)
+
 
 async def _handle_binary(
     session: SessionState,
@@ -637,17 +649,19 @@ async def _handle_binary(
     session.pending_audio_meta = None
 
 
-async def _handle_generate_branches(
+# ---------------------------------------------------------------------------
+# Branch pre-generation (background, during narration)
+# ---------------------------------------------------------------------------
+
+async def _pregenerate_branches_background(
     session: SessionState,
     websocket: WebSocket,
 ) -> None:
-    """Generate 3 branch candidates after scene completion.
+    """Background: generate branches + fire mask/NEG tasks.
 
-    Uses skip_masks=True for speed — masks are generated later when
-    the child selects a branch.
-
-    Before generating branches, updates NEGs for remaining scenes if
-    the student profile shows error patterns worth adapting to.
+    Runs during narration so branches are ready when the child finishes.
+    Uses the student_profile snapshot from before the current scene's
+    narration (acceptable trade-off for latency reduction).
     """
     try:
         branches = await generate_branches(
@@ -657,6 +671,7 @@ async def _handle_generate_branches(
             skip_masks=True,
         )
 
+        # Store branch images (same pattern as _handle_generate_branches)
         session.branch_images = {}
         session.branch_entity_images = {}
         for i, b in enumerate(branches):
@@ -666,14 +681,114 @@ async def _handle_generate_branches(
             ent_imgs = _pop_entity_images(b)
             if ent_imgs:
                 session.branch_entity_images[i] = ent_imgs
-        session.branches = branches
-        await websocket.send_json({"type": "branches", "scenes": branches})
+
+        session.precomputed_branches = branches
+        session.branches = branches  # needed by _generate_masks_background
 
         # Fire mask + NEG background tasks for each branch
         for i in range(len(branches)):
             session.mask_tasks[i] = asyncio.ensure_future(
                 _generate_masks_background(session, i, websocket)
             )
+
+        logger.info("Pre-generated %d branches in background", len(branches))
+
+    except asyncio.CancelledError:
+        logger.info("Branch pre-generation cancelled")
+    except Exception:
+        logger.warning("Branch pre-generation failed — will generate on demand",
+                       exc_info=True)
+
+
+def _maybe_pregenerate_branches(
+    session: SessionState,
+    websocket: WebSocket,
+) -> None:
+    """Launch branch pre-generation in background if not the last scene.
+
+    Called right after a scene is selected (initial or branch) and
+    the narration loop is initialized.  Branches generate while the
+    child narrates the current scene.
+    """
+    scenes_so_far = len(session.story_state.scenes)
+    if scenes_so_far >= MAX_SCENES:
+        logger.info("Scene %d/%d is the last — skipping branch pre-generation",
+                     scenes_so_far, MAX_SCENES)
+        return
+
+    # Cancel any existing pre-generation task
+    if session.branch_gen_task and not session.branch_gen_task.done():
+        session.branch_gen_task.cancel()
+
+    session.precomputed_branches = None
+    session.branch_gen_task = asyncio.ensure_future(
+        _pregenerate_branches_background(session, websocket)
+    )
+
+
+async def _handle_generate_branches(
+    session: SessionState,
+    websocket: WebSocket,
+) -> None:
+    """Generate 3 branch candidates after scene completion.
+
+    If branches were pre-generated in the background (during narration),
+    uses those directly.  Otherwise falls back to on-demand generation.
+
+    When the current scene is the last (>= MAX_SCENES), sends a
+    ``story_complete`` message instead.
+    """
+    try:
+        # Check if this is the last scene — no more branches needed
+        scenes_so_far = len(session.story_state.scenes)
+        if scenes_so_far >= MAX_SCENES:
+            await websocket.send_json({"type": "story_complete"})
+            return
+
+        # Try to use pre-computed branches from background generation
+        branches = None
+
+        if session.branch_gen_task is not None:
+            try:
+                await session.branch_gen_task
+            except Exception:
+                logger.warning("Pre-generation task failed")
+            session.branch_gen_task = None
+
+        if session.precomputed_branches:
+            branches = session.precomputed_branches
+            session.precomputed_branches = None
+            logger.info("Using %d pre-computed branches", len(branches))
+            # branches, branch_images, branch_entity_images, mask_tasks
+            # were all set by _pregenerate_branches_background()
+        else:
+            # Fallback: generate on demand (same as before)
+            logger.info("No pre-computed branches — generating on demand")
+            branches = await generate_branches(
+                api_key=session.api_key,
+                story_state=session.story_state,
+                student_profile=session.student_profile,
+                skip_masks=True,
+            )
+
+            session.branch_images = {}
+            session.branch_entity_images = {}
+            for i, b in enumerate(branches):
+                img = _pop_reference_image(b)
+                if img:
+                    session.branch_images[i] = img
+                ent_imgs = _pop_entity_images(b)
+                if ent_imgs:
+                    session.branch_entity_images[i] = ent_imgs
+            session.branches = branches
+
+            # Fire mask + NEG background tasks (fallback path only)
+            for i in range(len(branches)):
+                session.mask_tasks[i] = asyncio.ensure_future(
+                    _generate_masks_background(session, i, websocket)
+                )
+
+        await websocket.send_json({"type": "branches", "scenes": branches})
 
         # Voice narration of branch summaries (fire-and-forget)
         asyncio.ensure_future(
@@ -768,6 +883,9 @@ async def _handle_select_branch(
     await websocket.send_json({"type": "new_scene", "scene": scene})
 
     _init_narration_loop(session, ws_adapter)
+
+    # Pre-generate branches in background while child narrates
+    _maybe_pregenerate_branches(session, websocket)
 
 
 # ---------------------------------------------------------------------------

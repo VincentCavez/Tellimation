@@ -310,6 +310,68 @@ class NarrationLoop:
             }
         return bounds
 
+    def _extract_sprite_info(self, entity_id: str) -> Optional[Dict[str, Any]]:
+        """Extract sub-entity IDs, per-part stats, and actual bbox from stored sprite.
+
+        Returns a dict with:
+          - x, y, w, h: actual bounding box in art-grid coordinates
+          - sub_entity_ids: sorted list of unique sub-entity ID strings from mask
+          - sub_entity_stats: per-ID dict with pixel_count, avg_color, bbox
+        Returns None if sprite data is unavailable or not in raw_sprite format.
+        """
+        sprite_data = self.story_state.get_entity_sprite(entity_id)
+        if not sprite_data or not isinstance(sprite_data, dict):
+            return None
+        if sprite_data.get("format") != "raw_sprite":
+            return None
+
+        mask = sprite_data.get("mask", [])
+        pixels = sprite_data.get("pixels", [])
+        w = sprite_data.get("w", 0)
+        h = sprite_data.get("h", 0)
+        if not mask or w == 0:
+            return None
+
+        # Unique sub-entity IDs from the mask
+        sub_entity_ids = sorted(set(m for m in mask if m))
+
+        # Per-sub-entity stats: pixel count, average color, bounding box
+        sub_stats: Dict[str, Dict[str, Any]] = {}
+        for sid in sub_entity_ids:
+            px_indices = [i for i, m in enumerate(mask) if m == sid]
+            colors = [
+                pixels[i] for i in px_indices
+                if i < len(pixels) and pixels[i] is not None
+            ]
+            if colors:
+                avg_r = sum(c[0] for c in colors) // len(colors)
+                avg_g = sum(c[1] for c in colors) // len(colors)
+                avg_b = sum(c[2] for c in colors) // len(colors)
+            else:
+                avg_r = avg_g = avg_b = 0
+
+            xs = [i % w for i in px_indices]
+            ys = [i // w for i in px_indices]
+            sub_stats[sid] = {
+                "pixel_count": len(px_indices),
+                "avg_color": (avg_r, avg_g, avg_b),
+                "bbox": {
+                    "x_min": min(xs) if xs else 0,
+                    "y_min": min(ys) if ys else 0,
+                    "x_max": max(xs) if xs else 0,
+                    "y_max": max(ys) if ys else 0,
+                },
+            }
+
+        return {
+            "x": sprite_data.get("x", 0),
+            "y": sprite_data.get("y", 0),
+            "w": w,
+            "h": h,
+            "sub_entity_ids": sub_entity_ids,
+            "sub_entity_stats": sub_stats,
+        }
+
     async def _resolve_animation(
         self,
         cmd: AnimationCommand,
@@ -328,6 +390,17 @@ class NarrationLoop:
             "x": 0, "y": 0, "width": 40, "height": 40,
         })
 
+        # Extract sprite info (sub-entity IDs, per-part stats, actual bbox)
+        sprite_info = self._extract_sprite_info(cmd.entity_id)
+        if sprite_info:
+            # Use actual sprite bbox instead of manifest hint-based estimate
+            bounds = {
+                "x": sprite_info["x"],
+                "y": sprite_info["y"],
+                "width": sprite_info["w"],
+                "height": sprite_info["h"],
+            }
+
         try:
             animation = await generate_animation(
                 api_key=self.api_key,
@@ -339,6 +412,7 @@ class NarrationLoop:
                 animation_cache=self.animation_cache,
                 student_profile=self.student_profile,
                 discrepancy_details=cmd.discrepancy_details,
+                entity_sprite_info=sprite_info,
             )
             return animation
         except Exception:
