@@ -1,0 +1,41 @@
+{
+  "error_counts": {
+    "PROPERTY_COLOR": 2,
+    "SPATIAL": 1,
+    "IDENTITY": 1
+  },
+  "error_trend": {},
+  "difficult_entities": [
+    "mushroom_01"
+  ],
+  "strong_areas": [],
+  "scenes_completed": 0,
+  "corrections_after_animation": 0,
+  "total_utterances": 2,
+  "animation_history": [
+    {
+      "entity_id": "mushroom_01",
+      "error_type": "SPATIAL",
+      "animation_type": "mushroom_01",
+      "corrected": false
+    },
+    {
+      "entity_id": "mushroom_01",
+      "error_type": "PROPERTY_COLOR",
+      "animation_type": "mushroom_01.cap",
+      "corrected": false
+    },
+    {
+      "entity_id": "mushroom_01",
+      "error_type": "PROPERTY_COLOR",
+      "animation_type": "mushroom_01.cap",
+      "corrected": false
+    },
+    {
+      "entity_id": "pip_01",
+      "error_type": "IDENTITY",
+      "animation_type": "pip_01",
+      "corrected": false
+    }
+  ]
+}

@@ -32,7 +32,7 @@ import pytest
 from src.generation.scene_generator import generate_scene
 from src.generation.branch_generator import generate_branches
 from src.models.animation_cache import AnimationCache
-from src.models.neg import NEG, NarrativeTarget, TargetComponents, ErrorExclusion
+from src.models.neg import NEG, NarrativeTarget, TargetComponents
 from src.models.scene import Entity, Position, SceneManifest, Relation, Action
 from src.models.story_state import StoryState
 from src.models.student_profile import StudentProfile
@@ -115,18 +115,6 @@ SCENE_1_RESPONSE = {
                 },
                 "priority": 0.5,
                 "tolerance": 0.5,
-            },
-        ],
-        "error_exclusions": [
-            {
-                "entity_id": "clearing_01",
-                "excluded": ["IDENTITY", "QUANTITY", "PROPERTY_COLOR"],
-                "reason": "background entity",
-            },
-            {
-                "entity_id": "tree_01",
-                "excluded": ["QUANTITY", "ACTION", "MANNER"],
-                "reason": "unique static entity",
             },
         ],
         "min_coverage": 0.7,
@@ -286,7 +274,7 @@ def _make_branch(branch_idx: int) -> dict:
                     "priority": 0.6,
                 },
             ],
-            "error_exclusions": [],
+
             "min_coverage": 0.7,
             "skill_coverage_check": "PASS",
         },
@@ -661,18 +649,6 @@ class TestEndToEndMocked:
                     new_entity_ids.add(eid)
         # Each branch introduces a distinct new entity
         assert len(new_entity_ids) == 3
-
-    def test_error_exclusions_applied(self):
-        """Clearing_01 (background) discrepancies should be filtered out."""
-        neg = NEG.model_validate(SCENE_1_RESPONSE["neg"])
-
-        # clearing_01 has IDENTITY excluded
-        assert neg.is_error_excluded("clearing_01", "IDENTITY")
-        assert neg.is_error_excluded("clearing_01", "QUANTITY")
-        # tree_01 has ACTION excluded
-        assert neg.is_error_excluded("tree_01", "ACTION")
-        # rabbit_01 has no exclusions
-        assert not neg.is_error_excluded("rabbit_01", "PROPERTY_COLOR")
 
     def test_scene_progress_monotonic(self):
         """Scene progress never decreases across utterances."""

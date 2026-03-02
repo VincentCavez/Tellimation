@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+import time
 from typing import Any, Dict, List
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -9,7 +10,6 @@ import pytest
 
 from src.models.animation_cache import AnimationCache, CachedAnimation
 from src.models.neg import (
-    ErrorExclusion,
     NEG,
     NarrativeTarget,
     TargetComponents,
@@ -85,13 +85,6 @@ def _make_neg() -> NEG:
                 tolerance=0.5,
             ),
         ],
-        error_exclusions=[
-            ErrorExclusion(
-                entity_id="rock_01",
-                excluded=["QUANTITY", "ACTION", "MANNER"],
-                reason="unique static object",
-            ),
-        ],
         min_coverage=0.7,
         skill_coverage_check="PASS",
     )
@@ -110,9 +103,13 @@ class FakeWebSocket:
 
     def __init__(self) -> None:
         self.messages: List[Dict[str, Any]] = []
+        self.binary_messages: List[bytes] = []
 
     async def send_json(self, data: Dict[str, Any]) -> None:
         self.messages.append(data)
+
+    async def send_bytes(self, data: bytes) -> None:
+        self.binary_messages.append(data)
 
 
 # Responses for 3 consecutive utterances with increasing scene progress.
@@ -142,6 +139,7 @@ UTTERANCE_1_RESPONSE = {
         "errors_this_scene": {"PROPERTY_COLOR": 1, "ACTION": 1},
         "patterns": "omits adjectives and verbs",
     },
+    "voice_guidance": "",
 }
 
 UTTERANCE_2_RESPONSE = {
@@ -162,6 +160,7 @@ UTTERANCE_2_RESPONSE = {
         "errors_this_scene": {"PROPERTY_SIZE": 1},
         "patterns": "improving on color, still omits size",
     },
+    "voice_guidance": "",
 }
 
 UTTERANCE_3_RESPONSE = {
@@ -178,6 +177,7 @@ UTTERANCE_3_RESPONSE = {
         "errors_this_scene": {},
         "patterns": "excellent narration",
     },
+    "voice_guidance": "",
 }
 
 FAKE_ANIMATION_RESPONSE = {
@@ -187,65 +187,20 @@ FAKE_ANIMATION_RESPONSE = {
 }
 
 
-def _make_mock_transcription_client(responses: List[dict]):
-    """Mock genai.Client that returns successive transcription responses."""
-    call_idx = {"n": 0}
-
-    def make_client(**kwargs):
-        mock_response = MagicMock()
-        idx = call_idx["n"]
-        call_idx["n"] += 1
-        mock_response.text = json.dumps(responses[idx % len(responses)])
-
-        mock_models = AsyncMock()
-        mock_models.generate_content = AsyncMock(return_value=mock_response)
-        mock_aio = MagicMock()
-        mock_aio.models = mock_models
-        mock_client = MagicMock()
-        mock_client.aio = mock_aio
-        return mock_client
-
-    return make_client
-
-
-def _make_mock_animation_client():
-    """Mock genai.Client for animation generation calls."""
-
-    def make_client(**kwargs):
-        mock_response = MagicMock()
-        mock_response.text = json.dumps(FAKE_ANIMATION_RESPONSE)
-
-        mock_models = AsyncMock()
-        mock_models.generate_content = AsyncMock(return_value=mock_response)
-        mock_aio = MagicMock()
-        mock_aio.models = mock_models
-        mock_client = MagicMock()
-        mock_client.aio = mock_aio
-        return mock_client
-
-    return make_client
-
-
-# We need to patch genai.Client in BOTH modules (transcription and animation_generator).
-# Since both create their own Client, we use side_effect to handle all calls.
-
 def _make_unified_mock(transcription_responses: List[dict]):
     """Return a side_effect function that returns the right mock client
     depending on whether the call is for transcription or animation."""
     t_idx = {"n": 0}
 
     def client_factory(**kwargs):
-        # Each Client() call gets a fresh mock.
-        # We alternate: transcription calls come first in each on_audio_chunk,
-        # animation calls come after.  We track by counting.
         mock_client = MagicMock()
         mock_aio = MagicMock()
         mock_models = AsyncMock()
 
-        # We return a mock that can handle either transcription or animation.
         async def fake_generate(*args, **kw):
-            mime = kw.get("config", None)
+            config = kw.get("config", None)
             contents = kw.get("contents", None)
+            model = kw.get("model", "")
 
             # If contents is a list (multimodal), it's a transcription call.
             if isinstance(contents, list):
@@ -256,8 +211,36 @@ def _make_unified_mock(transcription_responses: List[dict]):
                     transcription_responses[idx % len(transcription_responses)]
                 )
                 return resp
+            elif "tts" in str(model):
+                # TTS call — return mock audio response
+                inline_data = MagicMock()
+                inline_data.data = b"\x00\x01\x02\x03"
+                part = MagicMock()
+                part.inline_data = inline_data
+                content_obj = MagicMock()
+                content_obj.parts = [part]
+                candidate = MagicMock()
+                candidate.content = content_obj
+                resp = MagicMock()
+                resp.candidates = [candidate]
+                return resp
+            elif isinstance(contents, str):
+                has_json_mime = False
+                if config is not None:
+                    mime = getattr(config, "response_mime_type", None)
+                    if mime and "json" in str(mime):
+                        has_json_mime = True
+                if has_json_mime:
+                    # Animation generation call
+                    resp = MagicMock()
+                    resp.text = json.dumps(FAKE_ANIMATION_RESPONSE)
+                    return resp
+                else:
+                    # Text generation call (correction text, branch narration)
+                    resp = MagicMock()
+                    resp.text = "Here is a friendly correction!"
+                    return resp
             else:
-                # Animation generation call
                 resp = MagicMock()
                 resp.text = json.dumps(FAKE_ANIMATION_RESPONSE)
                 return resp
@@ -285,12 +268,14 @@ class TestSingleUtterance:
             student_profile=StudentProfile(),
             animation_cache=AnimationCache(),
             websocket=ws,
+            narrative_text="The brave rabbit hopped onto the mossy rock.",
         )
 
         factory = _make_unified_mock([UTTERANCE_1_RESPONSE])
 
         with patch("src.narration.transcription.genai.Client", side_effect=factory), \
-             patch("src.generation.animation_generator.genai.Client", side_effect=factory):
+             patch("src.generation.animation_generator.genai.Client", side_effect=factory), \
+             patch("src.narration.voice_guidance.genai.Client", side_effect=factory):
             result = asyncio.get_event_loop().run_until_complete(
                 loop.on_audio_chunk(FAKE_AUDIO)
             )
@@ -309,12 +294,14 @@ class TestSingleUtterance:
             student_profile=StudentProfile(),
             animation_cache=AnimationCache(),
             websocket=ws,
+            narrative_text="The brave rabbit hopped onto the mossy rock.",
         )
 
         factory = _make_unified_mock([UTTERANCE_1_RESPONSE])
 
         with patch("src.narration.transcription.genai.Client", side_effect=factory), \
-             patch("src.generation.animation_generator.genai.Client", side_effect=factory):
+             patch("src.generation.animation_generator.genai.Client", side_effect=factory), \
+             patch("src.narration.voice_guidance.genai.Client", side_effect=factory):
             asyncio.get_event_loop().run_until_complete(
                 loop.on_audio_chunk(FAKE_AUDIO)
             )
@@ -342,12 +329,14 @@ class TestSingleUtterance:
             student_profile=profile,
             animation_cache=AnimationCache(),
             websocket=ws,
+            narrative_text="The brave rabbit hopped onto the mossy rock.",
         )
 
         factory = _make_unified_mock([UTTERANCE_1_RESPONSE])
 
         with patch("src.narration.transcription.genai.Client", side_effect=factory), \
-             patch("src.generation.animation_generator.genai.Client", side_effect=factory):
+             patch("src.generation.animation_generator.genai.Client", side_effect=factory), \
+             patch("src.narration.voice_guidance.genai.Client", side_effect=factory):
             asyncio.get_event_loop().run_until_complete(
                 loop.on_audio_chunk(FAKE_AUDIO)
             )
@@ -377,13 +366,15 @@ class TestThreeUtteranceScenario:
             student_profile=profile,
             animation_cache=cache,
             websocket=ws,
+            narrative_text="The brave rabbit hopped onto the mossy rock.",
         )
 
         responses = [UTTERANCE_1_RESPONSE, UTTERANCE_2_RESPONSE, UTTERANCE_3_RESPONSE]
         factory = _make_unified_mock(responses)
 
         with patch("src.narration.transcription.genai.Client", side_effect=factory), \
-             patch("src.generation.animation_generator.genai.Client", side_effect=factory):
+             patch("src.generation.animation_generator.genai.Client", side_effect=factory), \
+             patch("src.narration.voice_guidance.genai.Client", side_effect=factory):
 
             # --- Utterance 1 ---
             r1 = asyncio.get_event_loop().run_until_complete(
@@ -395,7 +386,7 @@ class TestThreeUtteranceScenario:
             assert not loop.is_scene_complete()
             assert profile.total_utterances == 1
 
-            # 2 discrepancies → 2 animations dispatched
+            # 2 discrepancies -> 2 animations dispatched
             anim_msgs_1 = [m for m in ws.messages if m["type"] == "animation"]
             assert len(anim_msgs_1) == 2
 
@@ -413,7 +404,7 @@ class TestThreeUtteranceScenario:
             assert not loop.is_scene_complete()
             assert profile.total_utterances == 2
 
-            # 1 discrepancy → 1 animation
+            # 1 discrepancy -> 1 animation
             anim_msgs_2 = [m for m in ws.messages if m["type"] == "animation"]
             assert len(anim_msgs_2) == 1
 
@@ -428,7 +419,7 @@ class TestThreeUtteranceScenario:
             assert loop.is_scene_complete()
             assert profile.total_utterances == 3
 
-            # No discrepancies → no animation, but scene_complete sent
+            # No discrepancies -> no animation, but scene_complete sent
             anim_msgs_3 = [m for m in ws.messages if m["type"] == "animation"]
             assert len(anim_msgs_3) == 0
 
@@ -452,12 +443,14 @@ class TestThreeUtteranceScenario:
             student_profile=StudentProfile(),
             animation_cache=AnimationCache(),
             websocket=ws,
+            narrative_text="The brave rabbit hopped onto the mossy rock.",
         )
 
         factory = _make_unified_mock([r1, r2])
 
         with patch("src.narration.transcription.genai.Client", side_effect=factory), \
-             patch("src.generation.animation_generator.genai.Client", side_effect=factory):
+             patch("src.generation.animation_generator.genai.Client", side_effect=factory), \
+             patch("src.narration.voice_guidance.genai.Client", side_effect=factory):
 
             asyncio.get_event_loop().run_until_complete(loop.on_audio_chunk(FAKE_AUDIO))
             assert loop.scene_progress == 0.5
@@ -484,12 +477,14 @@ class TestThreeUtteranceScenario:
             student_profile=StudentProfile(),
             animation_cache=AnimationCache(),
             websocket=ws,
+            narrative_text="The brave rabbit hopped onto the mossy rock.",
         )
 
         factory = _make_unified_mock([r1, r2, r3])
 
         with patch("src.narration.transcription.genai.Client", side_effect=factory), \
-             patch("src.generation.animation_generator.genai.Client", side_effect=factory):
+             patch("src.generation.animation_generator.genai.Client", side_effect=factory), \
+             patch("src.narration.voice_guidance.genai.Client", side_effect=factory):
 
             asyncio.get_event_loop().run_until_complete(loop.on_audio_chunk(FAKE_AUDIO))
             assert loop.satisfied_targets == ["t1_identity"]
@@ -519,14 +514,16 @@ class TestCacheInteraction:
             student_profile=StudentProfile(),
             animation_cache=cache,
             websocket=ws,
+            narrative_text="The brave rabbit hopped onto the mossy rock.",
         )
 
         # Same discrepancy twice
         responses = [UTTERANCE_1_RESPONSE, UTTERANCE_1_RESPONSE]
         factory = _make_unified_mock(responses)
 
-        with patch("src.narration.transcription.genai.Client", side_effect=factory) as t_mock, \
-             patch("src.generation.animation_generator.genai.Client", side_effect=factory) as a_mock:
+        with patch("src.narration.transcription.genai.Client", side_effect=factory), \
+             patch("src.generation.animation_generator.genai.Client", side_effect=factory), \
+             patch("src.narration.voice_guidance.genai.Client", side_effect=factory):
 
             # First call — animations generated
             asyncio.get_event_loop().run_until_complete(loop.on_audio_chunk(FAKE_AUDIO))
@@ -547,11 +544,12 @@ class TestCacheInteraction:
 
 
 # ---------------------------------------------------------------------------
-# Tests: hesitation / idle timeout
+# Tests: per-error animation limit (max 3)
 # ---------------------------------------------------------------------------
 
-class TestHesitation:
-    def test_idle_timeout_sends_omission(self):
+class TestAnimationLimit:
+    def test_error_counter_increments(self):
+        """Animation counter increments for each error occurrence."""
         ws = FakeWebSocket()
         loop = NarrationLoop(
             api_key="fake-key",
@@ -561,28 +559,41 @@ class TestHesitation:
             student_profile=StudentProfile(),
             animation_cache=AnimationCache(),
             websocket=ws,
+            narrative_text="The brave rabbit hopped onto the mossy rock.",
         )
 
-        factory = _make_unified_mock([])  # no transcription calls expected
+        # Response with a single PROPERTY_COLOR error
+        single_error = dict(UTTERANCE_1_RESPONSE)
+        single_error["discrepancies"] = [
+            {
+                "type": "PROPERTY_COLOR",
+                "entity_id": "rabbit_01",
+                "sub_entity": "rabbit_01.body",
+                "details": "omitted brown",
+                "severity": 0.6,
+            },
+        ]
+
+        factory = _make_unified_mock([single_error, single_error, single_error])
 
         with patch("src.narration.transcription.genai.Client", side_effect=factory), \
-             patch("src.generation.animation_generator.genai.Client", side_effect=factory):
+             patch("src.generation.animation_generator.genai.Client", side_effect=factory), \
+             patch("src.narration.voice_guidance.genai.Client", side_effect=factory):
 
-            cmd = asyncio.get_event_loop().run_until_complete(
-                loop.on_idle_timeout()
-            )
+            # First call
+            asyncio.get_event_loop().run_until_complete(loop.on_audio_chunk(FAKE_AUDIO))
+            assert loop._error_animation_counts.get(("rabbit_01", "PROPERTY_COLOR"), 0) == 1
 
-        assert cmd is not None
-        assert cmd.error_type == "OMISSION"
-        # Should target rabbit_01 (highest priority unsatisfied target)
-        assert cmd.entity_id == "rabbit_01"
+            # Second call
+            asyncio.get_event_loop().run_until_complete(loop.on_audio_chunk(FAKE_AUDIO))
+            assert loop._error_animation_counts.get(("rabbit_01", "PROPERTY_COLOR"), 0) == 2
 
-        # WS should have an animation message
-        anim_msgs = [m for m in ws.messages if m["type"] == "animation"]
-        assert len(anim_msgs) == 1
-        assert anim_msgs[0]["error_type"] == "OMISSION"
+            # Third call
+            asyncio.get_event_loop().run_until_complete(loop.on_audio_chunk(FAKE_AUDIO))
+            assert loop._error_animation_counts.get(("rabbit_01", "PROPERTY_COLOR"), 0) == 3
 
-    def test_idle_timeout_returns_none_when_all_satisfied(self):
+    def test_fourth_error_triggers_verbal_correction(self):
+        """After 3 animations, the 4th occurrence triggers a verbal correction."""
         ws = FakeWebSocket()
         loop = NarrationLoop(
             api_key="fake-key",
@@ -592,16 +603,85 @@ class TestHesitation:
             student_profile=StudentProfile(),
             animation_cache=AnimationCache(),
             websocket=ws,
-        )
-        # Pre-satisfy all targets
-        loop.satisfied_targets = ["t1_identity", "t2_identity"]
-
-        cmd = asyncio.get_event_loop().run_until_complete(
-            loop.on_idle_timeout()
+            narrative_text="The brave rabbit hopped onto the mossy rock.",
         )
 
-        assert cmd is None
-        assert len(ws.messages) == 0
+        # Pre-set counter to 3 (already had 3 animations)
+        loop._error_animation_counts[("rabbit_01", "PROPERTY_COLOR")] = 3
+
+        single_error = dict(UTTERANCE_1_RESPONSE)
+        single_error["discrepancies"] = [
+            {
+                "type": "PROPERTY_COLOR",
+                "entity_id": "rabbit_01",
+                "sub_entity": "rabbit_01.body",
+                "details": "omitted brown",
+                "severity": 0.6,
+            },
+        ]
+
+        factory = _make_unified_mock([single_error])
+
+        with patch("src.narration.transcription.genai.Client", side_effect=factory), \
+             patch("src.generation.animation_generator.genai.Client", side_effect=factory), \
+             patch("src.narration.voice_guidance.genai.Client", side_effect=factory):
+
+            asyncio.get_event_loop().run_until_complete(
+                loop.on_audio_chunk(FAKE_AUDIO)
+            )
+
+        # No animation should be sent (counter was already at 3)
+        anim_msgs = [m for m in ws.messages if m["type"] == "animation"]
+        assert len(anim_msgs) == 0
+
+        # Verbal correction via voice_audio should be sent
+        voice_msgs = [m for m in ws.messages if m.get("type") == "voice_audio"]
+        assert len(voice_msgs) >= 1
+        assert voice_msgs[0]["purpose"] == "correction"
+
+    def test_correction_includes_what_else(self):
+        """When there are unsatisfied targets, correction text includes 'What else'."""
+        ws = FakeWebSocket()
+        loop = NarrationLoop(
+            api_key="fake-key",
+            scene_manifest=_make_scene_manifest(),
+            neg=_make_neg(),
+            story_state=_make_story_state(),
+            student_profile=StudentProfile(),
+            animation_cache=AnimationCache(),
+            websocket=ws,
+            narrative_text="The brave rabbit hopped onto the mossy rock.",
+        )
+
+        # Pre-set counter to 3 and leave all targets unsatisfied
+        loop._error_animation_counts[("rabbit_01", "PROPERTY_COLOR")] = 3
+
+        single_error = dict(UTTERANCE_1_RESPONSE)
+        single_error["discrepancies"] = [
+            {
+                "type": "PROPERTY_COLOR",
+                "entity_id": "rabbit_01",
+                "sub_entity": "rabbit_01.body",
+                "details": "omitted brown",
+                "severity": 0.6,
+            },
+        ]
+        single_error["satisfied_targets"] = []  # nothing satisfied
+
+        factory = _make_unified_mock([single_error])
+
+        with patch("src.narration.transcription.genai.Client", side_effect=factory), \
+             patch("src.generation.animation_generator.genai.Client", side_effect=factory), \
+             patch("src.narration.voice_guidance.genai.Client", side_effect=factory):
+
+            asyncio.get_event_loop().run_until_complete(
+                loop.on_audio_chunk(FAKE_AUDIO)
+            )
+
+        # Voice text should include "What else happens"
+        voice_msgs = [m for m in ws.messages if m.get("type") == "voice_audio"]
+        assert len(voice_msgs) >= 1
+        assert "What else" in voice_msgs[0]["text"]
 
 
 # ---------------------------------------------------------------------------
@@ -619,12 +699,14 @@ class TestSessionLog:
             student_profile=StudentProfile(),
             animation_cache=AnimationCache(),
             websocket=ws,
+            narrative_text="The brave rabbit hopped onto the mossy rock.",
         )
 
         factory = _make_unified_mock([UTTERANCE_1_RESPONSE, UTTERANCE_2_RESPONSE])
 
         with patch("src.narration.transcription.genai.Client", side_effect=factory), \
-             patch("src.generation.animation_generator.genai.Client", side_effect=factory):
+             patch("src.generation.animation_generator.genai.Client", side_effect=factory), \
+             patch("src.narration.voice_guidance.genai.Client", side_effect=factory):
 
             asyncio.get_event_loop().run_until_complete(loop.on_audio_chunk(FAKE_AUDIO))
             asyncio.get_event_loop().run_until_complete(loop.on_audio_chunk(FAKE_AUDIO))
@@ -639,30 +721,6 @@ class TestSessionLog:
         assert log[1]["transcription"] == "a brown bunny is hopping by the rock"
         assert log[1]["animations_dispatched"] == 1
         assert log[1]["scene_progress"] == 0.55
-
-    def test_hesitation_logged(self):
-        ws = FakeWebSocket()
-        loop = NarrationLoop(
-            api_key="fake-key",
-            scene_manifest=_make_scene_manifest(),
-            neg=_make_neg(),
-            story_state=_make_story_state(),
-            student_profile=StudentProfile(),
-            animation_cache=AnimationCache(),
-            websocket=ws,
-        )
-
-        factory = _make_unified_mock([])
-
-        with patch("src.narration.transcription.genai.Client", side_effect=factory), \
-             patch("src.generation.animation_generator.genai.Client", side_effect=factory):
-
-            asyncio.get_event_loop().run_until_complete(loop.on_idle_timeout())
-
-        log = loop.session_log
-        assert len(log) == 1
-        assert log[0]["event"] == "hesitation"
-        assert log[0]["target_entity"] == "rabbit_01"
 
 
 # ---------------------------------------------------------------------------
@@ -679,6 +737,7 @@ class TestIsSceneComplete:
             student_profile=StudentProfile(),
             animation_cache=AnimationCache(),
             websocket=FakeWebSocket(),
+            narrative_text="The brave rabbit hopped onto the mossy rock.",
         )
         loop.scene_progress = 0.5
         assert not loop.is_scene_complete()
@@ -692,6 +751,7 @@ class TestIsSceneComplete:
             student_profile=StudentProfile(),
             animation_cache=AnimationCache(),
             websocket=FakeWebSocket(),
+            narrative_text="The brave rabbit hopped onto the mossy rock.",
         )
         loop.scene_progress = 0.7
         assert loop.is_scene_complete()
@@ -705,6 +765,54 @@ class TestIsSceneComplete:
             student_profile=StudentProfile(),
             animation_cache=AnimationCache(),
             websocket=FakeWebSocket(),
+            narrative_text="The brave rabbit hopped onto the mossy rock.",
         )
         loop.scene_progress = 0.95
         assert loop.is_scene_complete()
+
+
+# ---------------------------------------------------------------------------
+# Tests: _has_unsatisfied_targets
+# ---------------------------------------------------------------------------
+
+class TestHasUnsatisfiedTargets:
+    def test_all_satisfied(self):
+        loop = NarrationLoop(
+            api_key="fake-key",
+            scene_manifest=_make_scene_manifest(),
+            neg=_make_neg(),
+            story_state=_make_story_state(),
+            student_profile=StudentProfile(),
+            animation_cache=AnimationCache(),
+            websocket=FakeWebSocket(),
+            narrative_text="The brave rabbit hopped onto the mossy rock.",
+        )
+        loop.satisfied_targets = ["t1_identity", "t2_identity"]
+        assert not loop._has_unsatisfied_targets()
+
+    def test_some_unsatisfied(self):
+        loop = NarrationLoop(
+            api_key="fake-key",
+            scene_manifest=_make_scene_manifest(),
+            neg=_make_neg(),
+            story_state=_make_story_state(),
+            student_profile=StudentProfile(),
+            animation_cache=AnimationCache(),
+            websocket=FakeWebSocket(),
+            narrative_text="The brave rabbit hopped onto the mossy rock.",
+        )
+        loop.satisfied_targets = ["t1_identity"]
+        assert loop._has_unsatisfied_targets()
+
+    def test_none_satisfied(self):
+        loop = NarrationLoop(
+            api_key="fake-key",
+            scene_manifest=_make_scene_manifest(),
+            neg=_make_neg(),
+            story_state=_make_story_state(),
+            student_profile=StudentProfile(),
+            animation_cache=AnimationCache(),
+            websocket=FakeWebSocket(),
+            narrative_text="The brave rabbit hopped onto the mossy rock.",
+        )
+        assert loop._has_unsatisfied_targets()

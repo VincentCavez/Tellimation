@@ -66,13 +66,13 @@ amber fireflies, luminous teal moss on the ground, and distant lavender mountain
           "distinctive_features": "<SELF-CONTAINED intrinsic visual trait — NO references to other entities or surfaces>",
           ... other adjectives as needed
         },
-        "position": {"x": <int 0-559>, "y": <int 0-359>, "spatial_ref": "<on/under/beside entity_id or null>"},
+        "position": {"x": <int 0-1119>, "y": <int 0-719>, "spatial_ref": "<on/under/beside entity_id or null>"},
         "emotion": "<emotion or null>",
         "pose": "<SELF-CONTAINED body posture — describe ONLY the entity's own body, \
 NO references to other entities or surfaces. \
 BAD: 'leaning against the tree'. GOOD: 'standing on hind legs, front paws raised, head tilted up'>",
         "carried_over": <true if entity existed in previous scene, false if new>,
-        "width_hint": <int — estimated pixel width of this entity on the 560x360 canvas>,
+        "width_hint": <int — estimated pixel width of this entity on the 1120x720 canvas>,
         "height_hint": <int — estimated pixel height of this entity>
       }
     ],
@@ -102,22 +102,28 @@ false if same setting. For initial scenes always true.>
 # Size hints (width_hint and height_hint)
 
 Every entity MUST include `width_hint` and `height_hint` — the estimated pixel \
-dimensions of the entity on the 560×360 canvas. These are used to generate \
+dimensions of the entity on the 1120×720 canvas. These are used to generate \
 correctly-sized sprite images. Use these guidelines:
 
-- **Characters** (animals, people): width 80-120, height 100-140
-- **Trees**: width 120-180, height 140-200
-- **Small objects** (flowers, mushrooms, items): width 32-60, height 32-60
-- **Medium objects** (rocks, stumps, bushes): width 60-120, height 48-100
-- **Large objects** (houses, vehicles): width 120-200, height 100-180
+- **Characters** (animals, people): width 160-240, height 200-280
+- **Trees**: width 240-360, height 280-400
+- **Small objects** (flowers, mushrooms, items): width 64-120, height 64-120
+- **Medium objects** (rocks, stumps, bushes): width 120-240, height 96-200
+- **Large objects** (houses, vehicles): width 240-400, height 200-360
 
 The position `(x, y)` should be the approximate CENTER of the entity on the canvas. \
 The entity's bounding box will span from `(x - width_hint/2, y - height_hint/2)` \
 to `(x + width_hint/2, y + height_hint/2)`.
 
+CRITICAL: The entire entity bounding box MUST stay within the 1120×720 canvas. \
+This means: x - width_hint/2 >= 0, x + width_hint/2 <= 1119, \
+y - height_hint/2 >= 0, y + height_hint/2 <= 719. \
+For example, an entity 320px wide must have its center x between 160 and 959. \
+Entities that overflow the canvas edges will be forcibly shifted inward.
+
 For characters standing on the ground, `y` should be roughly at the character's \
-vertical center (NOT the feet). Example: a 60px tall character at ground level \
-(ground line ~y=260) should have y ≈ 230.
+vertical center (NOT the feet). Example: a 120px tall character at ground level \
+(ground line ~y=520) should have y ≈ 460.
 
 # CRITICAL: Entity description richness
 
@@ -156,13 +162,15 @@ yellow-green leaf tips"
 
 # Canvas dimensions and positioning
 
-The canvas is 560 x 360 pixels. Ground line at approximately y=170.
+The canvas is 1120 x 720 pixels. Ground line at approximately y=340.
 
-- Characters: 80-140px tall, feet touching ground (position y ~ 200-290).
-- Trees: 120-200px tall, trunk base on ground.
-- Small objects: 32-60px.
-- Spread entities across the full 560px width.
+- Characters: 160-280px tall, feet touching ground (position y ~ 400-580).
+- Trees: 240-400px tall, trunk base on ground.
+- Small objects: 64-120px.
+- Spread entities across the full 1120px width.
 - Create DEPTH: some objects further back (smaller, higher y on ground).
+- IMPORTANT: Keep ALL entities fully within canvas bounds (0,0)-(1119,719). \
+No part of any entity may extend beyond the canvas edges.
 
 # Scene description requirements
 
@@ -221,22 +229,22 @@ When in doubt, prefer `true` (it is safer to regenerate than to show a wrong bac
 # ---------------------------------------------------------------------------
 
 BACKGROUND_IMAGE_PROMPT_TEMPLATE = """\
-Create a pixel art BACKGROUND ONLY — no characters, no objects, no entities. \
-Just the environment and atmosphere. Classic retro game style (SNES / GBA era).
+Create a BACKGROUND ONLY illustration — no characters, no objects, no entities. \
+Just the environment and atmosphere. Clean children's illustration style.
 
 ## Scene environment
 {scene_description}
 
 ## Style Guidelines — CRITICAL
-- **Classic pixel art style**: chunky, blocky pixels with visible individual pixels.
-- **Flat side-view** (like a 2D platformer): no perspective.
+- **Clean children's illustration style**: smooth gradients, clear shapes, \
+  warm and friendly. Suitable for ages 7-11.
+- **Flat side-view** (like a 2D storybook): no perspective.
 - **Ground line at ~60% from top**. Sky above, ground below.
 - **Rich atmospheric gradients**: sky with color variation (lighter at horizon, \
   darker above). Ground with rich texture (grass, sand, stone, water, etc.).
 - **Atmospheric details**: clouds, stars, sun glow, distant mountains, etc.
 - **NO characters or objects** — purely the background environment.
 - **Warm, friendly, child-appropriate** feel.
-- DO NOT use outlines — let color contrast define shapes.
 """
 
 # Legacy scene image prompt (kept for backward compatibility)
@@ -277,7 +285,7 @@ Return ONLY valid JSON (no markdown fences, no commentary) matching this schema:
           "size": "<small|medium|large>",
           ... other adjectives
         },
-        "position": {"x": <int 0-559>, "y": <int 0-359>, "spatial_ref": "<on/under/beside entity_id or null>"},
+        "position": {"x": <int 0-1119>, "y": <int 0-719>, "spatial_ref": "<on/under/beside entity_id or null>"},
         "emotion": "<emotion or null>",
         "carried_over": <true if entity existed in previous scene, false if new>
       }
@@ -304,9 +312,6 @@ Return ONLY valid JSON (no markdown fences, no commentary) matching this schema:
         "priority": <0.0-1.0>,
         "tolerance": <0.0-1.0>
       }
-    ],
-    "error_exclusions": [
-      {"entity_id": "<id>", "excluded": ["<ERROR_TYPE>", ...], "reason": "<why>"}
     ],
     "min_coverage": 0.7,
     "skill_coverage_check": "PASS"
@@ -356,14 +361,14 @@ The root ID in the sprite code MUST match the entity's `id` field in the manifes
 Store the root id in a `const eid` variable and build sub-IDs from it:
 ```javascript
 const eid = 'rabbit_01';
-ellip(180, 260, 24, 16, 180, 140, 100, eid+'.body');
-circ(164, 236, 14, 180, 140, 100, eid+'.head');
+ellip(360, 520, 48, 32, 180, 140, 100, eid+'.body');
+circ(328, 472, 28, 180, 140, 100, eid+'.head');
 ```
 
 # Primitive API
 
-The canvas is 560 × 360 pixels. The ground line is at approximately y=170. \
-The sky goes from y=0 to y≈169, the ground from y≈170 to y=359.
+The canvas is 1120 × 720 pixels. The ground line is at approximately y=340. \
+The sky goes from y=0 to y≈339, the ground from y≈340 to y=719.
 
 Available drawing primitives (all coordinates in pixels, colors as r,g,b 0-255):
 
@@ -382,7 +387,8 @@ Draw order matters — later calls overdraw earlier ones. Draw back-to-front \
 (body first, then details on top).
 
 The sprite code is a flat JS string (no function wrapper). It will be executed \
-with the primitives available as globals. `PW` (560) and `PH` (360) are also available.
+with the primitives available as globals. `PW` (280) and `PH` (180) are also available \
+(art-grid resolution — each art pixel = 4×4 display pixels).
 
 # CRITICAL: Pixel Art Quality Standards
 
@@ -396,12 +402,12 @@ NEVER draw a single flat ellipse or circle. ALWAYS stack 2-3 layers from dark \
 
 ```javascript
 // BAD — flat blob:
-ellip(cx, cy, 11, 6, 200, 80, 48, eid+'.body');
+ellip(cx, cy, 22, 12, 200, 80, 48, eid+'.body');
 
 // GOOD — layered shading:
-ellip(cx, cy, 11, 6, 200, 80, 48, eid+'.body');   // dark outer
-ellip(cx, cy, 9, 5, 215, 100, 60, eid+'.body');    // mid tone
-ellip(cx-1, cy+1, 4, 4, 235, 200, 160, eid+'.body.belly'); // light belly
+ellip(cx, cy, 22, 12, 200, 80, 48, eid+'.body');   // dark outer
+ellip(cx, cy, 18, 10, 215, 100, 60, eid+'.body');    // mid tone
+ellip(cx-2, cy+2, 8, 8, 235, 200, 160, eid+'.body.belly'); // light belly
 ```
 
 Apply this to EVERYTHING: bodies, heads, tree canopies, rocks, water, etc.
@@ -422,12 +428,12 @@ Use warm, natural palettes with 3-4 shades per material. Examples:
 Eyes must include a dark pupil AND a white shine pixel for life:
 
 ```javascript
-// Eyes (4px wide each)
-circ(cx-8, cy-10, 2, 25, 18, 12, eid+'.head.eyes.left');
-circ(cx+2, cy-10, 2, 25, 18, 12, eid+'.head.eyes.right');
-// Eye shine (white highlight, 2px offset)
-px(cx-10, cy-12, 255, 255, 255, eid+'.head.eyes.left');
-px(cx, cy-12, 255, 255, 255, eid+'.head.eyes.right');
+// Eyes (8px wide each)
+circ(cx-16, cy-20, 4, 25, 18, 12, eid+'.head.eyes.left');
+circ(cx+4, cy-20, 4, 25, 18, 12, eid+'.head.eyes.right');
+// Eye shine (white highlight, 4px offset)
+px(cx-20, cy-24, 255, 255, 255, eid+'.head.eyes.left');
+px(cx, cy-24, 255, 255, 255, eid+'.head.eyes.right');
 ```
 
 ## 4. Fine details (whiskers, noses, claws, moss, cracks, spots)
@@ -436,15 +442,15 @@ Add at least 5-10 single-pixel details per character and 3-5 per environment obj
 These are what make pixel art look polished:
 
 ```javascript
-// Nose (4px, pinkish)
-circ(cx-4, cy-4, 2, 200, 130, 140, eid+'.head.nose');
-px(cx-2, cy-4, 200, 130, 140, eid+'.head.nose');
+// Nose (8px, pinkish)
+circ(cx-8, cy-8, 4, 200, 130, 140, eid+'.head.nose');
+px(cx-4, cy-8, 200, 130, 140, eid+'.head.nose');
 // Whiskers
-line(cx-14, cy-6, cx-8, cy-6, 130, 100, 40, eid+'.head.whiskers');
-line(cx-14, cy-4, cx-8, cy-4, 130, 100, 40, eid+'.head.whiskers');
-line(cx+4, cy-6, cx+10, cy-6, 130, 100, 40, eid+'.head.whiskers');
+line(cx-28, cy-12, cx-16, cy-12, 130, 100, 40, eid+'.head.whiskers');
+line(cx-28, cy-8, cx-16, cy-8, 130, 100, 40, eid+'.head.whiskers');
+line(cx+8, cy-12, cx+20, cy-12, 130, 100, 40, eid+'.head.whiskers');
 // Moss on rock
-for(var i=0;i<5;i++) px(cx-rx+4+i*4, cy-ry+2, 60, 110, 50, eid+'.moss');
+for(var i=0;i<5;i++) px(cx-rx+8+i*8, cy-ry+4, 60, 110, 50, eid+'.moss');
 ```
 
 ## 5. Background: sky and ground (MANDATORY, generated by YOU)
@@ -460,36 +466,36 @@ setting (forest, beach, night, cave, city, underwater, etc.).
 Example for a **daytime forest**:
 ```javascript
 // Gradient sky
-for(var y=0;y<170;y++) for(var x=0;x<PW;x++){
-  var g=y/170;
+for(var y=0;y<340;y++) for(var x=0;x<PW;x++){
+  var g=y/340;
   px(x,y, Math.floor(135+g*20), Math.floor(190+g*26), Math.floor(220+g*20), 'sky');
 }
 // Textured ground with noise
-for(var y=170;y<PH;y++) for(var x=0;x<PW;x++){
-  var n=Math.sin(x*0.06+y*0.1)*5+Math.sin(x*0.15)*3;
+for(var y=340;y<PH;y++) for(var x=0;x<PW;x++){
+  var n=Math.sin(x*0.03+y*0.05)*5+Math.sin(x*0.075)*3;
   var gr=Math.floor(38+n+Math.random()*8);
   px(x,y, Math.floor(gr*0.35), gr, Math.floor(gr*0.2), 'ground');
 }
 // Grass tufts at horizon
 for(var x=0;x<PW;x++){
-  var gy=168+Math.floor(Math.sin(x*0.0175)*6);
-  for(var dy=0;dy<10;dy++) px(x,gy+dy, 30+Math.floor(Math.random()*12), 55+Math.floor(Math.random()*15), 14, 'ground');
+  var gy=336+Math.floor(Math.sin(x*0.00875)*12);
+  for(var dy=0;dy<20;dy++) px(x,gy+dy, 30+Math.floor(Math.random()*12), 55+Math.floor(Math.random()*15), 14, 'ground');
 }
 ```
 
 Example for a **night scene** (dark sky + stars):
 ```javascript
-for(var y=0;y<170;y++) for(var x=0;x<PW;x++){
-  var g=y/170;
+for(var y=0;y<340;y++) for(var x=0;x<PW;x++){
+  var g=y/340;
   px(x,y, Math.floor(5+g*15), Math.floor(8+g*20), Math.floor(22+g*33), 'sky');
 }
 // Stars
-[[30,10],[100,16],[180,6],[280,20],[370,12],[460,8],[520,16],[70,36],[240,4],[400,30]].forEach(function(s){
+[[60,20],[200,32],[360,12],[560,40],[740,24],[920,16],[1040,32],[140,72],[480,8],[800,60]].forEach(function(s){
   px(s[0],s[1], 255,238,170, 'sky');
 });
 // Dark ground
-for(var y=170;y<PH;y++) for(var x=0;x<PW;x++){
-  var n=Math.sin(x*0.06+y*0.1)*4;
+for(var y=340;y<PH;y++) for(var x=0;x<PW;x++){
+  var n=Math.sin(x*0.03+y*0.05)*4;
   var gr=Math.floor(25+n+Math.random()*6);
   px(x,y, Math.floor(gr*0.3), Math.floor(gr*0.7), Math.floor(gr*0.2), 'ground');
 }
@@ -497,12 +503,12 @@ for(var y=170;y<PH;y++) for(var x=0;x<PW;x++){
 
 Example for a **beach**:
 ```javascript
-for(var y=0;y<160;y++) for(var x=0;x<PW;x++){
-  var g=y/160;
+for(var y=0;y<320;y++) for(var x=0;x<PW;x++){
+  var g=y/320;
   px(x,y, Math.floor(100+g*70), Math.floor(180+g*40), Math.floor(240+g*10), 'sky');
 }
-for(var y=160;y<PH;y++) for(var x=0;x<PW;x++){
-  var n=Math.sin(x*0.075+y*0.125)*4+Math.random()*6;
+for(var y=320;y<PH;y++) for(var x=0;x<PW;x++){
+  var n=Math.sin(x*0.0375+y*0.0625)*4+Math.random()*6;
   var s=Math.floor(50+n);
   px(x,y, Math.floor(s*0.95), Math.floor(s*0.8), Math.floor(s*0.6), 'ground');
 }
@@ -519,22 +525,25 @@ plus a highlight spot:
 
 ```javascript
 // Trunk
-rect(cx-2, groundY-40, 6, 40, 90, 42, 10, eid+'.trunk');
-rect(cx, groundY-40, 2, 40, 105, 57, 25, eid+'.trunk'); // highlight stripe
+rect(cx-4, groundY-80, 12, 80, 90, 42, 10, eid+'.trunk');
+rect(cx, groundY-80, 4, 80, 105, 57, 25, eid+'.trunk'); // highlight stripe
 // Canopy: dark base → mid → light → highlight
-ellip(cx, groundY-50, 30, 24, 38, 95, 38, eid+'.canopy');
-ellip(cx-10, groundY-46, 16, 16, 50, 125, 50, eid+'.canopy');
-ellip(cx+10, groundY-46, 12, 16, 50, 125, 50, eid+'.canopy');
-ellip(cx, groundY-60, 20, 16, 62, 145, 62, eid+'.canopy');
-circ(cx-10, groundY-60, 8, 77, 160, 77, eid+'.canopy'); // highlight
+ellip(cx, groundY-100, 60, 48, 38, 95, 38, eid+'.canopy');
+ellip(cx-20, groundY-92, 32, 32, 50, 125, 50, eid+'.canopy');
+ellip(cx+20, groundY-92, 24, 32, 50, 125, 50, eid+'.canopy');
+ellip(cx, groundY-120, 40, 32, 62, 145, 62, eid+'.canopy');
+circ(cx-20, groundY-120, 16, 77, 160, 77, eid+'.canopy'); // highlight
 ```
 
 ## 7. Scale and positioning
 
-- Characters: 80-140px tall, feet touching ground (y ≈ 200-290).
-- Trees: 120-200px tall, trunk base on ground.
-- Small objects (mushrooms, flowers, rocks): 32-60px.
-- Spread entities across the full 560px width for composition.
+- Characters: 160-280px tall, feet touching ground (y ≈ 400-580).
+- Trees: 240-400px tall, trunk base on ground.
+- Small objects (mushrooms, flowers, rocks): 64-120px.
+- Spread entities across the full 1120px width for composition.
+- IMPORTANT: Keep ALL entities fully within the canvas (0,0)-(1119,719). \
+  Ensure `center_x - width/2 >= 0` and `center_x + width/2 <= 1119`, and \
+  similarly for y. Entities near edges will be forcibly clamped to fit.
 - The scene must have DEPTH: place some objects further back (smaller, higher y) \
   and some closer (larger, lower y).
 
@@ -545,14 +554,14 @@ and a moon with 3-4 layered circles plus crater details:
 
 ```javascript
 // Stars
-[[30,10],[100,16],[180,6],[280,20],[370,12],[460,8],[520,16],[70,36]].forEach(function(s){
+[[60,20],[200,32],[360,12],[560,40],[740,24],[920,16],[1040,32],[140,72]].forEach(function(s){
   px(s[0],s[1], 255,238,170, 'sky');
 });
 // Moon (layered glow)
-circ(440,50, 30, 255,238,170, 'moon');
-circ(440,50, 26, 255,243,205, 'moon');
-circ(444,44, 18, 255,250,230, 'moon');
-circ(434,40, 4, 235,225,165, 'moon'); // crater
+circ(880,100, 60, 255,238,170, 'moon');
+circ(880,100, 52, 255,243,205, 'moon');
+circ(888,88, 36, 255,250,230, 'moon');
+circ(868,80, 8, 235,225,165, 'moon'); // crater
 ```
 
 ## 9. Water bodies (ponds, rivers, ocean)
@@ -560,12 +569,12 @@ circ(434,40, 4, 235,225,165, 'moon'); // crater
 Water MUST have layered shading + highlight ripple pixels:
 
 ```javascript
-ellip(cx,cy, rx,ry, 30,90,155, eid);      // deep
-ellip(cx,cy, rx-4,ry-2, 45,120,180, eid); // mid
-ellip(cx,cy-2, rx-8,ry-4, 60,150,205, eid); // surface
+ellip(cx,cy, rx,ry, 30,90,155, eid);       // deep
+ellip(cx,cy, rx-8,ry-4, 45,120,180, eid);  // mid
+ellip(cx,cy-4, rx-16,ry-8, 60,150,205, eid); // surface
 // Highlights
 for(var i=0;i<5;i++){
-  px(cx-rx/2+i*10, cy-2, 130,195,235, eid);
+  px(cx-rx/2+i*20, cy-4, 130,195,235, eid);
 }
 ```
 
@@ -578,222 +587,222 @@ draw must match or exceed the detail level shown here.
 
 ### BLUEPRINT: Rabbit / Bunny
 
-Proportions: body ellipse ~12×10, head circle ~10, ears ~4×12 each. \
-Total height ~40-50px. Use 4 fur shades (dark→light). \
+Proportions: body ellipse ~24×20, head circle ~20, ears ~8×24 each. \
+Total height ~80-100px. Use 4 fur shades (dark→light). \
 Key features: layered body+belly, round head with inner highlight, tall thin ears \
 with pink inner, eyes with shine, tiny nose, whisker pixels, round tail, oval feet.
 
 ```javascript
 const eid = 'rabbit_01';
-const cx = 210, cy = 220;
+const cx = 420, cy = 440;
 // Body: 3-layer shading
-ellip(cx, cy+4, 12, 10, 139,105,20, eid+'.body');       // dark outer
-ellip(cx, cy+4, 10, 8, 155,120,35, eid+'.body');         // mid
-ellip(cx-4, cy+4, 6, 6, 210,175,115, eid+'.body.belly'); // light belly
+ellip(cx, cy+8, 24, 20, 139,105,20, eid+'.body');        // dark outer
+ellip(cx, cy+8, 20, 16, 155,120,35, eid+'.body');         // mid
+ellip(cx-8, cy+8, 12, 12, 210,175,115, eid+'.body.belly'); // light belly
 // Head: 2-layer
-circ(cx-6, cy-10, 10, 155,121,36, eid+'.head');          // outer
-circ(cx-6, cy-10, 8, 170,138,55, eid+'.head');           // inner highlight
+circ(cx-12, cy-20, 20, 155,121,36, eid+'.head');          // outer
+circ(cx-12, cy-20, 16, 170,138,55, eid+'.head');           // inner highlight
 // Ears: outer + inner pink
-ellip(cx-12, cy-28, 4, 12, 145,110,30, eid+'.head.ears.left');
-ellip(cx-12, cy-28, 2, 8, 210,175,115, eid+'.head.ears.left');
-ellip(cx-2, cy-28, 4, 12, 145,110,30, eid+'.head.ears.right');
-ellip(cx-2, cy-28, 2, 8, 210,175,115, eid+'.head.ears.right');
+ellip(cx-24, cy-56, 8, 24, 145,110,30, eid+'.head.ears.left');
+ellip(cx-24, cy-56, 4, 16, 210,175,115, eid+'.head.ears.left');
+ellip(cx-4, cy-56, 8, 24, 145,110,30, eid+'.head.ears.right');
+ellip(cx-4, cy-56, 4, 16, 210,175,115, eid+'.head.ears.right');
 // Eyes: dark + shine pixel
-px(cx-10, cy-12, 25,18,12, eid+'.head.eyes.left');
-px(cx-8, cy-12, 25,18,12, eid+'.head.eyes.left');
-px(cx-2, cy-12, 25,18,12, eid+'.head.eyes.right');
-px(cx, cy-12, 25,18,12, eid+'.head.eyes.right');
-px(cx-10, cy-14, 255,255,255, eid+'.head.eyes.left');
-px(cx-2, cy-14, 255,255,255, eid+'.head.eyes.right');
+px(cx-20, cy-24, 25,18,12, eid+'.head.eyes.left');
+px(cx-16, cy-24, 25,18,12, eid+'.head.eyes.left');
+px(cx-4, cy-24, 25,18,12, eid+'.head.eyes.right');
+px(cx, cy-24, 25,18,12, eid+'.head.eyes.right');
+px(cx-20, cy-28, 255,255,255, eid+'.head.eyes.left');
+px(cx-4, cy-28, 255,255,255, eid+'.head.eyes.right');
 // Nose
-px(cx-6, cy-6, 200,130,140, eid+'.head.nose');
-px(cx-4, cy-6, 200,130,140, eid+'.head.nose');
+px(cx-12, cy-12, 200,130,140, eid+'.head.nose');
+px(cx-8, cy-12, 200,130,140, eid+'.head.nose');
 // Whiskers (single pixels extending outward)
-px(cx-14, cy-8, 130,100,40, eid+'.head.whiskers');
-px(cx-16, cy-10, 130,100,40, eid+'.head.whiskers');
-px(cx+2, cy-8, 130,100,40, eid+'.head.whiskers');
-px(cx+4, cy-10, 130,100,40, eid+'.head.whiskers');
+px(cx-28, cy-16, 130,100,40, eid+'.head.whiskers');
+px(cx-32, cy-20, 130,100,40, eid+'.head.whiskers');
+px(cx+4, cy-16, 130,100,40, eid+'.head.whiskers');
+px(cx+8, cy-20, 130,100,40, eid+'.head.whiskers');
 // Tail: small white-ish puff
-circ(cx+12, cy, 4, 220,210,190, eid+'.tail');
+circ(cx+24, cy, 8, 220,210,190, eid+'.tail');
 // Feet: small ovals at bottom
-ellip(cx-6, cy+14, 6, 2, 145,110,30, eid+'.legs.front');
-ellip(cx+6, cy+14, 6, 2, 145,110,30, eid+'.legs.back');
+ellip(cx-12, cy+28, 12, 4, 145,110,30, eid+'.legs.front');
+ellip(cx+12, cy+28, 12, 4, 145,110,30, eid+'.legs.back');
 ```
 
 ### BLUEPRINT: Fox
 
-Proportions: body ellipse ~22×12, head circle ~12, legs ~4 rects. \
-Total height ~50-60px. Key features: orange-to-cream layering, white chest patch, \
+Proportions: body ellipse ~44×24, head circle ~24, legs ~8 rects. \
+Total height ~100-120px. Key features: orange-to-cream layering, white chest patch, \
 snout ellipse with tiny black nose, TRIANGULAR ears (use `tri`) with inner color, \
 4 legs as thin rects + wider paw rects, bushy tail ellipse with white tip.
 
 ```javascript
 const eid = 'fox_01';
-const cx = 360, cy = 230;
+const cx = 720, cy = 460;
 // Body: dark→mid layered
-ellip(cx, cy, 22, 12, 200,80,48, eid+'.body');
-ellip(cx, cy, 18, 10, 215,100,60, eid+'.body');
+ellip(cx, cy, 44, 24, 200,80,48, eid+'.body');
+ellip(cx, cy, 36, 20, 215,100,60, eid+'.body');
 // Chest/belly: cream patch
-ellip(cx-10, cy+2, 8, 8, 235,200,160, eid+'.body.belly');
+ellip(cx-20, cy+4, 16, 16, 235,200,160, eid+'.body.belly');
 // Head: 2-layer circle
-circ(cx-24, cy-8, 12, 205,85,50, eid+'.head');
-circ(cx-24, cy-8, 10, 220,100,60, eid+'.head');
+circ(cx-48, cy-16, 24, 205,85,50, eid+'.head');
+circ(cx-48, cy-16, 20, 220,100,60, eid+'.head');
 // Snout: cream ellipse + dark nose pixels
-ellip(cx-32, cy-4, 6, 4, 235,200,160, eid+'.head.snout');
-px(cx-36, cy-6, 35,20,15, eid+'.head.nose');
-px(cx-38, cy-6, 35,20,15, eid+'.head.nose');
+ellip(cx-64, cy-8, 12, 8, 235,200,160, eid+'.head.snout');
+px(cx-72, cy-12, 35,20,15, eid+'.head.nose');
+px(cx-76, cy-12, 35,20,15, eid+'.head.nose');
 // Eyes: dark circles + shine
-circ(cx-28, cy-12, 2, 15,10,8, eid+'.head.eyes.left');
-circ(cx-20, cy-12, 2, 15,10,8, eid+'.head.eyes.right');
-px(cx-28, cy-14, 255,255,255, eid+'.head.eyes.left');
-px(cx-20, cy-14, 255,255,255, eid+'.head.eyes.right');
+circ(cx-56, cy-24, 4, 15,10,8, eid+'.head.eyes.left');
+circ(cx-40, cy-24, 4, 15,10,8, eid+'.head.eyes.right');
+px(cx-56, cy-28, 255,255,255, eid+'.head.eyes.left');
+px(cx-40, cy-28, 255,255,255, eid+'.head.eyes.right');
 // Ears: TRIANGLES (outer + inner lighter triangle)
-tri(cx-34,cy-16, cx-32,cy-28, cx-28,cy-16, 200,80,48, eid+'.head.ears.left');
-tri(cx-32,cy-18, cx-32,cy-26, cx-28,cy-18, 225,120,80, eid+'.head.ears.left');
-tri(cx-20,cy-16, cx-18,cy-28, cx-14,cy-16, 200,80,48, eid+'.head.ears.right');
-tri(cx-18,cy-18, cx-18,cy-26, cx-14,cy-18, 225,120,80, eid+'.head.ears.right');
+tri(cx-68,cy-32, cx-64,cy-56, cx-56,cy-32, 200,80,48, eid+'.head.ears.left');
+tri(cx-64,cy-36, cx-64,cy-52, cx-56,cy-36, 225,120,80, eid+'.head.ears.left');
+tri(cx-40,cy-32, cx-36,cy-56, cx-28,cy-32, 200,80,48, eid+'.head.ears.right');
+tri(cx-36,cy-36, cx-36,cy-52, cx-28,cy-36, 225,120,80, eid+'.head.ears.right');
 // Legs: 4 thin rects
-rect(cx-12, cy+12, 4, 14, 175,65,38, eid+'.legs.front_left');
-rect(cx-4, cy+12, 4, 14, 175,65,38, eid+'.legs.front_right');
-rect(cx+6, cy+12, 4, 14, 175,65,38, eid+'.legs.back_left');
-rect(cx+14, cy+12, 4, 14, 175,65,38, eid+'.legs.back_right');
+rect(cx-24, cy+24, 8, 28, 175,65,38, eid+'.legs.front_left');
+rect(cx-8, cy+24, 8, 28, 175,65,38, eid+'.legs.front_right');
+rect(cx+12, cy+24, 8, 28, 175,65,38, eid+'.legs.back_left');
+rect(cx+28, cy+24, 8, 28, 175,65,38, eid+'.legs.back_right');
 // Paws: wider rects at foot
-rect(cx-14, cy+24, 8, 4, 200,80,48, eid+'.legs.front_left');
-rect(cx-6, cy+24, 8, 4, 200,80,48, eid+'.legs.front_right');
-rect(cx+4, cy+24, 8, 4, 200,80,48, eid+'.legs.back_left');
-rect(cx+12, cy+24, 8, 4, 200,80,48, eid+'.legs.back_right');
+rect(cx-28, cy+48, 16, 8, 200,80,48, eid+'.legs.front_left');
+rect(cx-12, cy+48, 16, 8, 200,80,48, eid+'.legs.front_right');
+rect(cx+8, cy+48, 16, 8, 200,80,48, eid+'.legs.back_left');
+rect(cx+24, cy+48, 16, 8, 200,80,48, eid+'.legs.back_right');
 // Tail: bushy ellipse + white tip
-ellip(cx+28, cy-4, 14, 6, 200,80,48, eid+'.tail');
-ellip(cx+36, cy-6, 6, 4, 240,210,170, eid+'.tail');
+ellip(cx+56, cy-8, 28, 12, 200,80,48, eid+'.tail');
+ellip(cx+72, cy-12, 12, 8, 240,210,170, eid+'.tail');
 ```
 
 ### BLUEPRINT: Cat
 
-Proportions: body ellipse ~20×12, head circle ~12, pointed ears as triangles. \
+Proportions: body ellipse ~40×24, head circle ~24, pointed ears as triangles. \
 Key features: sleek body with 3-shade fur, triangular ears with inner pink, \
 almond-shaped eyes (horizontal ellipses) with vertical-slit pupils, tiny pink nose, \
 whiskers extending far, curved tail using multiple ellipses/circles, small neat paws.
 
 ```javascript
 const eid = 'cat_01';
-const cx = 280, cy = 230;
+const cx = 560, cy = 460;
 // Body
-ellip(cx, cy, 20, 12, 100,100,105, eid+'.body');       // dark grey
-ellip(cx, cy, 16, 10, 130,130,135, eid+'.body');        // mid grey
-ellip(cx-6, cy+2, 8, 6, 170,170,175, eid+'.body.belly'); // light belly
+ellip(cx, cy, 40, 24, 100,100,105, eid+'.body');        // dark grey
+ellip(cx, cy, 32, 20, 130,130,135, eid+'.body');         // mid grey
+ellip(cx-12, cy+4, 16, 12, 170,170,175, eid+'.body.belly'); // light belly
 // Head
-circ(cx-20, cy-6, 12, 120,120,125, eid+'.head');
-circ(cx-20, cy-6, 10, 140,140,145, eid+'.head');
+circ(cx-40, cy-12, 24, 120,120,125, eid+'.head');
+circ(cx-40, cy-12, 20, 140,140,145, eid+'.head');
 // Ears: pointed triangles
-tri(cx-30,cy-14, cx-28,cy-26, cx-24,cy-14, 120,120,125, eid+'.head.ears.left');
-tri(cx-28,cy-16, cx-28,cy-24, cx-24,cy-16, 180,140,145, eid+'.head.ears.left');
-tri(cx-16,cy-14, cx-14,cy-26, cx-10,cy-14, 120,120,125, eid+'.head.ears.right');
-tri(cx-14,cy-16, cx-14,cy-24, cx-10,cy-16, 180,140,145, eid+'.head.ears.right');
+tri(cx-60,cy-28, cx-56,cy-52, cx-48,cy-28, 120,120,125, eid+'.head.ears.left');
+tri(cx-56,cy-32, cx-56,cy-48, cx-48,cy-32, 180,140,145, eid+'.head.ears.left');
+tri(cx-32,cy-28, cx-28,cy-52, cx-20,cy-28, 120,120,125, eid+'.head.ears.right');
+tri(cx-28,cy-32, cx-28,cy-48, cx-20,cy-32, 180,140,145, eid+'.head.ears.right');
 // Eyes: almond shape (wider ellipses) with slit pupil
-ellip(cx-26, cy-8, 4, 2, 180,200,60, eid+'.head.eyes.left');   // yellow-green iris
-ellip(cx-14, cy-8, 4, 2, 180,200,60, eid+'.head.eyes.right');
-px(cx-26, cy-8, 15,10,8, eid+'.head.eyes.left');  // slit pupil
-px(cx-14, cy-8, 15,10,8, eid+'.head.eyes.right');
-px(cx-28, cy-10, 255,255,255, eid+'.head.eyes.left');  // shine
-px(cx-16, cy-10, 255,255,255, eid+'.head.eyes.right');
+ellip(cx-52, cy-16, 8, 4, 180,200,60, eid+'.head.eyes.left');   // yellow-green iris
+ellip(cx-28, cy-16, 8, 4, 180,200,60, eid+'.head.eyes.right');
+px(cx-52, cy-16, 15,10,8, eid+'.head.eyes.left');  // slit pupil
+px(cx-28, cy-16, 15,10,8, eid+'.head.eyes.right');
+px(cx-56, cy-20, 255,255,255, eid+'.head.eyes.left');  // shine
+px(cx-32, cy-20, 255,255,255, eid+'.head.eyes.right');
 // Nose: tiny pink triangle
-px(cx-20, cy-2, 200,130,140, eid+'.head.nose');
-px(cx-22, cy-2, 200,130,140, eid+'.head.nose');
+px(cx-40, cy-4, 200,130,140, eid+'.head.nose');
+px(cx-44, cy-4, 200,130,140, eid+'.head.nose');
 // Whiskers: long lines extending outward
-line(cx-32, cy-4, cx-24, cy-4, 160,160,165, eid+'.head.whiskers');
-line(cx-32, cy-2, cx-24, cy-2, 160,160,165, eid+'.head.whiskers');
-line(cx-8, cy-4, cx, cy-4, 160,160,165, eid+'.head.whiskers');
-line(cx-8, cy-2, cx, cy-2, 160,160,165, eid+'.head.whiskers');
+line(cx-64, cy-8, cx-48, cy-8, 160,160,165, eid+'.head.whiskers');
+line(cx-64, cy-4, cx-48, cy-4, 160,160,165, eid+'.head.whiskers');
+line(cx-16, cy-8, cx, cy-8, 160,160,165, eid+'.head.whiskers');
+line(cx-16, cy-4, cx, cy-4, 160,160,165, eid+'.head.whiskers');
 // Legs
-rect(cx-10, cy+12, 4, 12, 110,110,115, eid+'.legs.front_left');
-rect(cx-2, cy+12, 4, 12, 110,110,115, eid+'.legs.front_right');
-rect(cx+8, cy+12, 4, 12, 110,110,115, eid+'.legs.back_left');
-rect(cx+16, cy+12, 4, 12, 110,110,115, eid+'.legs.back_right');
+rect(cx-20, cy+24, 8, 24, 110,110,115, eid+'.legs.front_left');
+rect(cx-4, cy+24, 8, 24, 110,110,115, eid+'.legs.front_right');
+rect(cx+16, cy+24, 8, 24, 110,110,115, eid+'.legs.back_left');
+rect(cx+32, cy+24, 8, 24, 110,110,115, eid+'.legs.back_right');
 // Paws
-ellip(cx-8, cy+24, 4, 2, 135,135,140, eid+'.legs.front_left');
-ellip(cx, cy+24, 4, 2, 135,135,140, eid+'.legs.front_right');
-ellip(cx+10, cy+24, 4, 2, 135,135,140, eid+'.legs.back_left');
-ellip(cx+18, cy+24, 4, 2, 135,135,140, eid+'.legs.back_right');
+ellip(cx-16, cy+48, 8, 4, 135,135,140, eid+'.legs.front_left');
+ellip(cx, cy+48, 8, 4, 135,135,140, eid+'.legs.front_right');
+ellip(cx+20, cy+48, 8, 4, 135,135,140, eid+'.legs.back_left');
+ellip(cx+36, cy+48, 8, 4, 135,135,140, eid+'.legs.back_right');
 // Tail: curved using overlapping circles
-circ(cx+22, cy-2, 4, 120,120,125, eid+'.tail');
-circ(cx+26, cy-6, 4, 120,120,125, eid+'.tail');
-circ(cx+28, cy-12, 4, 120,120,125, eid+'.tail');
-circ(cx+28, cy-18, 2, 130,130,135, eid+'.tail');
+circ(cx+44, cy-4, 8, 120,120,125, eid+'.tail');
+circ(cx+52, cy-12, 8, 120,120,125, eid+'.tail');
+circ(cx+56, cy-24, 8, 120,120,125, eid+'.tail');
+circ(cx+56, cy-36, 4, 130,130,135, eid+'.tail');
 ```
 
 ### BLUEPRINT: Bird (perching)
 
-Proportions: round body ~14×10, small round head ~8, triangle beak, \
+Proportions: round body ~28×20, small round head ~16, triangle beak, \
 single wing on side, thin legs, fan tail. Very compact. \
 Key features: round chubby body, contrasting breast color, pointed beak, \
 dot eye with shine, wing as overlapping ellipses, stick legs, spread tail feathers.
 
 ```javascript
 const eid = 'bird_01';
-const cx = 300, cy = 200;
+const cx = 600, cy = 400;
 // Body: round, chubby
-ellip(cx, cy, 14, 10, 55,90,160, eid+'.body');         // blue-ish
-ellip(cx, cy, 12, 8, 70,110,180, eid+'.body');
-ellip(cx-2, cy+2, 6, 6, 210,180,140, eid+'.body.breast'); // orange breast
+ellip(cx, cy, 28, 20, 55,90,160, eid+'.body');          // blue-ish
+ellip(cx, cy, 24, 16, 70,110,180, eid+'.body');
+ellip(cx-4, cy+4, 12, 12, 210,180,140, eid+'.body.breast'); // orange breast
 // Head
-circ(cx-12, cy-8, 8, 65,100,170, eid+'.head');
-circ(cx-12, cy-8, 6, 80,115,185, eid+'.head');
+circ(cx-24, cy-16, 16, 65,100,170, eid+'.head');
+circ(cx-24, cy-16, 12, 80,115,185, eid+'.head');
 // Eye
-circ(cx-14, cy-10, 2, 15,10,10, eid+'.head.eyes.left');
-px(cx-16, cy-12, 255,255,255, eid+'.head.eyes.left');
+circ(cx-28, cy-20, 4, 15,10,10, eid+'.head.eyes.left');
+px(cx-32, cy-24, 255,255,255, eid+'.head.eyes.left');
 // Beak: small triangle
-tri(cx-20, cy-8, cx-16, cy-6, cx-16, cy-10, 240,180,60, eid+'.head.beak');
+tri(cx-40, cy-16, cx-32, cy-12, cx-32, cy-20, 240,180,60, eid+'.head.beak');
 // Wing: overlapping ellipse on body side
-ellip(cx+4, cy-2, 10, 6, 50,80,150, eid+'.body.wing');
-ellip(cx+4, cy-2, 8, 4, 60,95,165, eid+'.body.wing');
+ellip(cx+8, cy-4, 20, 12, 50,80,150, eid+'.body.wing');
+ellip(cx+8, cy-4, 16, 8, 60,95,165, eid+'.body.wing');
 // Tail feathers: fan of lines
-line(cx+14, cy, cx+22, cy-4, 50,80,150, eid+'.tail');
-line(cx+14, cy+2, cx+22, cy+2, 50,80,150, eid+'.tail');
-line(cx+14, cy+4, cx+22, cy+8, 50,80,150, eid+'.tail');
+line(cx+28, cy, cx+44, cy-8, 50,80,150, eid+'.tail');
+line(cx+28, cy+4, cx+44, cy+4, 50,80,150, eid+'.tail');
+line(cx+28, cy+8, cx+44, cy+16, 50,80,150, eid+'.tail');
 // Legs: thin lines
-line(cx-4, cy+10, cx-6, cy+18, 80,60,40, eid+'.legs.left');
-line(cx+4, cy+10, cx+2, cy+18, 80,60,40, eid+'.legs.right');
+line(cx-8, cy+20, cx-12, cy+36, 80,60,40, eid+'.legs.left');
+line(cx+8, cy+20, cx+4, cy+36, 80,60,40, eid+'.legs.right');
 // Feet: small toes
-px(cx-8, cy+18, 80,60,40, eid+'.legs.left');
-px(cx-4, cy+18, 80,60,40, eid+'.legs.left');
-px(cx, cy+18, 80,60,40, eid+'.legs.right');
-px(cx+4, cy+18, 80,60,40, eid+'.legs.right');
+px(cx-16, cy+36, 80,60,40, eid+'.legs.left');
+px(cx-8, cy+36, 80,60,40, eid+'.legs.left');
+px(cx, cy+36, 80,60,40, eid+'.legs.right');
+px(cx+8, cy+36, 80,60,40, eid+'.legs.right');
 ```
 
 ### BLUEPRINT: Fish
 
-Proportions: body ellipse ~20×8 (flat, wide), triangular tail, small fins, \
+Proportions: body ellipse ~40×16 (flat, wide), triangular tail, small fins, \
 eye on one side. Key features: layered body with shimmer gradient, \
 crescent tail using 2 triangles, dorsal fin triangle on top, pectoral fin below, \
 scales as scattered highlight pixels, mouth as 1-2 dark pixels.
 
 ```javascript
 const eid = 'fish_01';
-const cx = 200, cy = 250;
+const cx = 400, cy = 500;
 // Body: 3-layer ellipse (flat/wide)
-ellip(cx, cy, 20, 8, 220,120,40, eid+'.body');           // dark
-ellip(cx, cy, 16, 6, 240,150,60, eid+'.body');            // mid
-ellip(cx-4, cy+2, 8, 4, 255,200,100, eid+'.body.belly');  // light belly
+ellip(cx, cy, 40, 16, 220,120,40, eid+'.body');            // dark
+ellip(cx, cy, 32, 12, 240,150,60, eid+'.body');             // mid
+ellip(cx-8, cy+4, 16, 8, 255,200,100, eid+'.body.belly');   // light belly
 // Tail fin: 2 triangles forming V
-tri(cx+20, cy, cx+30, cy-8, cx+22, cy, 220,100,30, eid+'.tail');
-tri(cx+20, cy, cx+30, cy+8, cx+22, cy, 220,100,30, eid+'.tail');
+tri(cx+40, cy, cx+60, cy-16, cx+44, cy, 220,100,30, eid+'.tail');
+tri(cx+40, cy, cx+60, cy+16, cx+44, cy, 220,100,30, eid+'.tail');
 // Dorsal fin: triangle on top
-tri(cx-4, cy-8, cx+6, cy-14, cx+8, cy-8, 200,90,25, eid+'.body.fin_dorsal');
+tri(cx-8, cy-16, cx+12, cy-28, cx+16, cy-16, 200,90,25, eid+'.body.fin_dorsal');
 // Pectoral fin: small triangle below
-tri(cx-6, cy+4, cx-10, cy+10, cx-2, cy+6, 210,110,35, eid+'.body.fin_pectoral');
+tri(cx-12, cy+8, cx-20, cy+20, cx-4, cy+12, 210,110,35, eid+'.body.fin_pectoral');
 // Eye
-circ(cx-12, cy-2, 4, 255,255,255, eid+'.head.eyes.left');
-circ(cx-12, cy-2, 2, 15,10,8, eid+'.head.eyes.left');
-px(cx-14, cy-4, 255,255,255, eid+'.head.eyes.left');
+circ(cx-24, cy-4, 8, 255,255,255, eid+'.head.eyes.left');
+circ(cx-24, cy-4, 4, 15,10,8, eid+'.head.eyes.left');
+px(cx-28, cy-8, 255,255,255, eid+'.head.eyes.left');
 // Mouth
-px(cx-20, cy, 160,60,20, eid+'.head.mouth');
+px(cx-40, cy, 160,60,20, eid+'.head.mouth');
 // Scales: highlight shimmer pixels scattered on body
-for(var i=0;i<6;i++) px(cx-8+i*6, cy-2+((i%2)*2), 255,220,140, eid+'.body');
+for(var i=0;i<6;i++) px(cx-16+i*12, cy-4+((i%2)*4), 255,220,140, eid+'.body');
 ```
 
 ### BLUEPRINT: Crab
 
-Proportions: wide flat body ellipse ~20×10, 2 large claws as circles+ellipses, \
+Proportions: wide flat body ellipse ~40×20, 2 large claws as circles+ellipses, \
 6 thin legs (3 per side), 2 stalked eyes on top. \
 Key features: WIDE body (wider than tall), 2 distinct claws with pincers \
 (each claw = arm ellipse + 2 pincer arcs/triangles), thin segmented legs \
@@ -801,177 +810,177 @@ spreading outward, eyes on stalks above body.
 
 ```javascript
 const eid = 'crab_01';
-const cx = 250, cy = 240;
+const cx = 500, cy = 480;
 // Body: wide flat ellipse, layered
-ellip(cx, cy, 20, 10, 180,50,40, eid+'.body');           // dark shell
-ellip(cx, cy, 16, 8, 210,70,55, eid+'.body');             // mid
-ellip(cx, cy-2, 10, 4, 230,100,75, eid+'.body');          // highlight
+ellip(cx, cy, 40, 20, 180,50,40, eid+'.body');            // dark shell
+ellip(cx, cy, 32, 16, 210,70,55, eid+'.body');             // mid
+ellip(cx, cy-4, 20, 8, 230,100,75, eid+'.body');           // highlight
 // Eye stalks: thin rects going up from body
-rect(cx-8, cy-14, 2, 6, 180,50,40, eid+'.head.eyestalk.left');
-rect(cx+6, cy-14, 2, 6, 180,50,40, eid+'.head.eyestalk.right');
+rect(cx-16, cy-28, 4, 12, 180,50,40, eid+'.head.eyestalk.left');
+rect(cx+12, cy-28, 4, 12, 180,50,40, eid+'.head.eyestalk.right');
 // Eyes: small circles on top of stalks
-circ(cx-8, cy-16, 4, 20,20,20, eid+'.head.eyes.left');
-circ(cx+8, cy-16, 4, 20,20,20, eid+'.head.eyes.right');
-px(cx-8, cy-18, 255,255,255, eid+'.head.eyes.left');
-px(cx+6, cy-18, 255,255,255, eid+'.head.eyes.right');
+circ(cx-16, cy-32, 8, 20,20,20, eid+'.head.eyes.left');
+circ(cx+16, cy-32, 8, 20,20,20, eid+'.head.eyes.right');
+px(cx-16, cy-36, 255,255,255, eid+'.head.eyes.left');
+px(cx+12, cy-36, 255,255,255, eid+'.head.eyes.right');
 // LEFT CLAW: arm + pincer
-ellip(cx-26, cy-4, 6, 4, 200,60,48, eid+'.claws.left');         // arm
-ellip(cx-34, cy-6, 6, 4, 220,80,60, eid+'.claws.left');         // claw base
+ellip(cx-52, cy-8, 12, 8, 200,60,48, eid+'.claws.left');         // arm
+ellip(cx-68, cy-12, 12, 8, 220,80,60, eid+'.claws.left');        // claw base
 // Pincer: 2 small triangles forming open pincer shape
-tri(cx-38, cy-10, cx-34, cy-6, cx-30, cy-10, 220,80,60, eid+'.claws.left');
-tri(cx-38, cy-2, cx-34, cy-6, cx-30, cy-2, 210,70,55, eid+'.claws.left');
+tri(cx-76, cy-20, cx-68, cy-12, cx-60, cy-20, 220,80,60, eid+'.claws.left');
+tri(cx-76, cy-4, cx-68, cy-12, cx-60, cy-4, 210,70,55, eid+'.claws.left');
 // RIGHT CLAW: mirror
-ellip(cx+26, cy-4, 6, 4, 200,60,48, eid+'.claws.right');
-ellip(cx+34, cy-6, 6, 4, 220,80,60, eid+'.claws.right');
-tri(cx+30, cy-10, cx+34, cy-6, cx+38, cy-10, 220,80,60, eid+'.claws.right');
-tri(cx+30, cy-2, cx+34, cy-6, cx+38, cy-2, 210,70,55, eid+'.claws.right');
+ellip(cx+52, cy-8, 12, 8, 200,60,48, eid+'.claws.right');
+ellip(cx+68, cy-12, 12, 8, 220,80,60, eid+'.claws.right');
+tri(cx+60, cy-20, cx+68, cy-12, cx+76, cy-20, 220,80,60, eid+'.claws.right');
+tri(cx+60, cy-4, cx+68, cy-12, cx+76, cy-4, 210,70,55, eid+'.claws.right');
 // Legs: 3 per side, angled outward, using lines
-line(cx-14, cy+6, cx-24, cy+14, 175,50,38, eid+'.legs.left_1');
-line(cx-12, cy+8, cx-20, cy+18, 175,50,38, eid+'.legs.left_2');
-line(cx-10, cy+10, cx-16, cy+20, 175,50,38, eid+'.legs.left_3');
-line(cx+14, cy+6, cx+24, cy+14, 175,50,38, eid+'.legs.right_1');
-line(cx+12, cy+8, cx+20, cy+18, 175,50,38, eid+'.legs.right_2');
-line(cx+10, cy+10, cx+16, cy+20, 175,50,38, eid+'.legs.right_3');
+line(cx-28, cy+12, cx-48, cy+28, 175,50,38, eid+'.legs.left_1');
+line(cx-24, cy+16, cx-40, cy+36, 175,50,38, eid+'.legs.left_2');
+line(cx-20, cy+20, cx-32, cy+40, 175,50,38, eid+'.legs.left_3');
+line(cx+28, cy+12, cx+48, cy+28, 175,50,38, eid+'.legs.right_1');
+line(cx+24, cy+16, cx+40, cy+36, 175,50,38, eid+'.legs.right_2');
+line(cx+20, cy+20, cx+32, cy+40, 175,50,38, eid+'.legs.right_3');
 // Leg tips: small pixels at end of each leg
-px(cx-24, cy+14, 190,65,48, eid+'.legs.left_1');
-px(cx-20, cy+18, 190,65,48, eid+'.legs.left_2');
-px(cx-16, cy+20, 190,65,48, eid+'.legs.left_3');
-px(cx+24, cy+14, 190,65,48, eid+'.legs.right_1');
-px(cx+20, cy+18, 190,65,48, eid+'.legs.right_2');
-px(cx+16, cy+20, 190,65,48, eid+'.legs.right_3');
+px(cx-48, cy+28, 190,65,48, eid+'.legs.left_1');
+px(cx-40, cy+36, 190,65,48, eid+'.legs.left_2');
+px(cx-32, cy+40, 190,65,48, eid+'.legs.left_3');
+px(cx+48, cy+28, 190,65,48, eid+'.legs.right_1');
+px(cx+40, cy+36, 190,65,48, eid+'.legs.right_2');
+px(cx+32, cy+40, 190,65,48, eid+'.legs.right_3');
 ```
 
 ### BLUEPRINT: Frog
 
-Proportions: wide squat body ~18×10, big head ~14 radius, huge bulging eyes, \
+Proportions: wide squat body ~36×20, big head ~28 radius, huge bulging eyes, \
 wide mouth line, short bent legs. \
 Key features: smooth green layered body, lighter belly, very large protruding eyes \
 (circles that extend above head line), wide smiling mouth arc, webbed feet.
 
 ```javascript
 const eid = 'frog_01';
-const cx = 200, cy = 240;
+const cx = 400, cy = 480;
 // Body: squat and wide
-ellip(cx, cy, 18, 10, 40,120,35, eid+'.body');          // dark green
-ellip(cx, cy, 14, 8, 55,150,45, eid+'.body');            // mid green
-ellip(cx, cy+2, 10, 6, 120,190,80, eid+'.body.belly');   // light belly
+ellip(cx, cy, 36, 20, 40,120,35, eid+'.body');           // dark green
+ellip(cx, cy, 28, 16, 55,150,45, eid+'.body');            // mid green
+ellip(cx, cy+4, 20, 12, 120,190,80, eid+'.body.belly');   // light belly
 // Head merged with body (wider ellipse on top)
-ellip(cx, cy-6, 16, 8, 50,140,40, eid+'.head');
-ellip(cx, cy-6, 12, 6, 65,160,55, eid+'.head');
+ellip(cx, cy-12, 32, 16, 50,140,40, eid+'.head');
+ellip(cx, cy-12, 24, 12, 65,160,55, eid+'.head');
 // Eyes: large, protruding ABOVE head
-circ(cx-10, cy-16, 6, 50,140,40, eid+'.head.eyes.left');
-circ(cx-10, cy-16, 6, 240,240,220, eid+'.head.eyes.left');   // white
-circ(cx-10, cy-16, 4, 15,15,10, eid+'.head.eyes.left');      // pupil
-px(cx-12, cy-18, 255,255,255, eid+'.head.eyes.left');         // shine
-circ(cx+10, cy-16, 6, 50,140,40, eid+'.head.eyes.right');
-circ(cx+10, cy-16, 6, 240,240,220, eid+'.head.eyes.right');
-circ(cx+10, cy-16, 4, 15,15,10, eid+'.head.eyes.right');
-px(cx+8, cy-18, 255,255,255, eid+'.head.eyes.right');
+circ(cx-20, cy-32, 12, 50,140,40, eid+'.head.eyes.left');
+circ(cx-20, cy-32, 12, 240,240,220, eid+'.head.eyes.left');   // white
+circ(cx-20, cy-32, 8, 15,15,10, eid+'.head.eyes.left');       // pupil
+px(cx-24, cy-36, 255,255,255, eid+'.head.eyes.left');          // shine
+circ(cx+20, cy-32, 12, 50,140,40, eid+'.head.eyes.right');
+circ(cx+20, cy-32, 12, 240,240,220, eid+'.head.eyes.right');
+circ(cx+20, cy-32, 8, 15,15,10, eid+'.head.eyes.right');
+px(cx+16, cy-36, 255,255,255, eid+'.head.eyes.right');
 // Mouth: wide arc
-arc(cx, cy-2, 10, 0.1, 3.04, 30,80,25, eid+'.head.mouth');
+arc(cx, cy-4, 20, 0.1, 3.04, 30,80,25, eid+'.head.mouth');
 // Front legs: short, bent
-rect(cx-14, cy+6, 4, 8, 45,130,38, eid+'.legs.front_left');
-rect(cx+10, cy+6, 4, 8, 45,130,38, eid+'.legs.front_right');
+rect(cx-28, cy+12, 8, 16, 45,130,38, eid+'.legs.front_left');
+rect(cx+20, cy+12, 8, 16, 45,130,38, eid+'.legs.front_right');
 // Back legs: larger, bent (2 rects for thigh + shin)
-rect(cx-20, cy+2, 6, 8, 45,130,38, eid+'.legs.back_left');
-rect(cx-22, cy+8, 4, 8, 40,120,35, eid+'.legs.back_left');
-rect(cx+14, cy+2, 6, 8, 45,130,38, eid+'.legs.back_right');
-rect(cx+18, cy+8, 4, 8, 40,120,35, eid+'.legs.back_right');
+rect(cx-40, cy+4, 12, 16, 45,130,38, eid+'.legs.back_left');
+rect(cx-44, cy+16, 8, 16, 40,120,35, eid+'.legs.back_left');
+rect(cx+28, cy+4, 12, 16, 45,130,38, eid+'.legs.back_right');
+rect(cx+36, cy+16, 8, 16, 40,120,35, eid+'.legs.back_right');
 // Webbed feet: small spread shapes
-ellip(cx-24, cy+16, 6, 2, 50,140,40, eid+'.legs.back_left');
-ellip(cx+20, cy+16, 6, 2, 50,140,40, eid+'.legs.back_right');
+ellip(cx-48, cy+32, 12, 4, 50,140,40, eid+'.legs.back_left');
+ellip(cx+40, cy+32, 12, 4, 50,140,40, eid+'.legs.back_right');
 // Skin spots/texture
-px(cx-6, cy-2, 40,110,30, eid+'.body');
-px(cx+4, cy+2, 40,110,30, eid+'.body');
-px(cx-8, cy+4, 40,110,30, eid+'.body');
+px(cx-12, cy-4, 40,110,30, eid+'.body');
+px(cx+8, cy+4, 40,110,30, eid+'.body');
+px(cx-16, cy+8, 40,110,30, eid+'.body');
 ```
 
 ### BLUEPRINT: Turtle / Tortoise
 
-Proportions: domed shell ~24×14 (tall ellipse), small head poking out ~8 radius, \
+Proportions: domed shell ~48×28 (tall ellipse), small head poking out ~16 radius, \
 4 stubby legs. Key features: shell with layered dome + hexagonal pattern (drawn as \
 scattered darker patches on shell), head with tiny beak-like mouth, wrinkled texture.
 
 ```javascript
 const eid = 'turtle_01';
-const cx = 300, cy = 240;
+const cx = 600, cy = 480;
 // Shell: domed, layered
-ellip(cx, cy-2, 24, 14, 80,100,50, eid+'.body.shell');       // dark
-ellip(cx, cy-4, 20, 12, 100,130,60, eid+'.body.shell');      // mid
-ellip(cx, cy-6, 14, 8, 120,155,75, eid+'.body.shell');       // highlight
+ellip(cx, cy-4, 48, 28, 80,100,50, eid+'.body.shell');       // dark
+ellip(cx, cy-8, 40, 24, 100,130,60, eid+'.body.shell');      // mid
+ellip(cx, cy-12, 28, 16, 120,155,75, eid+'.body.shell');     // highlight
 // Shell pattern: darker hexagonal patches
-circ(cx-8, cy-6, 4, 75,95,45, eid+'.body.shell');
-circ(cx+6, cy-4, 4, 75,95,45, eid+'.body.shell');
-circ(cx, cy-10, 4, 75,95,45, eid+'.body.shell');
-circ(cx-4, cy, 4, 75,95,45, eid+'.body.shell');
-circ(cx+10, cy-8, 4, 75,95,45, eid+'.body.shell');
+circ(cx-16, cy-12, 8, 75,95,45, eid+'.body.shell');
+circ(cx+12, cy-8, 8, 75,95,45, eid+'.body.shell');
+circ(cx, cy-20, 8, 75,95,45, eid+'.body.shell');
+circ(cx-8, cy, 8, 75,95,45, eid+'.body.shell');
+circ(cx+20, cy-16, 8, 75,95,45, eid+'.body.shell');
 // Head: poking out left
-ellip(cx-26, cy+2, 8, 6, 90,120,55, eid+'.head');
-ellip(cx-26, cy+2, 6, 4, 110,145,70, eid+'.head');
+ellip(cx-52, cy+4, 16, 12, 90,120,55, eid+'.head');
+ellip(cx-52, cy+4, 12, 8, 110,145,70, eid+'.head');
 // Eye
-circ(cx-30, cy-2, 2, 15,12,8, eid+'.head.eyes.left');
-px(cx-32, cy-4, 255,255,255, eid+'.head.eyes.left');
+circ(cx-60, cy-4, 4, 15,12,8, eid+'.head.eyes.left');
+px(cx-64, cy-8, 255,255,255, eid+'.head.eyes.left');
 // Mouth line
-px(cx-34, cy+4, 60,80,40, eid+'.head.mouth');
-px(cx-34, cy+4, 60,80,40, eid+'.head.mouth');
+px(cx-68, cy+8, 60,80,40, eid+'.head.mouth');
+px(cx-68, cy+8, 60,80,40, eid+'.head.mouth');
 // Legs: 4 stubby
-ellip(cx-16, cy+12, 6, 4, 90,120,55, eid+'.legs.front_left');
-ellip(cx-4, cy+12, 6, 4, 90,120,55, eid+'.legs.front_right');
-ellip(cx+8, cy+12, 6, 4, 90,120,55, eid+'.legs.back_left');
-ellip(cx+18, cy+12, 6, 4, 90,120,55, eid+'.legs.back_right');
+ellip(cx-32, cy+24, 12, 8, 90,120,55, eid+'.legs.front_left');
+ellip(cx-8, cy+24, 12, 8, 90,120,55, eid+'.legs.front_right');
+ellip(cx+16, cy+24, 12, 8, 90,120,55, eid+'.legs.back_left');
+ellip(cx+36, cy+24, 12, 8, 90,120,55, eid+'.legs.back_right');
 // Tail: tiny nub
-circ(cx+24, cy+4, 2, 90,120,55, eid+'.tail');
+circ(cx+48, cy+8, 4, 90,120,55, eid+'.tail');
 // Shell edge highlight
-arc(cx, cy-2, 24, 3.5, 5.8, 130,165,85, eid+'.body.shell');
+arc(cx, cy-4, 48, 3.5, 5.8, 130,165,85, eid+'.body.shell');
 ```
 
 ### BLUEPRINT: Snowman
 
-Proportions: 3 stacked circles (bottom ~20, middle ~14, head ~10). \
+Proportions: 3 stacked circles (bottom ~40, middle ~28, head ~20). \
 Key features: 3 layered white-to-grey circles, coal eyes + mouth dots, \
 carrot nose (orange triangle), stick arms (thick lines), top hat or scarf, \
 button details on middle section.
 
 ```javascript
 const eid = 'snowman_01';
-const cx = 200, cy = 220;
+const cx = 400, cy = 440;
 // Bottom ball
-circ(cx, cy+16, 20, 210,215,225, eid+'.body.bottom');
-circ(cx, cy+16, 18, 225,230,240, eid+'.body.bottom');
-circ(cx-4, cy+20, 8, 240,242,248, eid+'.body.bottom');  // snow highlight
+circ(cx, cy+32, 40, 210,215,225, eid+'.body.bottom');
+circ(cx, cy+32, 36, 225,230,240, eid+'.body.bottom');
+circ(cx-8, cy+40, 16, 240,242,248, eid+'.body.bottom');  // snow highlight
 // Middle ball
-circ(cx, cy-4, 14, 215,220,230, eid+'.body.middle');
-circ(cx, cy-4, 12, 230,234,242, eid+'.body.middle');
+circ(cx, cy-8, 28, 215,220,230, eid+'.body.middle');
+circ(cx, cy-8, 24, 230,234,242, eid+'.body.middle');
 // Head
-circ(cx, cy-22, 10, 218,222,232, eid+'.head');
-circ(cx, cy-22, 8, 235,238,245, eid+'.head');
+circ(cx, cy-44, 20, 218,222,232, eid+'.head');
+circ(cx, cy-44, 16, 235,238,245, eid+'.head');
 // Eyes: coal
-circ(cx-4, cy-24, 2, 20,20,25, eid+'.head.eyes.left');
-circ(cx+4, cy-24, 2, 20,20,25, eid+'.head.eyes.right');
-px(cx-6, cy-26, 255,255,255, eid+'.head.eyes.left');
-px(cx+2, cy-26, 255,255,255, eid+'.head.eyes.right');
+circ(cx-8, cy-48, 4, 20,20,25, eid+'.head.eyes.left');
+circ(cx+8, cy-48, 4, 20,20,25, eid+'.head.eyes.right');
+px(cx-12, cy-52, 255,255,255, eid+'.head.eyes.left');
+px(cx+4, cy-52, 255,255,255, eid+'.head.eyes.right');
 // Carrot nose
-tri(cx, cy-20, cx+10, cy-18, cx, cy-16, 240,140,40, eid+'.head.nose');
+tri(cx, cy-40, cx+20, cy-36, cx, cy-32, 240,140,40, eid+'.head.nose');
 // Mouth: coal dots in smile arc
-px(cx-6, cy-16, 25,20,20, eid+'.head.mouth');
-px(cx-4, cy-14, 25,20,20, eid+'.head.mouth');
-px(cx, cy-14, 25,20,20, eid+'.head.mouth');
-px(cx+4, cy-14, 25,20,20, eid+'.head.mouth');
-px(cx+6, cy-16, 25,20,20, eid+'.head.mouth');
+px(cx-12, cy-32, 25,20,20, eid+'.head.mouth');
+px(cx-8, cy-28, 25,20,20, eid+'.head.mouth');
+px(cx, cy-28, 25,20,20, eid+'.head.mouth');
+px(cx+8, cy-28, 25,20,20, eid+'.head.mouth');
+px(cx+12, cy-32, 25,20,20, eid+'.head.mouth');
 // Buttons on middle
-circ(cx, cy-8, 2, 25,20,20, eid+'.body.middle');
-circ(cx, cy, 2, 25,20,20, eid+'.body.middle');
+circ(cx, cy-16, 4, 25,20,20, eid+'.body.middle');
+circ(cx, cy, 4, 25,20,20, eid+'.body.middle');
 // Stick arms
-thickLine(cx-14, cy-6, cx-30, cy-16, 2, 80,50,20, eid+'.body.arm_left');
-thickLine(cx+14, cy-6, cx+30, cy-16, 2, 80,50,20, eid+'.body.arm_right');
+thickLine(cx-28, cy-12, cx-60, cy-32, 4, 80,50,20, eid+'.body.arm_left');
+thickLine(cx+28, cy-12, cx+60, cy-32, 4, 80,50,20, eid+'.body.arm_right');
 // Twig fingers
-px(cx-30, cy-18, 80,50,20, eid+'.body.arm_left');
-px(cx-32, cy-16, 80,50,20, eid+'.body.arm_left');
-px(cx+30, cy-18, 80,50,20, eid+'.body.arm_right');
-px(cx+32, cy-16, 80,50,20, eid+'.body.arm_right');
+px(cx-60, cy-36, 80,50,20, eid+'.body.arm_left');
+px(cx-64, cy-32, 80,50,20, eid+'.body.arm_left');
+px(cx+60, cy-36, 80,50,20, eid+'.body.arm_right');
+px(cx+64, cy-32, 80,50,20, eid+'.body.arm_right');
 // Scarf
-rect(cx-10, cy-14, 20, 4, 200,40,40, eid+'.body.scarf');
-rect(cx+8, cy-14, 4, 12, 200,40,40, eid+'.body.scarf');
+rect(cx-20, cy-28, 40, 8, 200,40,40, eid+'.body.scarf');
+rect(cx+16, cy-28, 8, 24, 200,40,40, eid+'.body.scarf');
 ```
 
 ### BLUEPRINT: Dog
@@ -983,7 +992,7 @@ thick wagging tail curving up, collar rect with tag circle.
 
 ### BLUEPRINT: Butterfly
 
-Body as tiny rect ~1×4, 4 wings as overlapping colorful ellipses (2 big upper, \
+Body as tiny rect ~2×8, 4 wings as overlapping colorful ellipses (2 big upper, \
 2 small lower), antennae as lines with dot tips. Wings should have pattern pixels \
 (spots/dots). Very colorful — use contrasting brights.
 
@@ -991,132 +1000,132 @@ Body as tiny rect ~1×4, 4 wings as overlapping colorful ellipses (2 big upper, 
 
 ```javascript
 const eid = 'mush_01';
-const cx = 150, groundY = 260;
+const cx = 300, groundY = 520;
 // Stem: 2-layer rect
-rect(cx-2, groundY-16, 6, 16, 200,195,155, eid+'.stem');
-rect(cx, groundY-16, 2, 16, 220,215,175, eid+'.stem');  // highlight
+rect(cx-4, groundY-32, 12, 32, 200,195,155, eid+'.stem');
+rect(cx, groundY-32, 4, 32, 220,215,175, eid+'.stem');  // highlight
 // Cap: 2-layer dome (ellipse)
-ellip(cx, groundY-18, 10, 8, 204,50,50, eid+'.cap');
-ellip(cx, groundY-22, 8, 6, 224,70,70, eid+'.cap');     // highlight
+ellip(cx, groundY-36, 20, 16, 204,50,50, eid+'.cap');
+ellip(cx, groundY-44, 16, 12, 224,70,70, eid+'.cap');   // highlight
 // Spots: white dots on cap
-px(cx-6, groundY-20, 255,230,220, eid+'.cap');
-px(cx+4, groundY-22, 255,230,220, eid+'.cap');
-px(cx-2, groundY-24, 255,230,220, eid+'.cap');
+px(cx-12, groundY-40, 255,230,220, eid+'.cap');
+px(cx+8, groundY-44, 255,230,220, eid+'.cap');
+px(cx-4, groundY-48, 255,230,220, eid+'.cap');
 // Cap underside: lighter fringe
-for(var i=-8;i<=8;i++) px(cx+i, groundY-10, 220,200,170, eid+'.cap');
+for(var i=-16;i<=16;i++) px(cx+i, groundY-20, 220,200,170, eid+'.cap');
 ```
 
 ### BLUEPRINT: Rock
 
 ```javascript
 const eid = 'rock_01';
-const cx = 300, cy = 250;
-var rx = 20, ry = 12;
+const cx = 600, cy = 500;
+var rx = 40, ry = 24;
 // Layered ellipses (dark → mid → light)
 ellip(cx, cy, rx, ry, 80,80,80, eid);
-ellip(cx, cy-2, rx-2, ry-2, 100,98,95, eid);
-ellip(cx, cy-4, rx-6, ry-4, 118,115,110, eid);
+ellip(cx, cy-4, rx-4, ry-4, 100,98,95, eid);
+ellip(cx, cy-8, rx-12, ry-8, 118,115,110, eid);
 // Cracks: dark lines across surface
-for(var i=0;i<rx;i+=6) px(cx-rx/2+i, cy, 60,58,55, eid);
+for(var i=0;i<rx;i+=12) px(cx-rx/2+i, cy, 60,58,55, eid);
 // Moss: green pixels on top edge
-for(var i=0;i<4;i++) px(cx-rx+4+i*4, cy-ry+2, 60,110,50, eid+'.moss');
+for(var i=0;i<4;i++) px(cx-rx+8+i*8, cy-ry+4, 60,110,50, eid+'.moss');
 // Pebble detail: scattered lighter pixels
-px(cx+4, cy-4, 130,128,122, eid);
-px(cx-6, cy+2, 125,122,118, eid);
+px(cx+8, cy-8, 130,128,122, eid);
+px(cx-12, cy+4, 125,122,118, eid);
 ```
 
 ### BLUEPRINT: Flower
 
 ```javascript
 const eid = 'flower_01';
-const cx = 180, groundY = 260;
+const cx = 360, groundY = 520;
 // Stem
-rect(cx, groundY-18, 2, 18, 50,110,40, eid+'.stem');
+rect(cx, groundY-36, 4, 36, 50,110,40, eid+'.stem');
 // Leaf
-ellip(cx+4, groundY-8, 4, 2, 55,130,45, eid+'.stem.leaf');
+ellip(cx+8, groundY-16, 8, 4, 55,130,45, eid+'.stem.leaf');
 // Petals: 5 small circles around center
-var petalR = 4;
-circ(cx, groundY-22, petalR, 255,100,120, eid+'.petals');     // top
-circ(cx-6, groundY-18, petalR, 240,90,110, eid+'.petals');    // left
-circ(cx+6, groundY-18, petalR, 240,90,110, eid+'.petals');    // right
-circ(cx-4, groundY-14, petalR, 230,85,105, eid+'.petals');    // bottom-left
-circ(cx+4, groundY-14, petalR, 230,85,105, eid+'.petals');    // bottom-right
+var petalR = 8;
+circ(cx, groundY-44, petalR, 255,100,120, eid+'.petals');     // top
+circ(cx-12, groundY-36, petalR, 240,90,110, eid+'.petals');   // left
+circ(cx+12, groundY-36, petalR, 240,90,110, eid+'.petals');   // right
+circ(cx-8, groundY-28, petalR, 230,85,105, eid+'.petals');    // bottom-left
+circ(cx+8, groundY-28, petalR, 230,85,105, eid+'.petals');    // bottom-right
 // Center
-circ(cx, groundY-18, 4, 255,220,60, eid+'.center');
-px(cx-2, groundY-20, 255,240,100, eid+'.center');  // pollen highlight
+circ(cx, groundY-36, 8, 255,220,60, eid+'.center');
+px(cx-4, groundY-40, 255,240,100, eid+'.center');  // pollen highlight
 ```
 
 ### BLUEPRINT: House / Cottage
 
-Proportions: rect body ~50×40, triangle roof ~60 wide, door rect, \
+Proportions: rect body ~100×80, triangle roof ~120 wide, door rect, \
 window squares with cross-bars, chimney rect with smoke. \
 Key features: 2-shade brick/wood walls, darker roof with highlight edge, \
 windows with inner glow, door with knob pixel, chimney + wispy smoke pixels.
 
 ```javascript
 const eid = 'house_01';
-const cx = 300, groundY = 260;
+const cx = 600, groundY = 520;
 // Walls
-rect(cx-26, groundY-40, 50, 40, 140,110,75, eid+'.walls');
-rect(cx-24, groundY-38, 46, 36, 160,130,90, eid+'.walls');
+rect(cx-52, groundY-80, 100, 80, 140,110,75, eid+'.walls');
+rect(cx-48, groundY-76, 92, 72, 160,130,90, eid+'.walls');
 // Roof: triangle
-tri(cx-30, groundY-40, cx, groundY-70, cx+30, groundY-40, 150,50,40, eid+'.roof');
-tri(cx-26, groundY-40, cx, groundY-66, cx+26, groundY-40, 170,65,50, eid+'.roof');
+tri(cx-60, groundY-80, cx, groundY-140, cx+60, groundY-80, 150,50,40, eid+'.roof');
+tri(cx-52, groundY-80, cx, groundY-132, cx+52, groundY-80, 170,65,50, eid+'.roof');
 // Roof edge highlight
-line(cx-30, groundY-40, cx, groundY-70, 180,80,65, eid+'.roof');
+line(cx-60, groundY-80, cx, groundY-140, 180,80,65, eid+'.roof');
 // Door
-rect(cx-6, groundY-24, 12, 24, 100,60,30, eid+'.door');
-rect(cx-4, groundY-22, 8, 20, 120,75,40, eid+'.door');
-px(cx+2, groundY-12, 200,180,50, eid+'.door');  // knob
+rect(cx-12, groundY-48, 24, 48, 100,60,30, eid+'.door');
+rect(cx-8, groundY-44, 16, 40, 120,75,40, eid+'.door');
+px(cx+4, groundY-24, 200,180,50, eid+'.door');  // knob
 // Windows: left and right with glow
-rect(cx-20, groundY-32, 10, 10, 80,50,25, eid+'.windows.left');
-rect(cx-18, groundY-30, 6, 6, 240,220,140, eid+'.windows.left');  // warm glow
-px(cx-16, groundY-28, 200,180,80, eid+'.windows.left');   // cross
-rect(cx+10, groundY-32, 10, 10, 80,50,25, eid+'.windows.right');
-rect(cx+12, groundY-30, 6, 6, 240,220,140, eid+'.windows.right');
-px(cx+16, groundY-28, 200,180,80, eid+'.windows.right');
+rect(cx-40, groundY-64, 20, 20, 80,50,25, eid+'.windows.left');
+rect(cx-36, groundY-60, 12, 12, 240,220,140, eid+'.windows.left');  // warm glow
+px(cx-32, groundY-56, 200,180,80, eid+'.windows.left');   // cross
+rect(cx+20, groundY-64, 20, 20, 80,50,25, eid+'.windows.right');
+rect(cx+24, groundY-60, 12, 12, 240,220,140, eid+'.windows.right');
+px(cx+32, groundY-56, 200,180,80, eid+'.windows.right');
 // Chimney
-rect(cx+16, groundY-62, 8, 22, 130,90,65, eid+'.chimney');
-rect(cx+18, groundY-62, 4, 22, 145,100,72, eid+'.chimney');
+rect(cx+32, groundY-124, 16, 44, 130,90,65, eid+'.chimney');
+rect(cx+36, groundY-124, 8, 44, 145,100,72, eid+'.chimney');
 // Smoke wisps
-px(cx+20, groundY-66, 180,180,185, eid+'.chimney.smoke');
-px(cx+22, groundY-70, 170,170,175, eid+'.chimney.smoke');
-px(cx+18, groundY-74, 160,160,168, eid+'.chimney.smoke');
+px(cx+40, groundY-132, 180,180,185, eid+'.chimney.smoke');
+px(cx+44, groundY-140, 170,170,175, eid+'.chimney.smoke');
+px(cx+36, groundY-148, 160,160,168, eid+'.chimney.smoke');
 ```
 
 ### BLUEPRINT: Cloud
 
 ```javascript
 const eid = 'cloud_01';
-const cx = 150, cy = 50;
+const cx = 300, cy = 100;
 // Overlapping circles forming fluffy cloud
-circ(cx, cy, 14, 220,225,235, eid);
-circ(cx-14, cy+4, 10, 215,220,232, eid);
-circ(cx+14, cy+4, 10, 215,220,232, eid);
-circ(cx-8, cy-4, 10, 230,234,242, eid);     // top highlight
-circ(cx+8, cy-4, 10, 230,234,242, eid);
-circ(cx, cy-6, 8, 240,243,250, eid);        // bright top center
+circ(cx, cy, 28, 220,225,235, eid);
+circ(cx-28, cy+8, 20, 215,220,232, eid);
+circ(cx+28, cy+8, 20, 215,220,232, eid);
+circ(cx-16, cy-8, 20, 230,234,242, eid);     // top highlight
+circ(cx+16, cy-8, 20, 230,234,242, eid);
+circ(cx, cy-12, 16, 240,243,250, eid);       // bright top center
 // Bottom flattening: lighter fringe
-ellip(cx, cy+8, 18, 4, 228,232,240, eid);
+ellip(cx, cy+16, 36, 8, 228,232,240, eid);
 ```
 
 ### BLUEPRINT: Sun
 
 ```javascript
 const eid = 'sun_01';
-const cx = 60, cy = 40;
+const cx = 120, cy = 80;
 // Glow halo (large, faint)
-circ(cx, cy, 24, 255,240,180, eid+'.glow');
+circ(cx, cy, 48, 255,240,180, eid+'.glow');
 // Core: layered
-circ(cx, cy, 16, 255,210,80, eid);
-circ(cx, cy, 12, 255,230,110, eid);
-circ(cx, cy, 6, 255,245,180, eid);  // bright center
+circ(cx, cy, 32, 255,210,80, eid);
+circ(cx, cy, 24, 255,230,110, eid);
+circ(cx, cy, 12, 255,245,180, eid);  // bright center
 // Rays: lines extending outward
 for(var a=0; a<8; a++){
   var angle = a * Math.PI/4;
-  var x2 = Math.round(cx + Math.cos(angle)*28);
-  var y2 = Math.round(cy + Math.sin(angle)*28);
-  line(Math.round(cx+Math.cos(angle)*18), Math.round(cy+Math.sin(angle)*18), x2, y2, 255,220,100, eid+'.rays');
+  var x2 = Math.round(cx + Math.cos(angle)*56);
+  var y2 = Math.round(cy + Math.sin(angle)*56);
+  line(Math.round(cx+Math.cos(angle)*36), Math.round(cy+Math.sin(angle)*36), x2, y2, 255,220,100, eid+'.rays');
 }
 ```
 
@@ -1144,7 +1153,7 @@ When drawing an entity type not covered by these blueprints:
 - [ ] Single-pixel details: whiskers, moss, cracks, spots, reflections
 - [ ] Cohesive palette: 3-4 shades per material, warm natural tones
 - [ ] Proper depth: entities spread across canvas, varied sizes
-- [ ] Characters 80-140px tall, feet near y=200-290 on the ground
+- [ ] Characters 160-280px tall, feet near y=400-580 on the ground
 - [ ] Follow the entity blueprint if one exists for this entity type
 - [ ] At least 8 distinct sub-entity IDs per entity
 

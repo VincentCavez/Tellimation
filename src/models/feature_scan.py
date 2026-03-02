@@ -10,24 +10,87 @@ from __future__ import annotations
 
 from typing import List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, computed_field
 
 
 class PartFeatures(BaseModel):
-    """Visual properties of a single identifiable part of an element."""
+    """Visual properties of a single identifiable part of an element.
+
+    Each property category corresponds to a SKILL error type, enabling
+    precise error exclusion and targeted discrepancy detection.
+    """
 
     part: str
     parent: str
-    properties: List[str] = Field(default_factory=list)
+    colors: List[str] = Field(default_factory=list)
+    texture: Optional[str] = None
+    material: Optional[str] = None
+    hardness: Optional[str] = None
+    weight_appearance: Optional[str] = None
+    temperature_appearance: Optional[str] = None
+    shape: Optional[str] = None
+    size: Optional[str] = None
+    shine: Optional[str] = None
+    state: Optional[str] = None
+    pattern: Optional[str] = None
+    contour: Optional[str] = None
+    extra_properties: List[str] = Field(default_factory=list)
+
+    @computed_field
+    @property
+    def properties(self) -> List[str]:
+        """Flat list of all properties (backward-compatible)."""
+        props: List[str] = []
+        props.extend(self.colors)
+        for field_name in (
+            "texture", "material", "hardness", "weight_appearance",
+            "temperature_appearance", "shape", "size", "shine",
+            "state", "pattern", "contour",
+        ):
+            val = getattr(self, field_name)
+            if val is not None:
+                props.append(val)
+        props.extend(self.extra_properties)
+        return props
 
 
 class ElementFeatures(BaseModel):
     """Complete visual feature scan for a single element."""
 
     element_id: str
-    global_properties: List[str] = Field(default_factory=list)
+    colors: List[str] = Field(default_factory=list)
+    texture: Optional[str] = None
+    material: Optional[str] = None
+    hardness: Optional[str] = None
+    weight_appearance: Optional[str] = None
+    temperature_appearance: Optional[str] = None
+    shape: Optional[str] = None
+    size: Optional[str] = None
+    shine: Optional[str] = None
+    state: Optional[str] = None
+    pattern: Optional[str] = None
+    posture: Optional[str] = None
+    expression: Optional[str] = None
+    extra_properties: List[str] = Field(default_factory=list)
     parts: List[PartFeatures] = Field(default_factory=list)
     actionable_properties: List[str] = Field(default_factory=list)
+
+    @computed_field
+    @property
+    def global_properties(self) -> List[str]:
+        """Flat list of element-level properties (backward-compatible)."""
+        props: List[str] = []
+        props.extend(self.colors)
+        for field_name in (
+            "texture", "material", "hardness", "weight_appearance",
+            "temperature_appearance", "shape", "size", "shine",
+            "state", "pattern", "posture", "expression",
+        ):
+            val = getattr(self, field_name)
+            if val is not None:
+                props.append(val)
+        props.extend(self.extra_properties)
+        return props
 
     def get_part(self, part_name: str) -> Optional[PartFeatures]:
         """Return the PartFeatures for a given part name, or None."""

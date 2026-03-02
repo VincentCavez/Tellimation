@@ -13,7 +13,7 @@ from google.genai import types
 
 from src.models.neg import NEG
 from src.models.student_profile import Discrepancy, StudentProfile
-from src.narration.error_exclusions import is_excluded
+
 from src.generation.prompts.transcription_prompt import (
     TRANSCRIPTION_SYSTEM_PROMPT,
     TRANSCRIPTION_USER_PROMPT,
@@ -38,6 +38,7 @@ class TranscriptionResult(BaseModel):
     satisfied_targets: List[str] = Field(default_factory=list)
     updated_history: List[str] = Field(default_factory=list)
     profile_updates: ProfileUpdates = Field(default_factory=ProfileUpdates)
+    voice_guidance: str = ""
 
 
 # ---------------------------------------------------------------------------
@@ -96,6 +97,10 @@ def _validate_transcription_response(data: Dict[str, Any]) -> TranscriptionResul
         progress = 0.0
     progress = max(0.0, min(1.0, float(progress)))
 
+    voice_guidance = data.get("voice_guidance", "")
+    if not isinstance(voice_guidance, str):
+        voice_guidance = ""
+
     return TranscriptionResult(
         transcription=data.get("transcription", ""),
         discrepancies=_parse_discrepancies(raw_discrepancies),
@@ -103,6 +108,7 @@ def _validate_transcription_response(data: Dict[str, Any]) -> TranscriptionResul
         satisfied_targets=satisfied,
         updated_history=updated_history,
         profile_updates=_parse_profile_updates(data.get("profile_updates")),
+        voice_guidance=voice_guidance,
     )
 
 
@@ -110,9 +116,12 @@ def _build_user_prompt(
     neg: NEG,
     narration_history: List[str],
     student_profile: Optional[StudentProfile],
+    narrative_text: str = "",
 ) -> str:
     """Build the text portion of the user prompt."""
     neg_json = json.dumps(neg.model_dump(), indent=2)
+
+    narrative_str = narrative_text if narrative_text else "(no narrative context yet)"
 
     if narration_history:
         history_str = "\n".join(
@@ -126,6 +135,7 @@ def _build_user_prompt(
         profile_str = student_profile.to_prompt_context()
 
     return TRANSCRIPTION_USER_PROMPT.format(
+        narrative_text=narrative_str,
         neg_json=neg_json,
         narration_history=history_str,
         student_profile=profile_str,
@@ -142,6 +152,7 @@ async def transcribe_and_detect(
     neg: NEG,
     narration_history: Optional[List[str]] = None,
     student_profile: Optional[StudentProfile] = None,
+    narrative_text: str = "",
 ) -> TranscriptionResult:
     """Transcribe child audio and detect discrepancies against the NEG.
 
@@ -154,16 +165,19 @@ async def transcribe_and_detect(
         neg: The current scene's Narrative Expectation Graph.
         narration_history: Previous utterance transcriptions (ordered).
         student_profile: Child's error profile for context priming.
+        narrative_text: The scene's story narrative for voice guidance context.
 
     Returns:
         TranscriptionResult with transcription, discrepancies (filtered
-        by NEG error_exclusions), scene_progress, and more.
+        by the NEG), scene_progress, voice_guidance, and more.
     """
     if narration_history is None:
         narration_history = []
 
     # Build prompts
-    user_prompt = _build_user_prompt(neg, narration_history, student_profile)
+    user_prompt = _build_user_prompt(
+        neg, narration_history, student_profile, narrative_text
+    )
 
     # Multimodal content: audio part + text part
     audio_part = types.Part.from_bytes(data=audio_bytes, mime_type="audio/webm")
@@ -186,11 +200,5 @@ async def transcribe_and_detect(
     raw_text = response.text
     data = _extract_json(raw_text)
     result = _validate_transcription_response(data)
-
-    # Filter discrepancies using the NEG's error_exclusions
-    result.discrepancies = [
-        d for d in result.discrepancies
-        if not is_excluded(d.entity_id, d.type, neg.error_exclusions)
-    ]
 
     return result

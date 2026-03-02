@@ -5,13 +5,13 @@
 var ScenePicker = (function() {
   'use strict';
 
-  // Thumbnails are 1/4 the full scene size (560x360 → 140x90).
-  // We render sprites at full resolution then downsample by averaging
-  // each 4x4 block of pixels, so nothing gets cropped.
+  // Thumbnails are 1/2 the art grid (280x180 → 140x90).
+  // We render sprites at art-grid resolution then downsample by averaging
+  // each 2x2 block of pixels, so nothing gets cropped.
   var THUMB_PW = 140;
   var THUMB_PH = 90;
-  var THUMB_SCALE = 1.5;
-  var DOWNSAMPLE_FACTOR = 4;
+  var THUMB_SCALE = 2;  // integer scale for clean pixel blocks
+  var DOWNSAMPLE_FACTOR = 2;
 
   /**
    * Downsample a full-resolution PixelBuffer (PW×PH) to 1/4 size (THUMB_PW×THUMB_PH)
@@ -97,10 +97,35 @@ var ScenePicker = (function() {
           console.warn('[ScenePicker] Failed to render sprite for', entityEids[i], e);
         }
       }
-      // Downsample 560x360 → 140x90 by averaging 4x4 blocks
+      // Downsample art grid (280x180) → 140x90 by averaging 2x2 blocks
       var thumbBuf = downsampleBuffer(fullBuf);
-      var thumbRenderer = new Renderer(canvas, thumbBuf, scale);
-      thumbRenderer.render();
+      // Thumbnail renderer: canvas = THUMB_PW*scale × THUMB_PH*scale
+      canvas.width = THUMB_PW * scale;
+      canvas.height = THUMB_PH * scale;
+      canvas.style.imageRendering = 'pixelated';
+      canvas.style.imageRendering = 'crisp-edges';
+      var thumbCtx = canvas.getContext('2d');
+      thumbCtx.imageSmoothingEnabled = false;
+      // Render thumbnail: each thumb pixel = scale×scale block
+      var imgData = thumbCtx.createImageData(THUMB_PW * scale, THUMB_PH * scale);
+      var px = imgData.data;
+      var s = scale;
+      for (var row = 0; row < THUMB_PH; row++) {
+        for (var col = 0; col < THUMB_PW; col++) {
+          var p = thumbBuf.data[row * THUMB_PW + col];
+          for (var sdy = 0; sdy < s; sdy++) {
+            var rowOff = ((row * s + sdy) * THUMB_PW * s + col * s) * 4;
+            for (var sdx = 0; sdx < s; sdx++) {
+              var off = rowOff + sdx * 4;
+              px[off] = p.r;
+              px[off + 1] = p.g;
+              px[off + 2] = p.b;
+              px[off + 3] = 255;
+            }
+          }
+        }
+      }
+      thumbCtx.putImageData(imgData, 0, 0);
     }
 
     var fullBuf = new PixelBuffer(PW, PH);

@@ -1,0 +1,1 @@
+uvicorn src.ui.app:app --reload --port 8000

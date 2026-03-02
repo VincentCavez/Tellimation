@@ -188,9 +188,25 @@
           appendThumbnail(msg.scene, newIdx, false);
         }
 
+        if (msg.type === 'scene_selected_ready') {
+          // Server finished generating masks + features — navigate with updated scene
+          sessionStorage.setItem('chosen_scene', JSON.stringify(msg.scene));
+          sessionStorage.setItem('scene_index', String(pendingSelectIndex || 0));
+          window.location.href = '/story';
+        }
+
         if (msg.type === 'error') {
           console.error('Server error:', msg.message);
           hideProgress();
+          // Reset pending selection
+          if (pendingSelectIndex !== null) {
+            var card = cardElements[pendingSelectIndex];
+            if (card) {
+              card.style.opacity = '';
+              card.style.pointerEvents = '';
+            }
+            pendingSelectIndex = null;
+          }
           container.style.display = '';
           container.innerHTML = '<p style="color:var(--red)">' + msg.message + '</p>';
         }
@@ -258,20 +274,28 @@
         });
       }
 
+      var pendingSelectIndex = null;
+
       function selectScene(index) {
         if (!masksReadySet[index]) return; // safety check
+        if (pendingSelectIndex !== null) return; // already selecting
+        pendingSelectIndex = index;
         var scene = branches[index];
-        // Store chosen scene and go to story page
-        sessionStorage.setItem('chosen_scene', JSON.stringify(scene));
-        sessionStorage.setItem('scene_index', String(index));
         // Store story_index if it came from disk
         if (scene._story_index) {
           sessionStorage.setItem('story_index', String(scene._story_index));
         } else {
           sessionStorage.removeItem('story_index');
         }
+        // Show loading state on the selected card
+        var card = cardElements[index];
+        if (card) {
+          card.style.opacity = '0.6';
+          card.style.pointerEvents = 'none';
+        }
+        // Ask server to generate real masks + features, then wait for response
         ws.send(JSON.stringify({ type: 'select_scene', index: index }));
-        window.location.href = '/story';
+        // Navigation happens in onmessage when scene_selected_ready arrives
       }
 
       btnOneMore.addEventListener('click', function() {

@@ -50,15 +50,23 @@ logger = logging.getLogger(__name__)
 
 MODEL_ID = "gemini-3-flash-preview"
 IMAGE_MODEL_ID = "gemini-3-pro-image-preview"
+MASK_MODEL_ID = "gemini-2.5-flash"
 
 # Timeouts (seconds) for individual LLM calls to prevent indefinite hangs
-MANIFEST_TIMEOUT = 30   # text-only call, should be fast
-IMAGE_TIMEOUT = 25      # image generation is inherently slow
-MASK_TIMEOUT = 20       # text + small image input
+MANIFEST_TIMEOUT = 60    # text-only, generous for complex scenes
+IMAGE_TIMEOUT = 120      # image generation via Gemini Pro is slow
+MASK_TIMEOUT = 60        # text + image input, needs headroom
 
 # Retry counts per call type
 MANIFEST_MAX_RETRIES = 2  # manifest is non-optional, retry on failure
 IMAGE_MAX_RETRIES = 2     # retry entity/background images on timeout or error
+
+# Resolution model (must match engine.js)
+SOURCE_W = 1120   # manifest coordinates, image generation
+SOURCE_H = 720
+K = 4             # pixel-art aggregation factor
+ART_W = SOURCE_W // K   # 280 — art grid (pixel buffer, animations)
+ART_H = SOURCE_H // K   # 180
 
 
 # ---------------------------------------------------------------------------
@@ -228,8 +236,9 @@ async def _generate_manifest(
             last_exc = asyncio.TimeoutError(
                 f"Manifest generation timed out after {MANIFEST_TIMEOUT}s")
         except Exception as exc:
-            logger.warning("[manifest] Attempt %d/%d failed: %s",
-                           attempt, MANIFEST_MAX_RETRIES, exc)
+            logger.warning("[manifest] Attempt %d/%d failed (%s): %s",
+                           attempt, MANIFEST_MAX_RETRIES,
+                           type(exc).__name__, exc or "no details")
             last_exc = exc
 
     raise last_exc  # type: ignore[misc]
@@ -333,7 +342,7 @@ async def _generate_entity_image(
 ) -> Optional[bytes]:
     """Generate a single entity image on red chroma-key background.
 
-    Uses Gemini 2.5 Flash Image to produce a pixel art sprite
+    Uses Gemini 3 Pro Image to produce an illustration
     on solid #FF0000 red background. Retries up to IMAGE_MAX_RETRIES
     times on failure or timeout.
 
@@ -360,19 +369,26 @@ async def _generate_entity_image(
                 timeout=IMAGE_TIMEOUT,
             )
 
+            # Extract image data from response
+            img_data: Optional[bytes] = None
             if response.candidates and response.candidates[0].content:
                 for part in response.candidates[0].content.parts:
                     if part.inline_data is not None:
-                        logger.info("[entity-image] %s: got image (%d bytes)",
-                                    eid, len(part.inline_data.data))
-                        return part.inline_data.data
+                        img_data = part.inline_data.data
+                        break
 
-            logger.warning("[entity-image] %s: attempt %d/%d no image data returned",
-                           eid, attempt, IMAGE_MAX_RETRIES)
+            if img_data is None:
+                logger.warning("[entity-image] %s: attempt %d/%d no image data",
+                               eid, attempt, IMAGE_MAX_RETRIES)
+                continue
+
+            logger.info("[entity-image] %s: got image (%d bytes)", eid, len(img_data))
+            return img_data
 
         except Exception as exc:
-            logger.warning("[entity-image] %s: attempt %d/%d failed: %s",
-                           eid, attempt, IMAGE_MAX_RETRIES, exc)
+            logger.warning("[entity-image] %s: attempt %d/%d failed (%s): %s",
+                           eid, attempt, IMAGE_MAX_RETRIES,
+                           type(exc).__name__, exc or "no details")
 
     logger.warning("[entity-image] %s: all %d attempts exhausted", eid, IMAGE_MAX_RETRIES)
     return None
@@ -409,7 +425,7 @@ async def _generate_entity_images_parallel(
     try:
         results = await asyncio.wait_for(
             asyncio.gather(*tasks, return_exceptions=True),
-            timeout=IMAGE_TIMEOUT * IMAGE_MAX_RETRIES + 5,
+            timeout=IMAGE_TIMEOUT * IMAGE_MAX_RETRIES + 30,
         )
     except asyncio.TimeoutError:
         logger.warning("[entity-images] Global timeout — returning empty")
@@ -528,70 +544,171 @@ def _is_background_pixel(
     return dist < threshold
 
 
+def _find_content_bbox(
+    img: Image.Image,
+    bg_r: int,
+    bg_g: int,
+    bg_b: int,
+    threshold: float = 60.0,
+    margin: int = 2,
+) -> tuple:
+    """Find the bounding box of non-background content in an image.
+
+    Uses numpy for fast vectorized distance computation on the full
+    high-res image (e.g. 1024×1024).
+
+    Returns:
+        (left, upper, right, lower) tuple for Image.crop().
+    """
+    import numpy as np
+
+    w, h = img.size
+    arr = np.array(img, dtype=np.float32)  # shape (H, W, 3)
+    bg = np.array([bg_r, bg_g, bg_b], dtype=np.float32)
+
+    # Euclidean distance from each pixel to the background color
+    dist = np.sqrt(np.sum((arr - bg) ** 2, axis=2))  # shape (H, W)
+
+    # Content mask: pixels far enough from background
+    content = dist >= threshold
+
+    if not np.any(content):
+        # No content found — return full image
+        return (0, 0, w, h)
+
+    # Find bounding box of True values
+    rows = np.any(content, axis=1)
+    cols = np.any(content, axis=0)
+    min_y, max_y = np.where(rows)[0][[0, -1]]
+    min_x, max_x = np.where(cols)[0][[0, -1]]
+
+    # Add margin, clamped to image bounds
+    left = max(0, int(min_x) - margin)
+    upper = max(0, int(min_y) - margin)
+    right = min(w, int(max_x) + 1 + margin)
+    lower = min(h, int(max_y) + 1 + margin)
+    return (left, upper, right, lower)
+
+
 def _extract_entity_sprite(
     image_bytes: bytes,
     target_w: int,
     target_h: int,
 ) -> Dict[str, Any]:
-    """Extract raw pixels from an entity image with chroma-key removal.
+    """Extract raw pixels from an entity image using chroma-key background removal.
 
-    1. Open the image at original resolution (e.g. 1024×1024)
-    2. Detect background color by sampling corners (before downscale)
-    3. Downscale to (target_w, target_h) with NEAREST (pixel art)
-    4. Remove pixels close to the detected background color (Euclidean distance)
+    Pipeline (chroma-key + decontamination on HD, then downscale to art grid):
+    1. Open HD image (e.g. 1024×1024)
+    2. Detect background color from corner pixels
+    3. Chroma-key: Euclidean distance in RGB → alpha channel (soft threshold)
+    4. Alpha decontamination on HD — correct semi-transparent edge colors
+    5. Crop to content bounding box
+    6. Downscale RGBA to art-grid target size (target_w, target_h)
+    7. Convert to pixel list: transparent → None, visible → [r,g,b]
+
+    target_w and target_h should already be in art-grid coordinates
+    (i.e. width_hint // K, height_hint // K).
 
     Returns:
         Dict with keys: pixels (flat list of [r,g,b] or None), w, h
     """
+    import numpy as np
+
     img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-    logger.info("[extract-sprite] Original: %dx%d -> target %dx%d",
+    logger.info("[extract-sprite] Original: %dx%d -> art-grid target %dx%d",
                 img.width, img.height, target_w, target_h)
 
-    # Detect background color on the original (high-res) image
+    # Detect background color from corner pixels
     bg_color = _detect_background_color(img)
-    logger.info("[extract-sprite] Detected background color: rgb(%d, %d, %d)",
-                bg_color[0], bg_color[1], bg_color[2])
-
-    # Downscale to target size
-    img = img.resize((target_w, target_h), Image.NEAREST)
-
-    total = target_w * target_h
     bg_r, bg_g, bg_b = bg_color
+    logger.info("[extract-sprite] Detected background color: rgb(%d, %d, %d)",
+                bg_r, bg_g, bg_b)
 
-    # Remove pixels close to the detected background color
+    # Chroma-key: Euclidean distance from background color → alpha
+    INNER_THRESH = 40.0   # distance < INNER → fully transparent (pure background)
+    OUTER_THRESH = 80.0   # distance > OUTER → fully opaque (pure entity)
+                          # between → proportional alpha (anti-aliased edge)
+
+    arr = np.array(img, dtype=np.float32)           # (H, W, 3)
+    bg = np.array(bg_color, dtype=np.float32)        # (3,)
+    dist = np.sqrt(np.sum((arr - bg) ** 2, axis=2))  # (H, W)
+
+    alpha_f = np.clip((dist - INNER_THRESH) / (OUTER_THRESH - INNER_THRESH), 0, 1)
+    alpha_ch = (alpha_f * 255).astype(np.float32)
+
+    # Build RGBA array for decontamination
+    rgba_arr = np.zeros((*arr.shape[:2], 4), dtype=np.float32)
+    rgba_arr[:, :, :3] = arr
+    rgba_arr[:, :, 3] = alpha_ch
+
+    # Alpha decontamination on HD — correct edge colors BEFORE downscale
+    # Semi-transparent pixels have background color blended in; remove it:
+    #   observed = alpha * foreground + (1 - alpha) * background
+    #   foreground = (observed - background * (1 - alpha)) / alpha
+    semi_mask = (alpha_ch > 20) & (alpha_ch < 255)
+    if np.any(semi_mask):
+        af = alpha_ch[semi_mask] / 255.0
+        for c, bg_c in enumerate([bg_r, bg_g, bg_b]):
+            rgba_arr[:, :, c][semi_mask] = np.clip(
+                (rgba_arr[:, :, c][semi_mask] - bg_c * (1 - af)) / af, 0, 255
+            )
+    # Flatten: fully transparent stays, semi-transparent becomes opaque
+    rgba_arr[:, :, 3] = np.where(alpha_ch < 20, 0, 255)
+    rgba = Image.fromarray(rgba_arr.astype(np.uint8), "RGBA")
+
+    # Crop to content via alpha channel
+    alpha = rgba.split()[3]
+    bbox = alpha.getbbox()
+    if bbox:
+        content_w = bbox[2] - bbox[0]
+        content_h = bbox[3] - bbox[1]
+        logger.info("[extract-sprite] Content bbox: (%d,%d)-(%d,%d) = %dx%d",
+                    bbox[0], bbox[1], bbox[2], bbox[3], content_w, content_h)
+        rgba = rgba.crop(bbox)
+    else:
+        content_w, content_h = rgba.size
+        logger.warning("[extract-sprite] No content found via alpha, using full image")
+
+    # Downscale to art-grid target (preserving aspect ratio)
+    if content_w > 0 and content_h > 0:
+        scale = min(target_w / content_w, target_h / content_h)
+        final_w = max(1, round(content_w * scale))
+        final_h = max(1, round(content_h * scale))
+    else:
+        final_w, final_h = target_w, target_h
+
+    logger.info("[extract-sprite] Scaling %dx%d -> %dx%d (art-grid target %dx%d)",
+                content_w, content_h, final_w, final_h, target_w, target_h)
+    rgba = rgba.resize((final_w, final_h), Image.LANCZOS)
+
+    # Convert to pixel list (decontamination already done on HD)
+    total = final_w * final_h
     pixels: List[Optional[List[int]]] = []
-    chroma_count = 0
-    for y in range(target_h):
-        for x in range(target_w):
-            r, g, b = img.getpixel((x, y))
-            if _is_background_pixel(r, g, b, bg_r, bg_g, bg_b):
+    transparent_count = 0
+    for y in range(final_h):
+        for x in range(final_w):
+            r, g, b, a = rgba.getpixel((x, y))
+            if a < 128:
                 pixels.append(None)
-                chroma_count += 1
+                transparent_count += 1
             else:
                 pixels.append([r, g, b])
 
-    visible_count = total - chroma_count
-    pct_removed = (chroma_count / total * 100) if total > 0 else 0
+    visible_count = total - transparent_count
+    pct_removed = (transparent_count / total * 100) if total > 0 else 0
     logger.info("[extract-sprite] Extracted %d visible pixels out of %d total "
-                "(%.1f%% background removed)",
+                "(%.1f%% background removed via chroma-key)",
                 visible_count, total, pct_removed)
 
-    return {"pixels": pixels, "w": target_w, "h": target_h}
+    return {"pixels": pixels, "w": final_w, "h": final_h}
 
 
 def _extract_background_sprite(image_bytes: bytes) -> Dict[str, Any]:
-    """Convert a background image to a base64 PNG for direct canvas rendering.
+    """Convert a background image to a base64 PNG at art-grid resolution.
 
-    The background is non-interactive (no entity IDs, no sub-entities), so
-    we skip palette quantization entirely and just downscale + encode as
-    base64 PNG.  The client renders it directly to the pixel buffer.
-
-    1. Open image and downscale to 280×180 with nearest-neighbor (preserves pixelated look)
-    2. Upscale to 560×360 with nearest-neighbor (each pixel becomes a 2×2 block)
-    3. Re-encode as PNG and base64
-
-    The two-step resize keeps the background's pixelated aesthetic while
-    matching the 560×360 pixel buffer used by the client.
+    Downscales the HD image from Gemini directly to ART_W × ART_H with
+    LANCZOS.  The client renders it 1:1 into the pixel buffer; the Renderer
+    then upscales each art pixel K×K for display.
 
     Returns:
         Dict with format="image_background", width, height, image_base64.
@@ -599,28 +716,23 @@ def _extract_background_sprite(image_bytes: bytes) -> Dict[str, Any]:
     import base64
 
     img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-    logger.info("[extract-bg] Original: %dx%d", img.width, img.height)
+    logger.info("[extract-bg] Original: %dx%d -> art grid %dx%d",
+                img.width, img.height, ART_W, ART_H)
 
-    # Step 1: Downscale to 280×180 (keeps pixelated look from generation)
-    img = img.resize((280, 180), Image.NEAREST)
-    # Step 2: Upscale to 560×360 via nearest-neighbor (each pixel → 2×2 block)
-    img = img.resize((560, 360), Image.NEAREST)
+    img = img.resize((ART_W, ART_H), Image.LANCZOS)
 
-    # Re-encode as PNG
     out = io.BytesIO()
     img.save(out, format="PNG")
     png_bytes = out.getvalue()
 
     b64 = base64.b64encode(png_bytes).decode("ascii")
-    logger.info("[extract-bg] image_background: 560x360, %d bytes PNG, %d chars base64",
-                len(png_bytes), len(b64))
+    logger.info("[extract-bg] image_background: %dx%d, %d bytes PNG, %d chars base64",
+                ART_W, ART_H, len(png_bytes), len(b64))
 
     return {
         "format": "image_background",
-        "x": 0,
-        "y": 0,
-        "width": 560,
-        "height": 360,
+        "width": ART_W,
+        "height": ART_H,
         "image_base64": b64,
     }
 
@@ -736,11 +848,11 @@ async def _generate_mask_for_entity(
     try:
         response = await asyncio.wait_for(
             client.aio.models.generate_content(
-                model=MODEL_ID,
+                model=MASK_MODEL_ID,
                 contents=contents,
                 config=types.GenerateContentConfig(
                     system_instruction=system_text,
-                    thinking_config=types.ThinkingConfig(thinking_budget=256),
+                    thinking_config=types.ThinkingConfig(thinking_budget=0),
                     temperature=0.3,
                     response_mime_type="application/json",
                 ),
@@ -788,6 +900,12 @@ async def _generate_mask_for_entity(
         unique_ids = set(m for m in mask if m is not None)
         logger.info("[mask] %s: %d masked pixels, %d unique sub-entity IDs",
                     entity_id, visible_mask, len(unique_ids))
+
+        # Log each unique sub-entity ID with pixel count
+        from collections import Counter
+        id_counts = Counter(m for m in mask if m is not None)
+        for sub_id, count in sorted(id_counts.items()):
+            logger.info("[mask]   %-40s %5d px", sub_id, count)
 
         return mask
 
@@ -885,7 +1003,7 @@ async def _generate_masks_parallel(
     try:
         results = await asyncio.wait_for(
             asyncio.gather(*tasks, return_exceptions=True),
-            timeout=MASK_TIMEOUT + 5,  # small buffer over individual timeouts
+            timeout=MASK_TIMEOUT + 30,  # buffer for semaphore queuing
         )
     except asyncio.TimeoutError:
         logger.warning("[masks] Global mask generation timed out, using fallback masks")
@@ -909,15 +1027,15 @@ async def _generate_masks_parallel(
 
 
 def _downscale_to_canvas(image_bytes: bytes, target_w: int = 280, target_h: int = 180) -> bytes:
-    """Downscale an image to exact canvas dimensions using nearest-neighbor.
+    """Downscale an image to exact canvas dimensions using LANCZOS.
 
-    Nearest-neighbor preserves the blocky pixel-art aesthetic.
+    LANCZOS produces smooth results from HD source images.
     Returns PNG bytes.
     """
     img = Image.open(io.BytesIO(image_bytes))
     logger.info("[downscale] Original image: %dx%d → target %dx%d",
                 img.width, img.height, target_w, target_h)
-    img = img.resize((target_w, target_h), Image.NEAREST)
+    img = img.resize((target_w, target_h), Image.LANCZOS)
     out = io.BytesIO()
     img.save(out, format="PNG")
     return out.getvalue()
@@ -930,7 +1048,7 @@ async def _generate_background_image(
     """Step 2a: Generate a background-only illustration.
 
     Generates at 16:9 aspect ratio then downscales to 280×180
-    (canvas size) using nearest-neighbor for pixel-art aesthetic.
+    (canvas size) using LANCZOS for smooth results.
     Retries up to IMAGE_MAX_RETRIES times on failure or timeout.
 
     Returns:
@@ -964,8 +1082,9 @@ async def _generate_background_image(
                            attempt, IMAGE_MAX_RETRIES)
 
         except Exception as exc:
-            logger.warning("[bg-image] Attempt %d/%d failed: %s",
-                           attempt, IMAGE_MAX_RETRIES, exc)
+            logger.warning("[bg-image] Attempt %d/%d failed (%s): %s",
+                           attempt, IMAGE_MAX_RETRIES,
+                           type(exc).__name__, exc or "no details")
 
     logger.warning("[bg-image] All %d attempts exhausted", IMAGE_MAX_RETRIES)
     return None
@@ -975,22 +1094,54 @@ async def _generate_background_image(
 # Step 4: Assembly — combine background + entity sprites + masks
 # ---------------------------------------------------------------------------
 
-def _compute_entity_positions(manifest_data: Dict[str, Any]) -> Dict[str, Dict[str, int]]:
-    """Extract top-left positions and sizes for all entities in a manifest.
+def _compute_entity_positions(
+    manifest_data: Dict[str, Any],
+    entity_sprites: Optional[Dict[str, Dict[str, Any]]] = None,
+) -> Dict[str, Dict[str, int]]:
+    """Compute top-left positions and sizes in art-grid coordinates.
+
+    Manifest positions are in source coordinates (0–1119, 0–719).
+    This function converts them to art-grid coordinates (0–ART_W-1, 0–ART_H-1).
+
+    When ``entity_sprites`` is provided, uses actual sprite dimensions
+    (already in art-grid pixels) for centering.
 
     Returns:
-        Dict mapping entity_id -> {"x": int, "y": int, "w": int, "h": int}.
+        Dict mapping entity_id -> {"x": int, "y": int, "w": int, "h": int}
+        in art-grid coordinates.
     """
     positions = {}
     for ent in manifest_data.get("manifest", {}).get("entities", []):
         eid = ent["id"]
         pos = ent.get("position", {})
-        w = ent.get("width_hint", 50)
-        h = ent.get("height_hint", 60)
-        # Position is center; compute top-left
+
+        # Sprite dimensions (already in art-grid coords)
+        if entity_sprites and eid in entity_sprites:
+            w = entity_sprites[eid]["w"]
+            h = entity_sprites[eid]["h"]
+        else:
+            w = max(1, ent.get("width_hint", 50) // K)
+            h = max(1, ent.get("height_hint", 60) // K)
+
+        # Convert source center to art-grid center, then to top-left
+        art_cx = pos.get("x", 0) // K
+        art_cy = pos.get("y", 0) // K
+        x = art_cx - w // 2
+        y = art_cy - h // 2
+
+        # Clamp to art grid
+        if w > ART_W or h > ART_H:
+            logger.warning(
+                "[positions] Entity %s sprite (%dx%d) exceeds art grid (%dx%d); "
+                "it will be partially clipped",
+                eid, w, h, ART_W, ART_H,
+            )
+        x = max(0, min(x, ART_W - w))
+        y = max(0, min(y, ART_H - h))
+
         positions[eid] = {
-            "x": pos.get("x", 0) - w // 2,
-            "y": pos.get("y", 0) - h // 2,
+            "x": x,
+            "y": y,
             "w": w,
             "h": h,
         }
@@ -1005,9 +1156,11 @@ def _assemble_sprite_code(
 ) -> Dict[str, Any]:
     """Assemble the final sprite_code dict from all pipeline outputs.
 
+    All positions and dimensions are in art-grid coordinates.
+
     Returns:
         Dict mapping entity_id -> sprite data:
-        - "bg" -> image_background dict (or legacy palette_grid)
+        - "bg" -> image_background dict
         - entity_id -> raw_sprite dict
     """
     sprite_code: Dict[str, Any] = {}
@@ -1052,15 +1205,18 @@ async def _generate_scene_legacy(
     user_prompt: str,
 ) -> Dict[str, Any]:
     """Legacy all-in-one generation: manifest + NEG + sprite code in one call."""
-    response = await client.aio.models.generate_content(
-        model=MODEL_ID,
-        contents=user_prompt,
-        config=types.GenerateContentConfig(
-            system_instruction=SCENE_SYSTEM_PROMPT,
-            thinking_config=types.ThinkingConfig(thinking_budget=1024),
-            temperature=0.9,
-            response_mime_type="application/json",
+    response = await asyncio.wait_for(
+        client.aio.models.generate_content(
+            model=MODEL_ID,
+            contents=user_prompt,
+            config=types.GenerateContentConfig(
+                system_instruction=SCENE_SYSTEM_PROMPT,
+                thinking_config=types.ThinkingConfig(thinking_budget=1024),
+                temperature=0.9,
+                response_mime_type="application/json",
+            ),
         ),
+        timeout=MANIFEST_TIMEOUT,
     )
     data = _extract_json(_get_response_text(response))
     return _validate_scene_response(data)
@@ -1217,6 +1373,79 @@ async def generate_masks_for_scene(
     return scene
 
 
+async def generate_features_for_scene(
+    api_key: str,
+    scene: Dict[str, Any],
+) -> Dict[str, Any]:
+    """Extract visual features for a scene that was created with the image pipeline.
+
+    Calls Gemini 3.1 Pro on each entity's sprite image to extract structured
+    properties (colors, texture, material, hardness, etc.).
+    Updates scene dict in-place with a 'features' key.
+
+    Args:
+        api_key: Gemini API key.
+        scene: Scene dict with sprite_code containing raw_sprite entries.
+
+    Returns:
+        The updated scene dict (also modified in-place).
+    """
+    from src.generation.feature_scanner import _scan_element
+
+    sprite_code = scene.get("sprite_code", {})
+    if not sprite_code:
+        return scene
+
+    client = genai.Client(api_key=api_key)
+
+    # Build entity type lookup from manifest
+    entity_types: Dict[str, str] = {}
+    for ent in scene.get("manifest", {}).get("entities", []):
+        entity_types[ent["id"]] = ent.get("type", "entity")
+
+    # Collect entities to scan
+    tasks = []
+    entity_ids = []
+
+    for eid, entry in sprite_code.items():
+        if eid == "bg":
+            continue
+        if not isinstance(entry, dict) or entry.get("format") != "raw_sprite":
+            continue
+        # Convert sprite pixels to PNG for the feature scanner
+        sprite = {"w": entry["w"], "h": entry["h"], "pixels": entry["pixels"]}
+        image_bytes = _sprite_to_png(sprite)
+        entity_ids.append(eid)
+        tasks.append(
+            _scan_element(
+                client=client,
+                element_id=eid,
+                element_type=entity_types.get(eid, "entity"),
+                image_bytes=image_bytes,
+            )
+        )
+
+    if not tasks:
+        return scene
+
+    logger.info("[generate-features] Scanning features for %d entities...",
+                len(tasks))
+
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+
+    features: Dict[str, Any] = {}
+    for eid, result in zip(entity_ids, results):
+        if isinstance(result, Exception):
+            logger.warning("[generate-features] %s: failed: %s", eid, result)
+        else:
+            features[eid] = result.model_dump()
+            logger.info("[generate-features] %s: %d global props, %d parts",
+                        eid, len(result.global_properties), len(result.parts))
+
+    scene["features"] = features
+    return scene
+
+
 async def _pipeline_with_reference_image(
     client: Any,
     user_prompt: str,
@@ -1322,10 +1551,13 @@ async def _pipeline_with_reference_image(
 
         for eid, img_bytes in entity_images.items():
             size = entity_sizes.get(eid, {"w": 50, "h": 60})
-            logger.info("[pipeline] Extracting sprite for %s (%dx%d)...",
-                        eid, size["w"], size["h"])
+            # Target dimensions in art-grid coordinates
+            art_w = max(1, size["w"] // K)
+            art_h = max(1, size["h"] // K)
+            logger.info("[pipeline] Extracting sprite for %s (source %dx%d -> art %dx%d)...",
+                        eid, size["w"], size["h"], art_w, art_h)
             entity_sprites[eid] = _extract_entity_sprite(
-                img_bytes, size["w"], size["h"]
+                img_bytes, art_w, art_h
             )
 
         # ── Step 3: Mask generation ────────────────────────────────────────
@@ -1348,7 +1580,7 @@ async def _pipeline_with_reference_image(
 
         # ── Step 4: Assembly ───────────────────────────────────────────────
         logger.info("[pipeline] Step 4: Assembling sprite_code...")
-        entity_positions = _compute_entity_positions(manifest_data)
+        entity_positions = _compute_entity_positions(manifest_data, entity_sprites)
         sprite_code = _assemble_sprite_code(
             bg_sprite, entity_sprites, entity_masks, entity_positions
         )
@@ -1401,7 +1633,7 @@ async def _pipeline_with_reference_image(
         return result
 
     except Exception as exc:
-        logger.warning(
-            "Reference image pipeline failed, falling back to legacy: %s", exc
+        logger.error(
+            "Reference image pipeline failed: %s", exc
         )
-        return await _generate_scene_legacy(client, user_prompt)
+        raise

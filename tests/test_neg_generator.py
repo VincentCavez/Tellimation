@@ -55,13 +55,6 @@ FAKE_NEG_RESPONSE = {
                         "tolerance": 0.6,
                     },
                 ],
-                "error_exclusions": [
-                    {
-                        "entity_id": "rock_01",
-                        "excluded": ["QUANTITY", "ACTION", "MANNER"],
-                        "reason": "unique static object",
-                    }
-                ],
                 "min_coverage": 0.7,
                 "skill_coverage_check": "PASS",
             },
@@ -82,7 +75,7 @@ FAKE_NEG_RESPONSE = {
                         "tolerance": 0.4,
                     }
                 ],
-                "error_exclusions": [],
+
                 "min_coverage": 0.7,
                 "skill_coverage_check": "PASS",
             },
@@ -118,7 +111,7 @@ FAKE_UPDATE_RESPONSE = {
                         "tolerance": 0.2,
                     },
                 ],
-                "error_exclusions": [],
+
                 "min_coverage": 0.8,  # increased from 0.7
                 "skill_coverage_check": "PASS",
             },
@@ -215,13 +208,6 @@ class TestValidateNegResponse:
         assert neg.targets[0].id == "t1_identity"
         assert neg.targets[0].entity_id == "fox_01"
         assert neg.targets[0].priority == 0.9
-
-    def test_scene_01_has_error_exclusions(self):
-        result = _validate_neg_response(FAKE_NEG_RESPONSE)
-        neg = result["scene_01"]
-        assert len(neg.error_exclusions) == 1
-        assert neg.error_exclusions[0].entity_id == "rock_01"
-        assert "QUANTITY" in neg.error_exclusions[0].excluded
 
     def test_missing_scene_id_logged(self):
         data = {"scenes": [{"neg": {"targets": []}}]}
@@ -534,11 +520,6 @@ class TestNegPrompts:
         assert "PROPERTY_COLOR" in NEG_SHORT_SYSTEM_PROMPT
         assert "QUANTITY" in NEG_SHORT_SYSTEM_PROMPT
         assert "IDENTITY" in NEG_SHORT_SYSTEM_PROMPT
-
-    def test_system_prompt_has_error_exclusion_rules(self):
-        assert "exclude QUANTITY" in NEG_SHORT_SYSTEM_PROMPT
-        assert "exclude PROPERTY_COLOR" in NEG_SHORT_SYSTEM_PROMPT
-        assert "exclude MANNER" in NEG_SHORT_SYSTEM_PROMPT
 
     def test_system_prompt_has_skill_coverage(self):
         assert "skill_coverage_check" in NEG_SHORT_SYSTEM_PROMPT

@@ -5,7 +5,6 @@ import pytest
 from src.models.scene import Action, Entity, Position, Relation, SceneManifest
 from src.models.neg import (
     NEG,
-    ErrorExclusion,
     NarrativeTarget,
     TargetComponents,
 )
@@ -111,13 +110,6 @@ class TestNEG:
                     tolerance=0.3,
                 ),
             ],
-            error_exclusions=[
-                ErrorExclusion(
-                    entity_id="cat_01",
-                    excluded=["QUANTITY"],
-                    reason="unique in scene",
-                ),
-            ],
             min_coverage=0.7,
             skill_coverage_check="PASS",
         )
@@ -147,20 +139,6 @@ class TestNEG:
         cat_targets = neg.get_targets_for_entity("cat_01")
         assert len(cat_targets) == 2
         assert all(t.entity_id == "cat_01" for t in cat_targets)
-
-    def test_is_error_excluded(self):
-        neg = NEG(
-            error_exclusions=[
-                ErrorExclusion(
-                    entity_id="tree_01",
-                    excluded=["QUANTITY", "ACTION"],
-                    reason="static background",
-                ),
-            ],
-        )
-        assert neg.is_error_excluded("tree_01", "QUANTITY") is True
-        assert neg.is_error_excluded("tree_01", "PROPERTY_COLOR") is False
-        assert neg.is_error_excluded("cat_01", "QUANTITY") is False
 
 
 # ---------------------------------------------------------------------------

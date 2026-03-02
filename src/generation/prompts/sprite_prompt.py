@@ -1,38 +1,40 @@
 """Prompts for the image-based sprite generation pipeline.
 
 This module provides prompt templates for:
-  - ENTITY_IMAGE_PROMPT: Gemini 2.5 Flash Image — generate one entity on red chroma key
-  - BACKGROUND_IMAGE_PROMPT: Gemini 2.5 Flash Image — generate full 560x360 background
+  - ENTITY_IMAGE_PROMPT: Gemini 3 Pro Image — generate one entity on red chroma key
+  - BACKGROUND_IMAGE_PROMPT: Gemini 3 Pro Image — generate full scene background
   - MASK_SYSTEM_PROMPT / MASK_USER_PROMPT: Gemini 3 Flash — assign sub-entity IDs to pixels
 """
 
 # ---------------------------------------------------------------------------
-# Entity image generation (Gemini 2.5 Flash Image, one per entity)
+# Entity image generation (Gemini 3 Pro Image, one per entity)
 # ---------------------------------------------------------------------------
 
 ENTITY_IMAGE_PROMPT = """\
-Create a single pixel art sprite of the following character/object on a \
+Create an illustration of the following character/object on a \
 SOLID BRIGHT RED (#FF0000) background. The red must be perfectly uniform \
-— no gradients, no shading, no variation. Pure #FF0000 everywhere except the sprite.
+— no gradients, no shading, no variation. Pure #FF0000 everywhere except the subject.
 
 ## Subject
 {entity_description}
 
 ## Style Guidelines
-- **Classic pixel art style**: chunky, blocky sprite with visible individual pixels. \
-  Think SNES / GBA / Stardew Valley / Celeste sprites.
-- **Rich color palette**: use 8-15 distinct colors with smooth shading — dark \
-  shadows on edges, mid-tones in the middle, bright highlights.
+- **Clean children's illustration style**: smooth shapes, clear outlines, rich colors. \
+  Warm, friendly, suitable for ages 7-11.
+- **Rich color palette**: smooth shading with dark shadows on edges, mid-tones in \
+  the middle, bright highlights. No flat/blocky fills.
 - **Detailed**: clearly distinct body parts (head, body, limbs, tail, ears, eyes). \
   Eyes should have at least 2 colors (pupil + shine).
-- **Side view** (like a 2D platformer): flat side profile, no 3D perspective.
-- **The sprite should fill most of the image** — center it, leave only a small \
+- **Side view** (like a 2D storybook): flat side profile, no 3D perspective.
+- **The subject should fill most of the image** — center it, leave only a small \
   margin of red around it.
 - **NO other elements**: no ground, no shadow, no text, no decorations. \
-  ONLY the sprite on solid red.
+  ONLY the subject on solid red.
 
 ## ISOLATION — This sprite is generated COMPLETELY ALONE
 - Generate ONLY the described entity. Nothing else exists in this image.
+- Generate EXACTLY ONE instance of this character/object. Never draw duplicates, \
+  mirrors, reflections, shadows, or multiple copies. The image must contain a SINGLE entity.
 - Do NOT draw any environmental context: no ground, no trees, no rocks, no bark, \
   no branches, no roots, no walls, no surfaces, no other objects.
 - If the description mentions a pose "against" or "on" something, IGNORE the surface — \
@@ -48,20 +50,24 @@ SOLID BRIGHT RED (#FF0000) background. The red must be perfectly uniform \
 """
 
 # ---------------------------------------------------------------------------
-# Background image generation (Gemini 2.5 Flash Image, 560x360 scene)
+# Background image generation (Gemini 3 Pro Image, scene background)
 # ---------------------------------------------------------------------------
 
 BACKGROUND_IMAGE_PROMPT = """\
-Create a pixel art background scene illustration. This is ONLY the background — \
+Create a background scene illustration. This is ONLY the background — \
 no characters, no objects, no entities. Just the environment.
 
 ## Scene
 {scene_description}
 
 ## Style Guidelines
-- **Classic pixel art style**: chunky, blocky pixels, SNES / GBA era aesthetic.
-- **Flat side-view** (like a 2D platformer): no perspective, no 3/4 angle.
-- **Ground line at ~60% from top**. Sky above, ground below.
+- **Clean children's illustration style**: smooth gradients, clear shapes, \
+  warm and friendly. Suitable for ages 7-11.
+- **Flat side-view** (like a 2D storybook): no perspective, no 3/4 angle.
+- **Horizon at roughly the middle** of the image. The sky and ground should \
+  BOTH contain visual detail — the sky should have clouds, color gradients, or \
+  atmospheric elements, NOT be a flat solid color. The ground should have texture \
+  and depth. Fill the ENTIRE image with illustrated content.
 - **Rich atmospheric gradients**: sky should have color variation (lighter at \
   horizon, darker above). Ground should have texture (grass, sand, stone, etc.).
 - **Atmospheric details**: clouds, stars, sun glow, distant mountains, etc.

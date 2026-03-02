@@ -1,14 +1,14 @@
 """Real-time narration loop orchestrator.
 
-Orchestrates: audio → transcription → dispatch → animation generation → WebSocket.
+Orchestrates: audio -> transcription -> dispatch -> animation generation -> WebSocket.
+Voice is serialized (one at a time) via an asyncio lock.
 """
 
 from __future__ import annotations
 
-import json
+import asyncio
 import logging
-import time
-from typing import Any, Dict, List, Optional, Protocol
+from typing import Any, Dict, List, Optional, Protocol, Tuple
 
 from src.models.animation_cache import AnimationCache, CachedAnimation
 from src.models.neg import NEG
@@ -16,18 +16,20 @@ from src.models.scene import SceneManifest
 from src.models.story_state import StoryState
 from src.models.student_profile import Discrepancy, StudentProfile
 from src.generation.animation_generator import generate_animation
-from src.narration.dispatcher import AnimationCommand, dispatch, dispatch_hesitation
+from src.narration.dispatcher import AnimationCommand, dispatch
 from src.narration.transcription import TranscriptionResult, transcribe_and_detect
 
 logger = logging.getLogger(__name__)
 
-HESITATION_TIMEOUT_S = 10
+MAX_ANIMATIONS_PER_ERROR = 3
 
 
 class WebSocketLike(Protocol):
     """Minimal protocol for the WebSocket connection."""
 
     async def send_json(self, data: Dict[str, Any]) -> None: ...
+
+    async def send_bytes(self, data: bytes) -> None: ...
 
 
 class NarrationLoop:
@@ -36,8 +38,7 @@ class NarrationLoop:
     Lifecycle:
         1. Construct with scene data and shared state.
         2. Call ``on_audio_chunk`` for each push-to-talk utterance.
-        3. Call ``on_idle_timeout`` if the child is silent for > 10s.
-        4. Check ``is_scene_complete()`` after each utterance.
+        3. Check ``is_scene_complete()`` after each utterance.
     """
 
     def __init__(
@@ -49,6 +50,7 @@ class NarrationLoop:
         student_profile: StudentProfile,
         animation_cache: AnimationCache,
         websocket: WebSocketLike,
+        narrative_text: str = "",
     ) -> None:
         self.api_key = api_key
         self.scene_manifest = scene_manifest
@@ -57,12 +59,18 @@ class NarrationLoop:
         self.student_profile = student_profile
         self.animation_cache = animation_cache
         self.ws = websocket
+        self.narrative_text = narrative_text
 
         # Mutable state
         self.narration_history: List[str] = []
         self.satisfied_targets: List[str] = []
         self.scene_progress: float = 0.0
-        self.last_audio_time: float = time.monotonic()
+
+        # Per-error animation counter: (entity_id, error_type) -> count
+        self._error_animation_counts: Dict[Tuple[str, str], int] = {}
+
+        # Voice serialization lock — one voice at a time
+        self._voice_lock = asyncio.Lock()
 
         # Session log for post-session analytics
         self._session_log: List[Dict[str, Any]] = []
@@ -75,18 +83,16 @@ class NarrationLoop:
         """Process one push-to-talk utterance.
 
         1. Transcribe + detect discrepancies via Gemini.
-        2. Update student_profile with errors.
-        3. Update satisfied_targets and scene_progress.
-        4. Dispatch top discrepancies to animation system.
-        5. Generate missing animations on-the-fly.
-        6. Send animations to client via WebSocket.
+        2. Send transcription to client immediately.
+        3. Update student_profile with errors.
+        4. Update satisfied_targets and scene_progress.
+        5. Dispatch animations (max 3 per error).
+        6. Beyond 3rd animation -> verbal correction.
         7. Send scene_complete if threshold reached.
 
         Returns:
             The TranscriptionResult from the LLM.
         """
-        self.last_audio_time = time.monotonic()
-
         # 1. Transcribe + detect
         result = await transcribe_and_detect(
             api_key=self.api_key,
@@ -94,24 +100,32 @@ class NarrationLoop:
             neg=self.neg,
             narration_history=self.narration_history,
             student_profile=self.student_profile,
+            narrative_text=self.narrative_text,
         )
 
-        # 2. Update student_profile
+        # 2. Send transcription to client IMMEDIATELY (before animations)
+        await self.ws.send_json({
+            "type": "transcription",
+            "transcription": result.transcription,
+            "scene_progress": max(self.scene_progress, result.scene_progress),
+        })
+
+        # 3. Update student_profile
         self.student_profile.record_errors(result.discrepancies)
 
-        # 3. Update narration state
+        # 4. Update narration state
         prev_satisfied = set(self.satisfied_targets)
         self.narration_history = result.updated_history
         self._merge_satisfied_targets(result.satisfied_targets)
         self.scene_progress = max(self.scene_progress, result.scene_progress)
 
-        # 3b. Track corrections — newly satisfied targets may indicate
+        # 4b. Track corrections — newly satisfied targets may indicate
         #     the child corrected after a previous animation
         newly_satisfied = set(self.satisfied_targets) - prev_satisfied
         if newly_satisfied:
             self._record_corrections_for_targets(newly_satisfied)
 
-        # 4. Dispatch
+        # 5. Dispatch animations (with per-error limit)
         entity_bounds = self._compute_entity_bounds()
         scene_ctx = self.scene_manifest.model_dump()
         commands = dispatch(
@@ -121,8 +135,17 @@ class NarrationLoop:
             scene_ctx,
         )
 
-        # 5 & 6. Generate missing animations + send all to client
+        errors_needing_correction: List[AnimationCommand] = []
+
         for cmd in commands:
+            key = (cmd.entity_id, cmd.error_type)
+            count = self._error_animation_counts.get(key, 0)
+
+            if count >= MAX_ANIMATIONS_PER_ERROR:
+                # Already at limit -> queue verbal correction
+                errors_needing_correction.append(cmd)
+                continue
+
             animation = await self._resolve_animation(cmd, entity_bounds, scene_ctx)
             if animation is not None:
                 await self.ws.send_json({
@@ -133,9 +156,32 @@ class NarrationLoop:
                     "sub_entity": cmd.sub_entity,
                     "error_type": cmd.error_type,
                 })
-                # Record animation played for effectiveness tracking
+                self._error_animation_counts[key] = count + 1
                 self.student_profile.record_animation(
                     cmd.entity_id, cmd.error_type, animation.generated_for
+                )
+
+        # 6. Verbal corrections for errors past 3 animations
+        for cmd in errors_needing_correction:
+            try:
+                from src.narration.voice_guidance import generate_correction_text
+
+                correction_text = await generate_correction_text(
+                    api_key=self.api_key,
+                    entity_id=cmd.entity_id,
+                    error_type=cmd.error_type,
+                    discrepancy_details=cmd.discrepancy_details or "",
+                    scene_manifest=scene_ctx,
+                    narrative_text=self.narrative_text,
+                )
+                if correction_text:
+                    if self._has_unsatisfied_targets():
+                        correction_text += " What else happens in this scene?"
+                    await self._send_voice_safe(correction_text, "correction")
+            except Exception:
+                logger.exception(
+                    "Failed to generate correction for %s/%s",
+                    cmd.entity_id, cmd.error_type,
                 )
 
         # 7. Scene complete?
@@ -150,46 +196,10 @@ class NarrationLoop:
             "scene_progress": self.scene_progress,
             "satisfied_targets": list(self.satisfied_targets),
             "animations_dispatched": len(commands),
-            "animations_cached": sum(1 for c in commands if c.cached),
-            "animations_generated": sum(1 for c in commands if not c.cached),
+            "animations_limited": len(errors_needing_correction),
         })
 
         return result
-
-    async def on_idle_timeout(self) -> Optional[AnimationCommand]:
-        """Handle hesitation event (child silent > 10s).
-
-        Dispatches an OMISSION animation for the highest-priority
-        unsatisfied target.
-
-        Returns:
-            The AnimationCommand sent, or None if all targets are satisfied.
-        """
-        cmd = dispatch_hesitation(self.neg, self.satisfied_targets)
-        if cmd is None:
-            return None
-
-        entity_bounds = self._compute_entity_bounds()
-        scene_ctx = self.scene_manifest.model_dump()
-        animation = await self._resolve_animation(cmd, entity_bounds, scene_ctx)
-
-        if animation is not None:
-            await self.ws.send_json({
-                "type": "animation",
-                "code": animation.code,
-                "duration_ms": animation.duration_ms,
-                "entity_id": cmd.entity_id,
-                "sub_entity": cmd.sub_entity,
-                "error_type": cmd.error_type,
-            })
-
-        self._session_log.append({
-            "event": "hesitation",
-            "target_entity": cmd.entity_id,
-            "animation_sent": animation is not None,
-        })
-
-        return cmd
 
     def is_scene_complete(self) -> bool:
         """Whether the child has narrated enough (progress >= min_coverage)."""
@@ -200,9 +210,47 @@ class NarrationLoop:
         """Return the session log for post-session analytics."""
         return list(self._session_log)
 
-    def seconds_since_last_audio(self) -> float:
-        """Seconds elapsed since the last audio chunk was received."""
-        return time.monotonic() - self.last_audio_time
+    # ------------------------------------------------------------------
+    # Voice guidance (serialized)
+    # ------------------------------------------------------------------
+
+    async def _send_voice_safe(self, text: str, purpose: str) -> None:
+        """Send TTS with serialization -- one voice at a time."""
+        async with self._voice_lock:
+            await self._send_voice(text, purpose)
+
+    async def _send_voice(self, text: str, purpose: str) -> None:
+        """Generate TTS audio for *text* and send to the client.
+
+        Sends a JSON header (``voice_audio``) followed by raw PCM bytes.
+
+        Args:
+            text: The text to speak.
+            purpose: One of ``"intro"``, ``"correction"``,
+                ``"branch_summary"``.
+        """
+        try:
+            from src.narration.voice_guidance import text_to_speech
+
+            tts_prompt = f"Say warmly and encouragingly: {text}"
+            audio_bytes = await text_to_speech(self.api_key, tts_prompt)
+
+            await self.ws.send_json({
+                "type": "voice_audio",
+                "purpose": purpose,
+                "text": text,
+                "sample_rate": 24000,
+                "sample_width": 2,
+                "channels": 1,
+            })
+            await self.ws.send_bytes(audio_bytes)
+        except Exception:
+            logger.exception("Failed to send voice (%s): %s", purpose, text[:80])
+
+    def _has_unsatisfied_targets(self) -> bool:
+        """Check if there are NEG targets not yet satisfied."""
+        satisfied = set(self.satisfied_targets)
+        return any(t.id not in satisfied for t in self.neg.targets)
 
     # ------------------------------------------------------------------
     # Internals
@@ -242,19 +290,23 @@ class NarrationLoop:
                 existing.add(t)
 
     def _compute_entity_bounds(self) -> Dict[str, Dict[str, int]]:
-        """Compute bounding boxes from the manifest positions.
+        """Compute bounding boxes in art-grid coordinates.
 
-        This is a rough approximation — entities are assumed to be
-        ~40x40 pixels centered on their position.  In production the
-        pixel buffer would provide exact bounds.
+        Manifest positions are in source coordinates (0–1119, 0–719).
+        We convert to art-grid coords (source // K) using width_hint/height_hint.
         """
+        K = 4  # pixel-art aggregation factor (must match engine.js / scene_generator.py)
         bounds: Dict[str, Dict[str, int]] = {}
         for ent in self.scene_manifest.entities:
+            art_cx = ent.position.x // K
+            art_cy = ent.position.y // K
+            art_w = max(1, (ent.width_hint or 50) // K)
+            art_h = max(1, (ent.height_hint or 60) // K)
             bounds[ent.id] = {
-                "x": max(0, ent.position.x - 20),
-                "y": max(0, ent.position.y - 20),
-                "width": 40,
-                "height": 40,
+                "x": max(0, art_cx - art_w // 2),
+                "y": max(0, art_cy - art_h // 2),
+                "width": art_w,
+                "height": art_h,
             }
         return bounds
 

@@ -117,9 +117,9 @@
   <script src="animations.js"></script>
   <script>
     // -- Setup ---------------------------------------------------------------
-    const buf = new PixelBuffer(560, 360);
+    const buf = new PixelBuffer();
     const canvas = document.getElementById('scene');
-    const renderer = new Renderer(canvas, buf, 1.5);
+    const renderer = new Renderer(canvas, buf);
     const runner = new AnimationRunner(buf, renderer);
     const logEl = document.getElementById('log');
     const statusEl = document.getElementById('status');
@@ -141,37 +141,34 @@
       }
     }
 
-    // -- Draw scene ----------------------------------------------------------
+    // -- Draw scene (art-grid coordinates: 280×180) -------------------------
     function drawScene() {
       buf.clear();
-      renderer.drawBackground('forest');
+
+      // Sky + ground background
+      buf.rect(0, 0, PW, PH * 0.6, 135, 206, 235, 'bg');
+      buf.rect(0, PH * 0.6, PW, PH * 0.4, 34, 120, 34, 'bg');
 
       // Cat (entity: cat)
-      // Body
-      buf.ellip(160, 280, 28, 20, 230, 140, 30, 'cat.body');
-      // Head
-      buf.circ(136, 252, 16, 230, 140, 30, 'cat.head');
-      // Ears
-      buf.tri(122, 252, 126, 230, 132, 246, 230, 140, 30, 'cat.head.ears.left');
-      buf.tri(140, 246, 146, 230, 150, 252, 230, 140, 30, 'cat.head.ears.right');
-      // Eyes
-      buf.circ(130, 250, 2, 0, 180, 0, 'cat.head.eyes.left');
-      buf.circ(142, 250, 2, 0, 180, 0, 'cat.head.eyes.right');
-      // Tail
-      buf.arc(192, 264, 20, Math.PI * 0.8, Math.PI * 1.6, 230, 140, 30, 'cat.tail');
-      // Legs
-      buf.rect(144, 296, 6, 12, 200, 120, 20, 'cat.legs.front');
-      buf.rect(172, 296, 6, 12, 200, 120, 20, 'cat.legs.back');
+      buf.ellip(40, 70, 7, 5, 230, 140, 30, 'cat.body');
+      buf.circ(34, 63, 4, 230, 140, 30, 'cat.head');
+      buf.tri(30, 63, 31, 57, 33, 61, 230, 140, 30, 'cat.head.ears.left');
+      buf.tri(35, 61, 36, 57, 37, 63, 230, 140, 30, 'cat.head.ears.right');
+      buf.circ(32, 62, 1, 0, 180, 0, 'cat.head.eyes.left');
+      buf.circ(35, 62, 1, 0, 180, 0, 'cat.head.eyes.right');
+      buf.arc(48, 66, 5, Math.PI * 0.8, Math.PI * 1.6, 230, 140, 30, 'cat.tail');
+      buf.rect(36, 74, 2, 3, 200, 120, 20, 'cat.legs.front');
+      buf.rect(43, 74, 2, 3, 200, 120, 20, 'cat.legs.back');
 
       // Mushroom (entity: mushroom)
-      buf.rect(370, 290, 8, 20, 220, 200, 170, 'mushroom.stem');
-      buf.ellip(374, 284, 20, 12, 200, 30, 30, 'mushroom.cap');
-      buf.circ(366, 280, 2, 255, 255, 255, 'mushroom.cap.spot1');
-      buf.circ(380, 278, 2, 255, 255, 255, 'mushroom.cap.spot2');
+      buf.rect(92, 72, 2, 5, 220, 200, 170, 'mushroom.stem');
+      buf.ellip(93, 71, 5, 3, 200, 30, 30, 'mushroom.cap');
+      buf.circ(91, 70, 1, 255, 255, 255, 'mushroom.cap.spot1');
+      buf.circ(95, 69, 1, 255, 255, 255, 'mushroom.cap.spot2');
 
       // Tree (entity: tree_01)
-      buf.rect(480, 220, 12, 50, 100, 70, 30, 'tree_01.trunk');
-      buf.tri(440, 230, 532, 230, 486, 150, 34, 120, 34, 'tree_01.foliage');
+      buf.rect(120, 55, 3, 12, 100, 70, 30, 'tree_01.trunk');
+      buf.tri(110, 57, 133, 57, 121, 37, 34, 120, 34, 'tree_01.foliage');
 
       renderer.render();
     }
@@ -184,11 +181,11 @@
       // Capture a subset of pixel values for verification
       const checks = [];
       const positions = [
-        { x: 160, y: 280, label: 'cat.body center' },
-        { x: 374, y: 284, label: 'mushroom.cap center' },
-        { x: 486, y: 180, label: 'tree_01.foliage center' },
-        { x: 140, y: 50, label: 'sky' },
-        { x: 140, y: 160, label: 'ground' },
+        { x: 40, y: 70, label: 'cat.body center' },
+        { x: 93, y: 71, label: 'mushroom.cap center' },
+        { x: 121, y: 45, label: 'tree_01.foliage center' },
+        { x: 35, y: 12, label: 'sky' },
+        { x: 35, y: 130, label: 'ground' },
       ];
       for (const pos of positions) {
         const p = buf.getPixel(pos.x, pos.y);

@@ -154,6 +154,10 @@ Return ONLY valid JSON (no markdown fences, no commentary):
 """
 
 TRANSCRIPTION_USER_PROMPT = """\
+# Scene narrative (story context)
+
+{narrative_text}
+
 # Current scene NEG
 
 ```json

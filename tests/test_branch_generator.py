@@ -66,7 +66,6 @@ FAKE_SCENE_BASE = {
                 "tolerance": 0.3,
             }
         ],
-        "error_exclusions": [],
         "min_coverage": 0.7,
         "skill_coverage_check": "PASS",
     },

@@ -20,14 +20,35 @@ system (ages 7-11). Your job is to generate a Narrative Expectation Graph \
 
 # Task
 
-Given a list of scene manifests (entities, positions, relations, actions) and \
-the SKILL objectives for this session, produce a NEG for each scene. The NEG \
-defines:
+Given:
+- Scene manifests (entities, positions, relations, actions)
+- Sub-entity parts from visual masks (e.g. turtle_01.shell, turtle_01.head)
+- The child's student profile (error history, trends, weak areas)
+- SKILL objectives and micro-objectives for this session
+
+Produce a NEG for each scene. The NEG defines:
 - **Targets**: what the child should narrate (identity, descriptors, spatial, \
 action, temporal) and how important each element is.
-- **Error exclusions**: which error types are logically impossible for each \
-entity (based on the manifest).
 - **Coverage threshold**: minimum fraction of targets the child must satisfy.
+
+# Using masks (sub-entity parts)
+
+When masks are provided, they list the identifiable visual parts of each \
+entity (e.g. {"turtle_01": ["turtle_01.body", "turtle_01.head", "turtle_01.shell"]}). \
+Use these sub-entity IDs as `entity_id` in targets when a specific part is \
+the focus. For example, target "turtle_01.shell" for its color, or \
+"cat_01.tail" for its action. This enables targeted animations on the exact \
+visual part the child should describe.
+
+# Using the student profile
+
+Adapt targets based on the child's error history:
+- **High error count + stable/increasing trend**: increase priority, lower \
+tolerance for that error type's targets.
+- **Decreasing trend**: maintain current levels (child is improving).
+- **Difficult entities**: create more granular targets (separate color, size, \
+spatial instead of one combined target).
+- **Strong areas**: keep existing targets but do not over-emphasize.
 
 # Output JSON schema
 
@@ -54,9 +75,6 @@ Return ONLY valid JSON (no markdown fences, no commentary):
             "tolerance": <0.0-1.0>
           }
         ],
-        "error_exclusions": [
-          {"entity_id": "<id>", "excluded": ["<ERROR_TYPE>", ...], "reason": "<why>"}
-        ],
         "min_coverage": 0.7,
         "skill_coverage_check": "PASS"
       }
@@ -74,29 +92,23 @@ PROPERTY_STATE, TEMPORAL, IDENTITY, QUANTITY, ACTION, RELATIONAL, EXISTENCE,
 MANNER, REDUNDANCY, OMISSION
 ```
 
-# Error exclusion rules
-
-For each entity in a scene, exclude impossible error types:
-- Entity is unique in the scene → exclude QUANTITY
-- Entity has no distinctive color property → exclude PROPERTY_COLOR
-- Entity is static (no action in manifest) → exclude MANNER, ACTION
-- Entity has no weight property → exclude PROPERTY_WEIGHT
-- Entity has no temperature property → exclude PROPERTY_TEMPERATURE
-- Entity has no spatial relation → exclude SPATIAL
-- Background/decoration entity → exclude IDENTITY
-
 # SKILL coverage check
 
-For each SKILL objective, verify that at least one target exercises it:
-- **descriptive_adjectives** → targets with descriptors (PROPERTY_COLOR, \
-PROPERTY_SIZE, PROPERTY_WEIGHT, PROPERTY_TEMPERATURE, PROPERTY_STATE)
-- **spatial_prepositions** → targets with spatial component (SPATIAL, RELATIONAL)
-- **temporal_sequences** → targets with temporal component (TEMPORAL)
-- **quantity** → multiple instances of same entity type (QUANTITY)
-- **action_verbs** → targets with action component (ACTION, MANNER)
+For each SKILL objective requested for this session, verify that at least \
+one target exercises it. Use the micro-objectives catalog (provided in the \
+user prompt) to understand what each objective entails at sentence level.
 
-Set `skill_coverage_check` to "PASS" when all objectives are covered. \
-If an objective cannot be covered by the manifest entities, set "PARTIAL".
+Common objective → error type mapping:
+- **descriptive_adjectives** → targets with descriptors (PROPERTY_COLOR, \
+PROPERTY_SIZE, PROPERTY_STATE) — see micro-objectives A3-A7
+- **spatial_prepositions** → targets with spatial component (SPATIAL, \
+RELATIONAL) — see micro-objectives C1-C4
+- **action_verbs** → targets with action component (ACTION, MANNER) — \
+see micro-objectives B1-B3
+
+Set `skill_coverage_check` to "PASS" when all requested objectives are \
+covered. If an objective cannot be covered by the manifest entities, \
+set "PARTIAL".
 
 # Target design guidelines
 
@@ -116,15 +128,32 @@ Generate NEGs for the following scenes.
 
 {plot_json}
 
+# Sub-entity parts (from visual masks)
+
+These are the identifiable visual parts of each entity. Use them as \
+entity_id in targets when a specific part is the focus.
+
+{masks_summary}
+
+# Student profile
+
+{student_profile}
+
 # SKILL objectives for this session
 
 {skill_objectives}
+
+# SKILL micro-objectives (sentence-level structure)
+
+{skill_micro}
 
 # Instructions
 
 - Produce one NEG per scene.
 - Each scene's NEG must reference only entities present in that scene's manifest.
-- Apply the error exclusion rules based on each scene's entities.
+- Use sub-entity IDs from masks as entity_id when targeting a specific part \
+(e.g. "turtle_01.shell" for shell color descriptor).
+- Adapt priorities and tolerances based on the student profile.
 - Ensure every SKILL objective is covered across the targets.
 """
 
@@ -165,7 +194,6 @@ targets (e.g. separate color, size, spatial targets instead of one combined).
 - Preserve existing target IDs and scene_ids.
 - You may adjust `priority` and `tolerance` values.
 - You may add NEW targets (use incrementing IDs: t<N+1>_<component>).
-- You may add or remove entries in `error_exclusions` if justified.
 - Do NOT remove existing targets.
 - Do NOT change entity_ids or component types unless adding new targets.
 - min_coverage can be adjusted (0.5-0.9 range).
@@ -197,7 +225,6 @@ Return ONLY valid JSON (no markdown fences, no commentary):
       "scene_id": "<must match input scene_id>",
       "neg": {
         "targets": [...],
-        "error_exclusions": [...],
         "min_coverage": <float>,
         "skill_coverage_check": "<PASS|PARTIAL>"
       }

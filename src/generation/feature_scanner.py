@@ -147,6 +147,62 @@ def _remove_green_chroma(img: Image.Image, threshold: float = 60.0) -> Image.Ima
 
 
 # ---------------------------------------------------------------------------
+# Detailed logging
+# ---------------------------------------------------------------------------
+
+
+def _log_element_features(elem: ElementFeatures) -> None:
+    """Log detailed breakdown of an element's features to console."""
+    hdr = f"[feature-scan] ── {elem.element_id} "
+    logger.info("%s%s", hdr, "─" * max(0, 60 - len(hdr)))
+
+    # Element-level structured properties
+    for field in (
+        "colors", "texture", "material", "hardness", "weight_appearance",
+        "temperature_appearance", "shape", "size", "shine", "state",
+        "pattern", "posture", "expression",
+    ):
+        val = getattr(elem, field)
+        if val is not None and val != []:
+            logger.info("[feature-scan]   %-22s %s", field + ":", val)
+
+    if elem.extra_properties:
+        logger.info("[feature-scan]   %-22s %s", "extra:", elem.extra_properties)
+
+    if elem.actionable_properties:
+        logger.info(
+            "[feature-scan]   actionable (%d):     %s",
+            len(elem.actionable_properties),
+            elem.actionable_properties,
+        )
+
+    # Sub-parts
+    logger.info(
+        "[feature-scan]   sub-entities: %d parts", len(elem.parts),
+    )
+    for p in elem.parts:
+        props_summary = []
+        for field in (
+            "colors", "texture", "material", "hardness", "weight_appearance",
+            "temperature_appearance", "shape", "size", "shine", "state",
+            "pattern", "contour",
+        ):
+            val = getattr(p, field)
+            if val is not None and val != []:
+                if isinstance(val, list):
+                    props_summary.append(f"{field}={val}")
+                else:
+                    props_summary.append(f"{field}={val}")
+        if p.extra_properties:
+            props_summary.append(f"extra={p.extra_properties}")
+
+        logger.info(
+            "[feature-scan]     [%s] (parent: %s) → %s",
+            p.part, p.parent, ", ".join(props_summary) if props_summary else "(none)",
+        )
+
+
+# ---------------------------------------------------------------------------
 # Single element scan
 # ---------------------------------------------------------------------------
 
@@ -215,6 +271,10 @@ async def _scan_element(
                 len(result.parts),
                 len(result.actionable_properties),
             )
+
+            # Detailed property log for each element
+            _log_element_features(result)
+
             return result
 
         except Exception as exc:
@@ -303,6 +363,20 @@ async def _scan_composition(
                 "[feature-scan] Composition '%s': %d total properties",
                 scene_id, total_props,
             )
+
+            # Detailed composition log
+            logger.info("[feature-scan] ── Composition %s ──────────", scene_id)
+            for rel in result.spatial_relationships:
+                logger.info("[feature-scan]   spatial:     %s", rel)
+            for env in result.environment_properties:
+                logger.info("[feature-scan]   environment: %s", env)
+            for sz in result.relative_sizes:
+                logger.info("[feature-scan]   size:        %s", sz)
+            for d in result.depth_cues:
+                logger.info("[feature-scan]   depth:       %s", d)
+            for lit in result.lighting_and_atmosphere:
+                logger.info("[feature-scan]   lighting:    %s", lit)
+
             return result
 
         except Exception as exc:

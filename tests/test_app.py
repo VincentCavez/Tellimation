@@ -105,7 +105,7 @@ class TestInitNarrationLoop:
                         "priority": 1,
                     }
                 ],
-                "error_exclusions": [],
+                
                 "min_coverage": 0.7,
             },
             "narrative_text": "An orange cat sits.",
@@ -221,7 +221,7 @@ class TestWebSocket:
                 "relations": [],
                 "actions": [],
             },
-            "neg": {"targets": [], "error_exclusions": [], "min_coverage": 0.7},
+            "neg": {"targets": [], "min_coverage": 0.7},
             "sprite_code": {},
             "carried_over_entities": [],
         }
@@ -269,7 +269,7 @@ class TestWebSocket:
                 "relations": [],
                 "actions": [],
             },
-            "neg": {"targets": [], "error_exclusions": [], "min_coverage": 0.7},
+            "neg": {"targets": [], "min_coverage": 0.7},
             "sprite_code": {},
             "carried_over_entities": [],
         }
@@ -301,7 +301,7 @@ class TestWebSocket:
             return {
                 "narrative_text": "",
                 "manifest": {"scene_id": "s1", "entities": [], "relations": [], "actions": []},
-                "neg": {"targets": [], "error_exclusions": [], "min_coverage": 0.7},
+                "neg": {"targets": [], "min_coverage": 0.7},
                 "sprite_code": {},
                 "carried_over_entities": [],
             }

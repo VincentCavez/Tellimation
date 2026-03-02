@@ -20,48 +20,89 @@ to someone who cannot see it.
 Return ONLY valid JSON (no markdown fences, no commentary) with this schema:
 
 ```
-{
+{{
   "element_id": "<the element identifier>",
-  "global_properties": [
-    "<adjective or short descriptor visible at a glance>",
-    ...
-  ],
+  "colors": ["<dominant color>", "<accent color>", ...],
+  "texture": "<texture appearance or null>",
+  "material": "<material appearance or null>",
+  "hardness": "<perceived hardness or null>",
+  "weight_appearance": "<perceived weight or null>",
+  "temperature_appearance": "<perceived temperature or null>",
+  "shape": "<overall shape or null>",
+  "size": "<size impression or null>",
+  "shine": "<surface finish or null>",
+  "state": "<condition/age or null>",
+  "pattern": "<surface pattern or null>",
+  "posture": "<pose/posture or null>",
+  "expression": "<emotional expression or null>",
+  "extra_properties": ["<any property not fitting above categories>", ...],
   "parts": [
-    {
+    {{
       "part": "<identifiable sub-part name>",
       "parent": "<what this part belongs to>",
-      "properties": ["<property1>", "<property2>", ...]
-    },
+      "colors": ["<color1>", ...],
+      "texture": "<texture or null>",
+      "material": "<material or null>",
+      "hardness": "<hardness or null>",
+      "weight_appearance": "<weight or null>",
+      "temperature_appearance": "<temperature or null>",
+      "shape": "<shape or null>",
+      "size": "<size or null>",
+      "shine": "<shine or null>",
+      "state": "<condition or null>",
+      "pattern": "<pattern or null>",
+      "contour": "<edge quality or null>",
+      "extra_properties": ["<other properties>", ...]
+    }},
     ...
   ],
   "actionable_properties": [
     "<brief description of something that could move, change, or be animated>",
     ...
   ]
-}
+}}
 ```
 
-# What to Extract
+# Property Categories — What to Extract
 
-## global_properties
-Overall properties visible at first glance. Include ALL of:
-- **Colors**: dominant color(s), accent colors, color gradients
-- **Size impression**: tiny, small, medium, large, huge
-- **Shape**: round, elongated, blocky, irregular, angular, etc.
-- **Texture appearance**: smooth, furry, scaly, rough, feathery, etc.
-- **Shininess / surface**: matte, glossy, translucent, reflective
-- **Posture / pose** (if character): sitting, standing, crouching, leaping
-- **Emotional expression** (if character): happy, sad, curious, scared
-- **Material appearance**: soft, hard, wooden, metallic, stone, cloth
+For both the element-level and each sub-part, fill in these categories:
+
+- **colors**: ALL visible colors. Be specific: "bright orange", "pale yellow", \
+  "dark brown with white spots". List every color you see, not just the dominant one.
+- **texture**: surface feel — "furry", "smooth", "scaly", "rough", "feathery", \
+  "bumpy", "wrinkled", "silky", "woolly", "bristly"
+- **material**: what it appears made of — "wooden", "metallic", "stone", "fabric", \
+  "leather", "glass", "ceramic", "plastic", "organic"
+- **hardness**: perceived rigidity — "hard", "soft", "squishy", "rigid", "flexible", \
+  "brittle", "rubbery", "firm"
+- **weight_appearance**: how heavy it looks — "heavy-looking", "light", "dense", \
+  "delicate", "massive", "weightless", "sturdy"
+- **temperature_appearance**: perceived temperature — "warm", "cold", "icy", \
+  "steaming", "frost-covered", "sun-warmed", "cool"
+- **shape**: overall form — "round", "angular", "elongated", "blocky", "irregular", \
+  "organic", "geometric", "curved", "pointed"
+- **size**: relative impression — "tiny", "small", "medium", "large", "huge", \
+  "miniature", "oversized"
+- **shine**: surface light response — "matte", "glossy", "reflective", \
+  "translucent", "shimmering", "dull", "sparkling"
+- **state**: condition / age — "brand-new", "weathered", "worn", "pristine", \
+  "cracked", "chipped", "faded", "polished"
+- **pattern**: surface pattern — "striped", "spotted", "solid", "gradient", \
+  "checkered", "speckled", "marbled"
+- **contour** (parts only): edge quality — "smooth edges", "jagged", \
+  "fuzzy outline", "sharp edges", "rounded", "irregular border"
+- **posture** (element-level only, if character): "sitting", "standing", \
+  "crouching", "leaping", "lying down", "flying"
+- **expression** (element-level only, if character): "happy", "sad", "curious", \
+  "scared", "angry", "surprised", "neutral"
+- **extra_properties**: anything that doesn't fit the above — markings, \
+  accessories, distinctive features, special effects
 
 ## parts
-Break the element into its identifiable sub-parts. For each part, list:
-- `part`: name (e.g., "eyes", "tail", "hat brim", "trunk", "leaves")
-- `parent`: what it attaches to (e.g., "head", "body", "hat", "tree")
-- `properties`: every visible property of that specific part
+Break the element into its identifiable sub-parts:
 
 For characters, always try to identify:
-- head, eyes, ears, nose, mouth, body, limbs/legs, tail (if any)
+- head, eyes, ears, nose, mouth, body, belly, limbs/legs, tail (if any)
 - accessories: hat, scarf, collar, etc.
 - markings: stripes, spots, patches
 
@@ -84,18 +125,18 @@ Be generous — list every possible animation, even subtle ones.
 - Be exhaustive: a child might describe ANY visible detail.
 - Prefer concrete, specific adjectives over vague ones \
   ("bright orange" not just "colorful").
-- Include properties that convey weight, temperature, or age by appearance \
-  ("heavy-looking", "weathered", "brand-new", "frost-covered").
-- Each property should be 1-4 words maximum.
+- Set a field to null if the property is not visible or not applicable.
+- Each property value should be 1-4 words maximum.
+- colors is always a list (even if only one color).
 """
 
 ELEMENT_SCAN_USER_PROMPT = """\
 Analyze this image of element "{element_id}" (type: {element_type}).
 
-Extract ALL visually perceptible properties: colors, texture, shape, \
-expression, posture, material appearance, and every identifiable sub-part \
-with its properties. Also list all actionable properties (things that \
-could move or be animated).
+For the element and each sub-part, fill in ALL property categories: \
+colors, texture, material, hardness, weight_appearance, \
+temperature_appearance, shape, size, shine, state, pattern, contour. \
+Set to null if not applicable. Also list all actionable properties.
 
 Return the result as JSON.
 """

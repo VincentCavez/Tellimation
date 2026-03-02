@@ -14,6 +14,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import os
 from typing import Any, Dict, List, Optional
 
 from google import genai
@@ -34,10 +35,21 @@ from src.generation.utils import (
 
 logger = logging.getLogger(__name__)
 
+_CONFIG_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "config")
+
+
+def _load_skill_micro() -> str:
+    """Load skill_micro.txt from config/."""
+    micro_path = os.path.join(_CONFIG_DIR, "skill_micro.txt")
+    if os.path.exists(micro_path):
+        with open(micro_path) as f:
+            return f.read()
+    return ""
+
 NEG_MODEL_ID = "gemini-3.1-pro-preview"
 
 # Timeouts and retries
-NEG_TIMEOUT = 30
+NEG_TIMEOUT = 60
 NEG_MAX_RETRIES = 2
 
 
@@ -80,14 +92,19 @@ async def generate_neg_for_plot(
     api_key: str,
     plot_scenes: List[Dict[str, Any]],
     skill_objectives: Optional[List[str]] = None,
+    student_profile: Optional[StudentProfile] = None,
+    masks_summary: Optional[Dict[str, List[str]]] = None,
 ) -> Dict[str, NEG]:
-    """Generate initial NEGs for all scenes in a plot (offline).
+    """Generate initial NEGs for all scenes in a plot.
 
     Args:
         api_key: Gemini API key.
         plot_scenes: List of scene dicts, each with at minimum a "manifest"
             key containing the scene manifest (entities, relations, actions).
         skill_objectives: SKILL objectives for the session.
+        student_profile: The child's error profile (adapts priorities/tolerances).
+        masks_summary: Dict mapping entity_id -> list of sub-entity IDs from
+            visual masks (e.g. {"turtle_01": ["turtle_01.body", "turtle_01.shell"]}).
 
     Returns:
         Dict mapping scene_id -> NEG for each scene.
@@ -113,9 +130,18 @@ async def generate_neg_for_plot(
             "actions": manifest.get("actions", []),
         })
 
+    # Load skill micro-objectives
+    micro = _load_skill_micro()
+
     user_prompt = NEG_SHORT_USER_PROMPT_TEMPLATE.format(
         plot_json=json.dumps(plot_for_prompt, indent=2),
         skill_objectives=", ".join(skill_objectives),
+        student_profile=(
+            student_profile.to_prompt_context()
+            if student_profile else "(new student — no error history yet)"
+        ),
+        masks_summary=json.dumps(masks_summary or {}, indent=2),
+        skill_micro=micro or "(not available yet)",
     )
 
     client = genai.Client(api_key=api_key)
@@ -148,8 +174,9 @@ async def generate_neg_for_plot(
             last_exc = asyncio.TimeoutError(
                 f"NEG generation timed out after {NEG_TIMEOUT}s")
         except Exception as exc:
-            logger.warning("[neg-gen] Attempt %d/%d failed: %s",
-                           attempt, NEG_MAX_RETRIES, exc)
+            logger.warning("[neg-gen] Attempt %d/%d failed (%s): %s",
+                           attempt, NEG_MAX_RETRIES,
+                           type(exc).__name__, exc or "no details")
             last_exc = exc
 
     raise last_exc  # type: ignore[misc]
@@ -223,8 +250,9 @@ async def update_neg_live(
             last_exc = asyncio.TimeoutError(
                 f"NEG update timed out after {NEG_TIMEOUT}s")
         except Exception as exc:
-            logger.warning("[neg-update] Attempt %d/%d failed: %s",
-                           attempt, NEG_MAX_RETRIES, exc)
+            logger.warning("[neg-update] Attempt %d/%d failed (%s): %s",
+                           attempt, NEG_MAX_RETRIES,
+                           type(exc).__name__, exc or "no details")
             last_exc = exc
 
     # On failure, return the original NEGs unchanged

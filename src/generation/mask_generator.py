@@ -197,6 +197,20 @@ async def _segment_element(
                 "[mask-gen] Element '%s': %d parts segmented",
                 element_id, len(result.parts),
             )
+
+            # Detailed mask log
+            for pm in result.parts:
+                bbox_str = (
+                    f"bbox={pm.bounding_box}" if pm.bounding_box else "no bbox"
+                )
+                poly_str = (
+                    f"{len(pm.polygon)} vertices" if pm.polygon else "no polygon"
+                )
+                logger.info(
+                    "[mask-gen]   [%s] (parent: %s) → %s, %s",
+                    pm.part_name, pm.parent, poly_str, bbox_str,
+                )
+
             return result
 
         except Exception as exc:

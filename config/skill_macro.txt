@@ -1,0 +1,183 @@
+# SKILL Macro-Objectives: Story-Level Structure
+# Story structuring from beginning to end: characters, setting, plot(s)
+# Target: children ages 7-11 narrating pixel-art scenes
+#
+# The macro-structure defines how a story is organised across scenes.
+# It covers the incorporation of key elements: characters (with names
+# and emotions), setting, and plot(s).
+
+# ============================================================================
+# A. CHARACTERS — introduction and development
+# ============================================================================
+
+A1. Character introduction
+    The story must begin with the description of at least one character.
+    A character can be a person, an animal, an object, a toy, or even
+    the creator of the story.
+    - A complete introduction includes BOTH a name AND descriptive details.
+    - Example: "Once upon a time there was a little rabbit called Clover.
+      She had soft brown fur and long floppy ears."
+
+A2. Character naming
+    Every character must have a name.
+    - Proper name ("Clover", "Captain Finn") or a distinctive title
+      ("the wise owl", "the tiny blue fish").
+    - If the child describes a character without naming it, prompt for
+      a name.
+    - Error: referring to a character only as "the cat" or "it" throughout
+      the entire story.
+
+A3. Descriptive details
+    Every character must have descriptive details beyond just a name.
+    - Appearance: colour, size, texture, distinctive features.
+    - Personality traits: brave, shy, curious, friendly.
+    - If the child only provides a name, prompt for descriptive details.
+    - If the child only provides details, prompt for a name.
+    - Example: "Clover" alone is insufficient. "A rabbit" alone is
+      insufficient. "A small brown rabbit called Clover" is complete.
+
+A4. Character emotions and internal states
+    Characters should express emotions or internal states at key moments.
+    - Reactions to events: "Clover felt scared when she heard the noise."
+    - Motivations: "She wanted to find the hidden treasure."
+    - Changes over the story: "At first he was nervous, but then he
+      felt brave."
+    - Emotions can be stated ("she was happy") or shown through action
+      ("she jumped up and down with excitement").
+
+A5. New character introduction
+    New characters can be introduced at any point in the story.
+    - Each new character must also have a name and descriptive details
+      (same rules as A1-A3).
+    - The introduction should fit naturally into the narrative flow.
+    - Example: "Then they met a tall grey heron called Sterling, who
+      was standing very still by the river."
+
+# ============================================================================
+# B. SETTING — where and what
+# ============================================================================
+
+B1. Environment description
+    The story must include a description of the environment / location.
+    - Where: a forest, a pond, a mountain, a kitchen, under the sea.
+    - Sensory details: "a dark, quiet forest", "a sunny meadow with
+      tall yellow flowers".
+    - The setting is not complete until an environment is described.
+
+B2. Character activity within setting
+    The setting must include what the characters are doing in the
+    environment.
+    - Example: "Clover was sitting on a mossy rock by the pond" (who +
+      what + where).
+    - Error: describing only the place without any character activity,
+      or only the activity without the place.
+
+B3. Complete setting
+    A setting is complete when BOTH the environment AND the character
+    activity are described.
+    - Environment alone ("there was a forest") is incomplete.
+    - Activity alone ("the rabbit was hopping") is incomplete.
+    - Complete: "The rabbit was hopping through a dark forest."
+
+B4. New setting introduction
+    New settings can be introduced at any point in the story, just like
+    new characters.
+    - Each new setting follows the same rules (B1-B3): environment +
+      activity.
+    - Transitions should be explicit: "Then they went to...",
+      "The next day, they arrived at...".
+
+# ============================================================================
+# C. PLOT STRUCTURE — story arc
+# ============================================================================
+
+C1. Opening: character description
+    The story opens with the description of character(s) (see A1-A3).
+    - This is always the first element of the story.
+    - Multiple characters can be introduced together or one at a time.
+
+C2. Setting follows character introduction
+    The first event after the character description is the setting.
+    - Establishes where the characters are and what they are doing
+      (see B1-B3).
+    - The story cannot progress to plot events until a setting is
+      established.
+
+C3. Initiating event
+    The event following the setting is the initiating event: something
+    happens WITH the characters, or something happens TO the characters.
+    - External trigger: "Suddenly, a loud noise came from the cave."
+    - Discovery: "Clover found a strange glowing stone on the path."
+    - Problem: "The bridge was broken and they couldn't cross the river."
+    - The initiating event sets the story in motion.
+
+C4. Response to events
+    The event following the initiating event (or a complication) can be
+    an action, a plan, or feelings.
+    - Action: something the characters DO in response.
+      Example: "Clover decided to climb down and look inside the cave."
+    - Plan: something the characters THINK in response. A plan is always
+      followed by an action.
+      Example: "Clover thought she could use the vine as a rope."
+    - Feelings: something the characters FEEL in response.
+      Example: "Clover felt scared but also very curious."
+
+C5. Consequence
+    The event following an action is always a consequence.
+    A consequence is either a complication or a resolution.
+    - Complication: a new problem or twist that requires further action.
+      Example: "But when she pulled the vine, the whole tree started
+      to shake!"
+    - Resolution: the problem is solved or the situation improves.
+      Example: "The vine held strong and Clover swung safely across."
+
+C6. Complication cycle
+    After a complication, the cycle repeats: the complication is followed
+    by a response (action / plan / feelings), which leads to a new
+    consequence (complication or resolution).
+    - Stories can have multiple complication cycles, creating a richer
+      narrative.
+    - Each cycle deepens the story and builds tension.
+    - Example cycle: complication ("the path was blocked") → plan
+      ("she decided to go around") → action ("she climbed over the
+      rocks") → consequence/resolution ("she found a shortcut").
+
+C7. Ending
+    The event following a resolution is the ending.
+    - The ending summarises the important events of the story, OR
+      concludes with the moral / lesson of the story.
+    - Example (summary): "And so Clover made it home safely, with the
+      glowing stone in her pocket and a new friend by her side."
+    - Example (moral): "Clover learned that being brave doesn't mean
+      not being scared — it means doing things even when you are."
+    - The ending should feel like a natural conclusion, not an abrupt stop.
+
+# ============================================================================
+# D. NARRATIVE FLOW — sequencing and coherence
+# ============================================================================
+
+D1. Logical event ordering
+    Events must follow the prescribed sequence:
+    character description → setting → initiating event → response →
+    consequence → (complication cycle) → ending.
+    - Skipping steps is an error (e.g. jumping to action without
+      an initiating event).
+    - Going out of order is an error (e.g. ending before a resolution).
+
+D2. Causal links between events
+    Each event should be causally or logically connected to the previous
+    one.
+    - The initiating event triggers the response.
+    - The action leads to the consequence.
+    - Transitions make the connection explicit: "because of this...",
+      "so then...", "which meant that...".
+    - Error: events that feel random or disconnected ("The rabbit found
+      a stone. Then there was a birthday party.").
+
+D3. Story completeness
+    A complete story includes all required arc elements:
+    - At minimum: characters + setting + initiating event + response +
+      consequence + ending.
+    - A story that stops after the initiating event is incomplete.
+    - A story without an ending is incomplete.
+    - The ending must follow a resolution (not a complication).

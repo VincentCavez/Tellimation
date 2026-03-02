@@ -1,5 +1,6 @@
 // Tellimations Narration Client
 // Push-to-talk audio capture via MediaRecorder + WebSocket transport.
+// Voice guidance playback via Web Audio API.
 
 var NarrationClient = (function() {
   'use strict';
@@ -11,9 +12,14 @@ var NarrationClient = (function() {
   var mediaRecorder = null;
   var audioChunks = [];
   var isRecording = false;
-  var idleTimer = null;
-  var IDLE_TIMEOUT_MS = 10000;
   var stream = null;
+
+  // Voice playback state
+  var audioContext = null;
+  var pendingVoiceHeader = null;
+  var pendingVoiceTimeout = null;
+  var isPlayingVoice = false;
+  var voiceQueue = [];  // Queue audio if something is already playing
 
   /**
    * Initialize the narration client.
@@ -51,6 +57,7 @@ var NarrationClient = (function() {
     document.addEventListener('keydown', function(e) {
       if (e.code === 'Space' && !e.repeat && !isRecording) {
         e.preventDefault();
+        ensureAudioContext();
         startRecording();
       }
     });
@@ -63,17 +70,15 @@ var NarrationClient = (function() {
     });
   }
 
+  // -----------------------------------------------------------------------
+  // Audio recording (push-to-talk)
+  // -----------------------------------------------------------------------
+
   function startRecording() {
     if (!stream) return;
 
     isRecording = true;
     audioChunks = [];
-
-    // Clear idle timer
-    if (idleTimer) {
-      clearTimeout(idleTimer);
-      idleTimer = null;
-    }
 
     // Update UI
     transcriptionBox.classList.add('recording');
@@ -112,9 +117,6 @@ var NarrationClient = (function() {
     transcriptionBox.classList.remove('recording');
     feedbackEl.textContent = '';
     pttHintEl.style.visibility = '';
-
-    // Start idle timer
-    resetIdleTimer();
   }
 
   function sendAudio(blob) {
@@ -134,24 +136,129 @@ var NarrationClient = (function() {
     reader.readAsArrayBuffer(blob);
   }
 
-  function resetIdleTimer() {
-    if (idleTimer) {
-      clearTimeout(idleTimer);
+  // -----------------------------------------------------------------------
+  // Voice guidance playback (Web Audio API)
+  // -----------------------------------------------------------------------
+
+  /**
+   * Lazily initialise the AudioContext on the first user gesture.
+   * Browsers require a user interaction before audio can play.
+   */
+  function ensureAudioContext() {
+    if (!audioContext) {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)({
+        sampleRate: 24000,
+      });
     }
-    idleTimer = setTimeout(function() {
-      if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({ type: 'idle_timeout' }));
-      }
-    }, IDLE_TIMEOUT_MS);
+    // Resume if suspended (Safari auto-suspends)
+    if (audioContext.state === 'suspended') {
+      audioContext.resume();
+    }
   }
+
+  /**
+   * Handle a voice_audio JSON header from the server.
+   * The next binary message will contain the PCM data.
+   */
+  function handleVoiceHeader(msg) {
+    // Clear any stale pending header
+    if (pendingVoiceTimeout) {
+      clearTimeout(pendingVoiceTimeout);
+    }
+
+    pendingVoiceHeader = {
+      purpose: msg.purpose || 'guidance',
+      text: msg.text || '',
+      sampleRate: msg.sample_rate || 24000,
+      sampleWidth: msg.sample_width || 2,
+      channels: msg.channels || 1,
+    };
+
+    // Safety: expire the header after 5s if no binary follows
+    pendingVoiceTimeout = setTimeout(function() {
+      pendingVoiceHeader = null;
+      pendingVoiceTimeout = null;
+    }, 5000);
+  }
+
+  /**
+   * Handle a binary WebSocket message containing PCM audio data.
+   * Must be preceded by a voice_audio JSON header.
+   */
+  function handleVoiceBinary(arrayBuffer) {
+    if (pendingVoiceTimeout) {
+      clearTimeout(pendingVoiceTimeout);
+      pendingVoiceTimeout = null;
+    }
+
+    if (!pendingVoiceHeader) {
+      // Binary without a header — ignore (could be something else)
+      return;
+    }
+
+    var header = pendingVoiceHeader;
+    pendingVoiceHeader = null;
+
+    ensureAudioContext();
+
+    if (isPlayingVoice) {
+      // Queue if something is already playing
+      voiceQueue.push({ header: header, buffer: arrayBuffer });
+      return;
+    }
+
+    _playPCM(header, arrayBuffer);
+  }
+
+  /**
+   * Decode PCM 16-bit signed mono and play via Web Audio API.
+   */
+  function _playPCM(header, arrayBuffer) {
+    if (!audioContext) return;
+
+    // Convert PCM 16-bit signed to Float32
+    var pcmData = new Int16Array(arrayBuffer);
+    var float32 = new Float32Array(pcmData.length);
+    for (var i = 0; i < pcmData.length; i++) {
+      float32[i] = pcmData[i] / 32768.0;
+    }
+
+    // Create AudioBuffer
+    var buffer = audioContext.createBuffer(
+      header.channels,
+      float32.length,
+      header.sampleRate
+    );
+    buffer.getChannelData(0).set(float32);
+
+    // Play
+    var source = audioContext.createBufferSource();
+    source.buffer = buffer;
+    source.connect(audioContext.destination);
+    source.start();
+
+    isPlayingVoice = true;
+    source.onended = function() {
+      isPlayingVoice = false;
+      // Play next in queue if any
+      if (voiceQueue.length > 0) {
+        var next = voiceQueue.shift();
+        _playPCM(next.header, next.buffer);
+      }
+    };
+  }
+
+  // -----------------------------------------------------------------------
+  // Cleanup
+  // -----------------------------------------------------------------------
 
   /**
    * Clean up resources.
    */
   function destroy() {
-    if (idleTimer) {
-      clearTimeout(idleTimer);
-      idleTimer = null;
+    if (pendingVoiceTimeout) {
+      clearTimeout(pendingVoiceTimeout);
+      pendingVoiceTimeout = null;
     }
     if (mediaRecorder && isRecording) {
       mediaRecorder.stop();
@@ -160,13 +267,20 @@ var NarrationClient = (function() {
       stream.getTracks().forEach(function(track) { track.stop(); });
       stream = null;
     }
+    if (audioContext) {
+      audioContext.close();
+      audioContext = null;
+    }
     isRecording = false;
+    isPlayingVoice = false;
+    voiceQueue = [];
   }
 
   return {
     init: init,
     destroy: destroy,
-    IDLE_TIMEOUT_MS: IDLE_TIMEOUT_MS,
+    handleVoiceHeader: handleVoiceHeader,
+    handleVoiceBinary: handleVoiceBinary,
   };
 })();
 

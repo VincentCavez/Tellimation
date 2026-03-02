@@ -11,7 +11,11 @@
 <body>
   <div class="story-container">
     <!-- Scene label -->
-    <div class="story-scene-label">Scene <span id="scene-num">1</span></div>
+    <div class="story-scene-label">
+      <a href="/selection" class="home-link">Home</a>
+      <span class="label-sep">/</span>
+      Scene <span id="scene-num">1</span>
+    </div>
 
     <!-- Main scene canvas -->
     <div class="scene-canvas-wrapper">
@@ -123,6 +127,9 @@
 
       var storyIndex = parseInt(sessionStorage.getItem('story_index') || '0', 10);
 
+      // Receive binary data as ArrayBuffer (for voice audio PCM)
+      ws.binaryType = 'arraybuffer';
+
       ws.onopen = function() {
         // Send the chosen scene so the server can initialize the narration loop
         // (the previous WS connection was closed on navigation from /selection)
@@ -136,6 +143,12 @@
       };
 
       ws.onmessage = function(event) {
+        // Binary message (voice audio PCM data)
+        if (event.data instanceof ArrayBuffer) {
+          NarrationClient.handleVoiceBinary(event.data);
+          return;
+        }
+
         var msg = JSON.parse(event.data);
 
         switch (msg.type) {
@@ -157,6 +170,10 @@
 
           case 'new_scene':
             handleNewScene(msg.scene);
+            break;
+
+          case 'voice_audio':
+            NarrationClient.handleVoiceHeader(msg);
             break;
 
           case 'error':

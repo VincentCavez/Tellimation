@@ -1,9 +1,15 @@
 // Tellimations Pixel Art Engine
-// Canvas: 560x360, rendered at 1.5x scale (840x540) with image-rendering: pixelated
+//
+// Three-resolution model with k-factor:
+//   SOURCE  (1120×720)  — manifest coordinates, Gemini image generation
+//   ART GRID (280×180)  — pixel buffer, animations (= source / K)
+//   DISPLAY (1120×720)  — on-screen canvas (= art grid upscaled K×K)
 
-const PW = 560;
-const PH = 360;
-const DEFAULT_SCALE = 1.5;
+const SOURCE_W = 1120;
+const SOURCE_H = 720;
+const K = 4;                              // pixel-art aggregation factor
+const PW = Math.ceil(SOURCE_W / K);       // 280  — art grid width
+const PH = Math.ceil(SOURCE_H / K);       // 180  — art grid height
 
 // ---------------------------------------------------------------------------
 // PixelBuffer
@@ -261,48 +267,49 @@ class PixelBuffer {
 // ---------------------------------------------------------------------------
 
 class Renderer {
-  constructor(canvas, pixelBuffer, scale = DEFAULT_SCALE) {
+  constructor(canvas, pixelBuffer) {
     this.canvas = canvas;
     this.buf = pixelBuffer;
-    this.scale = scale;
 
-    canvas.width = pixelBuffer.width * scale;
-    canvas.height = pixelBuffer.height * scale;
+    // Display canvas is SOURCE resolution; each art pixel = K×K block
+    canvas.width = SOURCE_W;
+    canvas.height = SOURCE_H;
     canvas.style.imageRendering = 'pixelated';
     canvas.style.imageRendering = 'crisp-edges';
 
     this.ctx = canvas.getContext('2d');
     this.ctx.imageSmoothingEnabled = false;
-
-    // Off-screen 1:1 canvas for building ImageData
-    this._offCanvas = document.createElement('canvas');
-    this._offCanvas.width = pixelBuffer.width;
-    this._offCanvas.height = pixelBuffer.height;
-    this._offCtx = this._offCanvas.getContext('2d');
   }
 
   render() {
-    const w = this.buf.width;
-    const h = this.buf.height;
-    const imgData = this._offCtx.createImageData(w, h);
+    const artW = this.buf.width;   // 280
+    const artH = this.buf.height;  // 180
+    const imgData = this.ctx.createImageData(SOURCE_W, SOURCE_H);
     const pixels = imgData.data;
 
-    for (let i = 0; i < this.buf.data.length; i++) {
-      const p = this.buf.data[i];
-      const off = i * 4;
-      pixels[off] = p.r;
-      pixels[off + 1] = p.g;
-      pixels[off + 2] = p.b;
-      pixels[off + 3] = 255;
+    // Upscale: each art pixel becomes a K×K block on the display
+    for (let ay = 0; ay < artH; ay++) {
+      for (let ax = 0; ax < artW; ax++) {
+        const p = this.buf.data[ay * artW + ax];
+        const r = p.r, g = p.g, b = p.b;
+        for (let dy = 0; dy < K; dy++) {
+          const displayY = ay * K + dy;
+          if (displayY >= SOURCE_H) break;
+          const rowOff = (displayY * SOURCE_W + ax * K) * 4;
+          for (let dx = 0; dx < K; dx++) {
+            const displayX = ax * K + dx;
+            if (displayX >= SOURCE_W) break;
+            const off = rowOff + dx * 4;
+            pixels[off]     = r;
+            pixels[off + 1] = g;
+            pixels[off + 2] = b;
+            pixels[off + 3] = 255;
+          }
+        }
+      }
     }
 
-    this._offCtx.putImageData(imgData, 0, 0);
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.ctx.drawImage(
-      this._offCanvas,
-      0, 0, w, h,
-      0, 0, this.canvas.width, this.canvas.height
-    );
+    this.ctx.putImageData(imgData, 0, 0);
   }
 
 }
@@ -395,43 +402,6 @@ function executeSpriteCode(code, pixelBuffer) {
 }
 
 // ---------------------------------------------------------------------------
-// executePaletteSprite — render a palette-indexed pixel grid with entity masks
-// ---------------------------------------------------------------------------
-
-function _normalizeGrid(val) {
-  if (Array.isArray(val)) return val.join('');
-  return (typeof val === 'string') ? val : '';
-}
-
-function executePaletteSprite(spriteData, pixelBuffer) {
-  const { x, y, width, height, palette, sub_entities } = spriteData;
-  const pixels = _normalizeGrid(spriteData.pixels);
-  const mask = _normalizeGrid(spriteData.mask);
-  const rootId = spriteData.rootId || '';
-  if (!pixels || !palette) return;
-
-  for (let row = 0; row < height; row++) {
-    for (let col = 0; col < width; col++) {
-      const idx = row * width + col;
-      if (idx >= pixels.length) continue;
-      const palIdx = parseInt(pixels[idx], 16);
-      if (palIdx === 0) continue; // transparent
-      const colorIdx = palIdx - 1; // palette is 1-indexed (0=transparent)
-      if (colorIdx < 0 || colorIdx >= palette.length) continue;
-      const color = palette[colorIdx];
-      let entityId = rootId;
-      if (mask && idx < mask.length) {
-        const maskIdx = parseInt(mask[idx], 16);
-        if (maskIdx > 0 && sub_entities && maskIdx - 1 < sub_entities.length) {
-          entityId = sub_entities[maskIdx - 1];
-        }
-      }
-      pixelBuffer._set(x + col, y + row, color[0], color[1], color[2], entityId);
-    }
-  }
-}
-
-// ---------------------------------------------------------------------------
 // executeRawSprite — render a raw_sprite with direct RGB pixels + entity masks
 // ---------------------------------------------------------------------------
 
@@ -456,13 +426,10 @@ function executeRawSprite(spriteData, pixelBuffer) {
 // ---------------------------------------------------------------------------
 
 function executeImageBackground(spriteData, pixelBuffer) {
-  // This is async because Image loading is async in browsers.
-  // For synchronous rendering (e.g. thumbnails), we use a fallback.
-  // The caller should await the returned Promise if possible.
+  // Async: Image loading is async in browsers.
   var b64 = spriteData.image_base64;
 
-  // Always fill the entire pixel buffer — ignore spriteData.width/height
-  // so that older scenes (280×180) are upscaled to the current buffer size.
+  // Background image is at art-grid resolution — fill the entire buffer
   var targetW = pixelBuffer.width;
   var targetH = pixelBuffer.height;
 
@@ -506,22 +473,14 @@ function executeImageBackground(spriteData, pixelBuffer) {
 // ---------------------------------------------------------------------------
 
 function renderSpriteEntry(eid, entry, pixelBuffer) {
-  console.log('[renderSpriteEntry]', eid, 'format=', entry && entry.format,
-    entry && entry.format === 'raw_sprite' ?
-      'x=' + entry.x + ' y=' + entry.y + ' w=' + entry.w + ' h=' + entry.h +
-      ' pixels=' + (entry.pixels ? entry.pixels.length : 'none') +
-      ' visible=' + (entry.pixels ? entry.pixels.filter(function(p){return p!==null}).length : 0)
-    : '');
-  if (typeof entry === 'string') {
-    executeSpriteCode(entry, pixelBuffer);
-  } else if (entry && entry.format === 'raw_sprite') {
+  if (!entry) return;
+  if (entry.format === 'raw_sprite') {
     executeRawSprite(entry, pixelBuffer);
-  } else if (entry && entry.format === 'palette_grid') {
-    entry.rootId = eid;
-    executePaletteSprite(entry, pixelBuffer);
-  } else if (entry && entry.format === 'image_background') {
-    // Returns a Promise — caller should handle async if needed
+  } else if (entry.format === 'image_background') {
     return executeImageBackground(entry, pixelBuffer);
+  } else if (typeof entry === 'string') {
+    // Legacy JS code string — kept for backward compat
+    executeSpriteCode(entry, pixelBuffer);
   }
 }
 
@@ -532,8 +491,8 @@ function renderSpriteEntry(eid, entry, pixelBuffer) {
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     PixelBuffer, Renderer, EntityRegistry,
-    executeSpriteCode, executePaletteSprite, executeRawSprite,
+    executeSpriteCode, executeRawSprite,
     executeImageBackground, renderSpriteEntry,
-    PW, PH
+    SOURCE_W, SOURCE_H, K, PW, PH
   };
 }

@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from src.models.neg import ErrorExclusion, NEG, NarrativeTarget, TargetComponents
+from src.models.neg import NEG, NarrativeTarget, TargetComponents
 from src.models.student_profile import Discrepancy, StudentProfile
 from src.narration.transcription import (
     TranscriptionResult,
@@ -53,18 +53,6 @@ def _make_neg() -> NEG:
                 ),
                 priority=0.5,
                 tolerance=0.5,
-            ),
-        ],
-        error_exclusions=[
-            ErrorExclusion(
-                entity_id="rock_01",
-                excluded=["QUANTITY", "ACTION", "MANNER"],
-                reason="unique static object",
-            ),
-            ErrorExclusion(
-                entity_id="rabbit_01",
-                excluded=["QUANTITY"],
-                reason="unique in scene",
             ),
         ],
         min_coverage=0.7,
@@ -118,6 +106,7 @@ FAKE_LLM_RESPONSE = {
         "errors_this_scene": {"PROPERTY_COLOR": 1, "PROPERTY_SIZE": 1, "ACTION": 1},
         "patterns": "Child omits descriptive adjectives and uses generic verbs",
     },
+    "voice_guidance": "Can you describe the color of the bunny?",
 }
 
 FAKE_AUDIO = b"\x00\x01\x02\x03"  # Dummy audio bytes
@@ -184,6 +173,7 @@ class TestPromptContent:
         assert "{neg_json}" in TRANSCRIPTION_USER_PROMPT
         assert "{narration_history}" in TRANSCRIPTION_USER_PROMPT
         assert "{student_profile}" in TRANSCRIPTION_USER_PROMPT
+        assert "{narrative_text}" in TRANSCRIPTION_USER_PROMPT
 
 
 # ---------------------------------------------------------------------------
@@ -225,6 +215,17 @@ class TestBuildUserPrompt:
         neg = _make_neg()
         prompt = _build_user_prompt(neg, [], None)
         assert "no profile" in prompt.lower() or "first interaction" in prompt.lower()
+
+    def test_includes_narrative_text(self):
+        neg = _make_neg()
+        prompt = _build_user_prompt(neg, [], None, narrative_text="The brave rabbit hopped onto the mossy rock.")
+        assert "brave rabbit" in prompt
+        assert "mossy rock" in prompt
+
+    def test_no_narrative_text(self):
+        neg = _make_neg()
+        prompt = _build_user_prompt(neg, [], None, narrative_text="")
+        assert "no narrative" in prompt.lower() or "(no narrative" in prompt.lower()
 
 
 # ---------------------------------------------------------------------------
@@ -342,6 +343,18 @@ class TestValidateResponse:
         result = _validate_transcription_response({"scene_progress": "half"})
         assert result.scene_progress == 0.0
 
+    def test_parses_voice_guidance(self):
+        result = _validate_transcription_response(FAKE_LLM_RESPONSE)
+        assert result.voice_guidance == "Can you describe the color of the bunny?"
+
+    def test_voice_guidance_defaults_to_empty(self):
+        result = _validate_transcription_response({})
+        assert result.voice_guidance == ""
+
+    def test_voice_guidance_non_string_defaults_to_empty(self):
+        result = _validate_transcription_response({"voice_guidance": 42})
+        assert result.voice_guidance == ""
+
 
 # ---------------------------------------------------------------------------
 # Tests: TranscriptionResult model
@@ -361,6 +374,7 @@ class TestTranscriptionResultModel:
                 errors_this_scene={"PROPERTY_SIZE": 1},
                 patterns="omits size",
             ),
+            voice_guidance="What color is the rabbit?",
         )
         data = result.model_dump()
         restored = TranscriptionResult.model_validate(data)
@@ -368,6 +382,7 @@ class TestTranscriptionResultModel:
         assert len(restored.discrepancies) == 1
         assert restored.scene_progress == 0.6
         assert restored.profile_updates.patterns == "omits size"
+        assert restored.voice_guidance == "What color is the rabbit?"
 
 
 # ---------------------------------------------------------------------------
@@ -539,31 +554,32 @@ class TestTranscribeAndDetect:
         assert result.scene_progress == 0.95
         assert len(result.satisfied_targets) == 2
 
-    def test_all_discrepancies_filtered(self):
-        """All discrepancies are excluded by NEG rules -> empty list."""
-        neg = NEG(
-            targets=[],
-            error_exclusions=[
-                ErrorExclusion(
-                    entity_id="rock_01",
-                    excluded=["ACTION", "MANNER", "QUANTITY", "PROPERTY_COLOR"],
-                    reason="everything excluded",
-                ),
-            ],
-        )
-        response = {
-            "transcription": "the rock",
-            "discrepancies": [
-                {"type": "ACTION", "entity_id": "rock_01", "severity": 0.5},
-                {"type": "QUANTITY", "entity_id": "rock_01", "severity": 0.3},
-                {"type": "PROPERTY_COLOR", "entity_id": "rock_01", "severity": 0.4},
-            ],
-            "scene_progress": 0.2,
-            "satisfied_targets": [],
-            "updated_history": ["the rock"],
-            "profile_updates": {},
-        }
-        mock_client = _make_mock_client(response)
+    def test_narrative_text_passed_to_prompt(self):
+        """Verify narrative_text is included in the prompt sent to Gemini."""
+        neg = _make_neg()
+        mock_client = _make_mock_client(FAKE_LLM_RESPONSE)
+
+        with patch("src.narration.transcription.genai.Client", return_value=mock_client):
+            asyncio.get_event_loop().run_until_complete(
+                transcribe_and_detect(
+                    api_key="fake-key",
+                    audio_bytes=FAKE_AUDIO,
+                    neg=neg,
+                    narration_history=[],
+                    narrative_text="The brave rabbit hopped onto the mossy rock.",
+                )
+            )
+
+        call_args = mock_client.aio.models.generate_content.call_args
+        contents = call_args.kwargs.get("contents") or call_args.args[0]
+        text_content = str(contents)
+        assert "brave rabbit" in text_content
+        assert "mossy rock" in text_content
+
+    def test_voice_guidance_parsed_in_response(self):
+        """Verify voice_guidance field is parsed from LLM response."""
+        neg = _make_neg()
+        mock_client = _make_mock_client(FAKE_LLM_RESPONSE)
 
         with patch("src.narration.transcription.genai.Client", return_value=mock_client):
             result = asyncio.get_event_loop().run_until_complete(
@@ -574,7 +590,7 @@ class TestTranscribeAndDetect:
                 )
             )
 
-        assert len(result.discrepancies) == 0
+        assert result.voice_guidance == "Can you describe the color of the bunny?"
 
     def test_markdown_fenced_response(self):
         """Gemini wraps JSON in markdown fences."""

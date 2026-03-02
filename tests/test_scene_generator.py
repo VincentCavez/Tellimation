@@ -111,13 +111,6 @@ FAKE_INITIAL_RESPONSE = {
                 "tolerance": 0.3,
             }
         ],
-        "error_exclusions": [
-            {
-                "entity_id": "rock_01",
-                "excluded": ["QUANTITY", "ACTION", "MANNER"],
-                "reason": "unique static object",
-            }
-        ],
         "min_coverage": 0.7,
         "skill_coverage_check": "PASS",
     },
@@ -214,7 +207,7 @@ FAKE_CONTINUATION_RESPONSE = {
                 "tolerance": 0.3,
             }
         ],
-        "error_exclusions": [],
+
         "min_coverage": 0.7,
         "skill_coverage_check": "PASS",
     },
@@ -264,8 +257,8 @@ class TestPromptBuilding:
         assert "arc(" in SCENE_SYSTEM_PROMPT
 
     def test_system_prompt_documents_canvas_size(self):
-        assert "560" in SCENE_SYSTEM_PROMPT
-        assert "360" in SCENE_SYSTEM_PROMPT
+        assert "1120" in SCENE_SYSTEM_PROMPT
+        assert "720" in SCENE_SYSTEM_PROMPT
 
     def test_system_prompt_requires_hierarchical_ids(self):
         assert "rabbit_01.body" in SCENE_SYSTEM_PROMPT
@@ -545,7 +538,7 @@ class TestGenerateScene:
                     "tolerance": 0.5,
                 }
             ],
-            "error_exclusions": [],
+    
             "min_coverage": 0.8,
             "skill_coverage_check": "PASS",
         }
@@ -599,8 +592,8 @@ class TestManifestPrompt:
         assert "later step" in MANIFEST_SYSTEM_PROMPT.lower()
 
     def test_manifest_prompt_documents_canvas_size(self):
-        assert "560" in MANIFEST_SYSTEM_PROMPT
-        assert "360" in MANIFEST_SYSTEM_PROMPT
+        assert "1120" in MANIFEST_SYSTEM_PROMPT
+        assert "720" in MANIFEST_SYSTEM_PROMPT
 
     def test_manifest_prompt_requires_rich_descriptions(self):
         assert "distinctive_features" in MANIFEST_SYSTEM_PROMPT
@@ -610,7 +603,7 @@ class TestManifestPrompt:
     def test_manifest_prompt_does_not_include_neg(self):
         """MANIFEST_SYSTEM_PROMPT should NOT include NEG — it's generated separately."""
         assert "skill_coverage_check" not in MANIFEST_SYSTEM_PROMPT
-        assert "error_exclusions" not in MANIFEST_SYSTEM_PROMPT
+
         assert '"neg"' not in MANIFEST_SYSTEM_PROMPT
 
     def test_manifest_prompt_has_scene_description_field(self):
@@ -681,9 +674,6 @@ FAKE_MANIFEST_RESPONSE = {
                 "priority": 0.9,
                 "tolerance": 0.3,
             }
-        ],
-        "error_exclusions": [
-            {"entity_id": "rock_01", "excluded": ["QUANTITY", "ACTION"], "reason": "unique static object"}
         ],
         "min_coverage": 0.7,
         "skill_coverage_check": "PASS",
@@ -936,9 +926,10 @@ class TestExtractEntitySprite:
         img_bytes = _make_chroma_key_image()
         result = _extract_entity_sprite(img_bytes, 32, 32)
 
-        assert result["w"] == 32
-        assert result["h"] == 32
-        assert len(result["pixels"]) == 32 * 32
+        # Output fits within target; actual size depends on content aspect ratio
+        assert result["w"] <= 32
+        assert result["h"] <= 32
+        assert len(result["pixels"]) == result["w"] * result["h"]
 
         # Check that some pixels are None (red background) and some are not
         none_count = sum(1 for p in result["pixels"] if p is None)
@@ -953,19 +944,24 @@ class TestExtractEntitySprite:
 
         visible = [p for p in result["pixels"] if p is not None]
         assert len(visible) > 0
-        # The visible pixels should be bluish (from the blue square in the center)
-        for p in visible:
-            assert p[2] > 100, f"Blue channel too low: {p}"
-            assert p[0] < 100, f"Red channel too high: {p}"
+        # The majority of visible pixels should be bluish (from the blue square
+        # in the center). A few edge pixels may have blended colors from LANCZOS
+        # resampling near the content crop margin.
+        blue_count = sum(1 for p in visible if p[2] > 100 and p[0] < 100)
+        assert blue_count > len(visible) * 0.9, (
+            f"Expected >90% blue pixels, got {blue_count}/{len(visible)}"
+        )
 
-    def test_output_dimensions(self):
-        """Should downscale to exact target dimensions."""
+    def test_output_dimensions_fit_within_target(self):
+        """Output should fit within target dimensions, preserving aspect ratio."""
         img_bytes = _make_chroma_key_image(128, 128)
         result = _extract_entity_sprite(img_bytes, 20, 25)
 
-        assert result["w"] == 20
-        assert result["h"] == 25
-        assert len(result["pixels"]) == 20 * 25
+        # Content is square (16×16 blue square), so it should scale
+        # to fit within 20×25 → 20×20 (limited by width)
+        assert result["w"] <= 20
+        assert result["h"] <= 25
+        assert len(result["pixels"]) == result["w"] * result["h"]
 
 
 class TestIsChromaBackground:
@@ -1147,106 +1143,62 @@ class TestIsBackgroundPixel:
         assert _is_background_pixel(255, 255, 255, 255, 0, 0) is False
 
 
-class TestExtractEntitySpriteApproxRed:
-    """Test chroma-key extraction with approximate reds (real-world Gemini output)."""
+class TestExtractEntitySpriteRembg:
+    """Test rembg-based extraction with larger images that work with U2Net."""
 
-    def test_approximate_red_background(self):
-        """Gemini may generate (200,20,30) instead of exact #FF0000."""
-        from PIL import Image as _Img
-        img = _Img.new("RGB", (64, 64), (200, 20, 30))
-        # Draw a blue square in the center (non-red entity pixels)
-        for y in range(24, 40):
-            for x in range(24, 40):
-                img.putpixel((x, y), (30, 50, 200))
+    @staticmethod
+    def _make_test_image(bg_color, fg_color, size=256, fg_size=120):
+        """Create a test image with a centered filled circle on a solid background.
+
+        Uses a circle (not a square) so rembg's neural network can segment it.
+        Size must be large enough (>= 128) for U2Net to work properly.
+        """
+        from PIL import Image as _Img, ImageDraw
+        img = _Img.new("RGB", (size, size), bg_color)
+        draw = ImageDraw.Draw(img)
+        cx, cy = size // 2, size // 2
+        r = fg_size // 2
+        draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=fg_color)
         buf = io.BytesIO()
         img.save(buf, format="PNG")
+        return buf.getvalue()
 
-        result = _extract_entity_sprite(buf.getvalue(), 32, 32)
-        none_count = sum(1 for p in result["pixels"] if p is None)
-        visible_count = sum(1 for p in result["pixels"] if p is not None)
-        assert none_count > 0, "Approximate red should be removed"
-        assert visible_count > 0, "Non-red pixels should be preserved"
-
-    def test_impure_red_bg_preserves_brown_sprite(self):
-        """Impure red bg (254,52,47) should NOT eat brown sprite pixels (140,80,70)."""
-        from PIL import Image as _Img
-        img = _Img.new("RGB", (64, 64), (254, 52, 47))
-        # Brown pixels (like wood of a chest) in the center
-        for y in range(20, 44):
-            for x in range(20, 44):
-                img.putpixel((x, y), (140, 80, 70))
-        buf = io.BytesIO()
-        img.save(buf, format="PNG")
-
-        result = _extract_entity_sprite(buf.getvalue(), 32, 32)
+    def test_red_bg_preserves_blue_entity(self):
+        """Blue entity on red background should be preserved."""
+        img_bytes = self._make_test_image((255, 0, 0), (30, 50, 200))
+        result = _extract_entity_sprite(img_bytes, 64, 64)
         visible = [p for p in result["pixels"] if p is not None]
-        assert len(visible) > 50, f"Brown sprite pixels should be preserved, got {len(visible)}"
+        assert len(visible) > 0, "Blue entity pixels should be preserved"
+
+    def test_red_bg_preserves_green_entity(self):
+        """Green entity on red background should be preserved."""
+        img_bytes = self._make_test_image((255, 0, 0), (30, 200, 40))
+        result = _extract_entity_sprite(img_bytes, 64, 64)
+        visible = [p for p in result["pixels"] if p is not None]
+        assert len(visible) > 0, "Green pixels should not be removed"
+
+    def test_output_has_some_transparent_pixels(self):
+        """Background should be at least partially removed (some None pixels)."""
+        img_bytes = self._make_test_image((255, 0, 0), (30, 50, 200))
+        result = _extract_entity_sprite(img_bytes, 64, 64)
+        none_count = sum(1 for p in result["pixels"] if p is None)
+        # rembg should remove at least some background
+        assert none_count > 0, "rembg should remove at least some background pixels"
+
+    def test_output_dimensions_fit_target(self):
+        """Output dimensions should fit within the target."""
+        img_bytes = self._make_test_image((255, 0, 0), (80, 130, 50))
+        result = _extract_entity_sprite(img_bytes, 50, 40)
+        assert result["w"] <= 50, f"Width {result['w']} exceeds target 50"
+        assert result["h"] <= 40, f"Height {result['h']} exceeds target 40"
+        assert result["w"] > 0 and result["h"] > 0
 
     def test_preserves_orange_entity_pixels(self):
-        """Reddish entity pixels (orange, warm brown) should NOT be removed."""
-        from PIL import Image as _Img
-        img = _Img.new("RGB", (32, 32), (255, 0, 0))  # pure red bg
-        # Orange pixels that should be preserved
-        for y in range(10, 20):
-            for x in range(10, 20):
-                img.putpixel((x, y), (180, 130, 50))
-        buf = io.BytesIO()
-        img.save(buf, format="PNG")
-
-        result = _extract_entity_sprite(buf.getvalue(), 32, 32)
+        """Reddish entity pixels (orange) should NOT be removed."""
+        img_bytes = self._make_test_image((255, 0, 0), (180, 130, 50))
+        result = _extract_entity_sprite(img_bytes, 64, 64)
         visible = [p for p in result["pixels"] if p is not None]
         assert len(visible) > 0, "Orange pixels should not be removed"
-
-    def test_preserves_green_entity_pixels(self):
-        """Green entity pixels (leaves, frogs) should NOT be removed with red chroma-key."""
-        from PIL import Image as _Img
-        img = _Img.new("RGB", (32, 32), (255, 0, 0))  # pure red bg
-        # Green pixels that should be preserved
-        for y in range(10, 20):
-            for x in range(10, 20):
-                img.putpixel((x, y), (30, 200, 40))
-        buf = io.BytesIO()
-        img.save(buf, format="PNG")
-
-        result = _extract_entity_sprite(buf.getvalue(), 32, 32)
-        visible = [p for p in result["pixels"] if p is not None]
-        assert len(visible) > 0, "Green pixels should not be removed with red chroma-key"
-
-    def test_gray_background_detected_and_removed(self):
-        """Gray background → detected by corner sampling and removed."""
-        from PIL import Image as _Img
-        img = _Img.new("RGB", (32, 32), (128, 128, 128))
-        # Add a blue square far from gray in RGB space
-        for y in range(10, 22):
-            for x in range(10, 22):
-                img.putpixel((x, y), (40, 40, 200))
-        buf = io.BytesIO()
-        img.save(buf, format="PNG")
-
-        result = _extract_entity_sprite(buf.getvalue(), 32, 32)
-        # Gray bg (128,128,128) vs blue (40,40,200): dist ≈ 140 → blue preserved
-        # Gray bg vs gray: dist = 0 → removed
-        none_count = sum(1 for p in result["pixels"] if p is None)
-        visible_count = sum(1 for p in result["pixels"] if p is not None)
-        assert none_count > 0, "Gray background should be removed"
-        assert visible_count > 0, "Blue pixels should be preserved"
-
-    def test_pinkish_red_bg_removes_correctly(self):
-        """Pinkish red bg (254,18,59) — real Gemini output — should be removed."""
-        from PIL import Image as _Img
-        img = _Img.new("RGB", (64, 64), (254, 18, 59))
-        # Dark green coral pixels in center
-        for y in range(20, 44):
-            for x in range(20, 44):
-                img.putpixel((x, y), (50, 130, 80))
-        buf = io.BytesIO()
-        img.save(buf, format="PNG")
-
-        result = _extract_entity_sprite(buf.getvalue(), 32, 32)
-        none_count = sum(1 for p in result["pixels"] if p is None)
-        visible_count = sum(1 for p in result["pixels"] if p is not None)
-        assert none_count > 0, "Pinkish red background should be removed"
-        assert visible_count > 0, "Green sprite pixels should be preserved"
 
 
 class TestExtractBackgroundSprite:
@@ -1255,8 +1207,8 @@ class TestExtractBackgroundSprite:
         result = _extract_background_sprite(img_bytes)
 
         assert result["format"] == "image_background"
-        assert result["width"] == 560
-        assert result["height"] == 360
+        assert result["width"] == 1120
+        assert result["height"] == 720
         assert result["x"] == 0
         assert result["y"] == 0
 
@@ -1275,7 +1227,7 @@ class TestExtractBackgroundSprite:
         assert decoded[:4] == b'\x89PNG'
 
     def test_downscales_to_canvas_size(self):
-        """Even if input is larger, output should be 560x360 (upscaled from 280x180)."""
+        """Even if input is larger, output should be 1120x720 (upscaled from 560x360)."""
         import base64
         from PIL import Image as _Img
         # Create a large image
@@ -1284,13 +1236,13 @@ class TestExtractBackgroundSprite:
         img.save(buf, format="PNG")
 
         result = _extract_background_sprite(buf.getvalue())
-        assert result["width"] == 560
-        assert result["height"] == 360
+        assert result["width"] == 1120
+        assert result["height"] == 720
 
         # Decode and verify actual dimensions
         decoded = base64.b64decode(result["image_base64"])
         out_img = _Img.open(io.BytesIO(decoded))
-        assert out_img.size == (560, 360)
+        assert out_img.size == (1120, 720)
 
 
 class TestFallbackMask:
@@ -1412,7 +1364,7 @@ class TestAssembleSpriteCode:
         bg_sprite = {
             "format": "image_background",
             "x": 0, "y": 0,
-            "width": 560, "height": 360,
+            "width": 1120, "height": 720,
             "image_base64": "iVBORw0KGgoAAAANS...",  # truncated, just needs to exist
         }
         entity_sprites = {
@@ -1468,6 +1420,70 @@ class TestAssembleSpriteCode:
         result = _assemble_sprite_code(None, entity_sprites, {}, entity_positions)
         assert result["obj_01"]["x"] == 95   # 100 - 10//2
         assert result["obj_01"]["y"] == 95   # 100 - 10//2
+
+
+class TestComputeEntityPositions:
+    """Test _compute_entity_positions with edge clamping."""
+
+    def _manifest(self, x, y, w_hint, h_hint, eid="obj_01"):
+        return {
+            "manifest": {
+                "entities": [
+                    {"id": eid, "type": "obj",
+                     "position": {"x": x, "y": y},
+                     "width_hint": w_hint, "height_hint": h_hint}
+                ]
+            }
+        }
+
+    def test_center_converts_to_topleft(self):
+        positions = _compute_entity_positions(self._manifest(280, 180, 100, 60))
+        assert positions["obj_01"]["x"] == 230  # 280 - 100//2
+        assert positions["obj_01"]["y"] == 150  # 180 - 60//2
+
+    def test_no_clamping_when_within_bounds(self):
+        positions = _compute_entity_positions(self._manifest(280, 180, 40, 40))
+        assert positions["obj_01"]["x"] == 260  # 280 - 20
+        assert positions["obj_01"]["y"] == 160  # 180 - 20
+
+    def test_clamps_right_edge(self):
+        # center=1080, w=160 → top-left x = 1080-80 = 1000, x+w = 1160 > 1120
+        positions = _compute_entity_positions(self._manifest(1080, 360, 160, 60))
+        assert positions["obj_01"]["x"] == 960  # clamped: 1120 - 160
+        assert positions["obj_01"]["x"] + positions["obj_01"]["w"] <= 1120
+
+    def test_clamps_left_edge(self):
+        # center=20, w=100 → top-left x = 20-50 = -30
+        positions = _compute_entity_positions(self._manifest(20, 180, 100, 60))
+        assert positions["obj_01"]["x"] == 0
+
+    def test_clamps_top_edge(self):
+        # center_y=20, h=100 → top-left y = 20-50 = -30
+        positions = _compute_entity_positions(self._manifest(280, 20, 60, 100))
+        assert positions["obj_01"]["y"] == 0
+
+    def test_clamps_bottom_edge(self):
+        # center_y=700, h=100 → top-left y = 700-50 = 650, y+h = 750 > 720
+        positions = _compute_entity_positions(self._manifest(560, 700, 60, 100))
+        assert positions["obj_01"]["y"] == 620  # clamped: 720 - 100
+        assert positions["obj_01"]["y"] + positions["obj_01"]["h"] <= 720
+
+    def test_clamps_corner(self):
+        # both right and bottom overflow
+        positions = _compute_entity_positions(self._manifest(1100, 700, 80, 80))
+        assert positions["obj_01"]["x"] + positions["obj_01"]["w"] <= 1120
+        assert positions["obj_01"]["y"] + positions["obj_01"]["h"] <= 720
+        assert positions["obj_01"]["x"] >= 0
+        assert positions["obj_01"]["y"] >= 0
+
+    def test_uses_actual_sprite_dimensions(self):
+        # Actual sprite is larger than hint → clamping uses actual size
+        entity_sprites = {"obj_01": {"pixels": [None] * 8000, "w": 100, "h": 80}}
+        positions = _compute_entity_positions(
+            self._manifest(1100, 360, 50, 60), entity_sprites
+        )
+        assert positions["obj_01"]["x"] == 1020  # clamped: 1120 - 100
+        assert positions["obj_01"]["x"] + positions["obj_01"]["w"] <= 1120
 
 
 FAKE_MASK_RESPONSE = {
@@ -1597,39 +1613,27 @@ class TestPipelineIntegration:
         # So: 1 + 1 + 2 + 2 = 6 calls
         assert mock_client.aio.models.generate_content.call_count == 6
 
-    def test_pipeline_falls_back_on_manifest_error(self):
-        """If manifest generation fails on all retries, should fall back to legacy."""
-        fail_then_succeed_count = {"n": 0}
-        legacy_resp = MagicMock()
-        legacy_resp.text = json.dumps(FAKE_INITIAL_RESPONSE)
-
-        async def fail_then_legacy(*args, **kwargs):
-            idx = fail_then_succeed_count["n"]
-            fail_then_succeed_count["n"] += 1
-            # Fail on the first 2 calls (manifest retries), succeed on 3rd (legacy)
-            if idx < 2:
-                raise RuntimeError("Manifest generation failed")
-            return legacy_resp
+    def test_pipeline_raises_on_manifest_error(self):
+        """If manifest generation fails on all retries, exception propagates."""
+        async def always_fail(*args, **kwargs):
+            raise RuntimeError("Manifest generation failed")
 
         mock_models = AsyncMock()
-        mock_models.generate_content = AsyncMock(side_effect=fail_then_legacy)
+        mock_models.generate_content = AsyncMock(side_effect=always_fail)
         mock_aio = MagicMock()
         mock_aio.models = mock_models
         mock_client = MagicMock()
         mock_client.aio = mock_aio
 
         with patch("src.generation.scene_generator.genai.Client", return_value=mock_client):
-            result = asyncio.get_event_loop().run_until_complete(
-                generate_scene(
-                    api_key="fake-key",
-                    seed_index=1,
-                    use_reference_images=True,
+            with pytest.raises(RuntimeError, match="Manifest generation failed"):
+                asyncio.get_event_loop().run_until_complete(
+                    generate_scene(
+                        api_key="fake-key",
+                        seed_index=1,
+                        use_reference_images=True,
+                    )
                 )
-            )
-
-        # Should still return a valid scene (via legacy fallback)
-        assert result["manifest"]["scene_id"] == "scene_01"
-        assert "fox_01" in result["sprite_code"]
 
     def test_pipeline_commits_to_story_state(self):
         mock_client = self._make_pipeline_mock_client()
@@ -1803,7 +1807,7 @@ class TestBackgroundCarryOver:
         fake_bg = {
             "format": "image_background",
             "x": 0, "y": 0,
-            "width": 560, "height": 360,
+            "width": 1120, "height": 720,
             "image_base64": "AAAA",
         }
         state.add_scene(
