@@ -5,17 +5,17 @@
 var ScenePicker = (function() {
   'use strict';
 
-  // Thumbnails are 1/2 the art grid (280x180 → 140x90).
+  // Thumbnails are 1/2 the art grid (560x360 → 280x180).
   // We render sprites at art-grid resolution then downsample by averaging
   // each 2x2 block of pixels, so nothing gets cropped.
-  // Canvas is rendered at native 1:1 (140×90); CSS handles display scaling.
-  var THUMB_PW = 140;
-  var THUMB_PH = 90;
+  // Canvas is rendered at native 1:1 (280×180); CSS handles display scaling.
+  var THUMB_PW = 280;
+  var THUMB_PH = 180;
   var DOWNSAMPLE_FACTOR = 2;
 
   /**
    * Downsample a full-resolution PixelBuffer (PW×PH) to 1/4 size (THUMB_PW×THUMB_PH)
-   * by averaging every 4×4 block of pixels.
+   * by averaging every 2×2 block of pixels.
    */
   function downsampleBuffer(fullBuf) {
     var thumbBuf = new PixelBuffer(THUMB_PW, THUMB_PH);
@@ -98,7 +98,7 @@ var ScenePicker = (function() {
           console.warn('[ScenePicker] Failed to render sprite for', entityEids[i], e);
         }
       }
-      // Downsample art grid (280x180) → 140x90 by averaging 2x2 blocks
+      // Downsample art grid (560x360) → 280x180 by averaging 2x2 blocks
       var thumbBuf = downsampleBuffer(fullBuf);
       // Render at native 1:1 resolution — CSS handles display scaling
       // via image-rendering: pixelated (avoids fractional byte offsets
