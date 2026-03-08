@@ -1,14 +1,29 @@
 from __future__ import annotations
 
-from typing import Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field
 
 
 class CachedAnimation(BaseModel):
-    code: str
+    code: Optional[str] = None
+    template: Optional[str] = None
+    params: Dict[str, Any] = Field(default_factory=dict)
+    particles: List[Dict[str, Any]] = Field(default_factory=list)
     duration_ms: int = 1200
     generated_for: str = ""
+
+    def to_ws_dict(self) -> Dict[str, Any]:
+        """Return the dict to send over WebSocket."""
+        d: Dict[str, Any] = {"duration_ms": self.duration_ms}
+        if self.template:
+            d["template"] = self.template
+            d["params"] = self.params
+            if self.particles:
+                d["particles"] = self.particles
+        elif self.code:
+            d["code"] = self.code
+        return d
 
 
 class AnimationCache(BaseModel):

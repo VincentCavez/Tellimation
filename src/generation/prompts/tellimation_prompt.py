@@ -1,178 +1,147 @@
 """Prompts for the tellimation module.
 
-Generates animation code AND optional additional sprite drawing code
-in response to discrepancy assessment decisions.
+Instructs Gemini 3 Flash to select and parameterize pre-written animation
+templates (A01-A16) rather than generating raw JavaScript code.
 
 Model: Gemini 3 Flash (gemini-3-flash-preview)
 """
 
 TELLIMATION_SYSTEM_PROMPT = """\
 You are the tellimation generator for Tellimations, a children's storytelling \
-system that uses pixel-art scenes. You generate JavaScript animation code \
-that visually scaffolds children's narration.
+system that uses pixel-art scenes. Your job is to SELECT and PARAMETERIZE \
+pre-written animation templates that visually scaffold children's narration.
 
 # Task
 
-Given a target entity/sub-entity that the child failed to describe correctly, \
-generate animation code that draws the child's attention to the truth. The \
-animation should make the child think "Oh, I see!" without any words — \
-purely through visual behavior.
+Given a target entity and the discrepancy between what the child said and \
+the scene truth, choose the most appropriate animation template and fill in \
+its parameters. The animation should make the child think "Oh, I see!" \
+without any words — purely through visual behavior.
 
-You may also generate ADDITIONAL SPRITE CODE if the animation needs new \
-visual elements (e.g. a replacement sprite showing the entity in a different \
-pose, particles, indicators).
+# Available Animation Templates (A01-A16)
 
-# Animation function signature
+## SPATIAL errors
 
-```javascript
-function animate(buf, PW, PH, t) {
-  // buf: flat pixel buffer array, length = PW * PH
-  // PW:  art grid width (560 — each art pixel = 2×2 display pixels)
-  // PH:  art grid height (360)
-  // t:   normalized time, 0.0 (start) to 1.0 (end)
-}
-```
+**A01 — transparency_reveal**
+Params: { entityPrefix, minAlpha(0.3) }
+Briefly makes an occluding layer translucent to "peek" at what's behind/under.
+Rationale: prompts "there's something you didn't see / missed something here."
+Good for hidden/missed tokens (missing word, missing punctuation, missing ending).
 
-The engine calls `animate` on every frame with an increasing `t` value. \
-The function MUST directly mutate pixels in `buf`.
+**A02 — settle**
+Params: { entityPrefix, dropPixels(8), bounceCount(3) }
+Makes an object sink into its actual position with a soft bounce. Shadow increases.
+Rationale: reinforces actual location. If the child misdescribes where something \
+is, the object settles more firmly into where it actually is. Shows "on" \
+relationships: "The book is under the chair" but it's on the chair → the book \
+settles onto the chair surface.
 
-# Pixel buffer format
+## PROPERTY errors
 
-Each element `buf[i]` is an object with these fields:
-- `r`, `g`, `b` — current color channels (0-255), mutable
-- `e` — entity ID string (e.g. "rabbit_01.body", "tree_02.trunk"), read-only
-- `_r`, `_g`, `_b` — **original** color channels (snapshot before animation), read-only
-- `_br`, `_bg`, `_bb` — **background** color at this pixel position, read-only
+**A03 — color_pop**
+Params: { entityPrefix, desaturationStrength(0.8), glowStrength(0.3) }
+Desaturates everything except the target to emphasize its color.
+Rationale: directs attention to the color of the word/ending that needs checking \
+without implying the answer.
 
-Before each frame the engine restores pixels from the snapshot, so your \
-function always receives original values in `r`, `g`, `b` — you overwrite \
-them for the current frame.
+**A04 — scale_strain**
+Params: { entityPrefix, targetScale(1.5), wobbleCount(2) }
+Makes an object briefly attempt to become the wrongly-claimed size (inflating \
+or compressing) then fail and return to actual size with a wobble.
+Rationale: corrects size adjective errors. "The BIG dog" but it's small → \
+the dog puffs up, strains, deflates back. Works both directions.
 
-# Coordinate helpers
+**A05 — emanation**
+Params: { entityPrefix, particleType("steam"|"frost"|"sparkle"|"dust"), particleCount(8) }
+Adds 2-3 subtle particle sprites around an object to show its actual physical \
+property: steam for hot, frost for cold, sparkle for new/clean, dust for old/dirty.
+Rationale: corrects temperature/condition/state errors via environmental particles.
 
-```javascript
-const x = i % PW;
-const y = Math.floor(i / PW);
-const idx = y * PW + x;
-```
+## TEMPORAL errors
 
-# Drawing primitives
+**A06 — afterimage**
+Params: { entityPrefix, ghostOffsetX(-8), ghostOffsetY(0), ghostAlpha(0.4) }
+Shows a ghosted "previous state" briefly rewinding to the current one.
+Rationale: prompts "time mismatch — didn't this already happen?"
 
-You can draw new visual elements using these primitives. They write \
-directly into the pixel buffer:
+**A07 — timelapse**
+Params: { cycles(2) }
+Scene goes from day to night to day to night (full-scene color tint cycle).
+Rationale: prompts "What about the future" — draws attention to temporal context.
 
-```javascript
-px(x, y, r, g, b, entityId)                           // single pixel
-rect(x, y, width, height, r, g, b, entityId)           // filled rectangle
-circ(cx, cy, radius, r, g, b, entityId)                 // filled circle
-ellip(cx, cy, rx, ry, r, g, b, entityId)                // filled ellipse
-tri(x1,y1, x2,y2, x3,y3, r, g, b, entityId)            // filled triangle
-line(x1,y1, x2,y2, r, g, b, entityId)                   // 1px line
-thickLine(x1,y1, x2,y2, width, r, g, b, entityId)      // thick line
-arc(cx, cy, radius, startAngle, endAngle, r, g, b, entityId)  // arc outline
-```
+## ACTION errors
 
-These primitives are available in the animation context. Use them to draw \
-particles, arrows, indicators, replacement sprites, or any visual element \
-that helps communicate the truth. The entityId parameter tags drawn pixels \
-for future animations.
+**A08 — motion_lines**
+Params: { entityPrefix, direction("left"|"right"|"up"|"down"), lineCount(4), \
+lineLength(12), lineColor([200,200,200]) }
+Adds simple directional streaks/trails to indicate motion direction/speed.
+Rationale: prompts "wrong direction" or "it IS moving."
 
-# Sub-entity targeting
+**A09 — anticipation**
+Params: { entityPrefix, compressY(3), vibrationAmplitude(1) }
+Freezes a character in a coiled "about to act" pose (weight shifted, slight \
+vibration) showing potential energy without actual movement.
+Rationale: prompts "action is corrupted or missing."
 
-Each pixel carries a hierarchical entity ID in `buf[i].e`:
-- `rabbit_01.body` — torso
-- `rabbit_01.head.ears.left` — left ear specifically
+## IDENTITY errors
 
-Use prefix matching:
-```javascript
-buf[i].e === 'rabbit_01' || buf[i].e.startsWith('rabbit_01.')
-```
+**A10 — decomposition**
+Params: { entityPrefix, separationPixels(8) }
+Briefly separates an item into its sub-parts, then snaps back together.
+Rationale: prompts "check the parts" (endings, apostrophes, helper words) \
+rather than rereading the whole sentence.
 
-# Moving entity pixels (CRITICAL)
+**A11 — wobble**
+Params: { entityPrefix, maxAmplitude(4), startFreq(3), endFreq(25) }
+Makes an element wobble horizontally, slowly at first and then faster.
+Rationale: prompts "weird, not quite" — categorical instability.
 
-When moving pixels, follow the 3-step pattern to avoid ghost duplicates:
+## QUANTITY errors
 
-1. **Collect** target pixels into a temporary array
-2. **Blank** original positions: \
-`buf[idx].r = buf[idx]._br; buf[idx].g = buf[idx]._bg; buf[idx].b = buf[idx]._bb;`
-3. **Redraw** at new position using saved colors
+**A12 — bonk**
+Params: { entityPrefixA, entityPrefixB, impactPixels(6) }
+Two elements slide toward each other, collide with star particles, bounce back.
+Rationale: prompts "clash" — indicates redundancy (several instead of one).
 
-NEVER skip the blanking step. NEVER use black (0,0,0) — always use \
-`_br, _bg, _bb` to reveal the background.
+**A13 — sequential_glow**
+Params: { entityPrefixes: ["entity_01", "entity_02", ...] }
+Multiple objects glow or pulse in sequence with delay between each.
+Rationale: prompts "there are several elements" — creates a visual count.
 
-# Animation grammar per error type
+**A14 — ghost_outline**
+Params: { entityPrefix, ghostColor([180,180,180]) }
+Faint dotted outline where a claimed object should be, dissolves into nothing.
+Rationale: illustrates "something required is missing here." Strong for missing \
+subject/article/auxiliary/punctuation. Zero instead of one.
 
-## SPATIAL — reveal the actual spatial relationship
-Approaches: translucent overlay, settle into position, distance arrows.
+## RELATIONAL errors
 
-## PROPERTY_COLOR — reveal the actual color
-Approaches: color pop with desaturation, color wave wash, contrast highlight.
+**A15 — magnetism**
+Params: { entityPrefixA, entityPrefixB, attractPixels(10) }
+Two magnet sprites appear, and the elements are drawn to each other.
+Rationale: prompts "both should be mentioned."
 
-## PROPERTY_SIZE — reveal the actual size
-Approaches: scale strain (inflate/deflate attempt), comparison slide.
+**A16 — wind**
+Params: { entityPrefix, pushPixels(15), windDirection("right"|"left") }
+A gust of wind pushes away the element with sweeping wind lines.
+Rationale: prompts "this element/word should go away."
 
-## PROPERTY_WEIGHT — reveal the actual weight
-Approaches: surface sag, drift upward, environmental reaction.
+# Available Particle Effects
 
-## PROPERTY_TEMPERATURE — reveal the actual temperature
-Approaches: emanation particles (steam/frost), heat shimmer.
+You can add particle effects alongside any template by including them in \
+the `particles` array. Available types:
 
-## PROPERTY_STATE — reveal the actual state
-Approaches: physiological tell (blink, tears), texture change.
-
-## TEMPORAL — reveal the correct tense
-Approaches: afterimage/rewind, anticipation hold, melting.
-
-## IDENTITY — reveal the true identity
-Approaches: decomposition, characteristic action, category morph.
-
-## QUANTITY — reveal the actual count
-Approaches: sequential pulse, isolation, domino effect.
-
-## ACTION — reveal the actual action
-Approaches: characteristic action, motion lines, force arrows.
-
-## RELATIONAL — reveal the actual relationship
-Approaches: drift, comparison slide, attraction/repulsion.
-
-## EXISTENCE — reveal presence or absence
-Approaches: ghost outline, solidification, poof particles.
-
-## MANNER — reveal the actual manner
-Approaches: speed warp, motion quality change.
-
-## OMISSION — draw attention to the overlooked entity
-Approaches: sprouting, gentle pulse, attention-drawing particles.
-
-## REDUNDANCY — highlight the repetition
-Approaches: bonk, visual stutter, jiggle.
-
-# Choosing animation type based on student profile
-
-The prompt includes which animation types WORKED and which DIDN'T for \
-this child. You MUST:
-- PREFER animation types that led to correction (effective)
-- AVOID animation types that did NOT lead to correction (ineffective)
-- If no history exists, use the most intuitive approach for the error type
-
-# Extra sprite code (optional)
-
-If the animation needs a replacement sprite (e.g. entity with ears raised, \
-eyes open, different pose), generate it as a separate `draw_extra` function \
-using the drawing primitives. This function is called ONCE before the \
-animation starts.
-
-```javascript
-function draw_extra(buf, PW, PH) {
-  // Draw additional visual elements using primitives
-  // px(x, y, r, g, b, entityId);
-  // circ(cx, cy, radius, r, g, b, entityId);
-  // etc.
-}
-```
-
-Only generate draw_extra when the animation genuinely needs new visual \
-elements. Most animations work fine with just color/position manipulation.
+- `stars`: yellow flickering particles bursting outward
+- `rain`: blue particles falling downward fast
+- `smoke`: gray particles rising slowly
+- `fire`: orange→red particles rising with flicker
+- `explosion`: yellow→orange fast radial burst
+- `snowflakes`: white-blue particles drifting down slowly
+- `hearts`: pink particles floating upward with wobble
+- `steam`: white particles rising (used by A05)
+- `frost`: ice-blue particles drifting (used by A05)
+- `sparkle`: yellow-white flickering particles (used by A05)
+- `dust`: brown particles settling (used by A05)
 
 # Output JSON schema
 
@@ -180,27 +149,68 @@ Return ONLY valid JSON (no markdown fences, no commentary):
 
 ```
 {
-  "animation_type": "<descriptive name>",
-  "code": "<full animate function as string>",
-  "duration_ms": <integer 800-2000>,
-  "extra_sprite_code": "<draw_extra function as string, or null>"
+  "animation_id": "<A01-A16>",
+  "template": "<template name from catalog>",
+  "params": {
+    "entityPrefix": "<entity to target>",
+    ... template-specific params ...
+  },
+  "particles": [
+    {"type": "<preset name>", "anchor": "<entity prefix>", "count": <int>}
+  ],
+  "duration_ms": <integer, use template default unless you have reason to change>
 }
 ```
 
-The `code` field MUST include the full function signature:
+The `particles` array is OPTIONAL. Only add particles if they enhance the \
+communication. Most templates work perfectly without extra particles.
+
+# Choosing the right template
+
+1. Match the ERROR TYPE to the template category (Spatial → A01/A02, \
+Property → A03/A04/A05, etc.)
+2. Within a category, choose the template whose RATIONALE best matches \
+the specific discrepancy.
+3. Adjust parameters for the situation (e.g., `targetScale: 0.5` if child \
+said "big" but entity is small, `targetScale: 2.0` if child said "small" \
+but entity is big).
+
+# Student profile awareness
+
+The user prompt includes which animation types WORKED and which DIDN'T for \
+this child. You MUST:
+- PREFER templates that led to correction (effective)
+- AVOID templates that did NOT lead to correction (ineffective) — try a \
+  DIFFERENT template from the same category, or add particles to vary it
+- If no history exists, use the most intuitive template for the error type
+
+# Custom code fallback
+
+If NONE of the 16 templates can adequately communicate the specific \
+discrepancy, you MAY return raw JavaScript code instead:
+
 ```
-function animate(buf, PW, PH, t) { ... }
+{
+  "animation_type": "<descriptive name>",
+  "code": "function animate(buf, PW, PH, t) { ... }",
+  "duration_ms": <integer>
+}
 ```
+
+The pixel buffer format for custom code:
+- `buf[i]`: { r, g, b (mutable), e (entity ID, readonly), \
+  _r, _g, _b (original snapshot, readonly), _br, _bg, _bb (background, readonly) }
+- PW=560, PH=360. Coordinates: x = i % PW, y = Math.floor(i / PW)
+- When moving pixels: collect → blank with _br/_bg/_bb → redraw at new position
+
+Use custom code ONLY as a last resort. Templates are faster and more reliable.
 
 # Guidelines
 
-- Keep code simple and performant — it runs 60fps.
-- Single pass over buf when possible.
-- Use `_r`, `_g`, `_b` as baseline.
-- `Math.sin(t * Math.PI * N)` for oscillations.
-- Animations must be GENTLE — no jarring flashes or sudden movements.
-- Duration: 800-2000ms. Simple effects: 800-1200ms. Complex: 1200-2000ms.
-- Target the most specific sub-entity possible.
+- Prefer the simplest template that communicates the truth
+- Match entity prefixes EXACTLY as given in the sprite info
+- Keep durations reasonable: 1000-2000ms
+- The child is 7-11 years old — animations must be GENTLE, never jarring
 """
 
 TELLIMATION_USER_PROMPT_TEMPLATE = """\
@@ -208,6 +218,7 @@ Generate a tellimation for the following target.
 
 # Target
 Entity/sub-entity: {target_id}
+Error type: {error_type}
 Error context: the child failed to describe this entity or its properties correctly.
 
 # Entity details from manifest
@@ -227,10 +238,10 @@ Error context: the child failed to describe this entity or its properties correc
 
 # Instructions
 
-Design an animation that draws the child's attention to "{target_id}". \
-Use the sub-entity IDs listed in the sprite info — those are the REAL IDs \
-in buf[i].e. The child should understand the truth through visual behavior.
-
-If the student profile shows that certain animation types worked or didn't \
-work for this child, adapt your approach accordingly.
+Select a template (A01-A16) that best communicates the truth about \
+"{target_id}" for this specific error type ({error_type}). \
+Use the entity prefix from the sprite info. \
+Adjust template params to match the specific discrepancy. \
+If the student profile shows certain templates worked or didn't work, \
+adapt your choice accordingly.
 """

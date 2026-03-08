@@ -47,6 +47,7 @@
   </div>
 
   <script src="/static/engine.js?v=2"></script>
+  <script src="/static/animation_templates.js?v=2"></script>
   <script src="/static/animations.js?v=2"></script>
   <script src="/static/scene_picker.js?v=2"></script>
   <script src="/static/narration.js?v=2"></script>
@@ -195,7 +196,16 @@
 
       // -- Animation playback --
       function handleAnimation(msg) {
-        animRunner.play(msg.code, msg.duration_ms || 1200);
+        if (msg.template) {
+          animRunner.play({
+            template: msg.template,
+            params: msg.params || {},
+            particles: msg.particles || [],
+            duration_ms: msg.duration_ms || 1200,
+          });
+        } else {
+          animRunner.play(msg.code, msg.duration_ms || 1200);
+        }
       }
 
       // -- Scene complete → show branch picker --

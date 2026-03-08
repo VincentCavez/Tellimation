@@ -14,8 +14,55 @@ class AnimationRunner {
     this._resolve = null;
   }
 
-  play(animationCode, durationMs = 1200) {
-    // Stop any running animation first
+  /**
+   * Play an animation — accepts either a code string or a template spec object.
+   * @param {string|Object} codeOrSpec — JS code string OR { template, params, particles, duration_ms }
+   * @param {number} [durationMs=1200] — duration (ignored if spec provides duration_ms)
+   */
+  play(codeOrSpec, durationMs = 1200) {
+    // Template spec path
+    if (typeof codeOrSpec === 'object' && codeOrSpec !== null && codeOrSpec.template) {
+      return this._playSpec(codeOrSpec);
+    }
+
+    // Compile code string to function
+    let animFn;
+    try {
+      const wrapped = `
+        ${codeOrSpec}
+        return animate;
+      `;
+      animFn = new Function('buf', 'PW', 'PH', wrapped)(
+        this.buf.data, this.buf.width, this.buf.height
+      );
+    } catch (e1) {
+      try {
+        animFn = new Function('buf', 'PW', 'PH', 't', codeOrSpec);
+      } catch (e2) {
+        console.error('[AnimationRunner] Failed to compile animation:', e2);
+        return Promise.resolve();
+      }
+    }
+
+    return this._playFunction(animFn, durationMs);
+  }
+
+  /**
+   * Play a template spec by building it via AnimationTemplates.
+   */
+  _playSpec(spec) {
+    if (typeof AnimationTemplates === 'undefined') {
+      console.error('[AnimationRunner] AnimationTemplates not loaded');
+      return Promise.resolve();
+    }
+    var built = AnimationTemplates.build(spec);
+    return this._playFunction(built.animate, built.duration_ms);
+  }
+
+  /**
+   * Core animation loop — plays a pre-compiled animate function.
+   */
+  _playFunction(animFn, durationMs) {
     if (this.isPlaying) {
       this._finish();
     }
@@ -23,33 +70,7 @@ class AnimationRunner {
     return new Promise((resolve) => {
       this._resolve = resolve;
 
-      // Compile animation function
-      let animFn;
-      try {
-        // The code may define a function or be a function body directly.
-        // We wrap it so it always returns a callable animate(buf, PW, PH, t).
-        const wrapped = `
-          ${animationCode}
-          return animate;
-        `;
-        animFn = new Function('buf', 'PW', 'PH', wrapped)(
-          this.buf.data, this.buf.width, this.buf.height
-        );
-      } catch (e1) {
-        // Fallback: treat the code as a direct function body with (buf, PW, PH, t)
-        try {
-          animFn = new Function('buf', 'PW', 'PH', 't', animationCode);
-        } catch (e2) {
-          console.error('[AnimationRunner] Failed to compile animation:', e2);
-          console.error('[AnimationRunner] Code was:', animationCode);
-          resolve();
-          return;
-        }
-      }
-
-      // Snapshot original pixel colors
       this.buf.snapshot();
-
       this.isPlaying = true;
       const startTime = performance.now();
 
@@ -59,21 +80,12 @@ class AnimationRunner {
         const elapsed = now - startTime;
         const t = Math.min(elapsed / durationMs, 1);
 
-        // Restore to snapshot before each frame so the animation function
-        // always works from the original state
         this.buf.restore();
 
-        // Run animation
         try {
-          if (animFn.length === 4) {
-            // Direct body form: function(buf, PW, PH, t)
-            animFn(this.buf.data, this.buf.width, this.buf.height, t);
-          } else {
-            // Returned function form: animate(buf, PW, PH, t)
-            animFn(this.buf.data, this.buf.width, this.buf.height, t);
-          }
+          animFn(this.buf.data, this.buf.width, this.buf.height, t);
         } catch (err) {
-          console.error('[AnimationRunner] Runtime error in animation at t=' + t.toFixed(3) + ':', err);
+          console.error('[AnimationRunner] Runtime error at t=' + t.toFixed(3) + ':', err);
           this._finish();
           return;
         }
