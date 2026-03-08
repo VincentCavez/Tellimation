@@ -55,6 +55,17 @@ class AnimationRunner {
       console.error('[AnimationRunner] AnimationTemplates not loaded');
       return Promise.resolve();
     }
+    // Render text overlays into pixel buffer before snapshot
+    var overlays = spec.text_overlays || [];
+    if (overlays.length > 0 && typeof drawText === 'function') {
+      for (var i = 0; i < overlays.length; i++) {
+        var ov = overlays[i];
+        var c = ov.color || [255, 255, 255];
+        drawText(this.buf.data, this.buf.width, this.buf.height,
+          ov.text, ov.x, ov.y, c[0], c[1], c[2], ov.id, ov.scale || 1);
+      }
+      this.renderer.render();
+    }
     var built = AnimationTemplates.build(spec);
     return this._playFunction(built.animate, built.duration_ms);
   }
