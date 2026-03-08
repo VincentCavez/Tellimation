@@ -195,6 +195,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
     api_key = websocket.query_params.get("api_key", "")
     participant_id = websocket.query_params.get("participant_id", "")
+    child_age_str = websocket.query_params.get("child_age", "8")
 
     if not api_key:
         await websocket.send_json({"type": "error", "message": "Missing API key"})
@@ -202,6 +203,12 @@ async def websocket_endpoint(websocket: WebSocket):
         return
 
     session = SessionState(api_key, participant_id)
+
+    # Set child's age on the student profile
+    try:
+        session.student_profile.age = max(4, min(15, int(child_age_str)))
+    except (ValueError, TypeError):
+        session.student_profile.age = 8
     ws = _WebSocketAdapter(websocket)
 
     try:

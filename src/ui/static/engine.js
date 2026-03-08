@@ -495,13 +495,15 @@ function renderSpriteEntry(eid, entry, pixelBuffer) {
 
 /**
  * Global store for temporary sprites (speech bubbles, nametags, etc.).
- * Keys are sprite IDs, values are JS code strings (same format as sprite_code).
+ * Keys are sprite IDs, values are raw_sprite_data objects
+ * ({x, y, w, h, pixels, mask} — same format as raw_sprite entries in sprite_code).
  * Rendered on top of normal sprites. Managed via add/remove_temp_sprite WS msgs.
+ * Accessible to animation code via the tempSprites global.
  */
 var tempSprites = {};
 
-function addTempSprite(id, spriteCodeStr) {
-  tempSprites[id] = spriteCodeStr;
+function addTempSprite(id, rawSpriteData) {
+  tempSprites[id] = rawSpriteData;
 }
 
 function removeTempSprite(id) {
@@ -510,15 +512,15 @@ function removeTempSprite(id) {
 
 /**
  * Render all current tempSprites into the pixel buffer.
- * Call after rendering normal sprites.
+ * Call after rendering normal sprites, before renderer.render().
  */
 function renderTempSprites(pixelBuffer) {
   for (var sid in tempSprites) {
     if (tempSprites.hasOwnProperty(sid)) {
       try {
-        executeSpriteCode(tempSprites[sid], pixelBuffer);
+        executeRawSprite(tempSprites[sid], pixelBuffer);
       } catch (e) {
-        console.warn('[renderTempSprites] Failed to render', sid, e);
+        console.warn('[renderTempSprites] Failed to render temp sprite', sid, e);
       }
     }
   }
