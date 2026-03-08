@@ -7,10 +7,10 @@ decision about the next action.
 Model: Gemini 3 Flash (gemini-3-flash-preview)
 
 Escalation protocol (encoded in the prompt, not hardcoded):
-  Level 0: Open-ended invitation ("Qu'est-ce que tu vois ?")
+  Level 0: Open-ended invitation ("What do you see?")
   Level 1: Animate the highest-priority unsatisfied target
-  Level 2: Guided question ("Et le renard, il est comment ?")
-  Level 3: Explicit model ("C'est un renard orange !")
+  Level 2: Guided question ("What does the fox look like?")
+  Level 3: Explicit model ("Look, it's an orange fox!")
   Level 4: Move on to next target
 """
 
@@ -209,9 +209,8 @@ def _update_animation_efficacy(
 ) -> None:
     """Update student profile with animation efficacy data from LLM response.
 
-    For each reported efficacy entry:
-    - led_to_correction=True → record correction in profile
-    - led_to_correction=False → no action (escalation handled by next call)
+    Finds pending entries in profile.animation_efficacy (led_to_correction=False)
+    and updates them based on the LLM's assessment of whether the child corrected.
     """
     for entry in efficacy_list:
         target_id = entry.get("target_id", "")
@@ -221,10 +220,14 @@ def _update_animation_efficacy(
             continue
 
         if led_to_correction:
-            # Parse entity_id from target_id (e.g. "t1_color" → use target_id
-            # directly as entity_id since the LLM uses the NEG entity_id)
-            # The profile.record_correction needs entity_id + error_type,
-            # but here we only have target_id. We record a generic correction.
+            # Find the most recent pending efficacy entry for this target
+            for eff in reversed(profile.animation_efficacy):
+                if (
+                    eff.get("target_id") == target_id
+                    and not eff.get("led_to_correction", False)
+                ):
+                    eff["led_to_correction"] = True
+                    break
             profile.corrections_after_animation += 1
             logger.info("[assessment] Animation on %s led to correction", target_id)
         else:
