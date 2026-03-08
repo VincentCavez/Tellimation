@@ -38,24 +38,12 @@ MODEL_ID = "gemini-3-flash-preview"
 TELLIMATION_TIMEOUT = 30   # latency-critical
 MAX_RETRIES = 2
 
-# Fallback animation code by coarse family.
-# MISL elements are mapped to these families via _MISL_TO_FALLBACK.
+# Fallback animations when LLM generation fails.
+# Keyed by coarse family; MISL elements map to these via _MISL_TO_FALLBACK.
 _FALLBACK_CODE: Dict[str, str] = {
-    "spatial": """\
+    "colorPop": """\
 function animate(buf, PW, PH, t) {
-  var env = t < 0.15 ? t / 0.15 : t > 0.85 ? (1 - t) / 0.15 : 1;
-  var offset = Math.round(Math.abs(Math.sin(t * Math.PI * 3)) * -8 * (1 - t));
-  for (var i = 0; i < buf.length; i++) {
-    if (buf[i].e.startsWith('TARGET')) {
-      buf[i].r = Math.min(255, Math.round(buf[i]._r * (1 + 0.2 * env)));
-      buf[i].g = Math.min(255, Math.round(buf[i]._g * (1 + 0.2 * env)));
-      buf[i].b = Math.min(255, Math.round(buf[i]._b * (1 + 0.2 * env)));
-    }
-  }
-}""",
-    "property": """\
-function animate(buf, PW, PH, t) {
-  var env = t < 0.15 ? t / 0.15 : t > 0.85 ? (1 - t) / 0.15 : 1;
+  var env = _easeEnvelope(t, 0.15, 0.15);
   for (var i = 0; i < buf.length; i++) {
     var isTarget = buf[i].e.startsWith('TARGET');
     if (isTarget) {
@@ -71,53 +59,58 @@ function animate(buf, PW, PH, t) {
     }
   }
 }""",
-    "identity": """\
+    "shake": """\
 function animate(buf, PW, PH, t) {
   var freq = 3 + 22 * t;
   var amp = Math.round(4 * Math.sin(t * Math.PI));
   var offset = Math.round(amp * Math.sin(t * Math.PI * freq));
   if (offset === 0) return;
-  var pixels = [];
+  var pixels = _collectEntityPixels(buf, PW, 'TARGET');
+  _blankEntityPixels(buf, pixels);
+  _redrawEntityPixels(buf, PW, PH, pixels, offset, 0);
+}""",
+    "pulse": """\
+function animate(buf, PW, PH, t) {
+  var env = _easeEnvelope(t, 0.15, 0.15);
+  var pulse = 0.5 + 0.5 * Math.sin(t * Math.PI * 4);
   for (var i = 0; i < buf.length; i++) {
-    if (buf[i].e.startsWith('TARGET')) pixels.push(i);
-  }
-  for (var j = 0; j < pixels.length; j++) {
-    var idx = pixels[j];
-    buf[idx].r = buf[idx]._br || 0;
-    buf[idx].g = buf[idx]._bg || 0;
-    buf[idx].b = buf[idx]._bb || 0;
-  }
-  for (var j = 0; j < pixels.length; j++) {
-    var idx = pixels[j];
-    var x = idx % PW, y = (idx - x) / PW;
-    var nx = x + offset;
-    if (nx >= 0 && nx < PW) {
-      var ni = y * PW + nx;
-      buf[ni].r = buf[idx]._r; buf[ni].g = buf[idx]._g; buf[ni].b = buf[idx]._b;
+    if (buf[i].e.startsWith('TARGET')) {
+      var glow = 1 + 0.25 * env * pulse;
+      buf[i].r = Math.min(255, Math.round(buf[i]._r * glow));
+      buf[i].g = Math.min(255, Math.round(buf[i]._g * glow));
+      buf[i].b = Math.min(255, Math.round(buf[i]._b * glow));
     }
   }
+}""",
+    "bounce": """\
+function animate(buf, PW, PH, t) {
+  var offset = Math.round(Math.abs(Math.sin(t * Math.PI * 3)) * -8 * (1 - t));
+  if (offset === 0) return;
+  var pixels = _collectEntityPixels(buf, PW, 'TARGET');
+  _blankEntityPixels(buf, pixels);
+  _redrawEntityPixels(buf, PW, PH, pixels, 0, offset);
 }""",
 }
 
 _FALLBACK_DURATION_MS = 1200
 
-# Map MISL elements to coarse fallback family for _FALLBACK_CODE lookup.
+# Map MISL elements to fallback animation for _FALLBACK_CODE lookup.
 _MISL_TO_FALLBACK: Dict[str, str] = {
-    "character": "identity",
-    "setting": "spatial",
-    "initiating_event": "identity",
-    "internal_response": "property",
-    "plan": "identity",
-    "action": "identity",
-    "consequence": "identity",
-    "coordinating_conjunctions": "identity",
-    "subordinating_conjunctions": "identity",
-    "mental_verbs": "property",
-    "linguistic_verbs": "identity",
-    "adverbs": "property",
-    "elaborated_noun_phrases": "property",
-    "grammaticality": "identity",
-    "tense": "identity",
+    "character": "shake",            # A02 wobble
+    "setting": "bounce",             # D02 settle
+    "initiating_event": "pulse",     # C02 anticipation
+    "internal_response": "colorPop", # B03 emanation
+    "plan": "pulse",                 # H02 thought bubble → pulse
+    "action": "bounce",              # C01 motion lines → bounce
+    "consequence": "pulse",          # F03 causal push → pulse
+    "coordinating_conjunctions": "pulse",
+    "subordinating_conjunctions": "pulse",
+    "mental_verbs": "colorPop",      # H02 thought bubble → colorPop
+    "linguistic_verbs": "shake",     # H01 speech bubble → shake
+    "adverbs": "colorPop",           # B01 color pop
+    "elaborated_noun_phrases": "colorPop",  # B01 color pop
+    "grammaticality": "shake",       # A02 wobble
+    "tense": "pulse",                # E01 afterimage → pulse
 }
 
 
@@ -259,8 +252,8 @@ def _build_fallback(
     target_id: str, misl_element: str,
 ) -> Tuple[str, int, None]:
     """Build a fallback animation when LLM generation fails."""
-    family = _MISL_TO_FALLBACK.get(misl_element, "identity")
-    code = _FALLBACK_CODE.get(family, _FALLBACK_CODE["identity"])
+    family = _MISL_TO_FALLBACK.get(misl_element, "shake")
+    code = _FALLBACK_CODE.get(family, _FALLBACK_CODE["shake"])
     code = code.replace("TARGET", target_id)
     logger.info("[tellimation] Using fallback for %s (misl=%s, family=%s)",
                 target_id, misl_element, family)
