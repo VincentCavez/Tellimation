@@ -146,11 +146,11 @@ prefer configurations that play to effective animation types.
 - Include descriptors that are visually distinctive and narration-worthy.
 - Spatial targets must reference the actual relation from the manifest.
 
-## SKILL coverage
-Verify that targets cover ALL requested SKILL objectives. Use the \
-micro-objectives catalog to understand what each objective entails. If an \
-objective cannot be covered by the manifest, set skill_coverage_check to \
-"PARTIAL".
+## MISL coverage
+Verify that targets cover the MISL rubric elements relevant to the child's \
+profile. Use the macro/microstructure definitions to understand what each \
+element entails. If a targeted element cannot be covered by the manifest, \
+set skill_coverage_check to "PARTIAL".
 
 # Entity rules
 
@@ -199,13 +199,9 @@ body leaning slightly left"
 INITIAL_SCENE_USER_PROMPT = """\
 Generate an opening scene for a new story.
 
-# SKILL macro-objectives (story-level structure)
+# MISL Rubric (Monitoring Indicators of Scholarly Language)
 
-{skill_macro}
-
-# SKILL micro-objectives (sentence-level targets)
-
-{skill_micro}
+{misl_rubric}
 
 # Student profile
 
@@ -238,13 +234,9 @@ the scene for asset generation and module context.
 CONTINUATION_SCENE_USER_PROMPT = """\
 Generate the next scene in an ongoing story.
 
-# SKILL macro-objectives (story-level structure)
+# MISL Rubric (Monitoring Indicators of Scholarly Language)
 
-{skill_macro}
-
-# SKILL micro-objectives (sentence-level targets)
-
-{skill_micro}
+{misl_rubric}
 
 # Story so far
 
