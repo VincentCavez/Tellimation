@@ -4,6 +4,14 @@ from typing import Any, Dict, List
 
 from pydantic import BaseModel, Field
 
+from config.misl import (
+    AGE_EXPECTATIONS,
+    MICRO_AGE_THRESHOLD_LEVEL1,
+    MICRO_AGE_THRESHOLD_LEVEL2,
+    MACRO_KEYS,
+    MICRO_KEYS,
+)
+
 
 class Discrepancy(BaseModel):
     type: str
@@ -14,6 +22,7 @@ class Discrepancy(BaseModel):
 
 
 class StudentProfile(BaseModel):
+    age: int = 8
     error_counts: Dict[str, int] = Field(default_factory=dict)
     error_trend: Dict[str, str] = Field(default_factory=dict)
     difficult_entities: List[str] = Field(default_factory=list)
@@ -27,12 +36,17 @@ class StudentProfile(BaseModel):
     recent_utterances: List[Dict[str, Any]] = Field(default_factory=list)
     # Each entry: {text: str, timestamp: float, scene_id: str, errors: List[str]}
 
+    # MISL scores history — list of scores per element across utterances/scenes
+    misl_scores: Dict[str, List[int]] = Field(default_factory=dict)
+    # Ex: {"character": [1, 1, 2], "action": [0, 1],
+    #       "subordinating_conjunctions": [0, 0]}
+
     # Animation efficacy log — tracks whether animations led to correction
     animation_efficacy: List[Dict[str, Any]] = Field(default_factory=list)
     # Each entry: {
     #   target_id: str,           # sub-entity/feature targeted
-    #   animation_type: str,      # type of animation (shake, colorPop, pulse, etc.)
-    #   skill_type: str,          # SKILL type (descriptive_adjective, spatial_preposition, etc.)
+    #   animation_type: str,      # type of animation (e.g. A01_decomposition)
+    #   misl_element: str,        # MISL element (e.g. "character", "adverbs")
     #   led_to_correction: bool,  # did the child correct after the animation?
     #   escalation_level: int,    # 0=animation, 1=oral guidance, 2=explicit model
     #   timestamp: float,
@@ -43,6 +57,54 @@ class StudentProfile(BaseModel):
 
     def model_post_init(self, __context: object) -> None:
         self._recent_errors = {}
+
+    # ------------------------------------------------------------------
+    # MISL scoring
+    # ------------------------------------------------------------------
+
+    def get_current_level(self, misl_element: str) -> float:
+        """Average of the last 5 scores for a MISL element."""
+        scores = self.misl_scores.get(misl_element, [])
+        if not scores:
+            return 0.0
+        recent = scores[-5:]
+        return sum(recent) / len(recent)
+
+    def get_expected_level(self, misl_element: str) -> int:
+        """Expected score from the developmental trajectory for this age."""
+        if misl_element in MACRO_KEYS:
+            age_row = AGE_EXPECTATIONS.get(self.age)
+            if age_row is None:
+                # Clamp to nearest defined age
+                clamped = max(4, min(15, self.age))
+                age_row = AGE_EXPECTATIONS.get(clamped, {})
+            return age_row.get(misl_element, 0)
+        # Microstructure — no empirical trajectory
+        if self.age >= MICRO_AGE_THRESHOLD_LEVEL2:
+            return 2
+        if self.age >= MICRO_AGE_THRESHOLD_LEVEL1:
+            return 1
+        return 0
+
+    def get_gaps(self) -> Dict[str, int]:
+        """Elements where current level < expected level.
+
+        Returns dict mapping misl_element -> gap (expected - current).
+        Only includes elements with a positive gap.
+        """
+        gaps: Dict[str, int] = {}
+        all_keys = MACRO_KEYS + MICRO_KEYS
+        for key in all_keys:
+            expected = self.get_expected_level(key)
+            current = self.get_current_level(key)
+            gap = expected - int(current)
+            if gap > 0:
+                gaps[key] = gap
+        return gaps
+
+    # ------------------------------------------------------------------
+    # Error tracking
+    # ------------------------------------------------------------------
 
     def record_errors(self, discrepancies: List[Discrepancy]) -> None:
         self.total_utterances += 1
@@ -96,6 +158,10 @@ class StudentProfile(BaseModel):
                 if rate < 0.1:
                     self.strong_areas.append(error_type)
 
+    # ------------------------------------------------------------------
+    # Animation tracking
+    # ------------------------------------------------------------------
+
     def record_animation(
         self, entity_id: str, error_type: str, animation_type: str
     ) -> None:
@@ -126,17 +192,14 @@ class StudentProfile(BaseModel):
             if not entry["corrected"]
         ]
 
-    def get_effective_animations(self, skill_type: str) -> Dict[str, float]:
-        """Return efficacy scores per animation type for a given SKILL type.
+    def get_effective_animations(self, misl_element: str) -> Dict[str, float]:
+        """Return efficacy scores per animation type for a given MISL element.
 
         Computes ``corrections / total`` for each animation_type that has been
-        used for the given skill_type, based on the ``animation_efficacy`` log.
-        The Tellimation module uses these scores to choose the most effective
-        animation approach for this child.
+        used for the given misl_element, based on the ``animation_efficacy`` log.
 
         Args:
-            skill_type: SKILL type string (e.g. "descriptive_adjective",
-                "spatial_preposition").
+            misl_element: MISL element key (e.g. "character", "adverbs").
 
         Returns:
             Dict mapping animation_type -> efficacy score (0.0 to 1.0).
@@ -146,7 +209,7 @@ class StudentProfile(BaseModel):
         successes: Dict[str, int] = {}
 
         for entry in self.animation_efficacy:
-            if entry.get("skill_type") != skill_type:
+            if entry.get("misl_element") != misl_element:
                 continue
             atype = entry.get("animation_type", "")
             if not atype:
@@ -162,8 +225,6 @@ class StudentProfile(BaseModel):
 
     def get_ineffective_animations(self, error_type: str) -> List[str]:
         """Return animation types that did NOT lead to correction for an error type.
-
-        Uses the legacy animation_history log for backward compatibility.
 
         Args:
             error_type: Error type string (e.g. "PROPERTY_COLOR").
@@ -191,6 +252,7 @@ class StudentProfile(BaseModel):
 
     def to_prompt_context(self) -> str:
         lines = ["## Student Profile"]
+        lines.append(f"Age: {self.age}")
         lines.append(f"Utterances so far: {self.total_utterances}")
         lines.append(f"Scenes completed: {self.scenes_completed}")
         if self.error_counts:
@@ -203,6 +265,16 @@ class StudentProfile(BaseModel):
                     )
                 )
             )
+        # MISL gaps
+        gaps = self.get_gaps()
+        if gaps:
+            gap_parts = [f"{k} (gap={v})" for k, v in sorted(gaps.items(), key=lambda x: x[1], reverse=True)]
+            lines.append(f"MISL gaps (current < expected): {', '.join(gap_parts)}")
+        # MISL current levels
+        scored_elements = {k: self.get_current_level(k) for k in self.misl_scores}
+        if scored_elements:
+            level_parts = [f"{k}={v:.1f}" for k, v in scored_elements.items()]
+            lines.append(f"MISL current levels: {', '.join(level_parts)}")
         weak = self.get_weak_areas()
         if weak:
             lines.append(f"Weak areas (high error rate): {', '.join(weak)}")
