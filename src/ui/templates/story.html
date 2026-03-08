@@ -161,6 +161,14 @@
             handleAnimation(msg);
             break;
 
+          case 'add_temp_sprite':
+            handleAddTempSprite(msg);
+            break;
+
+          case 'remove_temp_sprite':
+            handleRemoveTempSprite(msg);
+            break;
+
           case 'scene_complete':
             handleSceneComplete();
             break;
@@ -194,28 +202,36 @@
         feedbackEl.textContent = msg.transcription || '';
       }
 
+      // -- Temp sprite handlers --
+      function handleAddTempSprite(msg) {
+        addTempSprite(msg.id, msg.sprite);
+        try {
+          executeSpriteCode(msg.sprite, buf);
+        } catch (e) {
+          console.warn('[handleAddTempSprite] Failed to render', msg.id, e);
+        }
+        renderer.render();
+      }
+
+      function handleRemoveTempSprite(msg) {
+        removeTempSprite(msg.id);
+        var prefix = msg.id;
+        for (var i = 0; i < buf.data.length; i++) {
+          var e = buf.data[i].e;
+          if (e === prefix || e.indexOf(prefix + '.') === 0) {
+            buf.data[i].r = buf.data[i]._br || 0;
+            buf.data[i].g = buf.data[i]._bg || 0;
+            buf.data[i].b = buf.data[i]._bb || 0;
+            buf.data[i].e = '';
+          }
+        }
+        renderer.render();
+      }
+
       // -- Animation playback --
       function handleAnimation(msg) {
-        // Render temp sprites into the scene before animation
-        var tempIds = [];
-        if (msg.temp_sprites) {
-          var spriteCode = msg.temp_sprites;
-          for (var sid in spriteCode) {
-            if (spriteCode.hasOwnProperty(sid)) {
-              try {
-                executeSpriteCode(spriteCode[sid], buf, sid);
-                tempIds.push(sid);
-              } catch (e) {
-                console.warn('[handleAnimation] Failed to render temp sprite', sid, e);
-              }
-            }
-          }
-          if (tempIds.length > 0) renderer.render();
-        }
-
-        var promise;
         if (msg.template) {
-          promise = animRunner.play({
+          animRunner.play({
             template: msg.template,
             params: msg.params || {},
             particles: msg.particles || [],
@@ -223,26 +239,7 @@
             duration_ms: msg.duration_ms || 1200,
           });
         } else {
-          promise = animRunner.play(msg.code, msg.duration_ms || 1200);
-        }
-
-        // Clean up temp sprites after animation ends
-        if (promise && tempIds.length > 0) {
-          promise.then(function() {
-            // Restore original pixels for temp sprite areas
-            for (var i = 0; i < buf.data.length; i++) {
-              for (var j = 0; j < tempIds.length; j++) {
-                if (buf.data[i].e === tempIds[j] || buf.data[i].e.indexOf(tempIds[j] + '.') === 0) {
-                  buf.data[i].r = buf.data[i]._br || 0;
-                  buf.data[i].g = buf.data[i]._bg || 0;
-                  buf.data[i].b = buf.data[i]._bb || 0;
-                  buf.data[i].e = '';
-                  break;
-                }
-              }
-            }
-            renderer.render();
-          });
+          animRunner.play(msg.code, msg.duration_ms || 1200);
         }
       }
 
