@@ -106,27 +106,37 @@ def _build_scene_image_prompt(manifest_data: Dict[str, Any]) -> str:
     if not bg_desc:
         bg_desc = manifest_data.get("scene_description", "")
 
-    # Compute ground level from entity foot positions in manifest
-    entities = manifest_data.get("manifest", {}).get("entities", [])
-    foot_positions: list[int] = []
-    for ent in entities:
-        pos = ent.get("position", {})
-        y_center = pos.get("y", 0)
-        h_hint = ent.get("height_hint", 200)
-        foot_positions.append(y_center + h_hint // 2)
-
-    if foot_positions:
-        avg_foot = sum(foot_positions) // len(foot_positions)
-        pct = round(avg_foot / SOURCE_H * 100)
+    # Use background.ground_line if available, else compute from entity feet
+    bg_data = manifest_data.get("manifest", {}).get("background")
+    if bg_data and isinstance(bg_data, dict) and "ground_line" in bg_data:
+        pct = round(bg_data["ground_line"] * 100)
         ground_level_hint = (
-            f"Characters will stand with their feet at approximately "
+            f"The ground/floor surface MUST be at approximately "
             f"{pct}% from the top of the image. "
-            f"The ground/floor surface MUST be clearly visible at this level."
+            f"Characters will be composited on top of this background at that level."
         )
     else:
-        ground_level_hint = (
-            "The ground or floor should be at approximately 70% from the top."
-        )
+        # Fallback: compute ground level from entity foot positions
+        entities = manifest_data.get("manifest", {}).get("entities", [])
+        foot_positions: list[int] = []
+        for ent in entities:
+            pos = ent.get("position", {})
+            y_center = pos.get("y", 0)
+            h_hint = ent.get("height_hint", 200)
+            foot_positions.append(y_center + h_hint // 2)
+
+        if foot_positions:
+            avg_foot = sum(foot_positions) // len(foot_positions)
+            pct = round(avg_foot / SOURCE_H * 100)
+            ground_level_hint = (
+                f"Characters will stand with their feet at approximately "
+                f"{pct}% from the top of the image. "
+                f"The ground/floor surface MUST be clearly visible at this level."
+            )
+        else:
+            ground_level_hint = (
+                "The ground or floor should be at approximately 70% from the top."
+            )
 
     return BACKGROUND_IMAGE_PROMPT_TEMPLATE.format(
         scene_description=bg_desc,
@@ -191,6 +201,14 @@ def _build_entity_description(entity: Dict[str, Any]) -> str:
             desc += f", {sanitized_pose}"
     if distinctive:
         desc += f". {distinctive}"
+
+    # Sensory properties (temperature, sound, smell) — enriches image prompt
+    sensory = entity.get("sensory")
+    if sensory and isinstance(sensory, dict):
+        sensory_parts = [f"{k}: {v}" for k, v in sensory.items() if v]
+        if sensory_parts:
+            desc += f". Sensory qualities: {', '.join(sensory_parts)}"
+
     return desc
 
 

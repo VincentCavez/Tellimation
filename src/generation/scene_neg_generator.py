@@ -226,6 +226,164 @@ def _validate_response(data: Dict[str, Any]) -> Tuple[SceneManifest, NEG]:
     return manifest, neg
 
 
+_CANVAS_H = 720
+_CANVAS_W = 1120
+
+# Expected y-ranges (normalized) per zone — generous tolerance
+_ZONE_Y_RANGES: Dict[str, Tuple[float, float]] = {
+    "background": (0.15, 0.60),
+    "midground": (0.40, 0.80),
+    "foreground": (0.55, 1.0),
+}
+
+# Flying/airborne entity types exempt from ground_contact checks
+_AIRBORNE_TYPES = frozenset({
+    "bird", "cloud", "butterfly", "kite", "airplane", "bee", "bat",
+    "dragonfly", "balloon", "eagle", "hawk", "owl_flying",
+})
+
+
+def _validate_semantic(
+    manifest: "SceneManifest",
+    neg: "NEG",
+    data: Dict[str, Any],
+) -> List[str]:
+    """Semantic validation of the manifest + NEG.
+
+    Returns a list of warning strings.  These are non-fatal — the scene is
+    still usable, but the warnings highlight quality issues that the LLM
+    prompt should ideally prevent.
+    """
+    warnings: List[str] = []
+
+    # ------------------------------------------------------------------
+    # 1. Zone/position consistency
+    # ------------------------------------------------------------------
+    for ent in manifest.entities:
+        zone = ent.position.zone
+        if zone and zone in _ZONE_Y_RANGES:
+            y_norm = ent.position.y / _CANVAS_H
+            lo, hi = _ZONE_Y_RANGES[zone]
+            if y_norm < lo - 0.05 or y_norm > hi + 0.05:
+                warnings.append(
+                    f"Entity {ent.id}: y={ent.position.y} (norm={y_norm:.2f}) "
+                    f"inconsistent with zone '{zone}' "
+                    f"(expected {lo:.2f}-{hi:.2f})"
+                )
+
+    # ------------------------------------------------------------------
+    # 2. Scale consistency within same zone
+    # ------------------------------------------------------------------
+    zone_scales: Dict[str, List[Tuple[str, float]]] = {}
+    for ent in manifest.entities:
+        if ent.scale_factor is not None and ent.position.zone:
+            zone_scales.setdefault(ent.position.zone, []).append(
+                (ent.id, ent.scale_factor)
+            )
+    for zone, entries in zone_scales.items():
+        scales = [s for _, s in entries]
+        spread = max(scales) - min(scales)
+        if spread > 0.5:
+            names = ", ".join(f"{n}={s:.1f}" for n, s in entries)
+            warnings.append(
+                f"Zone '{zone}': scale spread {spread:.2f} "
+                f"exceeds 0.5 ({names})"
+            )
+
+    # ------------------------------------------------------------------
+    # 3. Minimum entity count (3-5 recommended)
+    # ------------------------------------------------------------------
+    n_entities = len(manifest.entities)
+    if n_entities < 3:
+        warnings.append(
+            f"Only {n_entities} entities (3-5 recommended)"
+        )
+
+    # ------------------------------------------------------------------
+    # 4. Minimum spatial relations (2+ recommended)
+    # ------------------------------------------------------------------
+    if len(manifest.relations) < 2:
+        warnings.append(
+            f"Only {len(manifest.relations)} spatial relation(s) "
+            f"(2+ recommended)"
+        )
+
+    # ------------------------------------------------------------------
+    # 5. Color diversity (at least 2 distinct color families)
+    # ------------------------------------------------------------------
+    color_words: List[str] = []
+    for ent in manifest.entities:
+        raw = ent.properties.get("color", "").strip().lower()
+        if raw:
+            # Take the first significant word (skip modifiers like "warm", "bright")
+            for w in raw.split():
+                if w not in ("warm", "bright", "dark", "light", "pale",
+                             "deep", "soft", "rich", "dusty", "vivid"):
+                    color_words.append(w)
+                    break
+            else:
+                color_words.append(raw.split()[0])
+    unique_colors = set(color_words)
+    if len(unique_colors) < 2 and n_entities >= 2:
+        warnings.append(
+            f"Low color diversity ({unique_colors}) — "
+            f"need 2+ distinct color families"
+        )
+
+    # ------------------------------------------------------------------
+    # 6. Ground contact for foreground entities
+    # ------------------------------------------------------------------
+    for ent in manifest.entities:
+        if (ent.position.zone == "foreground"
+                and not ent.position.ground_contact
+                and ent.type.lower() not in _AIRBORNE_TYPES):
+            warnings.append(
+                f"Entity {ent.id} ({ent.type}) in foreground "
+                f"without ground_contact"
+            )
+
+    # ------------------------------------------------------------------
+    # 7. Bounding box within canvas
+    # ------------------------------------------------------------------
+    for ent in manifest.entities:
+        wh = ent.width_hint or 100
+        hh = ent.height_hint or 100
+        x, y = ent.position.x, ent.position.y
+        if x - wh // 2 < 0 or x + wh // 2 > _CANVAS_W - 1:
+            warnings.append(
+                f"Entity {ent.id}: x-bounds overflow canvas "
+                f"(x={x}, w={wh})"
+            )
+        if y - hh // 2 < 0 or y + hh // 2 > _CANVAS_H - 1:
+            warnings.append(
+                f"Entity {ent.id}: y-bounds overflow canvas "
+                f"(y={y}, h={hh})"
+            )
+
+    # ------------------------------------------------------------------
+    # 8. Missing orientation on character entities
+    # ------------------------------------------------------------------
+    character_types = {"person", "boy", "girl", "man", "woman", "child",
+                       "rabbit", "cat", "dog", "fox", "bear", "owl",
+                       "frog", "mouse", "squirrel", "deer", "bird",
+                       "penguin", "monkey", "elephant", "lion", "tiger"}
+    for ent in manifest.entities:
+        if ent.type.lower() in character_types and not ent.orientation:
+            warnings.append(
+                f"Character entity {ent.id} ({ent.type}) missing orientation"
+            )
+
+    # ------------------------------------------------------------------
+    # 9. NEG target count (at least 3)
+    # ------------------------------------------------------------------
+    if len(neg.targets) < 3:
+        warnings.append(
+            f"Only {len(neg.targets)} NEG target(s) (3+ recommended)"
+        )
+
+    return warnings
+
+
 # ---------------------------------------------------------------------------
 # Main entry point
 # ---------------------------------------------------------------------------
@@ -298,6 +456,16 @@ async def generate_scene_and_neg(
             manifest, neg = _validate_response(data)
             parse_elapsed = time.time() - t1
             logger.info("[scene-neg] Parsing + validation took %.1fs", parse_elapsed)
+
+            # Semantic validation (non-fatal warnings)
+            sem_warnings = _validate_semantic(manifest, neg, data)
+            for w in sem_warnings:
+                logger.warning("[scene-neg] Semantic: %s", w)
+            if sem_warnings:
+                logger.info(
+                    "[scene-neg] %d semantic warning(s) for scene '%s'",
+                    len(sem_warnings), manifest.scene_id,
+                )
 
             logger.info(
                 "[scene-neg] Generated scene '%s': %d entities, %d relations, "
