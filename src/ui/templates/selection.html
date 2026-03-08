@@ -49,21 +49,11 @@
       const progressContainer = document.getElementById('progress-container');
       const progressBar = document.getElementById('progress-bar');
       const progressLabel = document.getElementById('progress-label');
-      let branches = [];
-      let fromDisk = false;
-
-      // Track which scene indices have masks ready (clickable)
-      var masksReadySet = {};
-      // Map from scene index to its DOM card element
+      var branches = [];
       var cardElements = {};
-      // Timestamp when each card was appended (for minimum loading display)
-      var cardAppendedAt = {};
-      // Minimum time (ms) the loading state must be visible
-      var MIN_LOADING_MS = 1500;
-      // Queue of mask-ready events that arrived before the minimum delay
-      var pendingMaskReady = {};
+      var pendingSelectIndex = null;
 
-      // Step weights for progress calculation (% within a single scene)
+      // Step weights for progress calculation
       var stepWeights = {
         starting: 5,
         manifest: 20,
@@ -71,7 +61,6 @@
         masks: 85,
         assembly: 95
       };
-
       var stepLabels = {
         starting: 'Getting creative...',
         manifest: 'Imagining a story...',
@@ -79,24 +68,15 @@
         masks: 'Adding details...',
         assembly: 'Almost ready...'
       };
-
-      // Track per-scene progress for parallel generation
       var sceneProgressMap = {};
 
       function updateProgress(sceneIndex, totalScenes, stepName) {
-        // Store progress for this scene (scenes advance independently)
         sceneProgressMap[sceneIndex] = stepWeights[stepName] || 0;
-
-        // Overall progress = average across all scenes
         var total = 0;
-        for (var key in sceneProgressMap) {
-          total += sceneProgressMap[key];
-        }
+        for (var key in sceneProgressMap) total += sceneProgressMap[key];
         var overallPct = Math.min(total / totalScenes, 99);
-
         progressBar.style.width = overallPct + '%';
-        var label = stepLabels[stepName] || 'Working...';
-        progressLabel.textContent = label;
+        progressLabel.textContent = stepLabels[stepName] || 'Working...';
       }
 
       function showProgress() {
@@ -122,53 +102,29 @@
 
       ws.onopen = function() {
         showProgress();
-        // Request initial scenes
         ws.send(JSON.stringify({ type: 'generate_initial_scenes' }));
       };
 
       ws.onmessage = function(event) {
-        // Skip binary messages (TTS audio)
         if (event.data instanceof ArrayBuffer || event.data instanceof Blob) return;
-        const msg = JSON.parse(event.data);
+        var msg = JSON.parse(event.data);
 
         if (msg.type === 'generation_progress') {
-          // Scene generation started
           updateProgress(msg.scene_index, msg.total_scenes, 'manifest');
         }
 
         if (msg.type === 'generation_step') {
-          // Pipeline step completed
           updateProgress(msg.scene_index, msg.total_scenes, msg.step);
         }
 
         if (msg.type === 'scene_ready') {
-          // A single scene just finished generating — show it immediately (greyed out)
+          // Scene ready — show thumbnail and make it clickable immediately
           branches.push(msg.scene);
-          container.style.display = '';
-          appendThumbnail(msg.scene, branches.length - 1, false);
-        }
-
-        if (msg.type === 'masks_ready') {
-          // Masks generated for a scene — enable clicking
-          // Enforce minimum loading display time so the user sees the greyed-out state
-          var appearedAt = cardAppendedAt[msg.index];
-          if (appearedAt) {
-            var elapsed = Date.now() - appearedAt;
-            if (elapsed < MIN_LOADING_MS) {
-              (function(idx) {
-                setTimeout(function() { enableThumbnail(idx); }, MIN_LOADING_MS - elapsed);
-              })(msg.index);
-            } else {
-              enableThumbnail(msg.index);
-            }
-          } else {
-            // Card not yet shown — queue it
-            pendingMaskReady[msg.index] = true;
-          }
+          hideProgress();
+          appendThumbnail(msg.scene, branches.length - 1);
         }
 
         if (msg.type === 'initial_scenes_done') {
-          // All scenes finished generating
           hideProgress();
           btnOneMore.style.display = '';
         }
@@ -176,24 +132,25 @@
         if (msg.type === 'initial_scenes') {
           // Backward compat: bulk delivery (from-disk case)
           branches = msg.scenes;
-          fromDisk = !!msg.from_disk;
-          if (fromDisk) {
+          var isDisk = !!msg.from_disk;
+          if (isDisk) {
             selTitle.innerHTML = 'Welcome back! <span class="accent">Continue</span> a story';
             selSub.textContent = 'Pick a previous story to continue, or start a new one';
           }
           hideProgress();
-          renderThumbnails(branches, true); // from-disk = masks already ready
-          btnOneMore.style.display = fromDisk ? 'none' : '';
+          container.innerHTML = '';
+          cardElements = {};
+          branches.forEach(function(scene, i) { appendThumbnail(scene, i); });
+          btnOneMore.style.display = isDisk ? 'none' : '';
         }
 
         if (msg.type === 'one_more_scene') {
           branches.push(msg.scene);
           var newIdx = msg.index !== undefined ? msg.index : branches.length - 1;
-          appendThumbnail(msg.scene, newIdx, false);
+          appendThumbnail(msg.scene, newIdx);
         }
 
         if (msg.type === 'scene_selected_ready') {
-          // Server finished generating masks + features — navigate with updated scene
           sessionStorage.setItem('chosen_scene', JSON.stringify(msg.scene));
           sessionStorage.setItem('scene_index', String(pendingSelectIndex || 0));
           window.location.href = '/story';
@@ -202,7 +159,6 @@
         if (msg.type === 'error') {
           console.error('Server error:', msg.message);
           hideProgress();
-          // Reset pending selection
           if (pendingSelectIndex !== null) {
             var card = cardElements[pendingSelectIndex];
             if (card) {
@@ -222,97 +178,40 @@
         container.innerHTML = '<p style="color:var(--red)">Connection error. Please reload.</p>';
       };
 
-      function appendThumbnail(scene, index, ready) {
+      function appendThumbnail(scene, index) {
         var card = ScenePicker.createThumbnailCard(scene);
-
-        // Add a loading overlay with a spinning circle
-        var overlay = document.createElement('div');
-        overlay.className = 'thumb-loading-overlay';
-        var spinner = document.createElement('div');
-        spinner.className = 'thumb-spinner';
-        overlay.appendChild(spinner);
-        card.appendChild(overlay);
-
-        if (ready) {
-          // Already ready (from disk) — no loading state
-          masksReadySet[index] = true;
-          card.classList.remove('loading');
-          overlay.style.display = 'none';
-        } else {
-          card.classList.add('loading');
-          cardAppendedAt[index] = Date.now();
-        }
-
-        card.addEventListener('click', function() {
-          if (masksReadySet[index]) {
-            selectScene(index);
-          }
-        });
-
+        card.addEventListener('click', function() { selectScene(index); });
         cardElements[index] = card;
         container.appendChild(card);
-
-        // If masks_ready arrived before scene_ready, schedule enable with min delay
-        if (!ready && pendingMaskReady[index]) {
-          delete pendingMaskReady[index];
-          setTimeout(function() { enableThumbnail(index); }, MIN_LOADING_MS);
-        }
       }
-
-      function enableThumbnail(index) {
-        masksReadySet[index] = true;
-        var card = cardElements[index];
-        if (card) {
-          card.classList.remove('loading');
-          // Hide the loading overlay
-          var overlay = card.querySelector('.thumb-loading-overlay');
-          if (overlay) overlay.style.display = 'none';
-        }
-      }
-
-      function renderThumbnails(scenes, ready) {
-        container.innerHTML = '';
-        cardElements = {};
-        scenes.forEach(function(scene, index) {
-          appendThumbnail(scene, index, !!ready);
-        });
-      }
-
-      var pendingSelectIndex = null;
 
       function selectScene(index) {
-        if (!masksReadySet[index]) return; // safety check
-        if (pendingSelectIndex !== null) return; // already selecting
+        if (pendingSelectIndex !== null) return;
         pendingSelectIndex = index;
         var scene = branches[index];
-        // Store story_index if it came from disk
         if (scene._story_index) {
           sessionStorage.setItem('story_index', String(scene._story_index));
         } else {
           sessionStorage.removeItem('story_index');
         }
-        // Show loading state on the selected card
         var card = cardElements[index];
         if (card) {
           card.style.opacity = '0.6';
           card.style.pointerEvents = 'none';
         }
-        // Ask server to generate real masks + features, then wait for response
         ws.send(JSON.stringify({ type: 'select_scene', index: index }));
-        // Navigation happens in onmessage when scene_selected_ready arrives
       }
 
       btnOneMore.addEventListener('click', function() {
         btnOneMore.disabled = true;
         btnOneMore.textContent = 'Generating...';
         ws.send(JSON.stringify({ type: 'generate_one_more' }));
-        // Re-enable after response
         var origHandler = ws.onmessage;
         ws.onmessage = function(event) {
           origHandler(event);
           if (event.data instanceof ArrayBuffer || event.data instanceof Blob) return;
-          var msg = JSON.parse(event.data);
-          if (msg.type === 'one_more_scene' || msg.type === 'error') {
+          var m = JSON.parse(event.data);
+          if (m.type === 'one_more_scene' || m.type === 'error') {
             btnOneMore.disabled = false;
             btnOneMore.textContent = '+ I want to see one more';
           }
