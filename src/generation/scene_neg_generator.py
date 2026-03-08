@@ -24,8 +24,12 @@ from google import genai
 from google.genai import types
 
 from config.misl import (
+    AGE_EXPECTATIONS,
     ALL_KEYS,
     MACROSTRUCTURE,
+    MICRO_AGE_THRESHOLD_LEVEL1,
+    MICRO_AGE_THRESHOLD_LEVEL2,
+    MICRO_KEYS,
     MICROSTRUCTURE,
     MISL_TO_ANIMATIONS,
     QUANTITY_ANIMATIONS,
@@ -91,6 +95,37 @@ def _build_misl_rubric() -> str:
     return _misl_rubric_cache
 
 
+def _build_developmental_expectations(age: int) -> str:
+    """Format the expected MISL levels for the child's age."""
+    lines: List[str] = []
+    lines.append(f"Child age: {age}")
+    lines.append("")
+
+    # Macrostructure expectations
+    clamped = max(4, min(15, age))
+    age_row = AGE_EXPECTATIONS.get(clamped, {})
+    lines.append("Macrostructure expected levels:")
+    for key, level in age_row.items():
+        lines.append(f"  {key}: {level}")
+    lines.append("")
+
+    # Microstructure expectations
+    if age >= MICRO_AGE_THRESHOLD_LEVEL2:
+        micro_level = 2
+    elif age >= MICRO_AGE_THRESHOLD_LEVEL1:
+        micro_level = 1
+    else:
+        micro_level = 0
+    lines.append(f"Microstructure expected level (all elements): {micro_level}")
+    lines.append("")
+    lines.append(
+        "CRITICAL: target_level must NEVER exceed expected_level + 1 "
+        "(zone of proximal development). For elements already at or above "
+        "expected level, target_level = current_level (maintenance, not growth)."
+    )
+    return "\n".join(lines)
+
+
 # ---------------------------------------------------------------------------
 # Prompt builders
 # ---------------------------------------------------------------------------
@@ -101,14 +136,17 @@ def _build_initial_prompt(
     theme: str,
 ) -> str:
     """Build user prompt for an initial scene (no story state)."""
+    age = student_profile.age if student_profile else 8
+
     profile_ctx = ""
     if student_profile and student_profile.total_utterances > 0:
         profile_ctx = student_profile.to_prompt_context()
     else:
-        profile_ctx = "(New student — no error history yet.)"
+        profile_ctx = f"(New student, age {age} — no error history yet.)"
 
     return INITIAL_SCENE_USER_PROMPT.format(
         misl_rubric=_build_misl_rubric(),
+        developmental_expectations=_build_developmental_expectations(age),
         student_profile=profile_ctx,
         theme=theme,
     )
@@ -145,7 +183,8 @@ def _build_continuation_prompt(
         )
     active_entities = "\n".join(entity_lines) if entity_lines else "(none)"
 
-    # Student profile
+    # Student profile + age
+    age = student_profile.age if student_profile else 8
     profile_ctx = ""
     if student_profile:
         profile_ctx = student_profile.to_prompt_context()
@@ -154,6 +193,7 @@ def _build_continuation_prompt(
 
     return CONTINUATION_SCENE_USER_PROMPT.format(
         misl_rubric=_build_misl_rubric(),
+        developmental_expectations=_build_developmental_expectations(age),
         story_context=story_context,
         previous_manifest=prev_manifest_str,
         previous_neg=prev_neg_str,
