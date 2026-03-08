@@ -36,6 +36,7 @@
     (function() {
       const apiKey = sessionStorage.getItem('api_key');
       const participantId = sessionStorage.getItem('participant_id');
+      const childAge = sessionStorage.getItem('child_age') || '8';
       if (!apiKey || !participantId) {
         window.location.href = '/';
         return;
@@ -116,6 +117,7 @@
         protocol + '//' + location.host + '/ws'
         + '?api_key=' + encodeURIComponent(apiKey)
         + '&participant_id=' + encodeURIComponent(participantId)
+        + '&child_age=' + encodeURIComponent(childAge)
       );
 
       ws.onopen = function() {

@@ -158,8 +158,31 @@ a { color: var(--teal); text-decoration: none; }
   transition: border-color 0.2s;
   outline: none;
 }
-.field input:focus { border-color: var(--blue); }
+.field input:focus, .field select:focus { border-color: var(--blue); }
 .field input::placeholder { color: #444; }
+.field select {
+  width: 100%;
+  background: var(--dark);
+  border: 2px solid var(--dark4);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  color: var(--light);
+  font-family: var(--font);
+  font-size: 0.9rem;
+  font-weight: 300;
+  transition: border-color 0.2s;
+  outline: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23888' stroke-width='2'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+}
+.field select option {
+  background: var(--dark);
+  color: var(--light);
+}
 
 .login-btn-wrap { margin-top: 1.6rem; text-align: center; }
 .login-btn-wrap .btn { width: 100%; font-size: 1.15rem; padding: 16px; }
