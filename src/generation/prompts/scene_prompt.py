@@ -266,8 +266,6 @@ INITIAL_SCENE_USER_PROMPT = """\
 Generate an opening scene for a new story. This is for the story selection page \
 where the child picks from 3 options.
 
-SKILL objectives for this session: {skill_objectives}
-
 Story theme: {theme}
 
 Use this theme as the setting for the scene. Create characters and elements \
@@ -295,9 +293,6 @@ Generate the next scene in an ongoing story.
 {active_entities}
 
 {student_profile_context}
-
-# SKILL objectives
-{skill_objectives}
 
 # Instructions
 - Continue the narrative naturally from where it left off.

@@ -17,7 +17,6 @@ class ActiveEntity(BaseModel):
 class StoryState(BaseModel):
     session_id: str = ""
     participant_id: str = ""
-    skill_objectives: List[str] = Field(default_factory=list)
     scenes: List[Dict] = Field(default_factory=list)
     active_entities: Dict[str, ActiveEntity] = Field(default_factory=dict)
 
