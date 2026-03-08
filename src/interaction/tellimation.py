@@ -175,21 +175,33 @@ def _format_animation_effectiveness(
 
     Tells the LLM which animation types worked and which didn't for
     this child, so it can adapt its approach.
+
+    Uses animation_efficacy (skill_type-based scores) when available,
+    falls back to animation_history (error_type-based lists).
     """
     lines = []
 
-    # Check all error types that could apply
-    for error_type in student_profile.error_counts:
-        effective = student_profile.get_effective_animations(error_type)
-        ineffective = student_profile.get_ineffective_animations(error_type)
+    # Primary: efficacy scores from animation_efficacy log
+    seen_skill_types: set = set()
+    for entry in student_profile.animation_efficacy:
+        st = entry.get("skill_type", "")
+        if st:
+            seen_skill_types.add(st)
 
-        if effective:
-            lines.append(
-                f"For {error_type}: EFFECTIVE animations: {', '.join(effective)}"
-            )
+    for skill_type in sorted(seen_skill_types):
+        scores = student_profile.get_effective_animations(skill_type)
+        if scores:
+            ranked = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+            parts = [f"{atype}={score:.0%}" for atype, score in ranked]
+            lines.append(f"For {skill_type}: efficacy scores: {', '.join(parts)}")
+
+    # Fallback: ineffective animations from legacy animation_history
+    for error_type in student_profile.error_counts:
+        ineffective = student_profile.get_ineffective_animations(error_type)
         if ineffective:
             lines.append(
-                f"For {error_type}: INEFFECTIVE animations (avoid): {', '.join(ineffective)}"
+                f"For {error_type}: INEFFECTIVE animations (avoid): "
+                f"{', '.join(ineffective)}"
             )
 
     if not lines:
