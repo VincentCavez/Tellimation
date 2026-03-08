@@ -94,6 +94,10 @@ class AnimationRunner {
         const t = Math.min(elapsed / durationMs, 1);
 
         this.buf.restore();
+        // Re-render temp sprites so animation code can see/interact with them
+        if (typeof renderTempSprites === 'function') {
+          renderTempSprites(this.buf);
+        }
 
         try {
           animFn(this.buf.data, this.buf.width, this.buf.height, t);
@@ -130,6 +134,10 @@ class AnimationRunner {
     }
     // Restore original pixel state
     this.buf.restore();
+    // Re-render temp sprites on top after restore
+    if (typeof renderTempSprites === 'function') {
+      renderTempSprites(this.buf);
+    }
     this.renderer.render();
 
     if (this._resolve) {
