@@ -31,6 +31,7 @@ from src.generation.prompts.assessment_prompt import (
     ASSESSMENT_SYSTEM_PROMPT,
     ASSESSMENT_USER_PROMPT_TEMPLATE,
 )
+from src.generation.scene_neg_generator import _build_misl_rubric
 from src.generation.utils import (
     extract_json as _extract_json,
     get_response_text as _get_response_text,
@@ -113,6 +114,7 @@ async def assess_and_respond(
     profile_text = student_profile.to_prompt_context()
 
     user_prompt = ASSESSMENT_USER_PROMPT_TEMPLATE.format(
+        misl_rubric=_build_misl_rubric(),
         neg_json=neg_json,
         conversation_history=history_text,
         animations_played=animations_text,
@@ -143,18 +145,24 @@ async def assess_and_respond(
             decision = AssessmentDecision(
                 action=data.get("action", "wait"),
                 target_id=data.get("target_id"),
+                misl_element=data.get("misl_element"),
                 guidance_text=data.get("guidance_text"),
                 reasoning=data.get("reasoning", ""),
             )
+
+            # Record MISL scores from LLM evaluation
+            misl_scores = data.get("misl_scores", {})
+            _update_misl_scores(student_profile, misl_scores)
 
             # Log animation efficacy from LLM response
             efficacy_list = data.get("animation_efficacy", [])
             _update_animation_efficacy(student_profile, efficacy_list)
 
             logger.info(
-                "[assessment] action=%s target=%s reasoning=%s",
+                "[assessment] action=%s target=%s misl=%s reasoning=%s",
                 decision.action,
                 decision.target_id,
+                decision.misl_element,
                 decision.reasoning[:80] if decision.reasoning else "",
             )
 
@@ -178,6 +186,21 @@ async def assess_and_respond(
         action="wait",
         reasoning=f"LLM call failed after {MAX_RETRIES} attempts: {last_exc}",
     )
+
+
+def _update_misl_scores(
+    profile: StudentProfile,
+    scores: Dict[str, Any],
+) -> None:
+    """Append MISL scores from LLM evaluation to the student profile."""
+    for element, score in scores.items():
+        if not isinstance(score, int) or score < 0 or score > 3:
+            continue
+        if element not in profile.misl_scores:
+            profile.misl_scores[element] = []
+        profile.misl_scores[element].append(score)
+    if scores:
+        logger.info("[assessment] MISL scores recorded: %s", scores)
 
 
 def _update_animation_efficacy(

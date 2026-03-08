@@ -1,10 +1,10 @@
 """Tellimation module — generates animations from the animation grammar.
 
-Given a target entity and an error_category from the discrepancy assessment,
+Given a target entity and a misl_element from the discrepancy assessment,
 generates JS animation code, a duration, and optional temporary sprites.
 
-The module chooses, adapts and combines animations from these families:
-  spatial, property, temporal, action, identity, quantity, relational, discourse
+The module chooses, adapts and combines animations from the MISL→animation
+mapping (config/misl.py).
 
 Model: Gemini 3 Flash (gemini-3-flash-preview)
 
@@ -26,6 +26,7 @@ from src.generation.prompts.tellimation_prompt import (
     TELLIMATION_SYSTEM_PROMPT,
     TELLIMATION_USER_PROMPT_TEMPLATE,
 )
+from config.misl import MISL_TO_ANIMATIONS
 from src.generation.utils import (
     extract_json as _extract_json,
     get_response_text as _get_response_text,
@@ -37,7 +38,8 @@ MODEL_ID = "gemini-3-flash-preview"
 TELLIMATION_TIMEOUT = 30   # latency-critical
 MAX_RETRIES = 2
 
-# Fallback animation code per error_category
+# Fallback animation code by coarse family.
+# MISL elements are mapped to these families via _MISL_TO_FALLBACK.
 _FALLBACK_CODE: Dict[str, str] = {
     "spatial": """\
 function animate(buf, PW, PH, t) {
@@ -98,6 +100,25 @@ function animate(buf, PW, PH, t) {
 }
 
 _FALLBACK_DURATION_MS = 1200
+
+# Map MISL elements to coarse fallback family for _FALLBACK_CODE lookup.
+_MISL_TO_FALLBACK: Dict[str, str] = {
+    "character": "identity",
+    "setting": "spatial",
+    "initiating_event": "identity",
+    "internal_response": "property",
+    "plan": "identity",
+    "action": "identity",
+    "consequence": "identity",
+    "coordinating_conjunctions": "identity",
+    "subordinating_conjunctions": "identity",
+    "mental_verbs": "property",
+    "linguistic_verbs": "identity",
+    "adverbs": "property",
+    "elaborated_noun_phrases": "property",
+    "grammaticality": "identity",
+    "tense": "identity",
+}
 
 
 def _format_entity_details(
@@ -235,13 +256,14 @@ def _format_animation_effectiveness(
 
 
 def _build_fallback(
-    target_id: str, error_category: str,
+    target_id: str, misl_element: str,
 ) -> Tuple[str, int, None]:
     """Build a fallback animation when LLM generation fails."""
-    code = _FALLBACK_CODE.get(error_category, _FALLBACK_CODE["identity"])
+    family = _MISL_TO_FALLBACK.get(misl_element, "identity")
+    code = _FALLBACK_CODE.get(family, _FALLBACK_CODE["identity"])
     code = code.replace("TARGET", target_id)
-    logger.info("[tellimation] Using fallback for %s (category=%s)",
-                target_id, error_category)
+    logger.info("[tellimation] Using fallback for %s (misl=%s, family=%s)",
+                target_id, misl_element, family)
     return (code, _FALLBACK_DURATION_MS, None)
 
 
@@ -251,7 +273,7 @@ async def generate_tellimation(
     manifest: SceneManifest,
     student_profile: StudentProfile,
     target_id: str,
-    error_category: str,
+    misl_element: str,
 ) -> Tuple[str, int, Optional[Dict]]:
     """Generate a tellimation animation for a target entity.
 
@@ -259,6 +281,10 @@ async def generate_tellimation(
     temp_sprites is a dict of sprite entries (same format as sprite_code)
     for temporary visual elements like speech bubbles or nametags.
     """
+    # Build eligible animations list from MISL mapping
+    eligible = MISL_TO_ANIMATIONS.get(misl_element, [])
+    eligible_text = ", ".join(eligible) if eligible else "(any)"
+
     # Build prompt
     entity_details = _format_entity_details(target_id, manifest)
     sprite_info = _format_sprite_info(target_id, sprite_code)
@@ -268,7 +294,8 @@ async def generate_tellimation(
 
     user_prompt = TELLIMATION_USER_PROMPT_TEMPLATE.format(
         target_id=target_id,
-        error_category=error_category,
+        misl_element=misl_element,
+        eligible_animations=eligible_text,
         entity_details=entity_details,
         sprite_info=sprite_info,
         scene_context=scene_context,
@@ -317,7 +344,7 @@ async def generate_tellimation(
 
             student_profile.record_animation(
                 entity_id=target_id,
-                error_type=error_category,
+                error_type=misl_element,
                 animation_type=animation_id,
             )
 
@@ -337,12 +364,12 @@ async def generate_tellimation(
     logger.warning("[tellimation] All %d attempts failed (%s), using fallback",
                    MAX_RETRIES, last_exc)
 
-    result = _build_fallback(target_id, error_category)
+    result = _build_fallback(target_id, misl_element)
 
     student_profile.record_animation(
         entity_id=target_id,
-        error_type=error_category,
-        animation_type=f"fallback_{error_category}",
+        error_type=misl_element,
+        animation_type=f"fallback_{misl_element}",
     )
 
     return result
