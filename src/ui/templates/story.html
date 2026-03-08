@@ -55,6 +55,7 @@
     (function() {
       const apiKey = sessionStorage.getItem('api_key');
       const participantId = sessionStorage.getItem('participant_id');
+      const childAge = sessionStorage.getItem('child_age') || '8';
       if (!apiKey || !participantId) {
         window.location.href = '/';
         return;
@@ -97,6 +98,8 @@
               console.warn('[renderScene] Failed to render', entityEids[i], e);
             }
           }
+          // Render temporary sprites on top of normal entities
+          renderTempSprites(buf);
           renderer.render();
         }
 
@@ -124,6 +127,7 @@
         protocol + '//' + location.host + '/ws'
         + '?api_key=' + encodeURIComponent(apiKey)
         + '&participant_id=' + encodeURIComponent(participantId)
+        + '&child_age=' + encodeURIComponent(childAge)
       );
 
       var storyIndex = parseInt(sessionStorage.getItem('story_index') || '0', 10);
@@ -206,7 +210,7 @@
       function handleAddTempSprite(msg) {
         addTempSprite(msg.id, msg.sprite);
         try {
-          executeSpriteCode(msg.sprite, buf);
+          executeRawSprite(msg.sprite, buf);
         } catch (e) {
           console.warn('[handleAddTempSprite] Failed to render', msg.id, e);
         }
