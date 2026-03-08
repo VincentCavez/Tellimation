@@ -23,6 +23,22 @@ class StudentProfile(BaseModel):
     total_utterances: int = 0
     animation_history: List[Dict[str, Any]] = Field(default_factory=list)
 
+    # Per-utterance log with error context
+    recent_utterances: List[Dict[str, Any]] = Field(default_factory=list)
+    # Each entry: {text: str, timestamp: float, scene_id: str, errors: List[str]}
+
+    # Animation efficacy log — tracks whether animations led to correction
+    animation_efficacy: List[Dict[str, Any]] = Field(default_factory=list)
+    # Each entry: {
+    #   target_id: str,           # sub-entity/feature targeted
+    #   animation_type: str,      # type of animation (shake, colorPop, pulse, etc.)
+    #   skill_type: str,          # SKILL type (descriptive_adjective, spatial_preposition, etc.)
+    #   led_to_correction: bool,  # did the child correct after the animation?
+    #   escalation_level: int,    # 0=animation, 1=oral guidance, 2=explicit model
+    #   timestamp: float,
+    #   scene_id: str,
+    # }
+
     _recent_errors: Dict[str, List[int]] = {}
 
     def model_post_init(self, __context: object) -> None:
@@ -110,28 +126,44 @@ class StudentProfile(BaseModel):
             if not entry["corrected"]
         ]
 
-    def get_effective_animations(self, error_type: str) -> List[str]:
-        """Return animation types that led to correction for a given error type.
+    def get_effective_animations(self, skill_type: str) -> Dict[str, float]:
+        """Return efficacy scores per animation type for a given SKILL type.
 
-        Useful for choosing which animation approach to use: if "color_pop"
-        worked for PROPERTY_COLOR but "shake" didn't, prefer "color_pop".
+        Computes ``corrections / total`` for each animation_type that has been
+        used for the given skill_type, based on the ``animation_efficacy`` log.
+        The Tellimation module uses these scores to choose the most effective
+        animation approach for this child.
 
         Args:
-            error_type: Error type string (e.g. "PROPERTY_COLOR").
+            skill_type: SKILL type string (e.g. "descriptive_adjective",
+                "spatial_preposition").
 
         Returns:
-            List of animation_type strings that led to correction.
+            Dict mapping animation_type -> efficacy score (0.0 to 1.0).
+            Higher is better. Only includes types with at least one trial.
         """
-        effective: List[str] = []
-        for entry in self.animation_history:
-            if entry["error_type"] == error_type and entry["corrected"]:
-                at = entry.get("animation_type", "")
-                if at and at not in effective:
-                    effective.append(at)
-        return effective
+        totals: Dict[str, int] = {}
+        successes: Dict[str, int] = {}
+
+        for entry in self.animation_efficacy:
+            if entry.get("skill_type") != skill_type:
+                continue
+            atype = entry.get("animation_type", "")
+            if not atype:
+                continue
+            totals[atype] = totals.get(atype, 0) + 1
+            if entry.get("led_to_correction", False):
+                successes[atype] = successes.get(atype, 0) + 1
+
+        return {
+            atype: successes.get(atype, 0) / total
+            for atype, total in totals.items()
+        }
 
     def get_ineffective_animations(self, error_type: str) -> List[str]:
         """Return animation types that did NOT lead to correction for an error type.
+
+        Uses the legacy animation_history log for backward compatibility.
 
         Args:
             error_type: Error type string (e.g. "PROPERTY_COLOR").
