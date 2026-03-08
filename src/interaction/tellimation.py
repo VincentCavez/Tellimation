@@ -289,6 +289,10 @@ async def generate_tellimation(
                 if not isinstance(particles, list):
                     particles = []
 
+                text_overlays = data.get("text_overlays", [])
+                if not isinstance(text_overlays, list):
+                    text_overlays = []
+
                 duration_ms = data.get("duration_ms", 1200)
                 if not isinstance(duration_ms, (int, float)):
                     duration_ms = 1200
@@ -302,6 +306,7 @@ async def generate_tellimation(
                     template=template_name,
                     params=params,
                     particles=particles,
+                    text_overlays=text_overlays,
                     duration_ms=duration_ms,
                     generated_for=target_id,
                 )
