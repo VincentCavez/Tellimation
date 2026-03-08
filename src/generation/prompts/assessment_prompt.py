@@ -114,6 +114,14 @@ negative. Frame everything positively:
 - NOT: "Non, ce n'est pas marron."
 - YES: "Regarde bien sa couleur... il est orange !"
 
+# MISL scoring
+
+Each NEG target has a `misl_element` (e.g. "character", "action", \
+"subordinating_conjunctions"). When you evaluate the child's utterance, \
+score each mentioned MISL element 0-3 using the MISL rubric provided in \
+the user prompt. Report these scores in `misl_scores` so the system can \
+track the child's progress.
+
 # Output JSON schema
 
 Return ONLY valid JSON (no markdown fences, no commentary):
@@ -121,7 +129,9 @@ Return ONLY valid JSON (no markdown fences, no commentary):
 ```
 {
   "action": "animate" | "oral_guidance" | "next_scene" | "wait",
-  "target_id": "<entity_id or sub-entity from NEG, or null>",
+  "target_id": "<NEG target id, or null>",
+  "misl_element": "<MISL key of the target (e.g. 'consequence', \
+'subordinating_conjunctions'), or null>",
   "guidance_text": "<French text for TTS, or null>",
   "reasoning": "<brief explanation of why this action was chosen>",
   "animation_efficacy": [
@@ -130,23 +140,37 @@ Return ONLY valid JSON (no markdown fences, no commentary):
       "led_to_correction": true | false
     }
   ],
+  "misl_scores": {
+    "<misl_element>": <int 0-3>,
+    ...
+  },
   "satisfied_targets": ["<target_id>", ...],
   "scene_progress": <float 0.0-1.0>
 }
 ```
 
+The `misl_scores` field reports your evaluation of the child's production \
+for each MISL element observed in this utterance. Only include elements \
+that were relevant to what the child said. For example, if the child said \
+"the big orange fox ran because he was scared", you might score: \
+{"character": 1, "elaborated_noun_phrases": 2, "action": 2, \
+"subordinating_conjunctions": 1, "internal_response": 2}.
+
 # Priority selection for animate
 
 When choosing which target to animate, prefer:
 1. Highest priority targets first (priority field in NEG)
-2. Targets matching the child's weak areas (from student profile)
+2. Targets matching the child's MISL gaps (from student profile)
 3. Targets not yet animated in this scene
-4. Identity targets before descriptor targets (name the entity before \
-   describing it)
+4. Macrostructure targets (character, setting) before microstructure
 """
 
 ASSESSMENT_USER_PROMPT_TEMPLATE = """\
 Decide the next action in the interaction.
+
+# MISL Rubric (Monitoring Indicators of Scholarly Language)
+
+{misl_rubric}
 
 # NEG (Narrative Expectation Graph)
 
@@ -169,13 +193,15 @@ Decide the next action in the interaction.
 # Instructions
 
 Based on the conversation history:
-1. Determine which NEG targets have been satisfied.
-2. Check if any previously animated target was covered in the latest \
+1. Score each MISL element mentioned in the latest utterance (0-3 per the rubric).
+2. Compare to the NEG targets: which are satisfied, which are not?
+3. Check if any previously animated target was covered in the latest \
 utterance (animation_efficacy).
-3. Decide what to do next following the escalation protocol.
-4. If oral_guidance: write the French text for TTS.
-5. If animate: choose the highest-priority unsatisfied, un-animated target.
-6. If coverage is sufficient: next_scene.
+4. Decide what to do next following the escalation protocol.
+5. If oral_guidance: write the French text for TTS.
+6. If animate: choose the highest-priority unsatisfied, un-animated target \
+and include its misl_element.
+7. If coverage is sufficient: next_scene.
 
 Return your decision as structured JSON.
 """
