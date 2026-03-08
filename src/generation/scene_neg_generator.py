@@ -4,7 +4,7 @@ Replaces the old separate manifest generation (scene_generator.py Step 1)
 and NEG generation (neg_generator.py) with a single LLM call that produces
 both structures together.
 
-Model: Gemini 3.1 Pro (gemini-3.1-pro-preview)
+Model: Gemini 3 Flash (gemini-3-flash-preview)
 
 The co-generation ensures that the scene is designed WITH its learning
 objectives in mind.  Entity properties serve as "descriptive affordances"
@@ -17,6 +17,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -36,10 +37,10 @@ from src.models.student_profile import StudentProfile
 
 logger = logging.getLogger(__name__)
 
-MODEL_ID = "gemini-3.1-pro-preview"
+MODEL_ID = "gemini-3-flash-preview"
 
 # Timeouts and retries
-GENERATION_TIMEOUT = 90  # seconds — generous for complex co-generation
+GENERATION_TIMEOUT = 60  # seconds
 MAX_RETRIES = 2
 
 # SKILL framework files
@@ -202,47 +203,52 @@ async def generate_scene_and_neg(
             story_state, student_profile, previous_manifest, previous_neg
         )
 
-    # Call Gemini 3.1 Pro
     client = genai.Client(api_key=api_key)
 
     last_exc: Optional[Exception] = None
     for attempt in range(1, MAX_RETRIES + 1):
         try:
             logger.info(
-                "[scene-neg] Attempt %d/%d — %s scene",
+                "[scene-neg] Attempt %d/%d — %s scene (model=%s)",
                 attempt, MAX_RETRIES,
                 "initial" if is_initial else "continuation",
+                MODEL_ID,
             )
 
+            t0 = time.time()
             response = await asyncio.wait_for(
                 client.aio.models.generate_content(
                     model=MODEL_ID,
                     contents=user_prompt,
                     config=types.GenerateContentConfig(
                         system_instruction=SCENE_NEG_SYSTEM_PROMPT,
-                        thinking_config=types.ThinkingConfig(thinking_budget=4096),
-                        temperature=0.9,
+                        thinking_config=types.ThinkingConfig(thinking_budget=1024),
+                        temperature=1.0,
                         response_mime_type="application/json",
                     ),
                 ),
                 timeout=GENERATION_TIMEOUT,
             )
+            api_elapsed = time.time() - t0
+            logger.info("[scene-neg] API call took %.1fs", api_elapsed)
 
+            t1 = time.time()
             raw_text = get_response_text(response)
             data = extract_json(raw_text)
-
             manifest, neg = _validate_response(data)
+            parse_elapsed = time.time() - t1
+            logger.info("[scene-neg] Parsing + validation took %.1fs", parse_elapsed)
 
-            # Log summary
             logger.info(
                 "[scene-neg] Generated scene '%s': %d entities, %d relations, "
-                "%d actions, %d NEG targets (coverage_check=%s)",
+                "%d actions, %d NEG targets (coverage_check=%s) — total %.1fs",
                 manifest.scene_id,
                 len(manifest.entities),
                 len(manifest.relations),
                 len(manifest.actions),
                 len(neg.targets),
                 neg.skill_coverage_check,
+                time.time() - t0,
             )
 
             return manifest, neg, data
