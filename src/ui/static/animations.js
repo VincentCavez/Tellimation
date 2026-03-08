@@ -26,18 +26,20 @@ class AnimationRunner {
     }
 
     // Compile code string to function
+    // tempSprites is exposed so animation code can add/remove sprites mid-animation
     let animFn;
     try {
       const wrapped = `
         ${codeOrSpec}
         return animate;
       `;
-      animFn = new Function('buf', 'PW', 'PH', wrapped)(
-        this.buf.data, this.buf.width, this.buf.height
+      animFn = new Function('buf', 'PW', 'PH', 'tempSprites', wrapped)(
+        this.buf.data, this.buf.width, this.buf.height,
+        typeof tempSprites !== 'undefined' ? tempSprites : {}
       );
     } catch (e1) {
       try {
-        animFn = new Function('buf', 'PW', 'PH', 't', codeOrSpec);
+        animFn = new Function('buf', 'PW', 'PH', 't', 'tempSprites', codeOrSpec);
       } catch (e2) {
         console.error('[AnimationRunner] Failed to compile animation:', e2);
         return Promise.resolve();
