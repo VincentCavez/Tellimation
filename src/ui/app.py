@@ -362,9 +362,6 @@ async def _handle_generate_scene(
             "scene": scene,
         })
 
-        # Send initial oral guidance
-        await _send_initial_guidance(session, ws)
-
     except Exception as e:
         logger.exception("Failed to generate scene")
         await ws.send_json({"type": "error", "message": str(e)})
