@@ -7,7 +7,7 @@ brief for Nano Banana 2 image generation AND as context for the Tellimation
 module.  The NEG defines what the child should narrate and which error types
 to watch for.
 
-Model: Gemini 3.1 Pro (gemini-3.1-pro-preview)
+Model: Gemini 3 Flash (gemini-3-flash-preview)
 """
 
 # ---------------------------------------------------------------------------
@@ -177,15 +177,6 @@ Position `(x, y)` is the entity center. Bounding box must stay within canvas.
 
 # Canvas: 1120 x 720 pixels. Ground at ~y=500.
 
-# Error type enum
-
-Valid types for NEG targets and student profile:
-```
-SPATIAL, PROPERTY_COLOR, PROPERTY_SIZE, PROPERTY_WEIGHT, PROPERTY_TEMPERATURE,
-PROPERTY_STATE, TEMPORAL, IDENTITY, QUANTITY, ACTION, RELATIONAL, EXISTENCE,
-MANNER, REDUNDANCY, OMISSION
-```
-
 # Pose and distinctive_features: SELF-CONTAINED
 
 - Poses describe ONLY the entity's own body. NO references to other entities.
@@ -204,6 +195,10 @@ Generate an opening scene for a new story.
 # MISL Rubric (Monitoring Indicators of Scholarly Language)
 
 {misl_rubric}
+
+# Developmental expectations for this child
+
+{developmental_expectations}
 
 # Student profile
 
@@ -224,7 +219,9 @@ belong in this environment.
 - background_changed: true.
 - Scene ID: "scene_01".
 - Co-design the manifest and NEG: choose entity properties that maximize \
-descriptive affordances for the child's weak areas.
+descriptive affordances for the child's MISL gaps.
+- NEG targets must use current_level from the student profile and \
+target_level = min(current_level + 1, expected_level + 1).
 - There is NO narrative_text. The manifest is purely factual — it describes \
 the scene for asset generation and module context.
 """
@@ -239,6 +236,10 @@ Generate the next scene in an ongoing story.
 # MISL Rubric (Monitoring Indicators of Scholarly Language)
 
 {misl_rubric}
+
+# Developmental expectations for this child
+
+{developmental_expectations}
 
 # Story so far
 
@@ -270,8 +271,10 @@ You may introduce 1-2 new entities.
 - Scene ID: "scene_{scene_number:02d}".
 - Advance the plot — something new should happen.
 - Co-design the manifest and NEG based on the student profile:
-  - Weak areas → create more descriptive affordances for those SKILL objectives.
-  - Strong areas → maintain but don't over-emphasize.
+  - MISL gaps → create more descriptive affordances for those elements.
+  - Elements at/above expected level → maintain but don't over-emphasize.
   - Failed animation types → prefer scene configurations that suit effective animations.
+- NEG targets must use current_level from the student profile and \
+target_level = min(current_level + 1, expected_level + 1).
 - There is NO narrative_text. The manifest is purely factual.
 """
