@@ -602,7 +602,7 @@ async def _handle_audio(
         if decision.action == "animate" and decision.target_id:
             await _execute_animation(
                 session, ws, decision.target_id,
-                error_category=decision.error_category or "identity",
+                misl_element=decision.misl_element or "character",
             )
 
         elif decision.action == "oral_guidance" and decision.guidance_text:
@@ -640,7 +640,7 @@ async def _execute_animation(
     session: SessionState,
     ws: _WebSocketAdapter,
     target_id: str,
-    error_category: str = "identity",
+    misl_element: str = "character",
 ) -> None:
     """Generate and send a tellimation animation for a target entity."""
     try:
@@ -653,7 +653,7 @@ async def _execute_animation(
             manifest=session.current_manifest,
             student_profile=session.student_profile,
             target_id=target_id,
-            error_category=error_category,
+            misl_element=misl_element,
         )
 
         # Send temp sprites BEFORE animation
