@@ -1,10 +1,18 @@
-"""Tellimations FastAPI web server with WebSocket handler."""
+"""Tellimations FastAPI web server with WebSocket handler.
+
+Orchestrates the v3 pipeline:
+  1. scene_neg_generator → manifest + NEG (Gemini 3.1 Pro)
+  2. scene_generator → sprite_code (Nano Banana 2 images)
+  3. discrepancy_assessment → per-utterance decision (Gemini 3 Flash)
+  4. tellimation → animation code (Gemini 3 Flash)
+"""
 
 from __future__ import annotations
 
 import asyncio
 import json
 import logging
+import random
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -14,23 +22,22 @@ from fastapi.staticfiles import StaticFiles
 from starlette.websockets import WebSocketState
 
 from src.analytics.session_report import generate_report
-from src.generation.scene_generator import (
-    STORY_THEMES,
-    generate_scene,
-)
+from src.generation.scene_generator import STORY_THEMES, generate_scene_assets
+from src.generation.scene_neg_generator import generate_scene_and_neg
+from src.interaction.discrepancy_assessment import assess_and_respond
+from src.interaction.tellimation import generate_tellimation
 from src.models.animation_cache import AnimationCache
 from src.models.neg import NEG
 from src.models.scene import SceneManifest
 from src.models.story_state import StoryState
 from src.models.student_profile import StudentProfile
-from src.narration.narration_loop import NarrationLoop
+from src.narration.transcription import transcribe_and_detect
+from src.narration.voice_guidance import text_to_speech
 from src.persistence import (
     ensure_participant,
     load_student_profile,
-    load_story_first_scenes,
     save_scene,
     save_student_profile,
-    story_count,
     create_story,
 )
 
@@ -44,7 +51,6 @@ BASE_DIR = Path(__file__).resolve().parent
 TEMPLATES_DIR = BASE_DIR / "templates"
 STATIC_DIR = BASE_DIR / "static"
 
-# Maximum number of scenes per story (configurable)
 MAX_SCENES = 5
 
 app = FastAPI(title="Tellimations")
@@ -76,13 +82,7 @@ async def story_page():
 
 @app.post("/api/report")
 async def api_report(request: Request):
-    """Generate a post-session SLP report.
-
-    Expects JSON body with:
-        api_key: Gemini API key.
-        session_log: Full session log dict.
-        student_profile: StudentProfile dict.
-    """
+    """Generate a post-session SLP report."""
     body = await request.json()
     api_key = body.get("api_key", "")
     if not api_key:
@@ -111,11 +111,11 @@ async def api_report(request: Request):
 
 
 # ---------------------------------------------------------------------------
-# WebSocket adapter (so NarrationLoop can send via its protocol)
+# WebSocket adapter
 # ---------------------------------------------------------------------------
 
 class _WebSocketAdapter:
-    """Adapts FastAPI WebSocket to the WebSocketLike protocol."""
+    """Adapts FastAPI WebSocket to a simpler interface."""
 
     def __init__(self, ws: WebSocket) -> None:
         self._ws = ws
@@ -140,7 +140,6 @@ class SessionState:
         self.api_key = api_key
         self.participant_id = participant_id
 
-        # Ensure participant directory exists and load persisted profile
         ensure_participant(participant_id)
         self.student_profile = load_student_profile(participant_id)
 
@@ -149,15 +148,33 @@ class SessionState:
             participant_id=participant_id,
         )
         self.animation_cache = AnimationCache()
+
+        # Current scene data
         self.current_scene: Optional[Dict[str, Any]] = None
-        self.narration_loop: Optional[NarrationLoop] = None
-        self.pending_audio_meta: Optional[Dict[str, Any]] = None
-        # Current story index (set when a story is created/selected)
+        self.current_manifest: Optional[SceneManifest] = None
+        self.current_neg: Optional[NEG] = None
+
+        # Story tracking
         self.current_story_index: int = 0
-        # Initial scene candidates (for selection page)
-        self.initial_scenes: List[Dict[str, Any]] = []
-        # Completed scene IDs
         self.completed_scene_ids: List[str] = []
+
+        # Per-scene interaction state (reset on each new scene)
+        self.conversation_history: List[Dict[str, Any]] = []
+        self.animations_played_this_scene: List[str] = []
+        self.narration_history: List[str] = []
+        self.satisfied_targets: List[str] = []
+        self.scene_progress: float = 0.0
+
+        # Voice serialization lock — one voice at a time
+        self._voice_lock = asyncio.Lock()
+
+    def reset_scene_state(self) -> None:
+        """Reset per-scene state when starting a new scene."""
+        self.conversation_history = []
+        self.animations_played_this_scene = []
+        self.narration_history = []
+        self.satisfied_targets = []
+        self.scene_progress = 0.0
 
 
 # ---------------------------------------------------------------------------
@@ -168,7 +185,6 @@ class SessionState:
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
 
-    # Read credentials from query params
     api_key = websocket.query_params.get("api_key", "")
     participant_id = websocket.query_params.get("participant_id", "")
 
@@ -178,7 +194,7 @@ async def websocket_endpoint(websocket: WebSocket):
         return
 
     session = SessionState(api_key, participant_id)
-    ws_adapter = _WebSocketAdapter(websocket)
+    ws = _WebSocketAdapter(websocket)
 
     try:
         while True:
@@ -186,7 +202,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
             # Handle binary audio data
             if "bytes" in message:
-                await _handle_binary(session, message["bytes"], ws_adapter, websocket)
+                await _handle_audio(session, message["bytes"], ws)
                 continue
 
             # Handle text messages
@@ -197,37 +213,26 @@ async def websocket_endpoint(websocket: WebSocket):
             msg_type = data.get("type", "")
 
             if msg_type == "generate_initial_scenes":
-                await _handle_generate_initial(session, websocket)
-
-            elif msg_type == "select_scene":
-                await _handle_select_scene(session, data, websocket, ws_adapter)
+                await _handle_generate_scene(session, ws)
 
             elif msg_type == "init_scene":
-                # Client navigated to /story with a chosen scene — re-hydrate
-                # the session state and initialize the narration loop.
+                # Client navigated to /story with a scene — re-hydrate
                 scene = data.get("scene")
                 story_idx = data.get("story_index", 0)
                 if scene:
-                    session.current_scene = scene
                     if story_idx:
                         session.current_story_index = story_idx
-                    session.story_state.add_scene(
-                        scene_id=scene["manifest"]["scene_id"],
-                        narrative_text=scene.get("narrative_text", ""),
-                        manifest=scene["manifest"],
-                        neg=scene.get("neg", {}),
-                        sprite_code=scene.get("sprite_code"),
-                    )
-                    _init_narration_loop(session, ws_adapter)
+                    await _hydrate_scene(session, scene, ws)
 
             elif msg_type == "story_ready":
-                # Fallback: set up narration loop if scene was already set
-                if session.current_scene and session.narration_loop is None:
-                    _init_narration_loop(session, ws_adapter)
+                # Fallback: scene already set, send initial guidance
+                if session.current_scene and not session.conversation_history:
+                    await _send_initial_guidance(session, ws)
 
             elif msg_type == "audio":
-                # Audio metadata header — next binary message is the audio data
-                session.pending_audio_meta = data
+                # Audio metadata header — next binary message is audio data
+                # (kept for protocol compatibility, actual audio in binary frame)
+                pass
 
     except WebSocketDisconnect:
         logger.info("Client disconnected: %s", participant_id)
@@ -238,261 +243,351 @@ async def websocket_endpoint(websocket: WebSocket):
         except Exception:
             pass
     finally:
-        # Persist student profile on disconnect
         if participant_id:
             try:
                 save_student_profile(participant_id, session.student_profile)
                 logger.info("Saved profile on disconnect for %s", participant_id)
             except Exception:
-                logger.exception("Failed to save profile on disconnect for %s", participant_id)
+                logger.exception("Failed to save profile on disconnect for %s",
+                                 participant_id)
 
 
 # ---------------------------------------------------------------------------
-# Message handlers
+# Scene generation (initial + continuation)
 # ---------------------------------------------------------------------------
 
-async def _handle_generate_initial(
+async def _handle_generate_scene(
     session: SessionState,
-    websocket: WebSocket,
+    ws: _WebSocketAdapter,
+    is_continuation: bool = False,
 ) -> None:
-    """Generate initial scene candidates, or return existing stories.
+    """Generate a new scene using the 2-step pipeline.
 
-    Scenes are generated in parallel and streamed to the client
-    one-by-one as they complete.
+    1. scene_neg_generator → manifest + NEG  (Gemini 3.1 Pro)
+    2. scene_generator → sprite_code         (Nano Banana 2)
+    3. Send scene_ready to client
+    4. Send initial oral guidance ("Qu'est-ce que tu vois ?")
     """
     try:
-        pid = session.participant_id
-        existing_count = story_count(pid)
-
-        # If participant already has >= 2 stories, send them instead of generating
-        if existing_count >= 2:
-            existing_scenes = load_story_first_scenes(pid)
-            if len(existing_scenes) >= 2:
-                session.initial_scenes = existing_scenes
-                await websocket.send_json({
-                    "type": "initial_scenes",
-                    "scenes": existing_scenes,
-                    "from_disk": True,
-                })
-                return
-
-        # Generate fresh scenes in PARALLEL with progress
-        total_scenes = 1
-
-        # Notify client that generation is starting
-        await websocket.send_json({
+        await ws.send_json({
             "type": "generation_progress",
-            "scene_index": 0,
-            "total_scenes": total_scenes,
             "status": "generating",
         })
 
-        # Build progress callbacks — each scene sends its own progress
-        def _make_progress_cb(seed: int):
-            async def progress_cb(step_name: str) -> None:
-                await websocket.send_json({
-                    "type": "generation_step",
-                    "scene_index": seed,
-                    "total_scenes": total_scenes,
-                    "step": step_name,
-                })
-            return progress_cb
+        # Context for initial vs. continuation
+        theme = ""
+        previous_manifest = None
+        previous_neg = None
 
-        # Pick N random themes from the pool (no duplicates)
-        import random
-        themes = random.sample(STORY_THEMES, min(total_scenes, len(STORY_THEMES)))
+        if not is_continuation:
+            theme = random.choice(STORY_THEMES)
+        else:
+            if session.story_state.scenes:
+                last = session.story_state.scenes[-1]
+                previous_manifest = last.get("manifest")
+                previous_neg = last.get("neg")
 
-        # Launch all scenes in parallel
-        futures = {
-            asyncio.ensure_future(
-                generate_scene(
-                    api_key=session.api_key,
-                    story_state=None,
-                    student_profile=session.student_profile,
-                    theme=theme,
-                    commit_to_state=False,
-                    skip_masks=True,
-                    progress_callback=_make_progress_cb(idx),
-                )
-            ): idx
-            for idx, theme in enumerate(themes, start=1)
-        }
-
-        # Stream scenes to client as they complete
-        scenes: List[Dict[str, Any]] = []
-        for coro in asyncio.as_completed(futures.keys()):
-            try:
-                result = await coro
-            except Exception as exc:
-                logger.warning("Initial scene generation failed: %s", exc)
-                continue
-
-            idx = len(scenes)
-            img = _pop_reference_image(result)
-            ent_imgs = _pop_entity_images(result)
-
-            # Save to disk immediately
-            story_idx, _ = create_story(pid)
-            save_scene(pid, story_idx, result,
-                       reference_image=img, entity_images=ent_imgs)
-            result["_story_index"] = story_idx
-
-            scenes.append(result)
-
-            # Stream this scene to the client right away
-            await websocket.send_json({
-                "type": "scene_ready",
-                "scene": result,
-                "index": idx,
-                "total": total_scenes,
-            })
-
-        session.initial_scenes = scenes
-
-        # Final signal: all scenes done
-        await websocket.send_json({
-            "type": "initial_scenes_done",
-            "total": len(scenes),
+        # Step 1: Co-generate manifest + NEG
+        await ws.send_json({
+            "type": "generation_step",
+            "step": "manifest_neg",
         })
 
+        manifest, neg, raw_data = await generate_scene_and_neg(
+            api_key=session.api_key,
+            story_state=session.story_state if is_continuation else None,
+            student_profile=session.student_profile,
+            theme=theme,
+            previous_manifest=previous_manifest,
+            previous_neg=previous_neg,
+        )
+
+        # Step 2: Generate images + sprites
+        await ws.send_json({
+            "type": "generation_step",
+            "step": "images",
+        })
+
+        async def _progress_cb(step: str) -> None:
+            await ws.send_json({"type": "generation_step", "step": step})
+
+        assets = await generate_scene_assets(
+            api_key=session.api_key,
+            manifest_data=raw_data,
+            story_state=session.story_state if is_continuation else None,
+            progress_callback=_progress_cb,
+        )
+
+        # Assemble scene data
+        scene = {
+            "narrative_text": raw_data.get("narrative_text", ""),
+            "scene_description": raw_data.get("scene_description", ""),
+            "manifest": manifest.model_dump(),
+            "neg": neg.model_dump(),
+            "sprite_code": assets["sprite_code"],
+            "carried_over_entities": assets.get("carried_over_entities", []),
+        }
+
+        # Persist
+        if not is_continuation:
+            story_idx, _ = create_story(session.participant_id)
+            session.current_story_index = story_idx
+        save_scene(session.participant_id, session.current_story_index, scene)
+
+        # Update session state
+        session.current_scene = scene
+        session.current_manifest = manifest
+        session.current_neg = neg
+        session.reset_scene_state()
+
+        # Commit to story state
+        session.story_state.add_scene(
+            scene_id=manifest.scene_id,
+            narrative_text=raw_data.get("narrative_text", ""),
+            manifest=manifest.model_dump(),
+            neg=neg.model_dump(),
+            sprite_code=assets["sprite_code"],
+        )
+        session.completed_scene_ids.append(manifest.scene_id)
+
+        # Send scene to client
+        await ws.send_json({
+            "type": "scene_ready",
+            "scene": scene,
+        })
+
+        # Send initial oral guidance
+        await _send_initial_guidance(session, ws)
+
     except Exception as e:
-        logger.exception("Failed to generate initial scenes")
-        await websocket.send_json({"type": "error", "message": str(e)})
+        logger.exception("Failed to generate scene")
+        await ws.send_json({"type": "error", "message": str(e)})
 
 
-async def _handle_select_scene(
+async def _hydrate_scene(
     session: SessionState,
-    data: Dict[str, Any],
-    websocket: WebSocket,
-    ws_adapter: _WebSocketAdapter,
+    scene: Dict[str, Any],
+    ws: _WebSocketAdapter,
 ) -> None:
-    """Handle scene selection from thumbnails."""
-    index = data.get("index", 0)
-    if index < 0 or index >= len(session.initial_scenes):
-        await websocket.send_json({"type": "error", "message": "Invalid scene index"})
-        return
-
-    scene = session.initial_scenes[index]
+    """Re-hydrate session from a scene dict (e.g. after page navigation)."""
     session.current_scene = scene
+    session.current_manifest = SceneManifest.model_validate(scene["manifest"])
+    session.current_neg = NEG.model_validate(scene.get("neg", {"targets": []}))
+    session.reset_scene_state()
 
-    # Check if this is an existing story loaded from disk
-    story_idx = scene.pop("_story_index", None)
-    if story_idx is not None:
-        session.current_story_index = story_idx
-    else:
-        story_idx, _ = create_story(session.participant_id)
-        session.current_story_index = story_idx
-        save_scene(session.participant_id, story_idx, scene)
-
-    # Send scene to client
-    await websocket.send_json({
-        "type": "scene_selected_ready",
-        "scene": scene,
-    })
-
-    # Commit to story state
-    scene_id = scene["manifest"]["scene_id"]
     session.story_state.add_scene(
-        scene_id=scene_id,
+        scene_id=scene["manifest"]["scene_id"],
         narrative_text=scene.get("narrative_text", ""),
         manifest=scene["manifest"],
         neg=scene.get("neg", {}),
         sprite_code=scene.get("sprite_code"),
     )
-    session.completed_scene_ids.append(scene_id)
 
-    _init_narration_loop(session, ws_adapter)
+    await _send_initial_guidance(session, ws)
 
 
-async def _handle_binary(
+# ---------------------------------------------------------------------------
+# Initial guidance (Level 0 — open invitation)
+# ---------------------------------------------------------------------------
+
+async def _send_initial_guidance(
+    session: SessionState,
+    ws: _WebSocketAdapter,
+) -> None:
+    """Send the Level 0 open invitation: 'Qu'est-ce que tu vois ?'"""
+    guidance_text = "Qu'est-ce que tu vois ?"
+
+    session.conversation_history.append({
+        "role": "system",
+        "text": guidance_text,
+        "action": "oral_guidance",
+    })
+
+    await ws.send_json({
+        "type": "assessment_result",
+        "action": "oral_guidance",
+        "guidance_text": guidance_text,
+    })
+
+    # TTS (fire-and-forget, serialized via voice lock)
+    asyncio.ensure_future(_send_voice(session, ws, guidance_text))
+
+
+# ---------------------------------------------------------------------------
+# Audio handling (interactive loop)
+# ---------------------------------------------------------------------------
+
+async def _handle_audio(
     session: SessionState,
     audio_bytes: bytes,
-    ws_adapter: _WebSocketAdapter,
-    websocket: WebSocket,
+    ws: _WebSocketAdapter,
 ) -> None:
-    """Handle binary audio data from the client."""
-    if session.narration_loop is None:
-        await websocket.send_json({"type": "error", "message": "No active narration loop"})
+    """Handle an audio utterance: transcribe → assess → execute.
+
+    Full interactive loop per utterance:
+      1. Transcribe audio + detect discrepancies
+      2. Update student profile + conversation history
+      3. Discrepancy assessment → decision
+      4. Execute decision (animate / oral_guidance / next_scene / wait)
+    """
+    if session.current_neg is None or session.current_manifest is None:
+        await ws.send_json({"type": "error", "message": "No active scene"})
         return
 
     try:
-        # Transcription is now sent immediately inside narration_loop.on_audio_chunk()
-        await session.narration_loop.on_audio_chunk(audio_bytes)
+        # 1. Transcribe + detect discrepancies
+        result = await transcribe_and_detect(
+            api_key=session.api_key,
+            audio_bytes=audio_bytes,
+            neg=session.current_neg,
+            narration_history=session.narration_history,
+            student_profile=session.student_profile,
+            narrative_text=(
+                session.current_scene.get("narrative_text", "")
+                if session.current_scene else ""
+            ),
+        )
+
+        # Send transcription to client
+        await ws.send_json({
+            "type": "transcription",
+            "text": result.transcription,
+            "scene_progress": result.scene_progress,
+        })
+
+        # 2. Update state
+        if result.updated_history:
+            session.narration_history = result.updated_history
+        if result.transcription:
+            session.narration_history.append(result.transcription)
+
+        session.satisfied_targets = list(set(
+            session.satisfied_targets + result.satisfied_targets
+        ))
+        session.scene_progress = result.scene_progress
+
+        # Update student profile error counts
+        if result.profile_updates:
+            for error_type, count in result.profile_updates.errors_this_scene.items():
+                current = session.student_profile.error_counts.get(error_type, 0)
+                session.student_profile.error_counts[error_type] = current + count
+        session.student_profile.total_utterances += 1
+
+        # Add child utterance to conversation history
+        session.conversation_history.append({
+            "role": "child",
+            "text": result.transcription,
+        })
+
+        # 3. Discrepancy assessment
+        decision = await assess_and_respond(
+            api_key=session.api_key,
+            student_profile=session.student_profile,
+            neg=session.current_neg,
+            conversation_history=session.conversation_history,
+            animations_played=session.animations_played_this_scene,
+        )
+
+        # Send assessment result to client
+        await ws.send_json({
+            "type": "assessment_result",
+            "action": decision.action,
+            "target_id": decision.target_id,
+            "guidance_text": decision.guidance_text,
+            "reasoning": decision.reasoning,
+        })
+
+        # 4. Execute decision
+        if decision.action == "animate" and decision.target_id:
+            await _execute_animation(session, ws, decision.target_id)
+
+        elif decision.action == "oral_guidance" and decision.guidance_text:
+            session.conversation_history.append({
+                "role": "system",
+                "text": decision.guidance_text,
+                "action": "oral_guidance",
+            })
+            asyncio.ensure_future(
+                _send_voice(session, ws, decision.guidance_text)
+            )
+
+        elif decision.action == "next_scene":
+            if len(session.completed_scene_ids) < MAX_SCENES:
+                session.student_profile.scenes_completed += 1
+                await _handle_generate_scene(session, ws, is_continuation=True)
+            else:
+                await ws.send_json({"type": "story_complete"})
+
+        # "wait" → no action
+
         # Persist profile after every utterance
         save_student_profile(session.participant_id, session.student_profile)
+
     except Exception as e:
         logger.exception("Audio processing error")
-        await websocket.send_json({"type": "error", "message": str(e)})
-
-    session.pending_audio_meta = None
+        await ws.send_json({"type": "error", "message": str(e)})
 
 
 # ---------------------------------------------------------------------------
-# Helpers
+# Animation execution
 # ---------------------------------------------------------------------------
 
-def _pop_reference_image(scene: Dict[str, Any]) -> Optional[bytes]:
-    """Extract and remove the binary reference image from a scene dict.
-
-    The image bytes cannot be serialized to JSON (for WebSocket or disk),
-    so we pop them out and return them separately.
-    """
-    return scene.pop("_reference_image_bytes", None)
-
-
-def _pop_entity_images(scene: Dict[str, Any]) -> Optional[Dict[str, bytes]]:
-    """Extract and remove entity image bytes from a scene dict.
-
-    Entity images are binary PNG data (one per entity) attached by the
-    pipeline for debugging/persistence.  They cannot be JSON-serialized,
-    so we pop them before sending over WebSocket.
-    """
-    return scene.pop("_entity_image_bytes", None)
-
-
-def _init_narration_loop(
+async def _execute_animation(
     session: SessionState,
-    ws_adapter: _WebSocketAdapter,
+    ws: _WebSocketAdapter,
+    target_id: str,
 ) -> None:
-    """Initialize a NarrationLoop for the current scene and send intro voice."""
-    scene = session.current_scene
-    if scene is None:
-        return
-
-    manifest = SceneManifest.model_validate(scene["manifest"])
-    neg = NEG.model_validate(scene.get("neg", {"targets": []}))
-
-    session.narration_loop = NarrationLoop(
-        api_key=session.api_key,
-        scene_manifest=manifest,
-        neg=neg,
-        story_state=session.story_state,
-        student_profile=session.student_profile,
-        animation_cache=session.animation_cache,
-        websocket=ws_adapter,
-        narrative_text=scene.get("narrative_text", ""),
-    )
-
-    # Scene intro voice (fire once, serialized via voice lock)
-    asyncio.ensure_future(_send_scene_intro(session))
-
-
-async def _send_scene_intro(session: SessionState) -> None:
-    """Generate and send introductory voice for the current scene."""
-    scene = session.current_scene
-    if scene is None or session.narration_loop is None:
-        return
+    """Generate and send a tellimation animation for a target entity."""
     try:
-        from src.narration.voice_guidance import generate_scene_intro
-
-        intro_text = await generate_scene_intro(
+        code, duration_ms = await generate_tellimation(
             api_key=session.api_key,
-            narrative_text=scene.get("narrative_text", ""),
-            manifest=scene.get("manifest", {}),
+            sprite_code=(
+                session.current_scene.get("sprite_code", {})
+                if session.current_scene else {}
+            ),
+            manifest=session.current_manifest,
+            student_profile=session.student_profile,
+            target_id=target_id,
+            animation_cache=session.animation_cache,
+            error_type="OMISSION",
         )
-        if intro_text:
-            await session.narration_loop._send_voice_safe(intro_text, "intro")
+
+        await ws.send_json({
+            "type": "animation",
+            "target_id": target_id,
+            "code": code,
+            "duration_ms": duration_ms,
+        })
+
+        session.animations_played_this_scene.append(target_id)
+        session.conversation_history.append({
+            "role": "system",
+            "text": f"Animation on {target_id}",
+            "action": "animate",
+        })
+
     except Exception:
-        logger.warning("Failed to generate scene intro voice")
+        logger.exception("Animation generation failed for %s", target_id)
 
 
+# ---------------------------------------------------------------------------
+# Voice (TTS)
+# ---------------------------------------------------------------------------
+
+async def _send_voice(
+    session: SessionState,
+    ws: _WebSocketAdapter,
+    text: str,
+) -> None:
+    """Generate TTS audio and send to client (serialized via voice lock)."""
+    async with session._voice_lock:
+        try:
+            audio_bytes = await text_to_speech(
+                api_key=session.api_key,
+                text=text,
+            )
+            await ws.send_json({"type": "voice_start", "text": text})
+            await ws.send_bytes(audio_bytes)
+            await ws.send_json({"type": "voice_end"})
+        except Exception:
+            logger.warning("TTS failed for: %s", text[:50])
