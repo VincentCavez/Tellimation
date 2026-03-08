@@ -90,15 +90,15 @@ NO references to other entities or surfaces>",
   "neg": {
     "targets": [
       {
-        "id": "t<N>_<component>",
-        "entity_id": "<entity_id or sub-entity_id from manifest>",
-        "components": {
-          "identity": true,
-          "descriptors": ["<color>", "<size>", "<texture>", ...],
-          "spatial": "<preposition + reference entity or null>",
-          "action": "<verb + manner or null>",
-          "temporal": "<tense marker or null>"
-        },
+        "id": "t<N>",
+        "entity_id": "<entity_id from manifest>",
+        "misl_element": "<MISL key from rubric: character, setting, initiating_event, \
+internal_response, plan, action, consequence, coordinating_conjunctions, \
+subordinating_conjunctions, mental_verbs, linguistic_verbs, adverbs, \
+elaborated_noun_phrases, grammaticality, tense>",
+        "current_level": "<int 0-3 — child's estimated current level for this element>",
+        "target_level": "<int 0-3 — level to aim for (current_level + 1, capped by age)>",
+        "description": "<what the child should say concretely to reach target_level>",
         "priority": "<0.0-1.0>",
         "tolerance": "<0.0-1.0>"
       }
@@ -139,12 +139,14 @@ size (good for scale_strain) rather than texture.
 prefer configurations that play to effective animation types.
 
 ## Target design
-- At least 1 target per entity.
+Each target is a MISL element tied to a specific entity. The `description` field \
+states concretely what the child should say.
+- At least 3 targets per scene, covering both macro and microstructure.
 - Main characters: priority 0.8-1.0. Background elements: 0.3-0.6.
-- Lower tolerance (0.2-0.4) for weak areas in the student profile.
-- Higher tolerance (0.5-0.7) for strong areas.
-- Include descriptors that are visually distinctive and narration-worthy.
-- Spatial targets must reference the actual relation from the manifest.
+- `current_level`: use the student profile's MISL levels if available, else 0.
+- `target_level`: current_level + 1, capped at the expected level for the child's age.
+- Lower tolerance (0.2-0.4) for MISL gaps (current < expected).
+- Higher tolerance (0.5-0.7) for elements at or above expected level.
 
 ## MISL coverage
 Verify that targets cover the MISL rubric elements relevant to the child's \
