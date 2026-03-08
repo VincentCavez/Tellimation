@@ -10,6 +10,7 @@ class CachedAnimation(BaseModel):
     template: Optional[str] = None
     params: Dict[str, Any] = Field(default_factory=dict)
     particles: List[Dict[str, Any]] = Field(default_factory=list)
+    text_overlays: List[Dict[str, Any]] = Field(default_factory=list)
     duration_ms: int = 1200
     generated_for: str = ""
 
@@ -21,6 +22,8 @@ class CachedAnimation(BaseModel):
             d["params"] = self.params
             if self.particles:
                 d["particles"] = self.particles
+            if self.text_overlays:
+                d["text_overlays"] = self.text_overlays
         elif self.code:
             d["code"] = self.code
         return d
