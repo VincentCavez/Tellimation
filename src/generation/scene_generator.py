@@ -206,42 +206,203 @@ def _build_entity_description(entity: Dict[str, Any]) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Magenta chroma-key removal
+# Magenta chroma-key removal — multi-layer safeguards
 # ---------------------------------------------------------------------------
 
-def _is_magenta_background(r: int, g: int, b: int) -> bool:
-    """Detect magenta chroma-key background pixels (#FF00FF).
+# Pure magenta reference in float for distance calculations
+_MAGENTA_F = (255.0, 0.0, 255.0)
 
-    A pixel is magenta background if:
-    - R > 200
-    - G < 60
-    - B > 200
-    """
-    return r > 200 and g < 60 and b > 200
+# Thresholds (tuned for Nano Banana 2 output)
+_COLOR_DIST_HARD = 80.0      # Euclidean RGB distance — definite magenta
+_FLOOD_DIST = 110.0          # Flood fill propagation — catches off-magenta BG
+_COLOR_DIST_SOFT = 140.0     # Border fringe cleanup — anti-aliased edges only
+_GREEN_CHANNEL_MAX = 80      # Magenta has G≈0; genuine pink entities have G>80
+_EDGE_ERODE_PX = 1           # Pixels to erode from foreground border
+_DESPILL_STRENGTH = 0.7      # How aggressively to remove magenta tint (0–1)
+_MIN_FOREGROUND_PCT = 2.0    # Warn if less than this % of pixels are foreground
+_MAX_FOREGROUND_PCT = 98.0   # Warn if too few pixels removed (bad generation?)
+
+
+def _color_dist_magenta(r: float, g: float, b: float) -> float:
+    """Euclidean distance from pure magenta (255, 0, 255) in RGB space."""
+    return ((r - 255.0) ** 2 + g ** 2 + (b - 255.0) ** 2) ** 0.5
 
 
 def _remove_magenta(image_bytes: bytes) -> Image.Image:
-    """Remove magenta (#FF00FF) background from an entity image.
+    """Remove magenta (#FF00FF) chroma-key background with multiple safeguards.
 
-    Converts RGB image to RGBA, setting magenta pixels to fully transparent.
-    Uses the rule: R>200 AND G<60 AND B>200 → alpha=0.
+    Layers:
+      1. **Corner sampling**: Detect actual background color from image corners
+         (in case model used a slightly off-magenta).
+      2. **Color distance**: Mark pixels within _COLOR_DIST_HARD of the detected
+         background color as definite background.
+      3. **Green channel gate**: Any pixel with G < _GREEN_CHANNEL_MAX and
+         within _COLOR_DIST_SOFT is also background (catches anti-aliased edges).
+      4. **Flood fill from edges**: Starting from all 4 image edges, flood-fill
+         through near-magenta pixels. This catches connected background regions
+         that might have slight color variation, without accidentally removing
+         interior magenta-ish pixels (e.g., pink elements).
+      5. **Border erosion**: Erode _EDGE_ERODE_PX pixels from the foreground
+         boundary to remove halo/fringe pixels at entity edges.
+      6. **Magenta despill**: For remaining edge pixels that have magenta
+         contamination, reduce the magenta tint while preserving luminance.
+      7. **Diagnostics**: Log % removed; warn if foreground is suspiciously
+         small or large.
 
     Returns:
-        PIL Image in RGBA mode with magenta removed.
+        PIL Image in RGBA mode with background removed.
     """
     import numpy as np
+    from scipy import ndimage
 
     img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-    arr = np.array(img, dtype=np.uint8)  # (H, W, 3)
+    arr = np.array(img, dtype=np.float32)  # (H, W, 3) float for precision
+    H, W = arr.shape[:2]
+    total = H * W
 
-    # Magenta mask: R>200 AND G<60 AND B>200
-    magenta = (arr[:, :, 0] > 200) & (arr[:, :, 1] < 60) & (arr[:, :, 2] > 200)
+    # ── Layer 1: Corner sampling ──────────────────────────────────────────
+    # Sample 8×8 blocks from each corner to find the actual background color.
+    corner_size = min(8, H // 4, W // 4)
+    corners = [
+        arr[:corner_size, :corner_size],                  # top-left
+        arr[:corner_size, W - corner_size:],              # top-right
+        arr[H - corner_size:, :corner_size],              # bottom-left
+        arr[H - corner_size:, W - corner_size:],          # bottom-right
+    ]
+    corner_pixels = np.concatenate([c.reshape(-1, 3) for c in corners], axis=0)
+    bg_color = np.median(corner_pixels, axis=0)  # Robust to outliers
+    logger.info("[magenta] Corner-sampled background color: (%.0f, %.0f, %.0f)",
+                bg_color[0], bg_color[1], bg_color[2])
 
-    # Build RGBA
-    alpha = np.where(magenta, 0, 255).astype(np.uint8)
-    rgba_arr = np.zeros((*arr.shape[:2], 4), dtype=np.uint8)
-    rgba_arr[:, :, :3] = arr
+    # If corner color is far from magenta, warn but still proceed with both
+    corner_dist = _color_dist_magenta(bg_color[0], bg_color[1], bg_color[2])
+    if corner_dist > _COLOR_DIST_SOFT:
+        logger.warning("[magenta] Corner color is %.0f from magenta — "
+                       "image may not have magenta background!", corner_dist)
+
+    # ── Layer 2: Color distance from both pure magenta and detected bg ────
+    # Distance from pure magenta (255, 0, 255)
+    diff_magenta = arr - np.array(_MAGENTA_F, dtype=np.float32)
+    dist_magenta = np.sqrt(np.sum(diff_magenta ** 2, axis=2))
+
+    # Distance from corner-sampled background
+    diff_corner = arr - bg_color.reshape(1, 1, 3)
+    dist_corner = np.sqrt(np.sum(diff_corner ** 2, axis=2))
+
+    # Minimum distance to either reference color
+    dist_min = np.minimum(dist_magenta, dist_corner)
+
+    # A pixel is "hard background" if close to either reference
+    hard_bg = dist_min < _COLOR_DIST_HARD
+
+    # ── Layer 3: Green channel gate (combined with hard threshold) ────────
+    # Magenta has G≈0. Reinforce hard_bg with low-green pixels that are
+    # within moderate distance. This catches slight deviations from pure magenta.
+    green = arr[:, :, 1]
+    hard_bg = hard_bg | ((green < _GREEN_CHANNEL_MAX) & (dist_min < _FLOOD_DIST))
+
+    # ── Layer 4: Flood fill from edges ────────────────────────────────────
+    # Only remove connected background reachable from image borders.
+    # Uses _FLOOD_DIST (stricter than _COLOR_DIST_SOFT) to avoid eating
+    # into interior pinkish entities that are NOT background.
+    flood_candidate = dist_min < _FLOOD_DIST
+
+    # Seed from all 4 edges
+    edge_seed = np.zeros((H, W), dtype=bool)
+    edge_seed[0, :] = True
+    edge_seed[H - 1, :] = True
+    edge_seed[:, 0] = True
+    edge_seed[:, W - 1] = True
+
+    # Flood fill: iteratively expand from edges through flood candidates
+    flood_mask = edge_seed & flood_candidate
+    struct = ndimage.generate_binary_structure(2, 2)  # 8-connected
+    while True:
+        expanded = ndimage.binary_dilation(flood_mask, structure=struct)
+        expanded &= flood_candidate
+        if np.array_equal(expanded, flood_mask):
+            break
+        flood_mask = expanded
+
+    # Combine: pixel is background if (hard_bg) OR (flood-filled from edge)
+    bg_mask = hard_bg | flood_mask
+
+    # ── Layer 4b: Soft border fringe cleanup ──────────────────────────────
+    # For pixels immediately adjacent to confirmed background that are within
+    # _COLOR_DIST_SOFT, mark as background too (anti-aliased fringe pixels).
+    bg_border = ndimage.binary_dilation(bg_mask, structure=struct) & ~bg_mask
+    fringe = bg_border & (dist_min < _COLOR_DIST_SOFT) & (green < _GREEN_CHANNEL_MAX)
+    fringe_count = int(np.sum(fringe))
+    if fringe_count > 0:
+        bg_mask = bg_mask | fringe
+        logger.info("[magenta] Soft fringe cleanup removed %d border pixels",
+                    fringe_count)
+
+    # ── Layer 5: Border erosion ───────────────────────────────────────────
+    # Erode foreground by _EDGE_ERODE_PX to remove halo/fringe pixels.
+    fg_mask = ~bg_mask
+    if _EDGE_ERODE_PX > 0:
+        erode_struct = ndimage.generate_binary_structure(2, 1)  # 4-connected
+        fg_eroded = ndimage.binary_erosion(
+            fg_mask, structure=erode_struct, iterations=_EDGE_ERODE_PX
+        )
+        # Pixels that were foreground but got eroded = border halo
+        halo = fg_mask & ~fg_eroded
+        bg_mask = bg_mask | halo
+        fg_mask = ~bg_mask
+        halo_count = int(np.sum(halo))
+        logger.info("[magenta] Border erosion removed %d halo pixels", halo_count)
+
+    # ── Layer 6: Magenta despill on surviving edge pixels ─────────────────
+    # Find foreground pixels adjacent to background (the edge ring)
+    fg_dilated = ndimage.binary_dilation(fg_mask, structure=struct)
+    edge_ring = fg_mask & ndimage.binary_dilation(bg_mask, structure=struct)
+
+    out_arr = arr.copy()
+    if np.any(edge_ring):
+        # For edge pixels: reduce magenta contamination
+        # Magenta = high R, low G, high B. Despill by pulling R and B
+        # toward a neutral value based on luminance.
+        edge_r = out_arr[edge_ring, 0]
+        edge_g = out_arr[edge_ring, 1]
+        edge_b = out_arr[edge_ring, 2]
+
+        # Compute "magenta-ness": how much R and B exceed G
+        magenta_excess_r = np.maximum(0, edge_r - edge_g)
+        magenta_excess_b = np.maximum(0, edge_b - edge_g)
+        magenta_strength = np.minimum(magenta_excess_r, magenta_excess_b) / 255.0
+
+        # Only despill where there's actual magenta contamination
+        despill_factor = magenta_strength * _DESPILL_STRENGTH
+        out_arr[edge_ring, 0] -= (magenta_excess_r * despill_factor)
+        out_arr[edge_ring, 2] -= (magenta_excess_b * despill_factor)
+
+        despilled = int(np.sum(magenta_strength > 0.05))
+        logger.info("[magenta] Despilled %d edge pixels", despilled)
+
+    # ── Build RGBA output ─────────────────────────────────────────────────
+    out_arr = np.clip(out_arr, 0, 255).astype(np.uint8)
+    alpha = np.where(bg_mask, 0, 255).astype(np.uint8)
+    rgba_arr = np.zeros((H, W, 4), dtype=np.uint8)
+    rgba_arr[:, :, :3] = out_arr
     rgba_arr[:, :, 3] = alpha
+
+    # ── Layer 7: Diagnostics ──────────────────────────────────────────────
+    fg_count = int(np.sum(~bg_mask))
+    bg_count = total - fg_count
+    fg_pct = fg_count / total * 100
+    bg_pct = bg_count / total * 100
+    logger.info("[magenta] Result: %d fg (%.1f%%) / %d bg (%.1f%%) of %d total",
+                fg_count, fg_pct, bg_count, bg_pct, total)
+
+    if fg_pct < _MIN_FOREGROUND_PCT:
+        logger.warning("[magenta] VERY LOW foreground (%.1f%%) — entity may be "
+                       "almost entirely transparent! Check generation quality.",
+                       fg_pct)
+    if fg_pct > _MAX_FOREGROUND_PCT:
+        logger.warning("[magenta] VERY HIGH foreground (%.1f%%) — magenta removal "
+                       "may have failed. Background might still be visible.",
+                       fg_pct)
 
     return Image.fromarray(rgba_arr, "RGBA")
 
