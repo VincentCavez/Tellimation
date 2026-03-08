@@ -52,6 +52,7 @@ TEMPLATES_DIR = BASE_DIR / "templates"
 STATIC_DIR = BASE_DIR / "static"
 
 MAX_SCENES = 5
+INITIAL_SCENE_COUNT = 1  # number of scenes offered on the selection page
 
 app = FastAPI(title="Tellimations")
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
@@ -219,7 +220,7 @@ async def websocket_endpoint(websocket: WebSocket):
             msg_type = data.get("type", "")
 
             if msg_type == "generate_initial_scenes":
-                await _handle_generate_scene(session, ws)
+                await _handle_generate_initial_scenes(session, ws)
 
             elif msg_type == "init_scene":
                 # Client navigated to /story with a scene — re-hydrate
@@ -259,7 +260,85 @@ async def websocket_endpoint(websocket: WebSocket):
 
 
 # ---------------------------------------------------------------------------
-# Scene generation (initial + continuation)
+# Initial scene generation (selection page)
+# ---------------------------------------------------------------------------
+
+async def _handle_generate_initial_scenes(
+    session: SessionState,
+    ws: _WebSocketAdapter,
+) -> None:
+    """Generate INITIAL_SCENE_COUNT scenes in parallel for the selection page."""
+    n = INITIAL_SCENE_COUNT
+
+    async def _gen_one(index: int) -> None:
+        try:
+            theme = random.choice(STORY_THEMES)
+
+            await ws.send_json({
+                "type": "generation_step",
+                "scene_index": index,
+                "total_scenes": n,
+                "step": "manifest",
+            })
+
+            manifest, neg, raw_data = await generate_scene_and_neg(
+                api_key=session.api_key,
+                story_state=None,
+                student_profile=session.student_profile,
+                theme=theme,
+                previous_manifest=None,
+                previous_neg=None,
+            )
+
+            await ws.send_json({
+                "type": "generation_step",
+                "scene_index": index,
+                "total_scenes": n,
+                "step": "images",
+            })
+
+            async def _progress_cb(step: str) -> None:
+                await ws.send_json({
+                    "type": "generation_step",
+                    "scene_index": index,
+                    "total_scenes": n,
+                    "step": step,
+                })
+
+            assets = await generate_scene_assets(
+                api_key=session.api_key,
+                manifest_data=raw_data,
+                story_state=None,
+                progress_callback=_progress_cb,
+            )
+
+            scene = {
+                "narrative_text": raw_data.get("narrative_text", ""),
+                "scene_description": raw_data.get("scene_description", ""),
+                "manifest": manifest.model_dump(),
+                "neg": neg.model_dump(),
+                "sprite_code": assets["sprite_code"],
+                "carried_over_entities": assets.get("carried_over_entities", []),
+            }
+
+            await ws.send_json({
+                "type": "scene_ready",
+                "scene": scene,
+                "scene_index": index,
+            })
+
+        except Exception as e:
+            logger.exception("Failed to generate initial scene %d", index)
+            await ws.send_json({
+                "type": "error",
+                "message": f"Scene {index} failed: {e}",
+            })
+
+    await asyncio.gather(*[_gen_one(i) for i in range(n)])
+
+
+# ---------------------------------------------------------------------------
+# Scene generation (continuation)
 # ---------------------------------------------------------------------------
 
 async def _handle_generate_scene(
