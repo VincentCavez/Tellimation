@@ -463,23 +463,63 @@ var AnimationTemplates = {
 // Section 4: The 16 Animation Template Factories (A01-A16)
 // ═══════════════════════════════════════════════════════════════════
 
-// ── A01: Transparency Reveal ──
-AnimationTemplates.register('transparency_reveal', function(params) {
+// ── A01: Spotlight ──
+// Scene darkens, target entity pulses gently with luminous halo.
+// Visually isolates a character/object to push the child to identify it.
+AnimationTemplates.register('spotlight', function(params) {
   var prefix = params.entityPrefix || '';
-  var minAlpha = params.minAlpha != null ? params.minAlpha : 0.3;
+  var dimStrength = params.dimStrength != null ? params.dimStrength : 0.7;
+  var glowStrength = params.glowStrength != null ? params.glowStrength : 0.35;
+  var haloColor = params.haloColor || [255, 240, 180]; // warm yellow
 
   return function animate(buf, PW, PH, t) {
-    // Envelope: fade to transparent, hold, fade back
-    var alpha;
-    if (t < 0.3) alpha = 1 - (1 - minAlpha) * (t / 0.3);
-    else if (t < 0.7) alpha = minAlpha;
-    else alpha = minAlpha + (1 - minAlpha) * ((t - 0.7) / 0.3);
+    var env = _easeEnvelope(t, 0.2, 0.2);
+    // Gentle pulse: slow sine wave
+    var pulse = 0.6 + 0.4 * Math.sin(t * Math.PI * 4);
+    var glow = 1 + glowStrength * env * pulse;
+    var dim = 1 - dimStrength * env;
 
+    // First pass: dim non-target, brighten target
     for (var i = 0; i < buf.length; i++) {
-      if (buf[i].e === prefix || buf[i].e.startsWith(prefix + '.')) {
-        buf[i].r = Math.round(buf[i]._br * (1 - alpha) + buf[i]._r * alpha);
-        buf[i].g = Math.round(buf[i]._bg * (1 - alpha) + buf[i]._g * alpha);
-        buf[i].b = Math.round(buf[i]._bb * (1 - alpha) + buf[i]._b * alpha);
+      var p = buf[i];
+      if (p.e === prefix || p.e.startsWith(prefix + '.')) {
+        p.r = Math.min(255, Math.round(p._r * glow));
+        p.g = Math.min(255, Math.round(p._g * glow));
+        p.b = Math.min(255, Math.round(p._b * glow));
+      } else if (p.e && p.e !== '') {
+        p.r = Math.round(p._r * dim);
+        p.g = Math.round(p._g * dim);
+        p.b = Math.round(p._b * dim);
+      }
+    }
+
+    // Second pass: luminous halo around entity bounds
+    var bounds = _computeEntityBounds(buf, PW, prefix);
+    if (bounds.x2 < 0) return; // entity not found
+    var haloSize = Math.round(3 + 2 * env * pulse);
+    var hr = haloColor[0], hg = haloColor[1], hb = haloColor[2];
+    var haloAlpha = 0.4 * env * pulse;
+
+    for (var y = bounds.y1 - haloSize; y <= bounds.y2 + haloSize; y++) {
+      for (var x = bounds.x1 - haloSize; x <= bounds.x2 + haloSize; x++) {
+        if (x < 0 || x >= PW || y < 0 || y >= PH) continue;
+        var idx = y * PW + x;
+        var pe = buf[idx].e;
+        // Only draw halo on pixels that are NOT part of the target entity
+        if (pe === prefix || pe.startsWith(prefix + '.')) continue;
+        // Check if this pixel is near the entity border
+        var insideBounds = (x >= bounds.x1 && x <= bounds.x2 && y >= bounds.y1 && y <= bounds.y2);
+        if (insideBounds) continue;
+        // Distance to bounding box edge
+        var dx = x < bounds.x1 ? bounds.x1 - x : (x > bounds.x2 ? x - bounds.x2 : 0);
+        var dy = y < bounds.y1 ? bounds.y1 - y : (y > bounds.y2 ? y - bounds.y2 : 0);
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist > haloSize) continue;
+        var falloff = 1 - dist / haloSize;
+        var a = haloAlpha * falloff * falloff;
+        buf[idx].r = Math.min(255, Math.round(buf[idx].r * (1 - a) + hr * a));
+        buf[idx].g = Math.min(255, Math.round(buf[idx].g * (1 - a) + hg * a));
+        buf[idx].b = Math.min(255, Math.round(buf[idx].b * (1 - a) + hb * a));
       }
     }
   };
