@@ -2,14 +2,14 @@
 //
 // Three-resolution model with k-factor:
 //   SOURCE  (1120×720)  — manifest coordinates, Gemini image generation
-//   ART GRID (280×180)  — pixel buffer, animations (= source / K)
+//   ART GRID (560×360)  — pixel buffer, animations (= source / K)
 //   DISPLAY (1120×720)  — on-screen canvas (= art grid upscaled K×K)
 
 const SOURCE_W = 1120;
 const SOURCE_H = 720;
-const K = 4;                              // pixel-art aggregation factor
-const PW = Math.ceil(SOURCE_W / K);       // 280  — art grid width
-const PH = Math.ceil(SOURCE_H / K);       // 180  — art grid height
+const K = 2;                              // pixel-art aggregation factor (2×2 HD → 1 art pixel)
+const PW = Math.ceil(SOURCE_W / K);       // 560  — art grid width
+const PH = Math.ceil(SOURCE_H / K);       // 360  — art grid height
 
 // ---------------------------------------------------------------------------
 // PixelBuffer
@@ -282,8 +282,8 @@ class Renderer {
   }
 
   render() {
-    const artW = this.buf.width;   // 280
-    const artH = this.buf.height;  // 180
+    const artW = this.buf.width;   // 560
+    const artH = this.buf.height;  // 360
     const imgData = this.ctx.createImageData(SOURCE_W, SOURCE_H);
     const pixels = imgData.data;
 

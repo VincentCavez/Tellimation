@@ -425,7 +425,7 @@ a { color: var(--teal); text-decoration: none; }
 .scene-canvas-wrapper canvas {
   display: block;
   image-rendering: pixelated;
-  /* Display canvas is 1120×720 (art grid 280×180 upscaled 4×4).
+  /* Display canvas is 1120×720 (art grid 560×360 upscaled 2×2).
      On narrower viewports max-width scales down proportionally. */
   max-width: 100%;
   height: auto;
