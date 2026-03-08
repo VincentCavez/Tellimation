@@ -561,15 +561,36 @@ async def _execute_animation(
             error_category=error_category,
         )
 
-        msg: dict = {
+        # Send temp sprites BEFORE animation
+        if temp_sprites:
+            for sprite_id, sprite_code in temp_sprites.items():
+                await ws.send_json({
+                    "type": "add_temp_sprite",
+                    "id": sprite_id,
+                    "sprite": sprite_code,
+                })
+
+        # Send animation
+        await ws.send_json({
             "type": "animation",
             "target_id": target_id,
             "code": code,
             "duration_ms": duration_ms,
-        }
+        })
+
+        # Schedule temp sprite removal after animation ends
         if temp_sprites:
-            msg["temp_sprites"] = temp_sprites
-        await ws.send_json(msg)
+            sprite_ids = list(temp_sprites.keys())
+
+            async def _remove_temp_sprites_after_delay() -> None:
+                await asyncio.sleep(duration_ms / 1000.0)
+                for sid in sprite_ids:
+                    await ws.send_json({
+                        "type": "remove_temp_sprite",
+                        "id": sid,
+                    })
+
+            asyncio.ensure_future(_remove_temp_sprites_after_delay())
 
         session.animations_played_this_scene.append(target_id)
         session.conversation_history.append({
