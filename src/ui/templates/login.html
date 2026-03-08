@@ -24,6 +24,23 @@
         <label for="participant">Participant Number</label>
         <input type="text" id="participant" placeholder="e.g. P012">
       </div>
+      <div class="field">
+        <label for="child-age">Child's Age</label>
+        <select id="child-age">
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8" selected>8</option>
+          <option value="9">9</option>
+          <option value="10">10</option>
+          <option value="11">11</option>
+          <option value="12">12</option>
+          <option value="13">13</option>
+          <option value="14">14</option>
+          <option value="15">15</option>
+        </select>
+      </div>
       <div class="login-btn-wrap">
         <button class="btn btn-red" id="btn-ok">Let's go!</button>
       </div>
@@ -33,6 +50,7 @@
     const btnOk = document.getElementById('btn-ok');
     const apiKeyInput = document.getElementById('api-key');
     const participantInput = document.getElementById('participant');
+    const ageSelect = document.getElementById('child-age');
 
     function proceed() {
       const apiKey = apiKeyInput.value.trim();
@@ -41,12 +59,13 @@
       if (!participant) { participantInput.focus(); return; }
       sessionStorage.setItem('api_key', apiKey);
       sessionStorage.setItem('participant_id', participant);
+      sessionStorage.setItem('child_age', ageSelect.value);
       window.location.href = '/selection';
     }
 
     btnOk.addEventListener('click', proceed);
     participantInput.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') proceed();
+      if (e.key === 'Enter') ageSelect.focus();
     });
     apiKeyInput.addEventListener('keydown', function(e) {
       if (e.key === 'Enter') participantInput.focus();
