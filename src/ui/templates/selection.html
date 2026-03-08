@@ -308,6 +308,7 @@
         var origHandler = ws.onmessage;
         ws.onmessage = function(event) {
           origHandler(event);
+          if (event.data instanceof ArrayBuffer || event.data instanceof Blob) return;
           var msg = JSON.parse(event.data);
           if (msg.type === 'one_more_scene' || msg.type === 'error') {
             btnOneMore.disabled = false;
