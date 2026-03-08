@@ -19,5 +19,6 @@ class AssessmentDecision(BaseModel):
 
     action: Literal["animate", "oral_guidance", "next_scene", "wait"]
     target_id: Optional[str] = None
+    error_category: Optional[str] = None
     guidance_text: Optional[str] = None
     reasoning: str = ""
