@@ -403,8 +403,8 @@ Draw order matters — later calls overdraw earlier ones. Draw back-to-front \
 (body first, then details on top).
 
 The sprite code is a flat JS string (no function wrapper). It will be executed \
-with the primitives available as globals. `PW` (280) and `PH` (180) are also available \
-(art-grid resolution — each art pixel = 4×4 display pixels).
+with the primitives available as globals. `PW` (560) and `PH` (360) are also available \
+(art-grid resolution — each art pixel = 2×2 display pixels).
 
 # CRITICAL: Pixel Art Quality Standards
 
