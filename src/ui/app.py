@@ -545,7 +545,7 @@ async def _execute_animation(
 ) -> None:
     """Generate and send a tellimation animation for a target entity."""
     try:
-        code, duration_ms = await generate_tellimation(
+        result = await generate_tellimation(
             api_key=session.api_key,
             sprite_code=(
                 session.current_scene.get("sprite_code", {})
@@ -558,12 +558,9 @@ async def _execute_animation(
             error_type="OMISSION",
         )
 
-        await ws.send_json({
-            "type": "animation",
-            "target_id": target_id,
-            "code": code,
-            "duration_ms": duration_ms,
-        })
+        msg = {"type": "animation", "target_id": target_id}
+        msg.update(result.to_ws_dict())
+        await ws.send_json(msg)
 
         session.animations_played_this_scene.append(target_id)
         session.conversation_history.append({
