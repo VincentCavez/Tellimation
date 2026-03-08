@@ -1,23 +1,25 @@
-"""Tellimation module — selects animation templates and optional particles.
+"""Tellimation module — generates animations from the animation grammar.
 
-Responds to discrepancy assessment decisions by choosing pre-written
-animation templates (A01-A16) and parameterizing them for the scene.
+Given a target entity and an error_category from the discrepancy assessment,
+generates JS animation code, a duration, and optional temporary sprites.
+
+The module chooses, adapts and combines animations from these families:
+  spatial, property, temporal, action, identity, quantity, relational, discourse
 
 Model: Gemini 3 Flash (gemini-3-flash-preview)
 
-Fallback: if LLM generation fails, maps error type to a default template.
+Fallback: if LLM generation fails, returns a simple wobble animation.
 """
 
 from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from google import genai
 from google.genai import types
 
-from src.models.animation_cache import AnimationCache, CachedAnimation
 from src.models.scene import SceneManifest
 from src.models.student_profile import StudentProfile
 from src.generation.prompts.tellimation_prompt import (
@@ -35,23 +37,64 @@ MODEL_ID = "gemini-3-flash-preview"
 TELLIMATION_TIMEOUT = 30   # latency-critical
 MAX_RETRIES = 2
 
-# Mapping from error type to default template name (A01-A16)
-_FALLBACK_MAP = {
-    "SPATIAL": "settle",
-    "PROPERTY_COLOR": "color_pop",
-    "PROPERTY_SIZE": "scale_strain",
-    "PROPERTY_WEIGHT": "emanation",
-    "PROPERTY_TEMPERATURE": "emanation",
-    "PROPERTY_STATE": "emanation",
-    "TEMPORAL": "afterimage",
-    "ACTION": "motion_lines",
-    "MANNER": "motion_lines",
-    "IDENTITY": "wobble",
-    "QUANTITY": "sequential_glow",
-    "RELATIONAL": "magnetism",
-    "EXISTENCE": "ghost_outline",
-    "OMISSION": "ghost_outline",
-    "REDUNDANCY": "bonk",
+# Fallback animation code per error_category
+_FALLBACK_CODE: Dict[str, str] = {
+    "spatial": """\
+function animate(buf, PW, PH, t) {
+  var env = t < 0.15 ? t / 0.15 : t > 0.85 ? (1 - t) / 0.15 : 1;
+  var offset = Math.round(Math.abs(Math.sin(t * Math.PI * 3)) * -8 * (1 - t));
+  for (var i = 0; i < buf.length; i++) {
+    if (buf[i].e.startsWith('TARGET')) {
+      buf[i].r = Math.min(255, Math.round(buf[i]._r * (1 + 0.2 * env)));
+      buf[i].g = Math.min(255, Math.round(buf[i]._g * (1 + 0.2 * env)));
+      buf[i].b = Math.min(255, Math.round(buf[i]._b * (1 + 0.2 * env)));
+    }
+  }
+}""",
+    "property": """\
+function animate(buf, PW, PH, t) {
+  var env = t < 0.15 ? t / 0.15 : t > 0.85 ? (1 - t) / 0.15 : 1;
+  for (var i = 0; i < buf.length; i++) {
+    var isTarget = buf[i].e.startsWith('TARGET');
+    if (isTarget) {
+      var glow = 1 + 0.3 * env * (0.7 + 0.3 * Math.sin(t * Math.PI * 6));
+      buf[i].r = Math.min(255, Math.round(buf[i]._r * glow));
+      buf[i].g = Math.min(255, Math.round(buf[i]._g * glow));
+      buf[i].b = Math.min(255, Math.round(buf[i]._b * glow));
+    } else if (buf[i].e && buf[i].e !== 'bg') {
+      var L = Math.round(buf[i]._r * 0.3 + buf[i]._g * 0.59 + buf[i]._b * 0.11);
+      buf[i].r = Math.round(buf[i]._r * (1 - env * 0.7) + L * env * 0.7);
+      buf[i].g = Math.round(buf[i]._g * (1 - env * 0.7) + L * env * 0.7);
+      buf[i].b = Math.round(buf[i]._b * (1 - env * 0.7) + L * env * 0.7);
+    }
+  }
+}""",
+    "identity": """\
+function animate(buf, PW, PH, t) {
+  var freq = 3 + 22 * t;
+  var amp = Math.round(4 * Math.sin(t * Math.PI));
+  var offset = Math.round(amp * Math.sin(t * Math.PI * freq));
+  if (offset === 0) return;
+  var pixels = [];
+  for (var i = 0; i < buf.length; i++) {
+    if (buf[i].e.startsWith('TARGET')) pixels.push(i);
+  }
+  for (var j = 0; j < pixels.length; j++) {
+    var idx = pixels[j];
+    buf[idx].r = buf[idx]._br || 0;
+    buf[idx].g = buf[idx]._bg || 0;
+    buf[idx].b = buf[idx]._bb || 0;
+  }
+  for (var j = 0; j < pixels.length; j++) {
+    var idx = pixels[j];
+    var x = idx % PW, y = (idx - x) / PW;
+    var nx = x + offset;
+    if (nx >= 0 && nx < PW) {
+      var ni = y * PW + nx;
+      buf[ni].r = buf[idx]._r; buf[ni].g = buf[idx]._g; buf[ni].b = buf[idx]._b;
+    }
+  }
+}""",
 }
 
 _FALLBACK_DURATION_MS = 1200
@@ -191,29 +234,15 @@ def _format_animation_effectiveness(
     return "\n".join(lines)
 
 
-def _build_fallback(target_id: str, error_type: str) -> CachedAnimation:
-    """Build a fallback CachedAnimation using a default template."""
-    template_name = _FALLBACK_MAP.get(error_type, "wobble")
-    logger.info("[tellimation] Using fallback template '%s' for %s (error=%s)",
-                template_name, target_id, error_type)
-
-    params: Dict[str, Any] = {"entityPrefix": target_id}
-
-    # Template-specific defaults for fallback
-    if template_name == "emanation":
-        ptype_map = {
-            "PROPERTY_WEIGHT": "dust",
-            "PROPERTY_TEMPERATURE": "steam",
-            "PROPERTY_STATE": "sparkle",
-        }
-        params["particleType"] = ptype_map.get(error_type, "steam")
-
-    return CachedAnimation(
-        template=template_name,
-        params=params,
-        duration_ms=_FALLBACK_DURATION_MS,
-        generated_for=target_id,
-    )
+def _build_fallback(
+    target_id: str, error_category: str,
+) -> Tuple[str, int, None]:
+    """Build a fallback animation when LLM generation fails."""
+    code = _FALLBACK_CODE.get(error_category, _FALLBACK_CODE["identity"])
+    code = code.replace("TARGET", target_id)
+    logger.info("[tellimation] Using fallback for %s (category=%s)",
+                target_id, error_category)
+    return (code, _FALLBACK_DURATION_MS, None)
 
 
 async def generate_tellimation(
@@ -222,21 +251,14 @@ async def generate_tellimation(
     manifest: SceneManifest,
     student_profile: StudentProfile,
     target_id: str,
-    animation_cache: Optional[AnimationCache] = None,
-    error_type: str = "",
-) -> CachedAnimation:
+    error_category: str,
+) -> Tuple[str, int, Optional[Dict]]:
     """Generate a tellimation animation for a target entity.
 
-    Returns a CachedAnimation containing either a template spec or raw code.
-    The caller converts it to a WebSocket message via .to_ws_dict().
+    Returns (JS_code, duration_ms, temp_sprites_or_None).
+    temp_sprites is a dict of sprite entries (same format as sprite_code)
+    for temporary visual elements like speech bubbles or nametags.
     """
-    # Cache lookup
-    if animation_cache and error_type:
-        cached = animation_cache.lookup(target_id, error_type)
-        if cached is not None:
-            logger.info("[tellimation] Cache hit: %s × %s", target_id, error_type)
-            return cached
-
     # Build prompt
     entity_details = _format_entity_details(target_id, manifest)
     sprite_info = _format_sprite_info(target_id, sprite_code)
@@ -246,7 +268,7 @@ async def generate_tellimation(
 
     user_prompt = TELLIMATION_USER_PROMPT_TEMPLATE.format(
         target_id=target_id,
-        error_type=error_type or "OMISSION",
+        error_category=error_category,
         entity_details=entity_details,
         sprite_info=sprite_info,
         scene_context=scene_context,
@@ -275,87 +297,31 @@ async def generate_tellimation(
 
             data = _extract_json(_get_response_text(response))
 
-            # Template-based response (preferred)
-            template_name = data.get("template")
-            if template_name and isinstance(template_name, str):
-                params = data.get("params", {})
-                if not isinstance(params, dict):
-                    params = {}
-                # Ensure entityPrefix is set
-                if "entityPrefix" not in params:
-                    params["entityPrefix"] = target_id
-
-                particles = data.get("particles", [])
-                if not isinstance(particles, list):
-                    particles = []
-
-                text_overlays = data.get("text_overlays", [])
-                if not isinstance(text_overlays, list):
-                    text_overlays = []
-
-                duration_ms = data.get("duration_ms", 1200)
-                if not isinstance(duration_ms, (int, float)):
-                    duration_ms = 1200
-                duration_ms = int(duration_ms)
-
-                animation_id = data.get("animation_id", template_name)
-                logger.info("[tellimation] Template '%s' (%s) for %s (%d ms)",
-                            template_name, animation_id, target_id, duration_ms)
-
-                result = CachedAnimation(
-                    template=template_name,
-                    params=params,
-                    particles=particles,
-                    text_overlays=text_overlays,
-                    duration_ms=duration_ms,
-                    generated_for=target_id,
-                )
-
-                # Cache
-                if animation_cache and error_type:
-                    animation_cache.store(target_id, error_type, result)
-
-                student_profile.record_animation(
-                    entity_id=target_id,
-                    error_type=error_type or "OMISSION",
-                    animation_type=template_name,
-                )
-
-                return result
-
-            # Custom code fallback response
             code = data.get("code", "")
-            if code and isinstance(code, str):
-                if "animate" not in code:
-                    raise ValueError("Custom code must contain an 'animate' function")
+            if not isinstance(code, str) or "animate" not in code:
+                raise ValueError("Response missing valid 'code' with animate function")
 
-                duration_ms = data.get("duration_ms", 1200)
-                if not isinstance(duration_ms, (int, float)):
-                    duration_ms = 1200
-                duration_ms = int(duration_ms)
+            duration_ms = data.get("duration_ms", 1200)
+            if not isinstance(duration_ms, (int, float)):
+                duration_ms = 1200
+            duration_ms = int(duration_ms)
 
-                animation_type = data.get("animation_type", "custom")
-                logger.info("[tellimation] Custom code '%s' for %s (%d ms)",
-                            animation_type, target_id, duration_ms)
+            temp_sprites = data.get("temp_sprites")
+            if temp_sprites is not None and not isinstance(temp_sprites, dict):
+                temp_sprites = None
 
-                result = CachedAnimation(
-                    code=code,
-                    duration_ms=duration_ms,
-                    generated_for=target_id,
-                )
+            animation_id = data.get("animation_id", "custom")
+            logger.info("[tellimation] Generated '%s' for %s (%d ms, temp_sprites=%s)",
+                        animation_id, target_id, duration_ms,
+                        bool(temp_sprites))
 
-                if animation_cache and error_type:
-                    animation_cache.store(target_id, error_type, result)
+            student_profile.record_animation(
+                entity_id=target_id,
+                error_type=error_category,
+                animation_type=animation_id,
+            )
 
-                student_profile.record_animation(
-                    entity_id=target_id,
-                    error_type=error_type or "OMISSION",
-                    animation_type=animation_type,
-                )
-
-                return result
-
-            raise ValueError("Response has neither 'template' nor 'code' field")
+            return (code, duration_ms, temp_sprites)
 
         except asyncio.TimeoutError:
             logger.warning("[tellimation] Attempt %d/%d timed out after %ds",
@@ -371,12 +337,12 @@ async def generate_tellimation(
     logger.warning("[tellimation] All %d attempts failed (%s), using fallback",
                    MAX_RETRIES, last_exc)
 
-    result = _build_fallback(target_id, error_type or "OMISSION")
+    result = _build_fallback(target_id, error_category)
 
     student_profile.record_animation(
         entity_id=target_id,
-        error_type=error_type or "OMISSION",
-        animation_type=f"fallback_{result.template}",
+        error_type=error_category,
+        animation_type=f"fallback_{error_category}",
     )
 
     return result
