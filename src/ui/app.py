@@ -121,12 +121,18 @@ class _WebSocketAdapter:
         self._ws = ws
 
     async def send_json(self, data: Dict[str, Any]) -> None:
-        if self._ws.client_state == WebSocketState.CONNECTED:
-            await self._ws.send_json(data)
+        try:
+            if self._ws.client_state == WebSocketState.CONNECTED:
+                await self._ws.send_json(data)
+        except Exception:
+            pass  # client disconnected
 
     async def send_bytes(self, data: bytes) -> None:
-        if self._ws.client_state == WebSocketState.CONNECTED:
-            await self._ws.send_bytes(data)
+        try:
+            if self._ws.client_state == WebSocketState.CONNECTED:
+                await self._ws.send_bytes(data)
+        except Exception:
+            pass  # client disconnected
 
 
 # ---------------------------------------------------------------------------
