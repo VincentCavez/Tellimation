@@ -125,6 +125,8 @@
       };
 
       ws.onmessage = function(event) {
+        // Skip binary messages (TTS audio)
+        if (event.data instanceof ArrayBuffer || event.data instanceof Blob) return;
         const msg = JSON.parse(event.data);
 
         if (msg.type === 'generation_progress') {
