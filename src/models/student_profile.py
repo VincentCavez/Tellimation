@@ -110,6 +110,43 @@ class StudentProfile(BaseModel):
             if not entry["corrected"]
         ]
 
+    def get_effective_animations(self, error_type: str) -> List[str]:
+        """Return animation types that led to correction for a given error type.
+
+        Useful for choosing which animation approach to use: if "color_pop"
+        worked for PROPERTY_COLOR but "shake" didn't, prefer "color_pop".
+
+        Args:
+            error_type: Error type string (e.g. "PROPERTY_COLOR").
+
+        Returns:
+            List of animation_type strings that led to correction.
+        """
+        effective: List[str] = []
+        for entry in self.animation_history:
+            if entry["error_type"] == error_type and entry["corrected"]:
+                at = entry.get("animation_type", "")
+                if at and at not in effective:
+                    effective.append(at)
+        return effective
+
+    def get_ineffective_animations(self, error_type: str) -> List[str]:
+        """Return animation types that did NOT lead to correction for an error type.
+
+        Args:
+            error_type: Error type string (e.g. "PROPERTY_COLOR").
+
+        Returns:
+            List of animation_type strings that did not lead to correction.
+        """
+        ineffective: List[str] = []
+        for entry in self.animation_history:
+            if entry["error_type"] == error_type and not entry["corrected"]:
+                at = entry.get("animation_type", "")
+                if at and at not in ineffective:
+                    ineffective.append(at)
+        return ineffective
+
     def get_weak_areas(self) -> List[str]:
         if self.total_utterances == 0:
             return []
