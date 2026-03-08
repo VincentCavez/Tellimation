@@ -12,6 +12,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import time
 import random
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -273,6 +274,7 @@ async def _handle_generate_initial_scenes(
     async def _gen_one(index: int) -> None:
         try:
             theme = random.choice(STORY_THEMES)
+            t_scene = time.time()
 
             await ws.send_json({
                 "type": "generation_step",
@@ -281,6 +283,7 @@ async def _handle_generate_initial_scenes(
                 "step": "manifest",
             })
 
+            t0 = time.time()
             manifest, neg, raw_data = await generate_scene_and_neg(
                 api_key=session.api_key,
                 story_state=None,
@@ -288,6 +291,10 @@ async def _handle_generate_initial_scenes(
                 theme=theme,
                 previous_manifest=None,
                 previous_neg=None,
+            )
+            logger.info(
+                "[pipeline] Scene %d: manifest+NEG took %.1fs",
+                index, time.time() - t0,
             )
 
             await ws.send_json({
@@ -305,11 +312,16 @@ async def _handle_generate_initial_scenes(
                     "step": step,
                 })
 
+            t1 = time.time()
             assets = await generate_scene_assets(
                 api_key=session.api_key,
                 manifest_data=raw_data,
                 story_state=None,
                 progress_callback=_progress_cb,
+            )
+            logger.info(
+                "[pipeline] Scene %d: assets took %.1fs",
+                index, time.time() - t1,
             )
 
             scene = {
@@ -327,6 +339,11 @@ async def _handle_generate_initial_scenes(
                 "scene_index": index,
             })
 
+            logger.info(
+                "[pipeline] Scene %d: total %.1fs",
+                index, time.time() - t_scene,
+            )
+
         except Exception as e:
             logger.exception("Failed to generate initial scene %d", index)
             await ws.send_json({
@@ -334,7 +351,9 @@ async def _handle_generate_initial_scenes(
                 "message": f"Scene {index} failed: {e}",
             })
 
+    t_all = time.time()
     await asyncio.gather(*[_gen_one(i) for i in range(n)])
+    logger.info("[pipeline] All %d initial scenes took %.1fs", n, time.time() - t_all)
 
 
 # ---------------------------------------------------------------------------
