@@ -57,9 +57,9 @@ IMAGE_MAX_RETRIES = 2
 # Resolution model (must match engine.js)
 SOURCE_W = 1120   # manifest coordinates
 SOURCE_H = 720
-K = 4             # pixel-art aggregation factor
-ART_W = SOURCE_W // K   # 280
-ART_H = SOURCE_H // K   # 180
+K = 2             # pixel-art aggregation factor (2×2 HD pixels → 1 art pixel)
+ART_W = SOURCE_W // K   # 560
+ART_H = SOURCE_H // K   # 360
 
 
 # ---------------------------------------------------------------------------
