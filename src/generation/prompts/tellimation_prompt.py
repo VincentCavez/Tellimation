@@ -158,12 +158,56 @@ Return ONLY valid JSON (no markdown fences, no commentary):
   "particles": [
     {"type": "<preset name>", "anchor": "<entity prefix>", "count": <int>}
   ],
+  "text_overlays": [
+    {"id": "<entity ID>", "text": "<word>", "x": <int>, "y": <int>, "color": [r,g,b], "scale": <1|2|3>}
+  ],
   "duration_ms": <integer, use template default unless you have reason to change>
 }
 ```
 
 The `particles` array is OPTIONAL. Only add particles if they enhance the \
 communication. Most templates work perfectly without extra particles.
+
+# Text Overlays
+
+You can render pixel-art text (words) in the scene by including a \
+`text_overlays` array. Text becomes a regular entity in the pixel buffer \
+with its own entity ID, so ANY animation template can target it. Use text \
+when the discrepancy is best communicated by showing a word alongside \
+(or instead of) animating a scene entity.
+
+Each text overlay:
+```
+{"id": "<entity ID, e.g. text_big>", "text": "<word(s)>", \
+"x": <pixel x>, "y": <pixel y>, "color": [r, g, b], "scale": <1|2|3>}
+```
+
+The `text_overlays` array goes at the top level of your JSON response, \
+alongside `template`, `params`, `particles`. The text is rendered into \
+the pixel buffer BEFORE the animation starts, so templates can collect, \
+move, and animate text pixels just like sprite pixels.
+
+Examples:
+- Bonk an entity and a wrong word: template "bonk", \
+  params.entityPrefixA = "rabbit_01", params.entityPrefixB = "text_big", \
+  text_overlays: [{"id": "text_big", "text": "big", "x": 300, "y": 180, \
+  "color": [220, 60, 60], "scale": 2}]
+- Ghost outline for a missing word: template "ghost_outline", \
+  params.entityPrefix = "text_fluffy", \
+  text_overlays: [{"id": "text_fluffy", "text": "fluffy", "x": 250, \
+  "y": 150, "color": [180, 180, 180]}]
+- Wobble a wrong word: template "wobble", \
+  params.entityPrefix = "text_runned", \
+  text_overlays: [{"id": "text_runned", "text": "runned", "x": 200, \
+  "y": 120, "color": [200, 100, 100], "scale": 2}]
+
+Guidelines for text overlays:
+- Position text NEAR the relevant entity but not overlapping it
+- Use scale 2 for emphasis on important single words
+- Keep text short: 1-3 words maximum
+- The `id` field must match the entityPrefix used in params
+- Text overlays are OPTIONAL — only use when words enhance communication
+- The text is temporary: it appears only during the animation
 
 # Choosing the right template
 
