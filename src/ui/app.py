@@ -505,7 +505,10 @@ async def _handle_audio(
 
         # 4. Execute decision
         if decision.action == "animate" and decision.target_id:
-            await _execute_animation(session, ws, decision.target_id)
+            await _execute_animation(
+                session, ws, decision.target_id,
+                error_category=decision.error_category or "identity",
+            )
 
         elif decision.action == "oral_guidance" and decision.guidance_text:
             session.conversation_history.append({
@@ -542,10 +545,11 @@ async def _execute_animation(
     session: SessionState,
     ws: _WebSocketAdapter,
     target_id: str,
+    error_category: str = "identity",
 ) -> None:
     """Generate and send a tellimation animation for a target entity."""
     try:
-        result = await generate_tellimation(
+        code, duration_ms, temp_sprites = await generate_tellimation(
             api_key=session.api_key,
             sprite_code=(
                 session.current_scene.get("sprite_code", {})
@@ -554,12 +558,17 @@ async def _execute_animation(
             manifest=session.current_manifest,
             student_profile=session.student_profile,
             target_id=target_id,
-            animation_cache=session.animation_cache,
-            error_type="OMISSION",
+            error_category=error_category,
         )
 
-        msg = {"type": "animation", "target_id": target_id}
-        msg.update(result.to_ws_dict())
+        msg: dict = {
+            "type": "animation",
+            "target_id": target_id,
+            "code": code,
+            "duration_ms": duration_ms,
+        }
+        if temp_sprites:
+            msg["temp_sprites"] = temp_sprites
         await ws.send_json(msg)
 
         session.animations_played_this_scene.append(target_id)
