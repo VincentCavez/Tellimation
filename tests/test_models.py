@@ -6,7 +6,6 @@ from src.models.scene import Action, Entity, Position, Relation, SceneManifest
 from src.models.neg import (
     NEG,
     NarrativeTarget,
-    TargetComponents,
 )
 from src.models.story_state import ActiveEntity, StoryState
 from src.models.student_profile import Discrepancy, StudentProfile
@@ -101,11 +100,10 @@ class TestNEG:
                 NarrativeTarget(
                     id="t1",
                     entity_id="cat_01",
-                    components=TargetComponents(
-                        identity=True,
-                        descriptors=["orange", "fluffy"],
-                        spatial="on fence_01",
-                    ),
+                    misl_element="character",
+                    current_level=1,
+                    target_level=2,
+                    description="Name the cat: Whiskers",
                     priority=0.9,
                     tolerance=0.3,
                 ),
@@ -116,7 +114,8 @@ class TestNEG:
         data = json.loads(neg.model_dump_json())
         restored = NEG.model_validate(data)
         assert len(restored.targets) == 1
-        assert restored.targets[0].components.descriptors == ["orange", "fluffy"]
+        assert restored.targets[0].misl_element == "character"
+        assert restored.targets[0].target_level == 2
         assert restored.skill_coverage_check == "PASS"
 
     def test_get_targets_for_entity(self):
@@ -124,15 +123,18 @@ class TestNEG:
             targets=[
                 NarrativeTarget(
                     id="t1", entity_id="cat_01",
-                    components=TargetComponents(identity=True),
+                    misl_element="character",
+                    description="Name the cat",
                 ),
                 NarrativeTarget(
                     id="t2", entity_id="dog_01",
-                    components=TargetComponents(identity=True),
+                    misl_element="character",
+                    description="Name the dog",
                 ),
                 NarrativeTarget(
                     id="t3", entity_id="cat_01",
-                    components=TargetComponents(spatial="under table"),
+                    misl_element="setting",
+                    description="Describe where the cat is",
                 ),
             ],
         )
