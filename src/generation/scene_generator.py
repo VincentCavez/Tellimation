@@ -18,6 +18,7 @@ import base64
 import io
 import logging
 import re
+import time
 from typing import Any, Callable, Dict, List, Optional
 
 from PIL import Image
@@ -534,6 +535,7 @@ async def _generate_background(
 
     for attempt in range(1, IMAGE_MAX_RETRIES + 1):
         try:
+            t0 = time.time()
             response = await asyncio.wait_for(
                 client.aio.models.generate_content(
                     model=IMAGE_MODEL_ID,
@@ -547,22 +549,23 @@ async def _generate_background(
                 ),
                 timeout=IMAGE_TIMEOUT,
             )
+            elapsed = time.time() - t0
 
             if response.candidates and response.candidates[0].content:
                 for part in response.candidates[0].content.parts:
                     if part.inline_data is not None:
-                        logger.info("[bg] Attempt %d/%d: got %d bytes",
+                        logger.info("[bg] Attempt %d/%d: got %d bytes in %.1fs",
                                     attempt, IMAGE_MAX_RETRIES,
-                                    len(part.inline_data.data))
+                                    len(part.inline_data.data), elapsed)
                         return part.inline_data.data
 
-            logger.warning("[bg] Attempt %d/%d: no image data",
-                           attempt, IMAGE_MAX_RETRIES)
+            logger.warning("[bg] Attempt %d/%d: no image data (%.1fs)",
+                           attempt, IMAGE_MAX_RETRIES, elapsed)
 
         except Exception as exc:
-            logger.warning("[bg] Attempt %d/%d failed (%s): %s",
+            logger.warning("[bg] Attempt %d/%d failed in %.1fs (%s): %s",
                            attempt, IMAGE_MAX_RETRIES,
-                           type(exc).__name__, exc or "no details")
+                           time.time() - t0, type(exc).__name__, exc or "no details")
 
     logger.warning("[bg] All %d attempts exhausted", IMAGE_MAX_RETRIES)
     return None
@@ -585,6 +588,7 @@ async def _generate_entity(
 
     for attempt in range(1, IMAGE_MAX_RETRIES + 1):
         try:
+            t0 = time.time()
             response = await asyncio.wait_for(
                 client.aio.models.generate_content(
                     model=IMAGE_MODEL_ID,
@@ -598,22 +602,23 @@ async def _generate_entity(
                 ),
                 timeout=IMAGE_TIMEOUT,
             )
+            elapsed = time.time() - t0
 
             if response.candidates and response.candidates[0].content:
                 for part in response.candidates[0].content.parts:
                     if part.inline_data is not None:
-                        logger.info("[entity] %s: attempt %d/%d got %d bytes",
+                        logger.info("[entity] %s: attempt %d/%d got %d bytes in %.1fs",
                                     eid, attempt, IMAGE_MAX_RETRIES,
-                                    len(part.inline_data.data))
+                                    len(part.inline_data.data), elapsed)
                         return part.inline_data.data
 
-            logger.warning("[entity] %s: attempt %d/%d no image data",
-                           eid, attempt, IMAGE_MAX_RETRIES)
+            logger.warning("[entity] %s: attempt %d/%d no image data (%.1fs)",
+                           eid, attempt, IMAGE_MAX_RETRIES, elapsed)
 
         except Exception as exc:
-            logger.warning("[entity] %s: attempt %d/%d failed (%s): %s",
+            logger.warning("[entity] %s: attempt %d/%d failed in %.1fs (%s): %s",
                            eid, attempt, IMAGE_MAX_RETRIES,
-                           type(exc).__name__, exc or "no details")
+                           time.time() - t0, type(exc).__name__, exc or "no details")
 
     logger.warning("[entity] %s: all %d attempts exhausted", eid, IMAGE_MAX_RETRIES)
     return None
@@ -856,10 +861,13 @@ async def generate_scene_assets(
         all_tasks.append(bg_task)
     all_tasks.extend(entity_tasks)
 
+    t_img = time.time()
     if all_tasks:
         results = await asyncio.gather(*all_tasks, return_exceptions=True)
     else:
         results = []
+    logger.info("[assets] All image generation took %.1fs (%d tasks)",
+                time.time() - t_img, len(all_tasks))
 
     # Split results
     bg_image_bytes: Optional[bytes] = None
@@ -907,10 +915,11 @@ async def generate_scene_assets(
         art_w = max(1, ent.get("width_hint", 50) // K)
         art_h = max(1, ent.get("height_hint", 60) // K)
 
-        logger.info("[assets] Processing %s: magenta removal + downscale -> %dx%d",
-                    eid, art_w, art_h)
+        t_proc = time.time()
         rgba = _remove_magenta(entity_images[eid])
         entity_sprites[eid] = _downscale_entity(rgba, art_w, art_h)
+        logger.info("[assets] %s: magenta + downscale -> %dx%d in %.1fs",
+                    eid, art_w, art_h, time.time() - t_proc)
 
     await _notify("processing")
 
