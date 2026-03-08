@@ -20,6 +20,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from google import genai
 from google.genai import types
 
+from src.models.neg import NEG
 from src.models.scene import SceneManifest
 from src.models.student_profile import StudentProfile
 from src.generation.prompts.tellimation_prompt import (
@@ -248,16 +249,78 @@ def _format_animation_effectiveness(
     return "\n".join(lines)
 
 
+def _extract_fallback_text(
+    target_id: str,
+    misl_element: str,
+    manifest: SceneManifest,
+    neg: Optional[NEG],
+) -> List[Dict[str, Any]]:
+    """Extract text overlay from NEG target description for fallback animation.
+
+    Returns a list with one text_overlay dict, or empty list if no match found.
+    """
+    if neg is None:
+        return []
+
+    # Find matching NEG target
+    root_id = target_id.split(".")[0] if "." in target_id else target_id
+    matching_target = None
+    for t in neg.targets:
+        if t.entity_id == root_id and t.misl_element == misl_element:
+            matching_target = t
+            break
+    # Fallback: match just entity_id
+    if matching_target is None:
+        for t in neg.targets:
+            if t.entity_id == root_id:
+                matching_target = t
+                break
+
+    if matching_target is None or not matching_target.description:
+        return []
+
+    # Take first 2 words, uppercase, strip non-font chars
+    words = matching_target.description.strip().split()[:2]
+    text = " ".join(words).upper()
+    # Bitmap font only supports A-Z 0-9 . , ! ? - '  SPACE
+    text = "".join(c for c in text if c.isalnum() or c in " .,!?-'")
+    if not text:
+        return []
+
+    # Position text above the entity
+    entity = manifest.get_entity(root_id)
+    if entity and entity.position:
+        tx = max(5, min(entity.position.x - len(text) * 3, 500))
+        ty = max(5, entity.position.y - 20)
+    else:
+        tx, ty = 200, 50
+
+    return [{
+        "text": text,
+        "x": tx,
+        "y": ty,
+        "color": [255, 255, 100],
+        "id": "fallback_text",
+        "scale": 2,
+    }]
+
+
 def _build_fallback(
-    target_id: str, misl_element: str,
-) -> Tuple[str, int, None]:
-    """Build a fallback animation when LLM generation fails."""
+    target_id: str,
+    misl_element: str,
+    manifest: SceneManifest,
+    neg: Optional[NEG] = None,
+) -> Tuple[str, int, None, str, List[Dict[str, Any]]]:
+    """Build a fallback animation with text overlay when LLM generation fails."""
     family = _MISL_TO_FALLBACK.get(misl_element, "shake")
     code = _FALLBACK_CODE.get(family, _FALLBACK_CODE["shake"])
     code = code.replace("TARGET", target_id)
-    logger.info("[tellimation] Using fallback for %s (misl=%s, family=%s)",
-                target_id, misl_element, family)
-    return (code, _FALLBACK_DURATION_MS, None)
+    animation_id = f"fallback_{family}"
+    text_overlays = _extract_fallback_text(target_id, misl_element, manifest, neg)
+    logger.info("[tellimation] Using fallback for %s (misl=%s, family=%s, text=%s)",
+                target_id, misl_element, family,
+                text_overlays[0]["text"] if text_overlays else "none")
+    return (code, _FALLBACK_DURATION_MS, None, animation_id, text_overlays)
 
 
 async def generate_tellimation(
@@ -267,12 +330,14 @@ async def generate_tellimation(
     student_profile: StudentProfile,
     target_id: str,
     misl_element: str,
-) -> Tuple[str, int, Optional[Dict]]:
+    neg: Optional[NEG] = None,
+) -> Tuple[str, int, Optional[Dict], str, List[Dict[str, Any]]]:
     """Generate a tellimation animation for a target entity.
 
-    Returns (JS_code, duration_ms, temp_sprites_or_None).
+    Returns (JS_code, duration_ms, temp_sprites_or_None, animation_id, text_overlays).
     temp_sprites is a dict of sprite entries (same format as sprite_code)
     for temporary visual elements like speech bubbles or nametags.
+    text_overlays is a list of text overlay dicts for the client to render.
     """
     # Build eligible animations list from MISL mapping
     eligible = MISL_TO_ANIMATIONS.get(misl_element, [])
@@ -331,9 +396,13 @@ async def generate_tellimation(
                 temp_sprites = None
 
             animation_id = data.get("animation_id", "custom")
-            logger.info("[tellimation] Generated '%s' for %s (%d ms, temp_sprites=%s)",
+            text_overlays = data.get("text_overlays", [])
+            if not isinstance(text_overlays, list):
+                text_overlays = []
+
+            logger.info("[tellimation] Generated '%s' for %s (%d ms, temp_sprites=%s, overlays=%d)",
                         animation_id, target_id, duration_ms,
-                        bool(temp_sprites))
+                        bool(temp_sprites), len(text_overlays))
 
             student_profile.record_animation(
                 entity_id=target_id,
@@ -341,7 +410,7 @@ async def generate_tellimation(
                 animation_type=animation_id,
             )
 
-            return (code, duration_ms, temp_sprites)
+            return (code, duration_ms, temp_sprites, animation_id, text_overlays)
 
         except asyncio.TimeoutError:
             logger.warning("[tellimation] Attempt %d/%d timed out after %ds",
@@ -357,12 +426,14 @@ async def generate_tellimation(
     logger.warning("[tellimation] All %d attempts failed (%s), using fallback",
                    MAX_RETRIES, last_exc)
 
-    result = _build_fallback(target_id, misl_element)
+    code, duration_ms, temp_sprites, animation_id, text_overlays = _build_fallback(
+        target_id, misl_element, manifest, neg,
+    )
 
     student_profile.record_animation(
         entity_id=target_id,
         error_type=misl_element,
-        animation_type=f"fallback_{misl_element}",
+        animation_type=animation_id,
     )
 
-    return result
+    return (code, duration_ms, temp_sprites, animation_id, text_overlays)

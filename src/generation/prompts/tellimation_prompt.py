@@ -31,9 +31,10 @@ eligible for the current MISL element. Choose from those.
 
 ## A — IDENTITY (MISL: character, grammaticality)
 
-**A01 — Decomposition**
-Entity separates into sub-parts, snaps back together.
-Scaffolds inspection of components (what makes up this entity?).
+**A01 — Spotlight**
+Scene darkens except the target entity, which pulses gently with a luminous \
+halo. Visually isolates a character or object to push the child to identify \
+and name it.
 
 **A02 — Wobble**
 Horizontal oscillation, slow at first then faster.

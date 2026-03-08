@@ -187,7 +187,7 @@ MICRO_AGE_THRESHOLD_LEVEL2 = 9
 
 ANIMATION_IDS = {
     # A = Identity
-    "A01_decomposition": "Entity briefly disassembles into constituent parts",
+    "A01_spotlight": "Scene darkens, target entity pulses gently with luminous halo",
     "A02_wobble": "Gelatinous vibration for categorical instability",
     "A03_nametag": "Name label appears above entity",
     # B = Property
@@ -222,7 +222,7 @@ ANIMATION_IDS = {
 
 MISL_TO_ANIMATIONS: Dict[str, List[str]] = {
     # Macrostructure
-    "character":         ["A01_decomposition", "A02_wobble", "A03_nametag"],
+    "character":         ["A01_spotlight", "A02_wobble", "A03_nametag"],
     "setting":           ["D01_transparency_reveal", "D02_settle", "E02_timelapse"],
     "initiating_event":  ["C01_motion_line", "C02_anticipation", "F03_causal_push"],
     "internal_response": ["B03_emanation", "H02_thought_bubble"],

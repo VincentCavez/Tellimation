@@ -17,6 +17,9 @@ import random
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from google import genai
+from google.genai import types
+
 from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -173,6 +176,12 @@ class SessionState:
         self.satisfied_targets: List[str] = []
         self.scene_progress: float = 0.0
 
+        # Last animation played (for efficacy tracking)
+        self.last_animation: Optional[Dict[str, Any]] = None
+
+        # Initial scenes generated for the selection page
+        self.initial_scenes: List[Dict[str, Any]] = []
+
         # Voice serialization lock — one voice at a time
         self._voice_lock = asyncio.Lock()
 
@@ -243,6 +252,13 @@ async def websocket_endpoint(websocket: WebSocket):
                 # Fallback: scene already set, send initial guidance
                 if session.current_scene and not session.conversation_history:
                     await _send_initial_guidance(session, ws)
+
+            elif msg_type == "select_scene":
+                index = data.get("index", 0)
+                await _handle_select_scene(session, ws, index)
+
+            elif msg_type == "generate_one_more":
+                await _handle_generate_one_more(session, ws)
 
             elif msg_type == "audio":
                 # Audio metadata header — next binary message is audio data
@@ -340,6 +356,9 @@ async def _handle_generate_initial_scenes(
                 "carried_over_entities": assets.get("carried_over_entities", []),
             }
 
+            # Store in session for later selection
+            session.initial_scenes.append({"index": index, "scene": scene})
+
             await ws.send_json({
                 "type": "scene_ready",
                 "scene": scene,
@@ -362,6 +381,93 @@ async def _handle_generate_initial_scenes(
     await asyncio.gather(*[_gen_one(i) for i in range(n)])
     logger.info("[pipeline] All %d initial scenes took %.1fs", n, time.time() - t_all)
 
+    await ws.send_json({"type": "initial_scenes_done"})
+
+
+async def _handle_select_scene(
+    session: SessionState,
+    ws: _WebSocketAdapter,
+    index: int,
+) -> None:
+    """Handle scene selection from the selection page."""
+    # Find the scene by index
+    scene = None
+    for entry in session.initial_scenes:
+        if entry["index"] == index:
+            scene = entry["scene"]
+            break
+
+    if scene is None:
+        await ws.send_json({"type": "error", "message": f"Scene {index} not found"})
+        return
+
+    # Create a new story and persist
+    story_idx, _ = create_story(session.participant_id)
+    session.current_story_index = story_idx
+    save_scene(session.participant_id, story_idx, scene)
+
+    # Hydrate session
+    session.current_scene = scene
+    session.current_manifest = SceneManifest.model_validate(scene["manifest"])
+    session.current_neg = NEG.model_validate(scene.get("neg", {"targets": []}))
+    session.reset_scene_state()
+
+    session.story_state.add_scene(
+        scene_id=scene["manifest"]["scene_id"],
+        narrative_text=scene.get("narrative_text", ""),
+        manifest=scene["manifest"],
+        neg=scene.get("neg", {}),
+        sprite_code=scene.get("sprite_code"),
+    )
+
+    await ws.send_json({"type": "scene_selected_ready", "scene": scene})
+
+
+async def _handle_generate_one_more(
+    session: SessionState,
+    ws: _WebSocketAdapter,
+) -> None:
+    """Generate one additional scene for the selection page."""
+    index = len(session.initial_scenes)
+    try:
+        theme = random.choice(STORY_THEMES)
+
+        manifest, neg, raw_data = await generate_scene_and_neg(
+            api_key=session.api_key,
+            story_state=None,
+            student_profile=session.student_profile,
+            theme=theme,
+            previous_manifest=None,
+            previous_neg=None,
+        )
+
+        assets = await generate_scene_assets(
+            api_key=session.api_key,
+            manifest_data=raw_data,
+            story_state=None,
+        )
+
+        scene = {
+            "narrative_text": raw_data.get("narrative_text", ""),
+            "scene_description": raw_data.get("scene_description", ""),
+            "manifest": manifest.model_dump(),
+            "neg": neg.model_dump(),
+            "sprite_code": assets["sprite_code"],
+            "carried_over_entities": assets.get("carried_over_entities", []),
+        }
+
+        session.initial_scenes.append({"index": index, "scene": scene})
+
+        await ws.send_json({
+            "type": "one_more_scene",
+            "scene": scene,
+            "index": index,
+        })
+
+    except Exception as e:
+        logger.exception("Failed to generate one more scene")
+        await ws.send_json({"type": "error", "message": str(e)})
+
 
 # ---------------------------------------------------------------------------
 # Scene generation (continuation)
@@ -377,7 +483,7 @@ async def _handle_generate_scene(
     1. scene_neg_generator → manifest + NEG  (Gemini 3.1 Pro)
     2. scene_generator → sprite_code         (Nano Banana 2)
     3. Send scene_ready to client
-    4. Send initial oral guidance ("Qu'est-ce que tu vois ?")
+    4. Send initial oral guidance ("What do you see?")
     """
     try:
         await ws.send_json({
@@ -502,8 +608,8 @@ async def _send_initial_guidance(
     session: SessionState,
     ws: _WebSocketAdapter,
 ) -> None:
-    """Send the Level 0 open invitation: 'Qu'est-ce que tu vois ?'"""
-    guidance_text = "Qu'est-ce que tu vois ?"
+    """Send the Level 0 open invitation: 'What do you see?'"""
+    guidance_text = "What do you see?"
 
     session.conversation_history.append({
         "role": "system",
@@ -643,6 +749,54 @@ async def _handle_audio(
 # Animation execution
 # ---------------------------------------------------------------------------
 
+_ORAL_GUIDANCE_MODEL = "gemini-3-flash-preview"
+_ORAL_GUIDANCE_TIMEOUT = 10
+
+
+async def _generate_oral_guidance(
+    api_key: str,
+    target_id: str,
+    misl_element: str,
+    manifest: SceneManifest,
+    student_profile: StudentProfile,
+) -> str:
+    """Generate a spoken English guidance question via LLM.
+
+    Used as the last-resort fallback when animation generation fails entirely.
+    """
+    # Build entity context
+    root_id = target_id.split(".")[0] if "." in target_id else target_id
+    entity = manifest.get_entity(root_id)
+    if entity:
+        props = ", ".join(f"{k}={v}" for k, v in entity.properties.items())
+        entity_desc = f"{entity.type} ({props})" if props else entity.type
+    else:
+        entity_desc = root_id
+
+    prompt = (
+        f"Generate a single short spoken English question (max 15 words) "
+        f"to guide a child (age {student_profile.age}) to describe a "
+        f"{entity_desc} focusing on: {misl_element}. "
+        f"Just the question, nothing else."
+    )
+
+    client = genai.Client(api_key=api_key)
+    response = await asyncio.wait_for(
+        client.aio.models.generate_content(
+            model=_ORAL_GUIDANCE_MODEL,
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                thinking_config=types.ThinkingConfig(thinking_budget=256),
+                temperature=0.7,
+            ),
+        ),
+        timeout=_ORAL_GUIDANCE_TIMEOUT,
+    )
+    text = response.text.strip().strip('"')
+    logger.info("[animation] Oral fallback generated: %s", text)
+    return text
+
+
 async def _execute_animation(
     session: SessionState,
     ws: _WebSocketAdapter,
@@ -651,34 +805,42 @@ async def _execute_animation(
 ) -> None:
     """Generate and send a tellimation animation for a target entity."""
     try:
-        code, duration_ms, temp_sprites = await generate_tellimation(
-            api_key=session.api_key,
-            sprite_code=(
-                session.current_scene.get("sprite_code", {})
-                if session.current_scene else {}
-            ),
-            manifest=session.current_manifest,
-            student_profile=session.student_profile,
-            target_id=target_id,
-            misl_element=misl_element,
+        code, duration_ms, temp_sprites, animation_id, text_overlays = (
+            await generate_tellimation(
+                api_key=session.api_key,
+                sprite_code=(
+                    session.current_scene.get("sprite_code", {})
+                    if session.current_scene else {}
+                ),
+                manifest=session.current_manifest,
+                student_profile=session.student_profile,
+                target_id=target_id,
+                misl_element=misl_element,
+                neg=session.current_neg,
+            )
         )
 
         # Send temp sprites BEFORE animation
         if temp_sprites:
-            for sprite_id, sprite_code in temp_sprites.items():
+            for sprite_id, sprite_data in temp_sprites.items():
                 await ws.send_json({
                     "type": "add_temp_sprite",
                     "id": sprite_id,
-                    "sprite": sprite_code,
+                    "sprite": sprite_data,
                 })
 
-        # Send animation
-        await ws.send_json({
+        # Send animation with full context
+        msg: Dict[str, Any] = {
             "type": "animation",
+            "animation_id": animation_id,
             "target_id": target_id,
+            "misl_element": misl_element,
             "code": code,
             "duration_ms": duration_ms,
-        })
+        }
+        if text_overlays:
+            msg["text_overlays"] = text_overlays
+        await ws.send_json(msg)
 
         # Schedule temp sprite removal after animation ends
         if temp_sprites:
@@ -694,15 +856,57 @@ async def _execute_animation(
 
             asyncio.ensure_future(_remove_temp_sprites_after_delay())
 
+        # Log last animation for efficacy tracking
+        session.last_animation = {
+            "target_id": target_id,
+            "animation_type": animation_id,
+            "misl_element": misl_element,
+            "timestamp": time.time(),
+        }
+
+        # Append pending efficacy entry (discrepancy module updates led_to_correction)
+        session.student_profile.animation_efficacy.append({
+            "target_id": target_id,
+            "animation_type": animation_id,
+            "misl_element": misl_element,
+            "led_to_correction": False,
+            "escalation_level": 0,
+            "timestamp": time.time(),
+            "scene_id": (
+                session.current_scene.get("scene_id", "")
+                if session.current_scene else ""
+            ),
+        })
+
         session.animations_played_this_scene.append(target_id)
         session.conversation_history.append({
             "role": "system",
-            "text": f"Animation on {target_id}",
+            "text": f"Animation '{animation_id}' on {target_id} ({misl_element})",
             "action": "animate",
         })
 
     except Exception:
-        logger.exception("Animation generation failed for %s", target_id)
+        logger.warning("[animation] Animation failed for %s, falling back to oral guidance",
+                       target_id)
+        try:
+            guidance = await _generate_oral_guidance(
+                session.api_key, target_id, misl_element,
+                session.current_manifest, session.student_profile,
+            )
+            session.conversation_history.append({
+                "role": "system",
+                "text": guidance,
+                "action": "oral_guidance",
+            })
+            await ws.send_json({
+                "type": "assessment_result",
+                "action": "oral_guidance",
+                "guidance_text": guidance,
+            })
+            asyncio.ensure_future(_send_voice(session, ws, guidance))
+        except Exception:
+            logger.exception("[animation] Oral guidance fallback also failed for %s",
+                             target_id)
 
 
 # ---------------------------------------------------------------------------
