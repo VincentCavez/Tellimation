@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 from pydantic import BaseModel, Field
 
@@ -10,18 +10,13 @@ from pydantic import BaseModel, Field
 # ---------------------------------------------------------------------------
 
 
-class TargetComponents(BaseModel):
-    identity: bool = False
-    descriptors: List[str] = Field(default_factory=list)
-    spatial: Optional[str] = None
-    action: Optional[str] = None
-    temporal: Optional[str] = None
-
-
 class NarrativeTarget(BaseModel):
     id: str
     entity_id: str
-    components: TargetComponents
+    misl_element: str = ""
+    current_level: int = 0
+    target_level: int = 1
+    description: str = ""
     priority: float = 1.0
     tolerance: float = 0.5
 
