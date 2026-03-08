@@ -1,8 +1,8 @@
 """Prompts for the tellimation module.
 
 Instructs Gemini 3 Flash to generate JS animation code based on the
-animation grammar. The error_category determines which family of
-animations is appropriate.
+animation grammar. The misl_element determines which animations are
+eligible via the MISL→animation mapping.
 
 Model: Gemini 3 Flash (gemini-3-flash-preview)
 """
@@ -14,14 +14,19 @@ animation code that visually scaffolds children's narration.
 
 # Task
 
-Given a target entity, an error_category, and the scene context, generate \
-animation code that makes the child think "Oh, I see!" without any words — \
-purely through visual behavior. You can combine multiple animation types \
-and add temporary sprites (speech bubbles, nametags, etc.) when needed.
+Given a target entity, a MISL element (from the Monitoring Indicators of \
+Scholarly Language rubric), and the scene context, generate animation code \
+that makes the child think "Oh, I see!" without any words — purely through \
+visual behavior. You can combine multiple animation types and add temporary \
+sprites (speech bubbles, nametags, etc.) when needed.
+
+The user prompt tells you which MISL element is targeted and which \
+animation IDs are eligible. Choose from those, but you MAY combine with \
+animations from other families if it enhances communication.
 
 # Animation Grammar
 
-## SPATIAL (error_category="spatial")
+## SPATIAL — setting, spatial relations
 
 **A01 — Transparency reveal**
 Occluding layer becomes semi-transparent to peek at what's behind/under.
@@ -31,7 +36,7 @@ Rationale: "There's something you didn't see / missed something here."
 Object sinks into its actual position with soft bounce + shadow grows.
 Rationale: reinforces actual location. "on", "under", "next to" relations.
 
-## PROPERTY (error_category="property")
+## PROPERTY — elaborated noun phrases, adverbs, internal response
 
 **B01 — Color pop**
 Desaturate everything except the target to emphasize its color.
@@ -50,78 +55,82 @@ Response in MISL). Hearts for love/joy, tears for sadness, exclamation \
 for surprise, sweat for fear/stress, steam for hot, frost for cold, \
 sparkle for new/clean, dust for old/dirty.
 
-## TEMPORAL (error_category="temporal")
+## ACTION — action verbs, motion
 
-**C01 — Afterimage**
-Ghosted "previous state" briefly rewinds to the current one.
-Rationale: "time mismatch — didn't this already happen?"
-
-**C02 — Timelapse**
-Scene goes day → night → day → night → day.
-Rationale: "What about the future" — temporal context.
-
-## ACTION (error_category="action")
-
-**D01 — Motion lines**
+**C01 — Motion lines**
 Directional speed streaks behind entity.
 Rationale: "wrong direction" or "it IS moving."
 
-**D02 — Anticipation**
+**C02 — Anticipation**
 Character takes a bit of a run-up then freezes, showing potential energy.
 Rationale: "action is corrupted or missing."
 
-## IDENTITY (error_category="identity")
+## SPATIAL / SETTING
 
-**E01 — Decomposition**
+**D01 — Transparency reveal** (alias of A01)
+**D02 — Settle** (alias of A02)
+
+## TEMPORAL — tense errors
+
+**E01 — Afterimage**
+Ghosted "previous state" briefly rewinds to the current one.
+Rationale: "time mismatch — didn't this already happen?"
+
+**E02 — Timelapse**
+Scene goes day → night → day → night → day.
+Rationale: "What about the future" — temporal context.
+
+## RELATIONAL — conjunctions, causal links
+
+**F01 — Magnetism**
+Magnet sprites appear, elements drift toward each other.
+Rationale: "both should be mentioned."
+
+**F02 — Wind**
+Gust pushes an element away with sweeping wind lines.
+Rationale: "this element should not be there."
+
+**F03 — Causal push**
+Element A rushes toward element B and pushes it + impact burst at collision.
+Rationale: shows "A causes B." Causal connection (consequence, initiating event).
+
+## QUANTITY — count errors
+
+**G01 — Bonk**
+Redundant elements collide with star particles, bounce back.
+Rationale: "clash" — redundancy.
+
+**G02 — Sequential glow**
+Objects glow/pulse in sequence with delay. Visual counting.
+Rationale: "there are several elements."
+
+**G03 — Ghost outline**
+Faint dotted outline where a missing object should be, dissolves to nothing.
+Rationale: "something required is missing here."
+
+## IDENTITY — character, grammaticality
+
+**A01 — Decomposition** (see above)
 Separates into sub-parts, snaps back together.
-Rationale: "check the parts" (endings, apostrophes, helper words).
 
-**E02 — Wobble**
+**A02 — Wobble**
 Horizontal oscillation, slow at first then faster.
 Rationale: "weird, not quite" — categorical instability.
 
-**E03 — Nametag**
+**A03 — Nametag**
 Small temporary sprite "?" or "..." above the character.
 Rationale: scaffolds the passage from "he" to a proper name or precise \
 description. Uses temp_sprites (see below).
 
-## QUANTITY (error_category="quantity")
+## DISCOURSE — linguistic verbs, mental verbs, plan
 
-**F01 — Bonk**
-Redundant elements collide with star particles, bounce back.
-Rationale: "clash" — redundancy.
-
-**F02 — Sequential glow**
-Objects glow/pulse in sequence with delay. Visual counting.
-Rationale: "there are several elements."
-
-**F03 — Ghost outline**
-Faint dotted outline where a missing object should be, dissolves to nothing.
-Rationale: "something required is missing here."
-
-## RELATIONAL (error_category="relational")
-
-**G01 — Magnetism**
-Magnet sprites appear, elements drift toward each other.
-Rationale: "both should be mentioned."
-
-**G02 — Wind**
-Gust pushes an element away with sweeping wind lines.
-Rationale: "this element should not be there."
-
-**G03 — Causal push**
-Element A rushes toward element B and pushes it + impact burst at collision.
-Rationale: shows "A causes B." Causal connection (MISL level 2+).
-
-## DISCOURSE (error_category="discourse")
-
-**I01 — Speech bubble**
+**H01 — Speech bubble**
 Pixelated speech bubble with "..." or a keyword generated by you, \
 positioned above the character. Temporary sprite (small pixel art: \
 rounded rectangle + tail pointing down to the character).
 Rationale: scaffolds dialogue, direct speech.
 
-**I02 — Thought bubble**
+**H02 — Thought bubble**
 Pixelated thought bubble (round, linked bubbles) with "..." or symbol. \
 Temporary sprite.
 Rationale: scaffolds Internal Response and Plan (MISL).
@@ -129,9 +138,9 @@ Rationale: scaffolds Internal Response and Plan (MISL).
 # Documented Combinations
 
 You can chain or superpose multiple animation types:
-- Plan = D02 (anticipation) + I02 (thought bubble)
-- Missing consequence = G03 (causal push) + F03 (ghost outline)
-- Internal Response = B03 (emotional particles) or I02 with symbol
+- Plan = C02 (anticipation) + H02 (thought bubble)
+- Missing consequence = F03 (causal push) + G03 (ghost outline)
+- Internal Response = B03 (emotional particles) or H02 with symbol
 
 # Temporary Sprites (temp_sprites)
 
@@ -162,7 +171,7 @@ The temp_sprites are rendered into the scene BEFORE the animation plays, \
 and removed when the animation ends. Your animation code can target \
 temp_sprite entity IDs just like regular entities.
 
-Animations that typically use temp_sprites: B03, E03, I01, I02.
+Animations that typically use temp_sprites: B03, A03, H01, H02.
 
 # Pixel Buffer Format (for animation code)
 
@@ -222,8 +231,9 @@ Generate a tellimation for the following target.
 
 # Target
 Entity/sub-entity: {target_id}
-Error category: {error_category}
-Error context: the child failed to describe this entity or its properties correctly.
+MISL element: {misl_element}
+Eligible animations: {eligible_animations}
+Context: the child failed to adequately describe this aspect of the entity.
 
 # Entity details from manifest
 {entity_details}
@@ -242,10 +252,10 @@ Error context: the child failed to describe this entity or its properties correc
 
 # Instructions
 
-Generate animation code for "{target_id}" given error_category="{error_category}". \
-Choose from the {error_category} animation family. You may combine with \
-animations from other families if it enhances communication. \
-Use the entity prefix from the sprite info. \
+Generate animation code for "{target_id}" targeting the MISL element \
+"{misl_element}". Choose from the eligible animations listed above. \
+You may combine with animations from other families if it enhances \
+communication. Use the entity prefix from the sprite info. \
 If the student profile shows certain types worked or didn't work, \
 adapt your choice accordingly. \
 Add temp_sprites if the animation needs temporary visual elements.
