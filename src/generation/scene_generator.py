@@ -873,7 +873,7 @@ def _is_rle_format(mask_raw: List[Any]) -> bool:
     return isinstance(first, (list, tuple))
 
 
-async def _generate_mask_for_entity(
+async def _generate_mask_for_entity(  # DEPRECATED — kept for reference
     client: Any,
     entity_id: str,
     entity_type: str,
@@ -1029,7 +1029,7 @@ async def _generate_mask_for_entity(
     return None
 
 
-def _build_fallback_mask(
+def _build_fallback_mask(  # DEPRECATED — kept for reference
     entity_id: str,
     pixels: List[Optional[List[int]]],
 ) -> List[Optional[str]]:
@@ -1037,7 +1037,7 @@ def _build_fallback_mask(
     return [entity_id if p is not None else None for p in pixels]
 
 
-async def _generate_mask_for_background(
+async def _generate_mask_for_background(  # DEPRECATED — kept for reference
     client: Any,
     image_bytes: bytes,
     width: int,
@@ -1172,7 +1172,7 @@ def _sprite_to_png(sprite: Dict[str, Any]) -> bytes:
     return out.getvalue()
 
 
-async def _generate_masks_parallel(
+async def _generate_masks_parallel(  # DEPRECATED — kept for reference
     client: Any,
     entity_images: Dict[str, bytes],
     entity_sprites: Dict[str, Dict[str, Any]],
@@ -1555,7 +1555,7 @@ async def generate_scene(
     return result
 
 
-async def generate_masks_for_scene(
+async def generate_masks_for_scene(  # DEPRECATED — kept for reference
     api_key: str,
     scene: Dict[str, Any],
 ) -> Dict[str, Any]:
@@ -1681,7 +1681,7 @@ async def generate_masks_for_scene(
     return scene
 
 
-async def generate_features_for_scene(
+async def generate_features_for_scene(  # DEPRECATED — kept for reference
     api_key: str,
     scene: Dict[str, Any],
 ) -> Dict[str, Any]:
