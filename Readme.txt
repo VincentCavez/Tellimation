@@ -1,1 +1,1 @@
-uvicorn src.ui.app:app --reload --port 8000
+python3 -m uvicorn src.ui.app:app --reload --port 8000
