@@ -228,7 +228,6 @@ class TestStoryState:
         state = StoryState(
             session_id="s1",
             participant_id="P01",
-            skill_objectives=["descriptive_adjectives"],
         )
         state.add_scene(
             scene_id="scene_01",

@@ -18,12 +18,18 @@ import asyncio
 import json
 import logging
 import time
-from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 from google import genai
 from google.genai import types
 
+from config.misl import (
+    ALL_KEYS,
+    MACROSTRUCTURE,
+    MICROSTRUCTURE,
+    MISL_TO_ANIMATIONS,
+    QUANTITY_ANIMATIONS,
+)
 from src.generation.prompts.scene_neg_prompt import (
     CONTINUATION_SCENE_USER_PROMPT,
     INITIAL_SCENE_USER_PROMPT,
@@ -43,30 +49,46 @@ MODEL_ID = "gemini-3-flash-preview"
 GENERATION_TIMEOUT = 60  # seconds
 MAX_RETRIES = 2
 
-# SKILL framework files
-_CONFIG_DIR = Path(__file__).resolve().parent.parent.parent / "config"
-_SKILL_MACRO_PATH = _CONFIG_DIR / "skill_macro.txt"
-_SKILL_MICRO_PATH = _CONFIG_DIR / "skill_micro.txt"
 
-# Cached SKILL texts (loaded once)
-_skill_macro_cache: Optional[str] = None
-_skill_micro_cache: Optional[str] = None
+# Cached MISL rubric text (built once)
+_misl_rubric_cache: Optional[str] = None
 
 
-def _load_skill_macro() -> str:
-    """Load SKILL macro-objectives from config/skill_macro.txt."""
-    global _skill_macro_cache
-    if _skill_macro_cache is None:
-        _skill_macro_cache = _SKILL_MACRO_PATH.read_text(encoding="utf-8")
-    return _skill_macro_cache
+def _build_misl_rubric() -> str:
+    """Build a human-readable text of the full MISL rubric for prompt injection."""
+    global _misl_rubric_cache
+    if _misl_rubric_cache is not None:
+        return _misl_rubric_cache
 
+    lines: List[str] = []
 
-def _load_skill_micro() -> str:
-    """Load SKILL micro-objectives from config/skill_micro.txt."""
-    global _skill_micro_cache
-    if _skill_micro_cache is None:
-        _skill_micro_cache = _SKILL_MICRO_PATH.read_text(encoding="utf-8")
-    return _skill_micro_cache
+    lines.append("# MISL Rubric — Macrostructure (7 elements, scores 0-3)")
+    lines.append("")
+    for key, info in MACROSTRUCTURE.items():
+        lines.append(f"## {info['label']}")
+        for score, desc in info["scores"].items():
+            lines.append(f"  {score}: {desc}")
+        anims = MISL_TO_ANIMATIONS.get(key, [])
+        if anims:
+            lines.append(f"  Eligible animations: {', '.join(anims)}")
+        lines.append("")
+
+    lines.append("# MISL Rubric — Microstructure (8 elements, scores 0-3)")
+    lines.append("")
+    for key, info in MICROSTRUCTURE.items():
+        lines.append(f"## {info['label']}")
+        for score, desc in info["scores"].items():
+            lines.append(f"  {score}: {desc}")
+        anims = MISL_TO_ANIMATIONS.get(key, [])
+        if anims:
+            lines.append(f"  Eligible animations: {', '.join(anims)}")
+        lines.append("")
+
+    lines.append("# Quantity animations (apply to any element for count errors)")
+    lines.append(f"  {', '.join(QUANTITY_ANIMATIONS)}")
+
+    _misl_rubric_cache = "\n".join(lines)
+    return _misl_rubric_cache
 
 
 # ---------------------------------------------------------------------------
@@ -86,8 +108,7 @@ def _build_initial_prompt(
         profile_ctx = "(New student — no error history yet.)"
 
     return INITIAL_SCENE_USER_PROMPT.format(
-        skill_macro=_load_skill_macro(),
-        skill_micro=_load_skill_micro(),
+        misl_rubric=_build_misl_rubric(),
         student_profile=profile_ctx,
         theme=theme,
     )
@@ -132,8 +153,7 @@ def _build_continuation_prompt(
     scene_number = len(story_state.scenes) + 1
 
     return CONTINUATION_SCENE_USER_PROMPT.format(
-        skill_macro=_load_skill_macro(),
-        skill_micro=_load_skill_micro(),
+        misl_rubric=_build_misl_rubric(),
         story_context=story_context,
         previous_manifest=prev_manifest_str,
         previous_neg=prev_neg_str,
