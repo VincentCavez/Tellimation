@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "tellimations",
-      "runtimeExecutable": "uvicorn",
-      "runtimeArgs": ["src.ui.app:app", "--reload", "--port", "8000"],
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "uvicorn", "src.ui.app:app", "--reload", "--port", "8000"],
       "port": 8000
     }
   ]
