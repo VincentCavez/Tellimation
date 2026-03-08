@@ -490,6 +490,41 @@ function renderSpriteEntry(eid, entry, pixelBuffer) {
 }
 
 // ---------------------------------------------------------------------------
+// Temporary Sprites
+// ---------------------------------------------------------------------------
+
+/**
+ * Global store for temporary sprites (speech bubbles, nametags, etc.).
+ * Keys are sprite IDs, values are JS code strings (same format as sprite_code).
+ * Rendered on top of normal sprites. Managed via add/remove_temp_sprite WS msgs.
+ */
+var tempSprites = {};
+
+function addTempSprite(id, spriteCodeStr) {
+  tempSprites[id] = spriteCodeStr;
+}
+
+function removeTempSprite(id) {
+  delete tempSprites[id];
+}
+
+/**
+ * Render all current tempSprites into the pixel buffer.
+ * Call after rendering normal sprites.
+ */
+function renderTempSprites(pixelBuffer) {
+  for (var sid in tempSprites) {
+    if (tempSprites.hasOwnProperty(sid)) {
+      try {
+        executeSpriteCode(tempSprites[sid], pixelBuffer);
+      } catch (e) {
+        console.warn('[renderTempSprites] Failed to render', sid, e);
+      }
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Exports
 // ---------------------------------------------------------------------------
 
@@ -498,6 +533,7 @@ if (typeof module !== 'undefined' && module.exports) {
     PixelBuffer, Renderer, EntityRegistry,
     executeSpriteCode, executeRawSprite,
     executeImageBackground, renderSpriteEntry,
+    tempSprites, addTempSprite, removeTempSprite, renderTempSprites,
     SOURCE_W, SOURCE_H, K, PW, PH
   };
 }
