@@ -207,18 +207,18 @@ def _format_animation_effectiveness(
     """Format animation effectiveness info for the prompt."""
     lines: List[str] = []
 
-    seen_skill_types: set = set()
+    seen_misl_elements: set = set()
     for entry in student_profile.animation_efficacy:
-        st = entry.get("skill_type", "")
-        if st:
-            seen_skill_types.add(st)
+        me = entry.get("misl_element", "")
+        if me:
+            seen_misl_elements.add(me)
 
-    for skill_type in sorted(seen_skill_types):
-        scores = student_profile.get_effective_animations(skill_type)
+    for misl_element in sorted(seen_misl_elements):
+        scores = student_profile.get_effective_animations(misl_element)
         if scores:
             ranked = sorted(scores.items(), key=lambda x: x[1], reverse=True)
             parts = [f"{atype}={score:.0%}" for atype, score in ranked]
-            lines.append(f"For {skill_type}: efficacy scores: {', '.join(parts)}")
+            lines.append(f"For {misl_element}: efficacy scores: {', '.join(parts)}")
 
     for error_type in student_profile.error_counts:
         ineffective = student_profile.get_ineffective_animations(error_type)
