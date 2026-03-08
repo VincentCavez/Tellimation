@@ -1,20 +1,20 @@
 """Prompts for the image-based sprite generation pipeline.
 
 This module provides prompt templates for:
-  - ENTITY_IMAGE_PROMPT: Gemini 3 Pro Image — generate one entity on red chroma key
-  - BACKGROUND_IMAGE_PROMPT: Gemini 3 Pro Image — generate full scene background
-  - MASK_SYSTEM_PROMPT / MASK_USER_PROMPT: Gemini 3 Flash — assign sub-entity IDs to entity pixels
-  - BG_MASK_SYSTEM_PROMPT / BG_MASK_USER_PROMPT: Gemini 3 Flash — assign sub-entity IDs to background pixels
+  - ENTITY_IMAGE_PROMPT: Nano Banana 2 — generate one entity on magenta chroma key
+  - BACKGROUND_IMAGE_PROMPT: Nano Banana 2 — generate full scene background
+  - MASK_SYSTEM_PROMPT / MASK_USER_PROMPT: DEPRECATED — mask generation removed
+  - BG_MASK_SYSTEM_PROMPT / BG_MASK_USER_PROMPT: DEPRECATED — mask generation removed
 """
 
 # ---------------------------------------------------------------------------
-# Entity image generation (Gemini 3 Pro Image, one per entity)
+# Entity image generation (Nano Banana 2, one per entity)
 # ---------------------------------------------------------------------------
 
 ENTITY_IMAGE_PROMPT = """\
 Create an illustration of the following character/object on a \
-SOLID BRIGHT RED (#FF0000) background. The red must be perfectly uniform \
-— no gradients, no shading, no variation. Pure #FF0000 everywhere except the subject.
+SOLID MAGENTA (#FF00FF) background. The magenta must be perfectly uniform \
+— no gradients, no shading, no variation. Pure #FF00FF everywhere except the subject.
 
 ## Subject
 {entity_description}
@@ -28,9 +28,9 @@ SOLID BRIGHT RED (#FF0000) background. The red must be perfectly uniform \
   Eyes should have at least 2 colors (pupil + shine).
 - **Side view** (like a 2D storybook): flat side profile, no 3D perspective.
 - **The subject should fill most of the image** — center it, leave only a small \
-  margin of red around it.
+  margin of magenta around it.
 - **NO other elements**: no ground, no shadow, no text, no decorations. \
-  ONLY the subject on solid red.
+  ONLY the subject on solid magenta.
 
 ## ISOLATION — This sprite is generated COMPLETELY ALONE
 - Generate ONLY the described entity. Nothing else exists in this image.
@@ -41,13 +41,13 @@ SOLID BRIGHT RED (#FF0000) background. The red must be perfectly uniform \
 - If the description mentions a pose "against" or "on" something, IGNORE the surface — \
   only draw the entity's body in that posture.
 - If the subject is "beside" or "on top of" something, do NOT include that something.
-- The entity floats on the red background. There is NOTHING for it to lean on, sit on, \
+- The entity floats on the magenta background. There is NOTHING for it to lean on, sit on, \
   or attach to. Draw only the entity's own body/form.
 
 ## CRITICAL
-- The background MUST be perfectly solid #FF0000 (bright red).
-- Any pixel that is NOT part of the sprite must be exactly #FF0000.
-- The sprite should NOT contain any bright red (#FF0000) pixels.
+- The background MUST be perfectly solid #FF00FF (magenta).
+- Any pixel that is NOT part of the sprite must be exactly #FF00FF.
+- The sprite should NOT contain any magenta (#FF00FF) pixels.
 """
 
 # ---------------------------------------------------------------------------
