@@ -45,7 +45,7 @@ class StudentProfile(BaseModel):
     animation_efficacy: List[Dict[str, Any]] = Field(default_factory=list)
     # Each entry: {
     #   target_id: str,           # sub-entity/feature targeted
-    #   animation_type: str,      # type of animation (e.g. A01_decomposition)
+    #   animation_type: str,      # type of animation (e.g. A01_spotlight)
     #   misl_element: str,        # MISL element (e.g. "character", "adverbs")
     #   led_to_correction: bool,  # did the child correct after the animation?
     #   escalation_level: int,    # 0=animation, 1=oral guidance, 2=explicit model
