@@ -1,5 +1,5 @@
 // Tellimations Animation Templates & Particle System
-// 16 pre-written animation factories (A01-A16) + 7 particle presets
+// 20 animation factories (8 families: I, P, A, S, T, R, Q, D) + particle presets
 // Used by the Tellimation module: Gemini selects template + params,
 // client resolves instantly instead of compiling raw JS code.
 
@@ -402,8 +402,8 @@ var AnimationTemplates = {
   build: function(spec) {
     var entry = this.registry[spec.template];
     if (!entry) {
-      console.warn('[AnimationTemplates] Unknown template: ' + spec.template + ', using wobble fallback');
-      entry = this.registry['wobble'] || this.registry['color_pop'];
+      console.warn('[AnimationTemplates] Unknown template: ' + spec.template + ', using spotlight fallback');
+      entry = this.registry['spotlight'] || this.registry['color_pop'];
       if (!entry) {
         return {
           animate: function() {},
@@ -460,10 +460,12 @@ var AnimationTemplates = {
 };
 
 // ═══════════════════════════════════════════════════════════════════
-// Section 4: The 16 Animation Template Factories (A01-A16)
+// Section 4: Animation Template Factories (8 families, 20 animations)
+//   I=Identity, P=Property, A=Action, S=Space,
+//   T=Time, R=Relation, Q=Quantity, D=Discourse
 // ═══════════════════════════════════════════════════════════════════
 
-// ── A01: Spotlight ──
+// ── I1: Spotlight ──
 // Scene darkens, target entity pulses gently with luminous halo.
 // Visually isolates a character/object to push the child to identify it.
 AnimationTemplates.register('spotlight', function(params) {
@@ -525,7 +527,82 @@ AnimationTemplates.register('spotlight', function(params) {
   };
 }, 1500);
 
-// ── A02: Settle ──
+// ── I2: Nametag ──
+// Floating label with "..." attached to entity. Invites naming.
+AnimationTemplates.register('nametag', function(params) {
+  var prefix = params.entityPrefix || '';
+  var labelColor = params.labelColor || [255, 255, 255];
+  var bgColor = params.bgColor || [60, 60, 80];
+
+  return function animate(buf, PW, PH, t) {
+    var env = _easeEnvelope(t, 0.2, 0.2);
+    if (env < 0.01) return;
+
+    var bounds = _computeEntityBounds(buf, PW, prefix);
+    if (bounds.x2 < 0) return;
+
+    // Position label above entity with gentle bob
+    var bob = Math.round(2 * Math.sin(t * Math.PI * 3));
+    var labelW = 20, labelH = 10;
+    var lx = Math.round(bounds.cx - labelW / 2);
+    var ly = bounds.y1 - labelH - 6 + bob;
+
+    var alpha = env;
+
+    // Draw label background (rounded rect approximation)
+    for (var y = ly; y < ly + labelH; y++) {
+      for (var x = lx; x < lx + labelW; x++) {
+        if (x >= 0 && x < PW && y >= 0 && y < PH) {
+          var idx = y * PW + x;
+          buf[idx].r = Math.round(buf[idx].r * (1 - alpha * 0.8) + bgColor[0] * alpha * 0.8);
+          buf[idx].g = Math.round(buf[idx].g * (1 - alpha * 0.8) + bgColor[1] * alpha * 0.8);
+          buf[idx].b = Math.round(buf[idx].b * (1 - alpha * 0.8) + bgColor[2] * alpha * 0.8);
+        }
+      }
+    }
+
+    // Draw "..." dots inside label
+    var dotY = ly + Math.round(labelH / 2);
+    var dotSpacing = 4;
+    var dotStartX = lx + Math.round(labelW / 2) - dotSpacing;
+    for (var d = 0; d < 3; d++) {
+      var dotX = dotStartX + d * dotSpacing;
+      // Animate dots appearing sequentially
+      var dotPhase = (t * 3 - d * 0.3);
+      if (dotPhase < 0) continue;
+      var dotAlpha = Math.min(1, dotPhase * 3) * alpha;
+      if (dotX >= 0 && dotX < PW && dotY >= 0 && dotY < PH) {
+        var di = dotY * PW + dotX;
+        buf[di].r = Math.round(buf[di].r * (1 - dotAlpha) + labelColor[0] * dotAlpha);
+        buf[di].g = Math.round(buf[di].g * (1 - dotAlpha) + labelColor[1] * dotAlpha);
+        buf[di].b = Math.round(buf[di].b * (1 - dotAlpha) + labelColor[2] * dotAlpha);
+      }
+    }
+
+    // Draw tail pointing down to entity
+    var tailX = Math.round(bounds.cx);
+    for (var ty = ly + labelH; ty < ly + labelH + 4; ty++) {
+      if (tailX >= 0 && tailX < PW && ty >= 0 && ty < PH) {
+        var ti = ty * PW + tailX;
+        buf[ti].r = Math.round(buf[ti].r * (1 - alpha * 0.8) + bgColor[0] * alpha * 0.8);
+        buf[ti].g = Math.round(buf[ti].g * (1 - alpha * 0.8) + bgColor[1] * alpha * 0.8);
+        buf[ti].b = Math.round(buf[ti].b * (1 - alpha * 0.8) + bgColor[2] * alpha * 0.8);
+      }
+    }
+
+    // Gentle entity pulse
+    var pulse = 1 + 0.15 * env * Math.sin(t * Math.PI * 4);
+    for (var i = 0; i < buf.length; i++) {
+      if (buf[i].e === prefix || buf[i].e.startsWith(prefix + '.')) {
+        buf[i].r = Math.min(255, Math.round(buf[i]._r * pulse));
+        buf[i].g = Math.min(255, Math.round(buf[i]._g * pulse));
+        buf[i].b = Math.min(255, Math.round(buf[i]._b * pulse));
+      }
+    }
+  };
+}, 1500);
+
+// ── S2: Settle ──
 AnimationTemplates.register('settle', function(params) {
   var prefix = params.entityPrefix || '';
   var dropPx = _clamp(params.dropPixels || 8, 1, 20);
@@ -558,7 +635,7 @@ AnimationTemplates.register('settle', function(params) {
   };
 }, 1200);
 
-// ── A03: Color Pop ──
+// ── P1: Color Pop ──
 AnimationTemplates.register('color_pop', function(params) {
   var prefix = params.entityPrefix || '';
   var desatStr = params.desaturationStrength != null ? params.desaturationStrength : 0.8;
@@ -585,51 +662,57 @@ AnimationTemplates.register('color_pop', function(params) {
   };
 }, 1200);
 
-// ── A04: Scale Strain ──
-AnimationTemplates.register('scale_strain', function(params) {
+// ── S1: Reveal ──
+// Occluding layer becomes semi-transparent to show hidden elements.
+AnimationTemplates.register('reveal', function(params) {
   var prefix = params.entityPrefix || '';
-  var targetScale = params.targetScale != null ? params.targetScale : 1.5;
-  var wobbles = _clamp(params.wobbleCount || 2, 1, 5);
+  var revealAlpha = params.revealAlpha != null ? params.revealAlpha : 0.35;
 
   return function animate(buf, PW, PH, t) {
-    // Compute current scale factor
-    var scale;
-    if (t < 0.3) {
-      // Inflate/compress toward target scale
-      scale = 1 + (targetScale - 1) * (t / 0.3);
-    } else if (t < 0.5) {
-      // Strain: micro-jitter at target scale
-      scale = targetScale + (Math.random() - 0.5) * 0.05;
-    } else {
-      // Spring back with damped wobble
-      var st = (t - 0.5) / 0.5;
-      var wobbleDecay = Math.sin(st * Math.PI * wobbles) * (1 - st) * 0.3;
-      scale = 1 + (targetScale - 1) * (1 - st) * 0.2 + wobbleDecay;
+    var env = _easeEnvelope(t, 0.25, 0.25);
+    var alpha = revealAlpha * env;
+
+    // Make occluding entity semi-transparent to peek at what's behind
+    for (var i = 0; i < buf.length; i++) {
+      if (buf[i].e === prefix || buf[i].e.startsWith(prefix + '.')) {
+        buf[i].r = Math.round(buf[i]._r * (1 - alpha) + buf[i]._br * alpha);
+        buf[i].g = Math.round(buf[i]._g * (1 - alpha) + buf[i]._bg * alpha);
+        buf[i].b = Math.round(buf[i]._b * (1 - alpha) + buf[i]._bb * alpha);
+      }
     }
 
-    if (Math.abs(scale - 1) < 0.01) return;
-
-    var pixels = _collectEntityPixels(buf, PW, prefix);
-    if (pixels.length === 0) return;
-
-    var bounds = _computeEntityBounds(buf, PW, prefix);
-    var cx = bounds.cx, cy = bounds.cy;
-
-    _blankEntityPixels(buf, pixels);
-
-    for (var j = 0; j < pixels.length; j++) {
-      var p = pixels[j];
-      var nx = Math.round(cx + (p.x - cx) * scale);
-      var ny = Math.round(cy + (p.y - cy) * scale);
-      if (nx >= 0 && nx < PW && ny >= 0 && ny < PH) {
-        var ni = ny * PW + nx;
-        buf[ni].r = p.r; buf[ni].g = p.g; buf[ni].b = p.b;
+    // Gentle pulsing outline effect
+    if (env > 0.1) {
+      var bounds = _computeEntityBounds(buf, PW, prefix);
+      var outlineAlpha = 0.3 * env * (0.5 + 0.5 * Math.sin(t * Math.PI * 4));
+      var olc = [200, 220, 255]; // light blue outline
+      for (var y = bounds.y1; y <= bounds.y2; y++) {
+        for (var x = bounds.x1; x <= bounds.x2; x++) {
+          if (x < 0 || x >= PW || y < 0 || y >= PH) continue;
+          var idx = y * PW + x;
+          var isEntity = buf[idx].e === prefix || buf[idx].e.startsWith(prefix + '.');
+          if (!isEntity) continue;
+          // Check if border pixel (has a non-entity neighbor)
+          var isBorder = false;
+          var neighbors = [[-1,0],[1,0],[0,-1],[0,1]];
+          for (var n = 0; n < 4; n++) {
+            var nx = x + neighbors[n][0], ny = y + neighbors[n][1];
+            if (nx < 0 || nx >= PW || ny < 0 || ny >= PH) { isBorder = true; break; }
+            var ne = buf[ny * PW + nx].e;
+            if (ne !== prefix && !ne.startsWith(prefix + '.')) { isBorder = true; break; }
+          }
+          if (isBorder) {
+            buf[idx].r = Math.min(255, Math.round(buf[idx].r * (1 - outlineAlpha) + olc[0] * outlineAlpha));
+            buf[idx].g = Math.min(255, Math.round(buf[idx].g * (1 - outlineAlpha) + olc[1] * outlineAlpha));
+            buf[idx].b = Math.min(255, Math.round(buf[idx].b * (1 - outlineAlpha) + olc[2] * outlineAlpha));
+          }
+        }
       }
     }
   };
-}, 1800);
+}, 1500);
 
-// ── A05: Emanation ──
+// ── P2: Emanation ──
 AnimationTemplates.register('emanation', function(params) {
   var prefix = params.entityPrefix || '';
   var pType = params.particleType || 'steam';
@@ -680,42 +763,34 @@ AnimationTemplates.register('emanation', function(params) {
   };
 }, 1500);
 
-// ── A06: Afterimage ──
-AnimationTemplates.register('afterimage', function(params) {
+// ── T1: Flashback ──
+// Target desaturates briefly (palette swap to grey) then re-saturates.
+// Differs from Color Pop: HERE the target ITSELF loses its colors.
+// Scaffolds past tense — "this already happened."
+AnimationTemplates.register('flashback', function(params) {
   var prefix = params.entityPrefix || '';
-  var ghostDx = params.ghostOffsetX != null ? params.ghostOffsetX : -8;
-  var ghostDy = params.ghostOffsetY != null ? params.ghostOffsetY : 0;
-  var ghostAlpha = params.ghostAlpha != null ? params.ghostAlpha : 0.4;
 
   return function animate(buf, PW, PH, t) {
-    // Ghost opacity: appear then fade
-    var alpha;
-    if (t < 0.3) alpha = ghostAlpha * (t / 0.3);
-    else if (t < 0.5) alpha = ghostAlpha;
-    else alpha = ghostAlpha * (1 - (t - 0.5) / 0.5);
+    // Envelope: desaturate 0→1 (0-0.3), hold (0.3-0.7), re-saturate 1→0 (0.7-1)
+    var desat;
+    if (t < 0.3) desat = t / 0.3;
+    else if (t < 0.7) desat = 1;
+    else desat = 1 - (t - 0.7) / 0.3;
 
-    if (alpha < 0.02) return;
+    if (desat < 0.01) return;
 
-    // Draw ghost copy at offset
     for (var i = 0; i < buf.length; i++) {
       if (buf[i].e === prefix || buf[i].e.startsWith(prefix + '.')) {
-        var x = i % PW, y = Math.floor(i / PW);
-        var nx = x + ghostDx, ny = y + ghostDy;
-        if (nx >= 0 && nx < PW && ny >= 0 && ny < PH) {
-          var ni = ny * PW + nx;
-          // Only draw ghost on non-entity pixels (don't overwrite the real entity)
-          if (buf[ni].e !== prefix && !buf[ni].e.startsWith(prefix + '.')) {
-            buf[ni].r = Math.round(buf[ni].r * (1 - alpha) + buf[i]._r * alpha);
-            buf[ni].g = Math.round(buf[ni].g * (1 - alpha) + buf[i]._g * alpha);
-            buf[ni].b = Math.round(buf[ni].b * (1 - alpha) + buf[i]._b * alpha);
-          }
-        }
+        var L = Math.round(buf[i]._r * 0.299 + buf[i]._g * 0.587 + buf[i]._b * 0.114);
+        buf[i].r = Math.round(buf[i]._r * (1 - desat) + L * desat);
+        buf[i].g = Math.round(buf[i]._g * (1 - desat) + L * desat);
+        buf[i].b = Math.round(buf[i]._b * (1 - desat) + L * desat);
       }
     }
   };
 }, 1500);
 
-// ── A07: Timelapse ──
+// ── T2: Timelapse ──
 AnimationTemplates.register('timelapse', function(params) {
   var cycles = _clamp(params.cycles || 2, 1, 4);
   var ps = new ParticleSystem(ParticlePresets.sparkle);
@@ -751,7 +826,7 @@ AnimationTemplates.register('timelapse', function(params) {
   };
 }, 2000);
 
-// ── A08: Motion Lines ──
+// ── A1: Motion Lines ──
 AnimationTemplates.register('motion_lines', function(params) {
   var prefix = params.entityPrefix || '';
   var dir = params.direction || 'right';
@@ -807,27 +882,35 @@ AnimationTemplates.register('motion_lines', function(params) {
   };
 }, 1200);
 
-// ── A09: Anticipation ──
+// ── A2: Anticipation ──
+// Entity compresses slightly, lurches forward, then freezes mid-motion.
+// Like a momentum that was interrupted. Scaffolds missing/uncompleted action verbs.
 AnimationTemplates.register('anticipation', function(params) {
   var prefix = params.entityPrefix || '';
   var compressY = _clamp(params.compressY || 3, 1, 8);
-  var vibAmp = params.vibrationAmplitude != null ? params.vibrationAmplitude : 1;
+  var lurchPx = _clamp(params.lurchPixels || 10, 3, 20);
+  var lurchDir = params.lurchDirection || 'right';
+  var dirSign = lurchDir === 'left' ? -1 : 1;
 
   return function animate(buf, PW, PH, t) {
     var pixels = _collectEntityPixels(buf, PW, prefix);
     if (pixels.length === 0) return;
 
     var dy = 0, dx = 0;
-    if (t < 0.2) {
-      // Compress down
-      dy = Math.round(compressY * (t / 0.2));
-    } else if (t < 0.8) {
-      // Hold with micro-jitter
-      dy = compressY;
-      dx = Math.round((Math.random() - 0.5) * 2 * vibAmp);
+    if (t < 0.15) {
+      // Phase 1: Compress down (anticipation)
+      var p1 = t / 0.15;
+      dy = Math.round(compressY * p1);
+    } else if (t < 0.35) {
+      // Phase 2: Lurch forward with decompression
+      var p2 = (t - 0.15) / 0.2;
+      dy = Math.round(compressY * (1 - p2));
+      dx = Math.round(lurchPx * p2 * dirSign);
     } else {
-      // Release back
-      dy = Math.round(compressY * (1 - (t - 0.8) / 0.2));
+      // Phase 3: Freeze mid-motion (hold displaced position)
+      dx = Math.round(lurchPx * dirSign);
+      // Subtle vibration during freeze
+      dx += Math.round((Math.random() - 0.5) * 0.8);
     }
 
     if (dy === 0 && dx === 0) return;
@@ -835,11 +918,10 @@ AnimationTemplates.register('anticipation', function(params) {
     var bounds = _computeEntityBounds(buf, PW, prefix);
     _blankEntityPixels(buf, pixels);
 
-    // Compress: bottom rows shift up proportionally
+    // Compress: bottom rows shift up proportionally during phase 1
     for (var j = 0; j < pixels.length; j++) {
       var p = pixels[j];
       var relY = (p.y - bounds.y1) / Math.max(1, bounds.y2 - bounds.y1);
-      // Bottom compresses more, top stays ~fixed
       var pyOffset = Math.round(dy * relY);
       var nx = p.x + dx;
       var ny = p.y + pyOffset;
@@ -851,7 +933,7 @@ AnimationTemplates.register('anticipation', function(params) {
   };
 }, 1500);
 
-// ── A10: Decomposition ──
+// ── Decomposition (not in new grammar — legacy support) ──
 AnimationTemplates.register('decomposition', function(params) {
   var prefix = params.entityPrefix || '';
   var sepPx = _clamp(params.separationPixels || 8, 2, 20);
@@ -923,27 +1005,68 @@ AnimationTemplates.register('decomposition', function(params) {
   };
 }, 1800);
 
-// ── A11: Wobble ──
-AnimationTemplates.register('wobble', function(params) {
-  var prefix = params.entityPrefix || '';
-  var maxAmp = _clamp(params.maxAmplitude || 4, 1, 10);
-  var startFreq = params.startFreq || 3;
-  var endFreq = params.endFreq || 25;
+// ── R3: Causal Push ──
+// Element A rushes toward element B + impact burst at collision.
+// Scaffolds "A causes B" — consequence, causal connectors (because, so).
+AnimationTemplates.register('causal_push', function(params) {
+  var prefixA = params.entityPrefixA || params.entityPrefix || '';
+  var prefixB = params.entityPrefixB || '';
+  var rushPx = _clamp(params.rushPixels || 15, 3, 30);
+  var ps = new ParticleSystem(ParticlePresets.explosion);
+  var impacted = false;
 
   return function animate(buf, PW, PH, t) {
-    // Frequency ramps up, amplitude follows a bell curve
-    var freq = startFreq + (endFreq - startFreq) * t;
-    var amp = maxAmp * Math.sin(t * Math.PI); // ramp up then down
-    var offset = Math.round(amp * Math.sin(t * Math.PI * freq));
-    if (offset === 0) return;
+    var boundsA = _computeEntityBounds(buf, PW, prefixA);
+    var boundsB = prefixB ? _computeEntityBounds(buf, PW, prefixB) : null;
+    if (!boundsB || boundsA.x2 < 0) return;
 
-    var pixels = _collectEntityPixels(buf, PW, prefix);
-    _blankEntityPixels(buf, pixels);
-    _redrawEntityPixels(buf, PW, PH, pixels, offset, 0);
+    var pixelsA = _collectEntityPixels(buf, PW, prefixA);
+    var dirAB = boundsB.cx > boundsA.cx ? 1 : -1;
+    var dxA = 0;
+
+    if (t < 0.4) {
+      // Rush toward B
+      var progress = t / 0.4;
+      // Ease-in curve for acceleration
+      dxA = Math.round(rushPx * progress * progress * dirAB);
+    } else if (t < 0.5) {
+      // Impact — hold at max displacement
+      dxA = Math.round(rushPx * dirAB);
+
+      // Spawn impact burst
+      if (!impacted) {
+        var impactX = Math.round((boundsA.cx + rushPx * dirAB + boundsB.cx) / 2);
+        var impactY = Math.round((boundsA.cy + boundsB.cy) / 2);
+        ps.burst(impactX, impactY, 12);
+        impacted = true;
+      }
+    } else {
+      // Recoil — bounce back
+      var recoil = (t - 0.5) / 0.5;
+      dxA = Math.round(rushPx * (1 - recoil) * dirAB);
+    }
+
+    if (dxA !== 0) {
+      _blankEntityPixels(buf, pixelsA);
+      _redrawEntityPixels(buf, PW, PH, pixelsA, dxA, 0);
+    }
+
+    // B shakes slightly on impact
+    if (t >= 0.4 && t < 0.65) {
+      var pixelsB = _collectEntityPixels(buf, PW, prefixB);
+      var shake = Math.round(3 * Math.sin((t - 0.4) / 0.25 * Math.PI * 6) * (1 - (t - 0.4) / 0.25));
+      if (shake !== 0 && pixelsB.length > 0) {
+        _blankEntityPixels(buf, pixelsB);
+        _redrawEntityPixels(buf, PW, PH, pixelsB, shake, 0);
+      }
+    }
+
+    ps.update(1 / 60);
+    ps.draw(buf, PW, PH);
   };
-}, 1200);
+}, 1500);
 
-// ── A12: Bonk ──
+// ── Q1: Bonk ──
 AnimationTemplates.register('bonk', function(params) {
   var prefixA = params.entityPrefixA || params.entityPrefix || '';
   var prefixB = params.entityPrefixB || '';
@@ -1012,7 +1135,7 @@ AnimationTemplates.register('bonk', function(params) {
   };
 }, 1200);
 
-// ── A13: Sequential Glow ──
+// ── Q2: Sequential Glow ──
 AnimationTemplates.register('sequential_glow', function(params) {
   var prefixes = params.entityPrefixes || [params.entityPrefix || ''];
   var n = prefixes.length;
@@ -1061,7 +1184,7 @@ AnimationTemplates.register('sequential_glow', function(params) {
   };
 }, 1600);
 
-// ── A14: Ghost Outline ──
+// ── Q3: Ghost Outline ──
 AnimationTemplates.register('ghost_outline', function(params) {
   var prefix = params.entityPrefix || '';
   var gc = params.ghostColor || [180, 180, 180];
@@ -1125,7 +1248,7 @@ AnimationTemplates.register('ghost_outline', function(params) {
   };
 }, 1500);
 
-// ── A15: Magnetism ──
+// ── R1: Magnetism ──
 AnimationTemplates.register('magnetism', function(params) {
   var prefixA = params.entityPrefixA || params.entityPrefix || '';
   var prefixB = params.entityPrefixB || '';
@@ -1203,64 +1326,342 @@ AnimationTemplates.register('magnetism', function(params) {
   };
 }, 1500);
 
-// ── A16: Wind ──
-AnimationTemplates.register('wind', function(params) {
-  var prefix = params.entityPrefix || '';
-  var pushPx = _clamp(params.pushPixels || 15, 3, 30);
-  var windDir = params.windDirection || 'right';
-  var dirSign = windDir === 'left' ? -1 : 1;
+// ── R2: Repel ──
+// Two elements push apart from each other, like same-polarity magnets.
+// Exact symmetric of Magnetism (R1).
+// Scaffolds incorrect grouping — "A and B went home" but only A left.
+AnimationTemplates.register('repel', function(params) {
+  var prefixA = params.entityPrefixA || params.entityPrefix || '';
+  var prefixB = params.entityPrefixB || '';
+  var repelPx = _clamp(params.repelPixels || 12, 2, 25);
+  var ps = new ParticleSystem(ParticlePresets.sparkle);
+  var sparkled = false;
 
   return function animate(buf, PW, PH, t) {
-    // Entity displacement
-    var dx = 0;
-    if (t < 0.5) {
-      dx = Math.round(pushPx * (t / 0.5) * dirSign);
+    var boundsA = _computeEntityBounds(buf, PW, prefixA);
+    var boundsB = prefixB ? _computeEntityBounds(buf, PW, prefixB) : null;
+    if (!boundsB) return;
+
+    var pixelsA = _collectEntityPixels(buf, PW, prefixA);
+    var pixelsB = _collectEntityPixels(buf, PW, prefixB);
+
+    var dirAB = boundsB.cx > boundsA.cx ? 1 : -1;
+    var dxA = 0, dxB = 0;
+
+    if (t < 0.1) {
+      // Brief attract (tension)
+      var attract = t / 0.1;
+      dxA = Math.round(2 * attract * dirAB);
+      dxB = Math.round(-2 * attract * dirAB);
+    } else if (t < 0.4) {
+      // Push apart
+      var progress = (t - 0.1) / 0.3;
+      dxA = Math.round(-repelPx / 2 * progress * dirAB);
+      dxB = Math.round(repelPx / 2 * progress * dirAB);
+
+      // Sparkle at midpoint
+      if (!sparkled && t > 0.15) {
+        var midX = Math.round((boundsA.cx + boundsB.cx) / 2);
+        var midY = Math.round((boundsA.cy + boundsB.cy) / 2);
+        ps.burst(midX, midY, 8);
+        sparkled = true;
+      }
     } else if (t < 0.7) {
-      // Wobble at displaced position
-      dx = Math.round((pushPx + 2 * Math.sin((t - 0.5) / 0.2 * Math.PI * 4)) * dirSign);
+      // Hold apart
+      dxA = Math.round(-repelPx / 2 * dirAB);
+      dxB = Math.round(repelPx / 2 * dirAB);
     } else {
-      // Slide back slowly
-      dx = Math.round(pushPx * (1 - (t - 0.7) / 0.3) * dirSign);
+      // Drift back
+      var release = (t - 0.7) / 0.3;
+      dxA = Math.round(-repelPx / 2 * (1 - release) * dirAB);
+      dxB = Math.round(repelPx / 2 * (1 - release) * dirAB);
     }
 
-    var pixels = _collectEntityPixels(buf, PW, prefix);
+    _blankEntityPixels(buf, pixelsA);
+    _blankEntityPixels(buf, pixelsB);
+    _redrawEntityPixels(buf, PW, PH, pixelsA, dxA, 0);
+    _redrawEntityPixels(buf, PW, PH, pixelsB, dxB, 0);
+
+    ps.update(1 / 60);
+    ps.draw(buf, PW, PH);
+  };
+}, 1500);
+
+
+// ── D1: Speech Bubble ──
+// Pixelated speech bubble with "..." or keyword above character.
+// Scaffolds dialogue and direct speech (linguistic_verbs).
+AnimationTemplates.register('speech_bubble', function(params) {
+  var prefix = params.entityPrefix || '';
+  var text = params.text || '...';
+  var bubbleColor = params.bubbleColor || [255, 255, 255];
+  var textColor = params.textColor || [40, 40, 40];
+
+  return function animate(buf, PW, PH, t) {
+    var env = _easeEnvelope(t, 0.2, 0.2);
+    if (env < 0.01) return;
+
     var bounds = _computeEntityBounds(buf, PW, prefix);
+    if (bounds.x2 < 0) return;
 
-    if (pixels.length > 0 && dx !== 0) {
-      _blankEntityPixels(buf, pixels);
-      _redrawEntityPixels(buf, PW, PH, pixels, dx, 0);
+    // Position bubble above entity
+    var textLen = text.length;
+    var bw = Math.max(24, textLen * 7 + 8);
+    var bh = 14;
+    var bx = Math.round(bounds.cx - bw / 2);
+    var by = bounds.y1 - bh - 8;
+
+    // Clamp to canvas
+    bx = Math.max(1, Math.min(PW - bw - 1, bx));
+    by = Math.max(1, by);
+
+    var alpha = env;
+
+    // Draw bubble background
+    for (var y = by; y < by + bh; y++) {
+      for (var x = bx; x < bx + bw; x++) {
+        if (x >= 0 && x < PW && y >= 0 && y < PH) {
+          var idx = y * PW + x;
+          buf[idx].r = Math.round(buf[idx].r * (1 - alpha) + bubbleColor[0] * alpha);
+          buf[idx].g = Math.round(buf[idx].g * (1 - alpha) + bubbleColor[1] * alpha);
+          buf[idx].b = Math.round(buf[idx].b * (1 - alpha) + bubbleColor[2] * alpha);
+        }
+      }
     }
 
-    // Draw wind lines
-    var windAlpha = _easeEnvelope(t, 0.05, 0.3);
-    if (windAlpha > 0.05 && bounds.x2 > 0) {
-      var lineCount = 4;
-      for (var l = 0; l < lineCount; l++) {
-        var ly = bounds.y1 + ((l + 0.5) / lineCount) * (bounds.y2 - bounds.y1);
-        ly = Math.round(ly);
+    // Draw bubble border
+    for (var x = bx; x < bx + bw; x++) {
+      _setPixel(buf, PW, PH, x, by, Math.round(120 * alpha), Math.round(120 * alpha), Math.round(120 * alpha));
+      _setPixel(buf, PW, PH, x, by + bh - 1, Math.round(120 * alpha), Math.round(120 * alpha), Math.round(120 * alpha));
+    }
+    for (var y = by; y < by + bh; y++) {
+      _setPixel(buf, PW, PH, bx, y, Math.round(120 * alpha), Math.round(120 * alpha), Math.round(120 * alpha));
+      _setPixel(buf, PW, PH, bx + bw - 1, y, Math.round(120 * alpha), Math.round(120 * alpha), Math.round(120 * alpha));
+    }
 
-        // Wind line sweeps across: position based on t
-        var lineStartX;
-        if (dirSign > 0) {
-          lineStartX = Math.round(bounds.x1 - 20 + t * (bounds.x2 - bounds.x1 + 40));
-        } else {
-          lineStartX = Math.round(bounds.x2 + 20 - t * (bounds.x2 - bounds.x1 + 40));
+    // Draw tail (triangle pointing down to entity)
+    var tailX = Math.round(bounds.cx);
+    for (var td = 0; td < 4; td++) {
+      if (tailX >= 0 && tailX < PW && by + bh + td >= 0 && by + bh + td < PH) {
+        var ti = (by + bh + td) * PW + tailX;
+        buf[ti].r = Math.round(buf[ti].r * (1 - alpha) + bubbleColor[0] * alpha);
+        buf[ti].g = Math.round(buf[ti].g * (1 - alpha) + bubbleColor[1] * alpha);
+        buf[ti].b = Math.round(buf[ti].b * (1 - alpha) + bubbleColor[2] * alpha);
+      }
+    }
+
+    // Draw text inside bubble
+    var tx = bx + 4;
+    var ty = by + 3;
+    drawText(buf, PW, PH, text, tx, ty,
+      Math.round(textColor[0] * alpha), Math.round(textColor[1] * alpha), Math.round(textColor[2] * alpha),
+      'temp.speech_bubble');
+  };
+}, 1500);
+
+// ── D2: Thought Bubble ──
+// Pixelated thought bubble (round, linked bubbles) with "..." or symbol.
+// Scaffolds Internal Response and Plan (mental_verbs).
+AnimationTemplates.register('thought_bubble', function(params) {
+  var prefix = params.entityPrefix || '';
+  var text = params.text || '...';
+  var bubbleColor = params.bubbleColor || [240, 240, 255];
+  var textColor = params.textColor || [60, 60, 80];
+
+  return function animate(buf, PW, PH, t) {
+    var env = _easeEnvelope(t, 0.25, 0.25);
+    if (env < 0.01) return;
+
+    var bounds = _computeEntityBounds(buf, PW, prefix);
+    if (bounds.x2 < 0) return;
+
+    var alpha = env;
+
+    // Main thought bubble (ellipse)
+    var textLen = text.length;
+    var bw = Math.max(20, textLen * 7 + 10);
+    var bh = 14;
+    var bx = Math.round(bounds.cx - bw / 2 + 8);
+    var by = bounds.y1 - bh - 12;
+    bx = Math.max(1, Math.min(PW - bw - 1, bx));
+    by = Math.max(1, by);
+
+    // Draw main elliptical bubble
+    var rx = bw / 2, ry = bh / 2;
+    var cx = bx + rx, cy = by + ry;
+    for (var y = by - 1; y <= by + bh; y++) {
+      for (var x = bx - 1; x <= bx + bw; x++) {
+        var dx = (x - cx) / rx, dy = (y - cy) / ry;
+        if (dx * dx + dy * dy <= 1.0 && x >= 0 && x < PW && y >= 0 && y < PH) {
+          var idx = y * PW + x;
+          buf[idx].r = Math.round(buf[idx].r * (1 - alpha) + bubbleColor[0] * alpha);
+          buf[idx].g = Math.round(buf[idx].g * (1 - alpha) + bubbleColor[1] * alpha);
+          buf[idx].b = Math.round(buf[idx].b * (1 - alpha) + bubbleColor[2] * alpha);
         }
+      }
+    }
 
-        // Draw dashed line
-        for (var d = 0; d < 10; d++) {
-          if (d % 3 === 2) continue; // dash gap
-          var wx = lineStartX + d * dirSign;
-          if (wx >= 0 && wx < PW && ly >= 0 && ly < PH) {
-            var wi = ly * PW + wx;
-            var wa = windAlpha * (1 - d / 10);
-            buf[wi].r = Math.round(buf[wi].r * (1 - wa) + 220 * wa);
-            buf[wi].g = Math.round(buf[wi].g * (1 - wa) + 220 * wa);
-            buf[wi].b = Math.round(buf[wi].b * (1 - wa) + 240 * wa);
+    // Draw trailing thought dots (3 small circles)
+    var dotTrail = [
+      { x: Math.round(bounds.cx + 2), y: by + bh + 3, r: 2 },
+      { x: Math.round(bounds.cx - 1), y: by + bh + 7, r: 1.5 },
+      { x: Math.round(bounds.cx - 3), y: by + bh + 10, r: 1 },
+    ];
+    for (var d = 0; d < dotTrail.length; d++) {
+      var dot = dotTrail[d];
+      for (var dy = -Math.ceil(dot.r); dy <= Math.ceil(dot.r); dy++) {
+        for (var dx = -Math.ceil(dot.r); dx <= Math.ceil(dot.r); dx++) {
+          if (dx * dx + dy * dy <= dot.r * dot.r) {
+            var px = Math.round(dot.x + dx), py = Math.round(dot.y + dy);
+            if (px >= 0 && px < PW && py >= 0 && py < PH) {
+              var di = py * PW + px;
+              buf[di].r = Math.round(buf[di].r * (1 - alpha) + bubbleColor[0] * alpha);
+              buf[di].g = Math.round(buf[di].g * (1 - alpha) + bubbleColor[1] * alpha);
+              buf[di].b = Math.round(buf[di].b * (1 - alpha) + bubbleColor[2] * alpha);
+            }
           }
         }
       }
     }
+
+    // Draw text inside bubble
+    var tx = bx + 5;
+    var ty = by + 3;
+    drawText(buf, PW, PH, text, tx, ty,
+      Math.round(textColor[0] * alpha), Math.round(textColor[1] * alpha), Math.round(textColor[2] * alpha),
+      'temp.thought_bubble');
+  };
+}, 1500);
+
+// ── D3: Alert ──
+// "!" sprite above entity. Signals that an important event just happened
+// or that the entity is reacting to something.
+// Scaffolds Initiating Event (IE) and Internal Response (IR).
+AnimationTemplates.register('alert', function(params) {
+  var prefix = params.entityPrefix || '';
+  var alertColor = params.alertColor || [255, 220, 50];
+  var bgColor = params.bgColor || [200, 60, 60];
+
+  return function animate(buf, PW, PH, t) {
+    var env = _easeEnvelope(t, 0.15, 0.2);
+    if (env < 0.01) return;
+
+    var bounds = _computeEntityBounds(buf, PW, prefix);
+    if (bounds.x2 < 0) return;
+
+    // Pop-in scale effect
+    var scale;
+    if (t < 0.15) scale = t / 0.15 * 1.3;
+    else if (t < 0.25) scale = 1.3 - (t - 0.15) / 0.1 * 0.3;
+    else scale = 1;
+
+    var alpha = env;
+
+    // Position "!" above entity
+    var exX = Math.round(bounds.cx);
+    var exY = bounds.y1 - 14;
+
+    // Draw red circle background
+    var circR = Math.round(5 * scale);
+    for (var dy = -circR; dy <= circR; dy++) {
+      for (var dx = -circR; dx <= circR; dx++) {
+        if (dx * dx + dy * dy <= circR * circR) {
+          var px = exX + dx, py = exY + dy;
+          if (px >= 0 && px < PW && py >= 0 && py < PH) {
+            var idx = py * PW + px;
+            buf[idx].r = Math.round(buf[idx].r * (1 - alpha) + bgColor[0] * alpha);
+            buf[idx].g = Math.round(buf[idx].g * (1 - alpha) + bgColor[1] * alpha);
+            buf[idx].b = Math.round(buf[idx].b * (1 - alpha) + bgColor[2] * alpha);
+          }
+        }
+      }
+    }
+
+    // Draw "!" text
+    drawText(buf, PW, PH, '!', exX - 2, exY - 3,
+      Math.round(alertColor[0] * alpha), Math.round(alertColor[1] * alpha), Math.round(alertColor[2] * alpha),
+      'temp.alert');
+
+    // Gentle entity pulse
+    var pulse = 1 + 0.12 * env * (0.5 + 0.5 * Math.sin(t * Math.PI * 5));
+    for (var i = 0; i < buf.length; i++) {
+      if (buf[i].e === prefix || buf[i].e.startsWith(prefix + '.')) {
+        buf[i].r = Math.min(255, Math.round(buf[i]._r * pulse));
+        buf[i].g = Math.min(255, Math.round(buf[i]._g * pulse));
+        buf[i].b = Math.min(255, Math.round(buf[i]._b * pulse));
+      }
+    }
+  };
+}, 1200);
+
+// ── D4: Interjection ──
+// Comic-style burst displaying the problematic word with "?".
+// The ONLY animation that displays text from the child's speech.
+// Positioned at the top of the scene, centered. Size adapts to text length.
+AnimationTemplates.register('interjection', function(params) {
+  var word = params.word || '???';
+  var burstColor = params.burstColor || [255, 240, 100];
+  var textColor = params.textColor || [50, 30, 30];
+  var borderColor = params.borderColor || [200, 80, 30];
+
+  return function animate(buf, PW, PH, t) {
+    var env = _easeEnvelope(t, 0.1, 0.25);
+    if (env < 0.01) return;
+
+    // Pop-in scale
+    var scale;
+    if (t < 0.1) scale = t / 0.1 * 1.2;
+    else if (t < 0.2) scale = 1.2 - (t - 0.1) / 0.1 * 0.2;
+    else scale = 1;
+
+    var alpha = env;
+
+    // Compute burst size based on text
+    var displayText = word.toUpperCase() + '?';
+    var textW = displayText.length * 7;
+    var burstW = Math.round((textW + 16) * scale);
+    var burstH = Math.round(20 * scale);
+
+    // Center at top of scene
+    var bx = Math.round(PW / 2 - burstW / 2);
+    var by = 15;
+
+    // Draw spiky burst background
+    var cx = bx + burstW / 2, cy = by + burstH / 2;
+    var spikes = 12;
+    var innerR = Math.min(burstW, burstH) / 2 * 0.7;
+    var outerR = Math.max(burstW, burstH) / 2 * 1.1;
+
+    for (var y = by - Math.round(outerR); y <= by + burstH + Math.round(outerR); y++) {
+      for (var x = bx - Math.round(outerR); x <= bx + burstW + Math.round(outerR); x++) {
+        if (x < 0 || x >= PW || y < 0 || y >= PH) continue;
+        var dx = x - cx, dy = y - cy;
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        var angle = Math.atan2(dy, dx);
+        // Spiky radius
+        var spikeR = innerR + (outerR - innerR) * 0.5 * (1 + Math.cos(angle * spikes));
+        if (dist <= spikeR) {
+          var idx = y * PW + x;
+          // Border: outer ring
+          if (dist > spikeR - 2) {
+            buf[idx].r = Math.round(buf[idx].r * (1 - alpha) + borderColor[0] * alpha);
+            buf[idx].g = Math.round(buf[idx].g * (1 - alpha) + borderColor[1] * alpha);
+            buf[idx].b = Math.round(buf[idx].b * (1 - alpha) + borderColor[2] * alpha);
+          } else {
+            buf[idx].r = Math.round(buf[idx].r * (1 - alpha) + burstColor[0] * alpha);
+            buf[idx].g = Math.round(buf[idx].g * (1 - alpha) + burstColor[1] * alpha);
+            buf[idx].b = Math.round(buf[idx].b * (1 - alpha) + burstColor[2] * alpha);
+          }
+        }
+      }
+    }
+
+    // Draw text inside burst
+    var tx = Math.round(cx - textW / 2);
+    var ty = Math.round(cy - 3);
+    drawText(buf, PW, PH, displayText, tx, ty,
+      Math.round(textColor[0] * alpha), Math.round(textColor[1] * alpha), Math.round(textColor[2] * alpha),
+      'temp.interjection');
   };
 }, 1500);
 

@@ -133,6 +133,10 @@ Return ONLY valid JSON (no markdown fences, no commentary):
   "misl_element": "<MISL key of the target (e.g. 'consequence', \
 'subordinating_conjunctions'), or null>",
   "guidance_text": "<English text for TTS, or null>",
+  "problematic_segment": "<the specific word or short phrase from the child's \
+speech that is problematic, or null — REQUIRED for 'grammaticality' and 'tense' \
+errors so the D4 Interjection animation can display it. Example: 'runned', \
+'goed', 'was go'. Keep it to the minimal problematic word(s), never the full sentence.>",
   "reasoning": "<brief explanation of why this action was chosen>",
   "animation_efficacy": [
     {
