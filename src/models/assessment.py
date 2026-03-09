@@ -21,4 +21,5 @@ class AssessmentDecision(BaseModel):
     target_id: Optional[str] = None
     misl_element: Optional[str] = None
     guidance_text: Optional[str] = None
+    problematic_segment: Optional[str] = None
     reasoning: str = ""
