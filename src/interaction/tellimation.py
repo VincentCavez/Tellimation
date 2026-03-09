@@ -8,7 +8,7 @@ mapping (config/misl.py).
 
 Model: Gemini 3 Flash (gemini-3-flash-preview)
 
-Fallback: if LLM generation fails, returns a simple wobble animation.
+Fallback: if LLM generation fails, returns a simple deterministic animation.
 """
 
 from __future__ import annotations
@@ -60,15 +60,17 @@ function animate(buf, PW, PH, t) {
     }
   }
 }""",
-    "shake": """\
+    "desaturate": """\
 function animate(buf, PW, PH, t) {
-  var freq = 3 + 22 * t;
-  var amp = Math.round(4 * Math.sin(t * Math.PI));
-  var offset = Math.round(amp * Math.sin(t * Math.PI * freq));
-  if (offset === 0) return;
-  var pixels = _collectEntityPixels(buf, PW, 'TARGET');
-  _blankEntityPixels(buf, pixels);
-  _redrawEntityPixels(buf, PW, PH, pixels, offset, 0);
+  var env = _easeEnvelope(t, 0.2, 0.2);
+  for (var i = 0; i < buf.length; i++) {
+    if (buf[i].e.startsWith('TARGET')) {
+      var L = Math.round(buf[i]._r * 0.3 + buf[i]._g * 0.59 + buf[i]._b * 0.11);
+      buf[i].r = Math.round(buf[i]._r * (1 - env * 0.8) + L * env * 0.8);
+      buf[i].g = Math.round(buf[i]._g * (1 - env * 0.8) + L * env * 0.8);
+      buf[i].b = Math.round(buf[i]._b * (1 - env * 0.8) + L * env * 0.8);
+    }
+  }
 }""",
     "pulse": """\
 function animate(buf, PW, PH, t) {
@@ -97,21 +99,21 @@ _FALLBACK_DURATION_MS = 1200
 
 # Map MISL elements to fallback animation for _FALLBACK_CODE lookup.
 _MISL_TO_FALLBACK: Dict[str, str] = {
-    "character": "shake",            # A02 wobble
-    "setting": "bounce",             # D02 settle
-    "initiating_event": "pulse",     # C02 anticipation
-    "internal_response": "colorPop", # B03 emanation
-    "plan": "pulse",                 # H02 thought bubble → pulse
-    "action": "bounce",              # C01 motion lines → bounce
-    "consequence": "pulse",          # F03 causal push → pulse
+    "character": "pulse",            # I1 spotlight → pulse
+    "setting": "bounce",             # S2 settle → bounce
+    "initiating_event": "pulse",     # A2 anticipation → pulse
+    "internal_response": "colorPop", # P2 emanation → colorPop
+    "plan": "pulse",                 # D2 thought bubble → pulse
+    "action": "bounce",              # A1 motion lines → bounce
+    "consequence": "pulse",          # R3 causal push → pulse
     "coordinating_conjunctions": "pulse",
     "subordinating_conjunctions": "pulse",
-    "mental_verbs": "colorPop",      # H02 thought bubble → colorPop
-    "linguistic_verbs": "shake",     # H01 speech bubble → shake
-    "adverbs": "colorPop",           # B01 color pop
-    "elaborated_noun_phrases": "colorPop",  # B01 color pop
-    "grammaticality": "shake",       # A02 wobble
-    "tense": "pulse",                # E01 afterimage → pulse
+    "mental_verbs": "colorPop",      # D2 thought bubble → colorPop
+    "linguistic_verbs": "pulse",     # D1 speech bubble → pulse
+    "adverbs": "colorPop",           # P1 color pop
+    "elaborated_noun_phrases": "colorPop",  # P1 color pop
+    "grammaticality": "pulse",       # D4 interjection → pulse
+    "tense": "desaturate",           # T1 flashback → desaturate
 }
 
 
@@ -312,8 +314,8 @@ def _build_fallback(
     neg: Optional[NEG] = None,
 ) -> Tuple[str, int, None, str, List[Dict[str, Any]]]:
     """Build a fallback animation with text overlay when LLM generation fails."""
-    family = _MISL_TO_FALLBACK.get(misl_element, "shake")
-    code = _FALLBACK_CODE.get(family, _FALLBACK_CODE["shake"])
+    family = _MISL_TO_FALLBACK.get(misl_element, "pulse")
+    code = _FALLBACK_CODE.get(family, _FALLBACK_CODE["pulse"])
     code = code.replace("TARGET", target_id)
     animation_id = f"fallback_{family}"
     text_overlays = _extract_fallback_text(target_id, misl_element, manifest, neg)
@@ -331,6 +333,7 @@ async def generate_tellimation(
     target_id: str,
     misl_element: str,
     neg: Optional[NEG] = None,
+    problematic_segment: Optional[str] = None,
 ) -> Tuple[str, int, Optional[Dict], str, List[Dict[str, Any]]]:
     """Generate a tellimation animation for a target entity.
 
@@ -342,6 +345,14 @@ async def generate_tellimation(
     # Build eligible animations list from MISL mapping
     eligible = MISL_TO_ANIMATIONS.get(misl_element, [])
     eligible_text = ", ".join(eligible) if eligible else "(any)"
+
+    # Build problematic segment section for D4 interjection
+    if problematic_segment:
+        segment_section = (
+            f"Problematic segment (from child's speech): \"{problematic_segment}\"\n"
+        )
+    else:
+        segment_section = ""
 
     # Build prompt
     entity_details = _format_entity_details(target_id, manifest)
@@ -359,6 +370,7 @@ async def generate_tellimation(
         scene_context=scene_context,
         student_profile=profile_text,
         animation_effectiveness=effectiveness,
+        problematic_segment_section=segment_section,
     )
 
     client = genai.Client(api_key=api_key)

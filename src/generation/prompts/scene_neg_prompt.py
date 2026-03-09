@@ -218,9 +218,9 @@ The student_profile includes `animation_history` with which animation types \
 led to correction and which didn't. Use this:
 - If "color_pop" animations are effective for this child, favor scenes \
 with strong color contrasts (which lend themselves to color_pop).
-- If "shake" animations never lead to correction for descriptive adjectives, \
+- If "emanation" animations never lead to correction for descriptive adjectives, \
 favor scenes where adjectives are carried by color (good for color_pop) or \
-size (good for scale_strain) rather than texture.
+spatial relations (good for settle, reveal) rather than texture.
 - This is subtle — don't force unnatural scenes, but when you have choices, \
 prefer configurations that play to effective animation types.
 

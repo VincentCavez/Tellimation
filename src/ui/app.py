@@ -716,6 +716,7 @@ async def _handle_audio(
             await _execute_animation(
                 session, ws, decision.target_id,
                 misl_element=decision.misl_element or "character",
+                problematic_segment=decision.problematic_segment,
             )
 
         elif decision.action == "oral_guidance" and decision.guidance_text:
@@ -802,6 +803,7 @@ async def _execute_animation(
     ws: _WebSocketAdapter,
     target_id: str,
     misl_element: str = "character",
+    problematic_segment: Optional[str] = None,
 ) -> None:
     """Generate and send a tellimation animation for a target entity."""
     try:
@@ -817,6 +819,7 @@ async def _execute_animation(
                 target_id=target_id,
                 misl_element=misl_element,
                 neg=session.current_neg,
+                problematic_segment=problematic_segment,
             )
         )
 

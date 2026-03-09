@@ -186,34 +186,34 @@ MICRO_AGE_THRESHOLD_LEVEL2 = 9
 # ============================================================================
 
 ANIMATION_IDS = {
-    # A = Identity
-    "A01_spotlight": "Scene darkens, target entity pulses gently with luminous halo",
-    "A02_wobble": "Gelatinous vibration for categorical instability",
-    "A03_nametag": "Name label appears above entity",
-    # B = Property
-    "B01_color_pop": "Desaturation of everything except target to emphasize color",
-    "B02_scale_strain": "Object attempts claimed size, fails, returns to actual with wobble",
-    "B03_emanation": "Particle sprites showing actual property (steam, frost, sparkle, dust)",
-    # C = Action
-    "C01_motion_line": "Directional streaks showing actual direction and speed",
-    "C02_anticipation": "Character frozen in 'about to act' pose showing potential energy",
-    # D = Space
-    "D01_transparency_reveal": "Occluding object becomes translucent to show spatial relationship",
-    "D02_settle": "Object sinks into its actual position with soft bounce",
-    # E = Time
-    "E01_afterimage": "Ghost-duplicate in previous action pose fades",
-    "E02_timelapse": "Visual fast-forward or rewind effect",
-    # F = Relation
-    "F01_magnetism": "Objects attracted/repelled showing actual relationship",
-    "F02_wind": "Directional force showing connection between entities",
-    "F03_causal_push": "Chain reaction showing cause-effect relationship",
-    # G = Quantity
-    "G01_bonk": "Character hits redundant element, correction stars appear",
-    "G02_sequential_glow": "Objects glow in sequence creating visual count",
-    "G03_ghost_outline": "Faint dotted outline where claimed object should be, dissolves",
-    # H = Discourse
-    "H01_speech_bubble": "Speech bubble appears with linguistic content",
-    "H02_thought_bubble": "Thought bubble appears with mental content",
+    # I = Identity
+    "I1_spotlight": "Scene darkens, target entity pulses gently with luminous halo",
+    "I2_nametag": "Floating label with '...' attached to entity, invites naming",
+    # P = Property
+    "P1_color_pop": "Desaturation of everything except target to emphasize visual attributes",
+    "P2_emanation": "2-3 particle sprites revealing non-visible properties or emotions",
+    # A = Action
+    "A1_motion_line": "Directional speed streaks showing direction and speed",
+    "A2_anticipation": "Entity compresses and lurches forward, freezes mid-motion",
+    # S = Space
+    "S1_reveal": "Occluding layer becomes semi-transparent to show hidden elements",
+    "S2_settle": "Object sinks into its actual position with soft bounce and shadow",
+    # T = Time
+    "T1_flashback": "Target desaturates briefly (palette swap to grey) then re-saturates",
+    "T2_timelapse": "Day-night cycle effect signaling temporal progression",
+    # R = Relation
+    "R1_magnetism": "Magnet sprites appear, elements drift toward each other",
+    "R2_repel": "Two elements push apart from each other like same-polarity magnets",
+    "R3_causal_push": "Element A rushes toward B + impact burst at collision",
+    # Q = Quantity
+    "Q1_bonk": "Redundant elements collide with star particles, bounce back",
+    "Q2_sequential_glow": "Objects glow in sequence creating visual count",
+    "Q3_ghost_outline": "Faint dotted outline where missing element should be, dissolves",
+    # D = Discourse
+    "D1_speech_bubble": "Pixelated speech bubble with '...' or keyword",
+    "D2_thought_bubble": "Pixelated thought bubble with '...' or symbol",
+    "D3_alert": "'!' sprite above entity, signals important event or reaction",
+    "D4_interjection": "Comic-style burst displaying problematic word with '?'",
 }
 
 # ============================================================================
@@ -222,26 +222,26 @@ ANIMATION_IDS = {
 
 MISL_TO_ANIMATIONS: Dict[str, List[str]] = {
     # Macrostructure
-    "character":         ["A01_spotlight", "A02_wobble", "A03_nametag"],
-    "setting":           ["D01_transparency_reveal", "D02_settle", "E02_timelapse"],
-    "initiating_event":  ["C01_motion_line", "C02_anticipation", "F03_causal_push"],
-    "internal_response": ["B03_emanation", "H02_thought_bubble"],
-    "plan":              ["H02_thought_bubble"],
-    "action":            ["C01_motion_line", "C02_anticipation"],
-    "consequence":       ["F03_causal_push"],
+    "character":         ["I1_spotlight", "I2_nametag"],
+    "setting":           ["S1_reveal", "S2_settle", "T2_timelapse"],
+    "initiating_event":  ["A1_motion_line", "A2_anticipation", "R3_causal_push", "D3_alert"],
+    "internal_response": ["P2_emanation", "D2_thought_bubble", "D3_alert"],
+    "plan":              ["D2_thought_bubble"],
+    "action":            ["A1_motion_line", "A2_anticipation"],
+    "consequence":       ["R3_causal_push"],
     # Microstructure
-    "coordinating_conjunctions":  ["F01_magnetism", "F02_wind", "F03_causal_push"],
-    "subordinating_conjunctions": ["F03_causal_push"],
-    "mental_verbs":               ["H02_thought_bubble"],
-    "linguistic_verbs":           ["H01_speech_bubble"],
-    "adverbs":                    ["B01_color_pop", "B02_scale_strain", "B03_emanation"],
-    "elaborated_noun_phrases":    ["B01_color_pop", "B02_scale_strain", "B03_emanation"],
-    "grammaticality":             ["A02_wobble"],
-    "tense":                      ["E01_afterimage", "E02_timelapse"],
+    "coordinating_conjunctions":  ["R1_magnetism", "R2_repel", "R3_causal_push"],
+    "subordinating_conjunctions": ["R3_causal_push"],
+    "mental_verbs":               ["D2_thought_bubble"],
+    "linguistic_verbs":           ["D1_speech_bubble"],
+    "adverbs":                    ["P1_color_pop", "P2_emanation"],
+    "elaborated_noun_phrases":    ["P1_color_pop", "P2_emanation"],
+    "grammaticality":             ["D4_interjection"],
+    "tense":                      ["T1_flashback", "T2_timelapse", "D4_interjection"],
 }
 
 # Quantity animations apply to any element when the problem is incorrect count.
-QUANTITY_ANIMATIONS: List[str] = ["G01_bonk", "G02_sequential_glow", "G03_ghost_outline"]
+QUANTITY_ANIMATIONS: List[str] = ["Q1_bonk", "Q2_sequential_glow", "Q3_ghost_outline"]
 
 # ============================================================================
 # All MISL element keys (convenience)

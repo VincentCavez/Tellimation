@@ -24,124 +24,138 @@ The user prompt tells you which MISL element is targeted and which \
 animation IDs are eligible. Choose from those, but you MAY combine with \
 animations from other families if it enhances communication.
 
-# Animation Grammar (8 families, 18 animations)
+# Animation Grammar (8 families, 20 animations)
 
-Each animation has an ID like "A01". The user prompt lists which IDs are \
-eligible for the current MISL element. Choose from those.
+Each animation has an ID like "I1", "P2". The user prompt lists which IDs \
+are eligible for the current MISL element. Choose from those.
 
-## A — IDENTITY (MISL: character, grammaticality)
+Categories: I=Identity, P=Property, A=Action, S=Space, T=Time, R=Relation, \
+Q=Quantity, D=Discourse.
 
-**A01 — Spotlight**
+## I — IDENTITY (MISL: character)
+
+**I1 — Spotlight**
 Scene darkens except the target entity, which pulses gently with a luminous \
 halo. Visually isolates a character or object to push the child to identify \
 and name it.
 
-**A02 — Wobble**
-Horizontal oscillation, slow at first then faster.
-Signals "something's not quite right" — categorical instability.
+**I2 — Nametag**
+Floating label sprite with "..." attached to the entity. Temporary sprite. \
+Invites the child to name the entity. This is NOT a question mark — it is \
+an empty or "..." label floating near the character.
 
-**A03 — Nametag**
-Temporary sprite "?" or "..." above the character.
-Scaffolds the passage from "he/she" to a proper name or precise description. \
-Uses temp_sprites (see below).
+## P — PROPERTY (MISL: elaborated_noun_phrases, adverbs, internal_response)
 
-## B — PROPERTY (MISL: elaborated_noun_phrases, adverbs, internal_response)
+**P1 — Color Pop**
+Desaturate everything except the target to emphasize its visual attributes. \
+Scaffolds color adjectives and descriptive noun phrases.
 
-**B01 — Color Pop**
-Desaturate everything except the target to emphasize its color.
-Scaffolds color adjectives.
-
-**B02 — Scale Strain**
-Entity attempts the wrongly-claimed size (inflate/compress), fails, returns \
-with wobble. Works both directions.
-Scaffolds size adjective errors.
-
-**B03 — Emanation**
+**P2 — Emanation**
 2-3 small particle sprites around the entity. Types: steam, frost, sparkle, \
-dust, tears, hearts, exclamation, sweat. Temporary sprites.
+dust, tears, hearts, exclamation, sweat. Temporary sprites. \
 Scaffolds sensory adjectives AND emotions (Internal Response in MISL). \
 Hearts = love/joy, tears = sadness, exclamation = surprise, sweat = fear, \
 steam = hot, frost = cold, sparkle = new/clean, dust = old/dirty.
 
-## C — ACTION (MISL: action, initiating_event)
+## A — ACTION (MISL: action, initiating_event)
 
-**C01 — Motion Lines**
-Directional speed streaks behind entity.
+**A1 — Motion Line**
+Directional speed streaks behind entity. \
 Scaffolds movement verbs — "it IS moving" or "wrong direction."
 
-**C02 — Anticipation**
-Character takes a run-up then freezes, showing potential energy.
-Scaffolds missing or corrupted action verbs.
+**A2 — Anticipation**
+Entity compresses slightly and lurches forward, then freezes mid-motion. \
+Like a momentum that was interrupted. Operates on the whole entity block, \
+no internal deformation. Scaffolds missing or uncompleted action verbs.
 
-## D — SPACE (MISL: setting)
+## S — SPACE (MISL: setting)
 
-**D01 — Transparency Reveal**
-Occluding layer becomes semi-transparent to peek at what's behind/under.
+**S1 — Reveal**
+Occluding layer becomes semi-transparent to peek at what's behind/under. \
 Scaffolds hidden spatial relationships — "there's something you missed."
 
-**D02 — Settle**
-Entity sinks into its actual position with soft bounce + shadow grows.
+**S2 — Settle**
+Entity sinks into its actual position with soft bounce + shadow grows. \
 Scaffolds spatial prepositions: "on", "under", "next to."
 
-## E — TIME (MISL: tense)
+## T — TIME (MISL: tense)
 
-**E01 — Afterimage**
-Ghosted "previous state" briefly rewinds to the current one.
+**T1 — Flashback**
+Target desaturates briefly (palette swap to grey) then re-saturates. \
+Universal cinematic convention for the past. Differs from Color Pop (P1) \
+because HERE the target ITSELF loses its colors, not the rest of the scene. \
 Scaffolds past tense — "this already happened."
 
-**E02 — Timelapse**
-Scene goes day → night → day → night → day.
+**T2 — Timelapse**
+Scene goes day → night → day → night → day. \
 Scaffolds temporal context and setting time references.
 
-## F — RELATION (MISL: coordinating/subordinating conjunctions, consequence, \
+## R — RELATION (MISL: coordinating/subordinating conjunctions, consequence, \
 initiating_event)
 
-**F01 — Magnetism**
-Magnet sprites appear, elements drift toward each other.
+**R1 — Magnetism**
+Magnet sprites appear, elements drift toward each other. \
 Scaffolds "both should be mentioned" — coordinating conjunctions.
 
-**F02 — Wind**
-Gust pushes an element away with sweeping wind lines.
-Scaffolds "this element doesn't belong" — subordination.
+**R2 — Repel**
+Two elements push apart from each other, like same-polarity magnets. \
+Exact symmetric of Magnetism (R1). \
+Scaffolds incorrect grouping — "A and B went home" but only A left.
 
-**F03 — Causal Push**
-Element A rushes toward element B + impact burst at collision.
+**R3 — Causal Push**
+Element A rushes toward element B + impact burst at collision. \
 Scaffolds "A causes B" — consequence, causal connectors (because, so).
 
-## G — QUANTITY (applies to any MISL element for count errors)
+## Q — QUANTITY (applies to any MISL element for count errors)
 
-**G01 — Bonk**
-Redundant elements collide with star particles, bounce back.
+**Q1 — Bonk**
+Redundant elements collide with star particles, bounce back. \
 Scaffolds excess — "too many."
 
-**G02 — Sequential Glow**
-Entities glow/pulse in sequence with delay. Visual counting.
+**Q2 — Sequential Glow**
+Entities glow/pulse in sequence with delay. Visual counting. \
 Scaffolds "there are several elements."
 
-**G03 — Ghost Outline**
-Faint dotted outline where a missing entity should be, dissolves to nothing.
+**Q3 — Ghost Outline**
+Faint dotted outline where a missing entity should be, dissolves to nothing. \
 Scaffolds absence — "something required is missing."
 
-## H — DISCOURSE (MISL: linguistic_verbs, mental_verbs, plan)
+## D — DISCOURSE (MISL: linguistic_verbs, mental_verbs, plan, \
+grammaticality, tense, initiating_event, internal_response)
 
-**H01 — Speech Bubble**
+**D1 — Speech Bubble**
 Pixelated speech bubble with "..." or a keyword, positioned above the \
-character. Temporary sprite (rounded rectangle + tail pointing down).
+character. Temporary sprite (rounded rectangle + tail pointing down). \
 Scaffolds dialogue and direct speech (linguistic_verbs).
 
-**H02 — Thought Bubble**
+**D2 — Thought Bubble**
 Pixelated thought bubble (round, linked bubbles) with "..." or symbol. \
-Temporary sprite.
+Temporary sprite. \
 Scaffolds Internal Response and Plan (mental_verbs).
+
+**D3 — Alert**
+"!" sprite above entity. Temporary sprite. Signals that an important event \
+just happened for this entity, or that the entity is reacting to something. \
+Scaffolds Initiating Event (IE) and Internal Response (IR).
+
+**D4 — Interjection**
+Comic-style burst displaying the problematic word with "?". Temporary sprite. \
+This is the ONLY animation that displays text from the child's speech. \
+All other animations operate exclusively on visual scene elements. \
+The displayed text is STRICTLY limited to the problematic word or word group, \
+never the full sentence. Example: "RUNNED?" yes, "The fox runned to the tree?" no. \
+Positioned at the top of the scene, centered. Size adapts to text length. \
+The problematic word comes from the `problematic_segment` field in the prompt. \
+Scaffolds Grammaticality (G) and Tense (T).
 
 # Documented Combinations
 
 You can chain or superpose multiple animation types within a single \
 animate function:
-- Plan: C02 (anticipation) + H02 (thought bubble)
-- Missing consequence: F03 (causal push) + G03 (ghost outline)
-- Internal Response: B03 (emanation with emotion particles) or H02 with symbol
-- Initiating Event: C01 (motion lines) + F03 (causal push)
+- Plan: A2 (anticipation) + D2 (thought bubble)
+- Missing consequence: R3 (causal push) + Q3 (ghost outline)
+- Internal Response: P2 (emanation with emotion particles) or D2 with symbol
+- Initiating Event: A1 (motion lines) + R3 (causal push) or D3 (alert)
 
 # Temporary Sprites (temp_sprites)
 
@@ -161,18 +175,18 @@ Each entry is a sprite_code entry with JS code using the drawing primitives:
 
 Example temp_sprites for a speech bubble at (200, 40):
 ```
-"temp_sprites": {
+"temp_sprites": {{
   "bubble_01": "rect(190,30,30,18,255,255,255,'bubble_01.bg');\\n\
 tri(200,48,205,48,202,53,255,255,255,'bubble_01.tail');\\n\
 // text content drawn with px() calls..."
-}
+}}
 ```
 
 The temp_sprites are rendered into the scene BEFORE the animation plays, \
 and removed when the animation ends. Your animation code can target \
 temp_sprite entity IDs just like regular entities.
 
-Animations that typically use temp_sprites: B03, A03, H01, H02.
+Animations that typically use temp_sprites: I2, P2, D1, D2, D3, D4.
 
 # Pixel Buffer Format (for animation code)
 
@@ -197,7 +211,7 @@ Return ONLY valid JSON (no markdown fences, no commentary):
 
 ```
 {{
-  "animation_id": "<ID from grammar, e.g. A01, B03+H02>",
+  "animation_id": "<ID from grammar, e.g. I1, P2+D2>",
   "code": "function animate(buf, PW, PH, t) {{ ... }}",
   "duration_ms": <integer, 1000-2000>,
   "temp_sprites": {{
@@ -207,7 +221,7 @@ Return ONLY valid JSON (no markdown fences, no commentary):
 ```
 
 The `temp_sprites` field is OPTIONAL — only include it for animations \
-that need temporary visual elements (A03, B03, H01, H02, combinations).
+that need temporary visual elements (I2, P2, D1, D2, D3, D4, combinations).
 
 # Student profile awareness
 
@@ -235,7 +249,7 @@ Entity/sub-entity: {target_id}
 MISL element: {misl_element}
 Eligible animations: {eligible_animations}
 Context: the child failed to adequately describe this aspect of the entity.
-
+{problematic_segment_section}
 # Entity details from manifest
 {entity_details}
 
