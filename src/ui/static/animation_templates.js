@@ -702,8 +702,10 @@ AnimationTemplates.register('nametag', function(params) {
         var drawY = tagY + ly;
         if (drawX < 0 || drawX >= PW || drawY < 0 || drawY >= PH) continue;
 
-        // Round corners: skip outermost pixels at each corner
-        if ((ly === 0 || ly === labelH - 1) && (lx === 0 || lx === labelW - 1)) continue; // skip exact corners
+        // Round corners: diagonal notch at each corner (Manhattan distance < 3)
+        var cxDist = Math.min(lx, labelW - 1 - lx);
+        var cyDist = Math.min(ly, labelH - 1 - ly);
+        if (cxDist + cyDist < 3) continue;
 
         var di = drawY * PW + drawX;
         var isBorder = (ly === 0 || ly === labelH - 1 || lx === 0 || lx === labelW - 1);
