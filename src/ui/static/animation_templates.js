@@ -1095,67 +1095,160 @@ AnimationTemplates.register('emanation', function(params) {
 }, 3000);
 
 // ── T1: Flashback ──
-// Target desaturates briefly (palette swap to grey) then re-saturates.
-// Differs from Color Pop: HERE the target ITSELF loses its colors.
+// Old film effect: entire scene goes B&W with projector flicker,
+// vertical scratch lines, and dust specks — like a silent-era film reel.
 // Scaffolds past tense — "this already happened."
 AnimationTemplates.register('flashback', function(params) {
-  var prefix = params.entityPrefix || '';
 
   return function animate(buf, PW, PH, t) {
-    // Envelope: desaturate 0→1 (0-0.3), hold (0.3-0.7), re-saturate 1→0 (0.7-1)
+    // Envelope: fade to B&W (0→0.08), hold (0.08→0.92), fade back (0.92→1)
     var desat;
-    if (t < 0.3) desat = t / 0.3;
-    else if (t < 0.7) desat = 1;
-    else desat = 1 - (t - 0.7) / 0.3;
+    if (t < 0.08) desat = t / 0.08;
+    else if (t < 0.92) desat = 1;
+    else desat = 1 - (t - 0.92) / 0.08;
 
-    if (desat < 0.01) return;
+    // Projector brightness flicker (pseudo-random per frame)
+    var frame = Math.floor(t * 180); // ~60fps × 3s
+    var flickSeed = (frame * 16807 + 12345) % 2147483647;
+    var flick = 1.0 + ((flickSeed % 1000) / 1000 - 0.5) * 0.08 * desat; // ±4%
 
+    // Desaturate ALL pixels + apply flicker
     for (var i = 0; i < buf.length; i++) {
-      if (buf[i].e === prefix || buf[i].e.startsWith(prefix + '.')) {
-        var L = Math.round(buf[i]._r * 0.299 + buf[i]._g * 0.587 + buf[i]._b * 0.114);
-        buf[i].r = Math.round(buf[i]._r * (1 - desat) + L * desat);
-        buf[i].g = Math.round(buf[i]._g * (1 - desat) + L * desat);
-        buf[i].b = Math.round(buf[i]._b * (1 - desat) + L * desat);
+      var L = buf[i]._r * 0.299 + buf[i]._g * 0.587 + buf[i]._b * 0.114;
+      var r = buf[i]._r * (1 - desat) + L * desat;
+      var g = buf[i]._g * (1 - desat) + L * desat;
+      var b = buf[i]._b * (1 - desat) + L * desat;
+      buf[i].r = _clamp(Math.round(r * flick), 0, 255);
+      buf[i].g = _clamp(Math.round(g * flick), 0, 255);
+      buf[i].b = _clamp(Math.round(b * flick), 0, 255);
+    }
+
+    if (desat < 0.3) return; // artifacts only when sufficiently B&W
+    var alpha = Math.min((desat - 0.3) / 0.2, 1); // fade artifacts in
+
+    // --- Vertical scratch lines ---
+    // Change scratches every ~3 frames for a flickering look
+    var scratchGroup = Math.floor(frame / 3);
+    var seed = (scratchGroup * 7919 + 31337) % 2147483647;
+    function rng() { seed = (seed * 16807 + 31) % 2147483647; return (seed & 0x7fffffff) / 0x7fffffff; }
+
+    var numScratches = 1 + Math.floor(rng() * 3); // 1-3 scratches
+    for (var s = 0; s < numScratches; s++) {
+      var sx = Math.floor(rng() * PW);
+      var scratchW = rng() < 0.7 ? 1 : 2; // mostly 1px wide
+      var scratchA = (0.25 + rng() * 0.45) * alpha;
+      var yStart = Math.floor(rng() * PH * 0.15);
+      var yEnd = PH - Math.floor(rng() * PH * 0.15);
+      var wobbleAmp = rng() * 1.5;
+      var wobbleFreq = 3 + rng() * 4;
+
+      for (var y = yStart; y < yEnd; y++) {
+        var wx = sx + Math.round(wobbleAmp * Math.sin(y / PH * wobbleFreq * Math.PI));
+        for (var w = 0; w < scratchW; w++) {
+          var px = wx + w;
+          if (px >= 0 && px < PW) {
+            var idx = y * PW + px;
+            buf[idx].r = Math.round(buf[idx].r * (1 - scratchA));
+            buf[idx].g = Math.round(buf[idx].g * (1 - scratchA));
+            buf[idx].b = Math.round(buf[idx].b * (1 - scratchA));
+          }
+        }
+      }
+    }
+
+    // --- Dust specks / black spots ---
+    seed = (scratchGroup * 3571 + 99991) % 2147483647;
+    var numSpecks = 4 + Math.floor(rng() * 8); // 4-11 specks per window
+    for (var d = 0; d < numSpecks; d++) {
+      var dx = Math.floor(rng() * PW);
+      var dy = Math.floor(rng() * PH);
+      var speckR = 1 + Math.floor(rng() * 2); // 1-2px radius
+      var speckA = (0.35 + rng() * 0.4) * alpha;
+
+      for (var sy = -speckR; sy <= speckR; sy++) {
+        for (var sxx = -speckR; sxx <= speckR; sxx++) {
+          if (sxx * sxx + sy * sy <= speckR * speckR) {
+            var py = dy + sy, pxx = dx + sxx;
+            if (py >= 0 && py < PH && pxx >= 0 && pxx < PW) {
+              var si = py * PW + pxx;
+              buf[si].r = Math.round(buf[si].r * (1 - speckA));
+              buf[si].g = Math.round(buf[si].g * (1 - speckA));
+              buf[si].b = Math.round(buf[si].b * (1 - speckA));
+            }
+          }
+        }
       }
     }
   };
-}, 1500);
+}, 3000);
 
 // ── T2: Timelapse ──
 AnimationTemplates.register('timelapse', function(params) {
-  var cycles = _clamp(params.cycles || 2, 1, 4);
-  var ps = new ParticleSystem(ParticlePresets.sparkle);
-  var lastPhase = -1;
+  // Two full day-night cycles: day→night→day→night→day
+  // 4 transitions × 1s each = 4s total. No lingering on night.
+  // Each keyframe: { t, mult, tintR, tintG, tintB }
+  // Pixel formula: out = clamp(_original * mult + tint, 0, 255)
+  var keyframes = [
+    { t: 0.000, mult: 1.00, tintR:   0, tintG:   0, tintB:   0 }, // day
+    { t: 0.125, mult: 0.70, tintR:  60, tintG:  18, tintB:  38 }, // dusk (rose)
+    { t: 0.250, mult: 0.22, tintR:  10, tintG:   8, tintB:  52 }, // night
+    { t: 0.375, mult: 0.50, tintR:  12, tintG:  22, tintB:  88 }, // dawn (light blue)
+    { t: 0.500, mult: 1.00, tintR:   0, tintG:   0, tintB:   0 }, // day
+    { t: 0.625, mult: 0.70, tintR:  60, tintG:  18, tintB:  38 }, // dusk (rose)
+    { t: 0.750, mult: 0.22, tintR:  10, tintG:   8, tintB:  52 }, // night
+    { t: 0.875, mult: 0.50, tintR:  12, tintG:  22, tintB:  88 }, // dawn (light blue)
+    { t: 1.000, mult: 1.00, tintR:   0, tintG:   0, tintB:   0 }, // day
+  ];
+
+  var isIndoor = !!params.isIndoor;
+  // Two particle systems for the two night phases
+  var ps1 = isIndoor ? null : new ParticleSystem(ParticlePresets.sparkle);
+  var ps2 = isIndoor ? null : new ParticleSystem(ParticlePresets.sparkle);
+  var stars1Spawned = false;
+  var stars2Spawned = false;
 
   return function animate(buf, PW, PH, t) {
-    // Sine wave: 0 = day, 1 = night
-    var phase = 0.5 - 0.5 * Math.cos(t * Math.PI * 2 * cycles);
-
-    // Night tint: shift all pixels toward dark blue
-    for (var i = 0; i < buf.length; i++) {
-      var nightR = Math.round(buf[i]._r * (1 - phase * 0.7) + 20 * phase);
-      var nightG = Math.round(buf[i]._g * (1 - phase * 0.7) + 15 * phase);
-      var nightB = Math.round(buf[i]._b * (1 - phase * 0.5) + 60 * phase);
-      buf[i].r = _clamp(nightR, 0, 255);
-      buf[i].g = _clamp(nightG, 0, 255);
-      buf[i].b = _clamp(nightB, 0, 255);
-    }
-
-    // Stars during dark phases (phase > 0.6)
-    if (phase > 0.6) {
-      var currentPhaseIdx = Math.floor(t * cycles * 2);
-      if (currentPhaseIdx !== lastPhase) {
-        // Spawn new stars batch
-        for (var s = 0; s < 8; s++) {
-          ps.spawn(Math.random() * PW, Math.random() * PH * 0.4);
-        }
-        lastPhase = currentPhaseIdx;
+    // Find surrounding keyframes and interpolate linearly
+    var kA = keyframes[0], kB = keyframes[keyframes.length - 1];
+    for (var k = 0; k < keyframes.length - 1; k++) {
+      if (t >= keyframes[k].t && t <= keyframes[k + 1].t) {
+        kA = keyframes[k];
+        kB = keyframes[k + 1];
+        break;
       }
     }
-    ps.update(1 / 60);
-    ps.draw(buf, PW, PH);
+    var span = kB.t - kA.t;
+    var f = span > 0 ? (t - kA.t) / span : 1;
+
+    var mult  = kA.mult  + (kB.mult  - kA.mult)  * f;
+    var tintR = kA.tintR + (kB.tintR - kA.tintR) * f;
+    var tintG = kA.tintG + (kB.tintG - kA.tintG) * f;
+    var tintB = kA.tintB + (kB.tintB - kA.tintB) * f;
+
+    for (var i = 0; i < buf.length; i++) {
+      buf[i].r = _clamp(Math.round(buf[i]._r * mult + tintR), 0, 255);
+      buf[i].g = _clamp(Math.round(buf[i]._g * mult + tintG), 0, 255);
+      buf[i].b = _clamp(Math.round(buf[i]._b * mult + tintB), 0, 255);
+    }
+
+    // Stars (sparkle preset) only for outdoor scenes, during both night phases
+    if (!isIndoor) {
+      // Night 1: ~t 0.15 → 0.40
+      if (t >= 0.15 && !stars1Spawned) {
+        for (var s = 0; s < 12; s++) ps1.spawn(Math.random() * PW, Math.random() * PH * 0.35);
+        stars1Spawned = true;
+      }
+      if (t >= 0.15 && t <= 0.40) { ps1.update(1 / 60); ps1.draw(buf, PW, PH); }
+
+      // Night 2: ~t 0.65 → 0.90
+      if (t >= 0.65 && !stars2Spawned) {
+        for (var s = 0; s < 12; s++) ps2.spawn(Math.random() * PW, Math.random() * PH * 0.35);
+        stars2Spawned = true;
+      }
+      if (t >= 0.65 && t <= 0.90) { ps2.update(1 / 60); ps2.draw(buf, PW, PH); }
+    }
   };
-}, 2000);
+}, 4000);
 
 // ── A1: Motion Lines ──
 // Fast burst movements with pauses between. Direction coherent with entity
@@ -1163,9 +1256,9 @@ AnimationTemplates.register('timelapse', function(params) {
 AnimationTemplates.register('motion_lines', function(params) {
   var prefix = params.entityPrefix || '';
   var dir = params.direction || 'right';   // 'left', 'right', 'any'
-  var lineCount = _clamp(params.lineCount || 7, 4, 10);
   var lineLen = _clamp(params.lineLength || 20, 10, 30);
   var amp = _clamp(params.amplitude || 10, 5, 15);
+  var MAX_LINES = 60;
 
   // Streak colors: alternating grey shades
   var streakColors = [
@@ -1178,17 +1271,19 @@ AnimationTemplates.register('motion_lines', function(params) {
     [130, 130, 130],  // medium grey
   ];
 
-  // Pre-generate per-streak variation (seeded by lineCount for determinism)
+  // Pre-generate per-streak variation: spacing 5-15px, random length, some thin
   var streakVariation = [];
   var _sv = 12345;
-  for (var sv = 0; sv < lineCount; sv++) {
+  for (var sv = 0; sv < MAX_LINES; sv++) {
+    _sv = (_sv * 16807 + 31) % 2147483647;
+    var gap = 5 + (_sv % 11);                        // 5–15px spacing
     _sv = (_sv * 16807 + 31) % 2147483647;
     var lenMult = 0.5 + (_sv % 1000) / 1000 * 1.0;  // 0.5× to 1.5× length
     _sv = (_sv * 16807 + 31) % 2147483647;
-    var posJitter = ((_sv % 1000) / 500 - 1.0) * 0.12; // ±12% sampling offset
+    var thin = (_sv % 3 === 0);                      // ~1/3 are 1px thin lines
     _sv = (_sv * 16807 + 31) % 2147483647;
-    var thickBonus = (_sv % 3 === 0) ? 1 : 0; // some streaks 1px thicker
-    streakVariation.push({ lenMult: lenMult, posJitter: posJitter, thickBonus: thickBonus });
+    var alphaScale = thin ? (0.4 + (_sv % 1000) / 1000 * 0.3) : 1.0;
+    streakVariation.push({ gap: gap, lenMult: lenMult, thin: thin, alphaScale: alphaScale });
   }
 
   // Build burst patterns based on direction mode
@@ -1305,46 +1400,45 @@ AnimationTemplates.register('motion_lines', function(params) {
         trailingPts.sort(function(a, b2) { return a.x - b2.x; });
       }
 
-      // Fallback to bounding box if no silhouette points
-      if (trailingPts.length < lineCount) {
+      // Fallback to bounding box if no silhouette points (1px steps = dense coverage)
+      if (trailingPts.length < 3) {
         trailingPts = [];
-        for (var l = 0; l < lineCount; l++) {
-          if (Math.abs(bDx) >= Math.abs(bDy)) {
-            trailingPts.push({
-              x: bDx > 0 ? bounds.x1 : bounds.x2,
-              y: bounds.y1 + ((l + 0.5) / lineCount) * (bounds.y2 - bounds.y1)
-            });
-          } else {
-            trailingPts.push({
-              x: bounds.x1 + ((l + 0.5) / lineCount) * (bounds.x2 - bounds.x1),
-              y: bDy > 0 ? bounds.y1 : bounds.y2
-            });
+        var entityH = bounds.y2 - bounds.y1;
+        var entityW = bounds.x2 - bounds.x1;
+        if (Math.abs(bDx) >= Math.abs(bDy)) {
+          for (var fy = 0; fy <= entityH; fy++) {
+            trailingPts.push({ x: bDx > 0 ? bounds.x1 : bounds.x2, y: bounds.y1 + fy });
+          }
+        } else {
+          for (var fx = 0; fx <= entityW; fx++) {
+            trailingPts.push({ x: bounds.x1 + fx, y: bDy > 0 ? bounds.y1 : bounds.y2 });
           }
         }
       }
 
-      // Sample lineCount irregularly-spaced contour points
-      for (var l = 0; l < lineCount; l++) {
-        var sv2 = streakVariation[l];
-        // Jittered sampling position along contour
-        var basePos = (l + 0.5) / lineCount + sv2.posJitter;
-        basePos = Math.max(0.02, Math.min(0.98, basePos));
-        var ptIdx = Math.floor(basePos * trailingPts.length);
-        ptIdx = Math.min(ptIdx, trailingPts.length - 1);
+      // Walk contour with pixel-based spacing (5–15px per line)
+      var ptIdx = 0;
+      var lineIdx = 0;
+      while (ptIdx < trailingPts.length && lineIdx < MAX_LINES) {
+        var sv2 = streakVariation[lineIdx];
         var pt = trailingPts[ptIdx];
         var startX = pt.x + shiftX;
         var startY = pt.y + shiftY;
 
-        var sc = streakColors[l % streakColors.length];
-        // Variable streak length per line
+        var sc = streakColors[lineIdx % streakColors.length];
         var curLen = Math.round(lineLen * sv2.lenMult * (0.6 + burstProgress * 0.4));
+        var lineAlpha = streakAlpha * sv2.alphaScale;
 
         for (var d = 0; d < curLen; d++) {
           var fadeD = 1 - d / curLen;
-          var dAlpha = streakAlpha * fadeD;
-          // Taper width: 3-4px near entity, 2-3px mid, 1px at end (with per-streak bonus)
-          var baseThick = d < curLen * 0.3 ? 3 : (d < curLen * 0.7 ? 2 : 1);
-          var thickness = baseThick + (d < curLen * 0.5 ? sv2.thickBonus : 0);
+          var dAlpha = lineAlpha * fadeD;
+          // Thin lines stay 1px; normal lines taper 3→2→1
+          var thickness;
+          if (sv2.thin) {
+            thickness = 1;
+          } else {
+            thickness = d < curLen * 0.3 ? 3 : (d < curLen * 0.7 ? 2 : 1);
+          }
           var halfT = Math.floor(thickness / 2);
 
           for (var tw = -halfT; tw <= halfT; tw++) {
@@ -1358,6 +1452,9 @@ AnimationTemplates.register('motion_lines', function(params) {
             }
           }
         }
+
+        ptIdx += sv2.gap;
+        lineIdx++;
       }
     }
   };
@@ -1733,9 +1830,18 @@ AnimationTemplates.register('ghost_outline', function(params) {
 AnimationTemplates.register('magnetism', function(params) {
   var prefixA = params.entityPrefixA || params.entityPrefix || '';
   var prefixB = params.entityPrefixB || '';
-  var attractPx = _clamp(params.attractPixels || 10, 2, 25);
-  var ps = new ParticleSystem(ParticlePresets.sparkle);
+  // Bigger sparkles: size 3, more spread, longer life
+  var ps = new ParticleSystem({
+    color: [255, 255, 200], size: 3,
+    maxAge: 0.45, gravity: 0, drag: 0.8,
+    spreadX: 8, spreadY: 8,
+    vx: 0, vy: 0, vxJitter: 20, vyJitter: 20,
+    fadeIn: 0.05, fadeOut: 0.4, flicker: true,
+  });
   var sparkled = false;
+  // Cached diagonal movement data (computed once on first frame)
+  var cachedMoveA = null, cachedMoveB = null;
+  var cachedNdx = 0, cachedNdy = 0; // unit direction A→B
 
   return function animate(buf, PW, PH, t) {
     var boundsA = _computeEntityBounds(buf, PW, prefixA);
@@ -1745,59 +1851,131 @@ AnimationTemplates.register('magnetism', function(params) {
     var pixelsA = _collectEntityPixels(buf, PW, prefixA);
     var pixelsB = _collectEntityPixels(buf, PW, prefixB);
 
-    var dirAB = boundsB.cx > boundsA.cx ? 1 : -1;
-    var dxA = 0, dxB = 0;
+    // Compute diagonal contour gap on first frame (cached for subsequent frames)
+    if (cachedMoveA === null) {
+      var aCx0 = boundsA.cx, aCy0 = boundsA.cy;
+      var bCx0 = boundsB.cx, bCy0 = boundsB.cy;
+      var ddx = bCx0 - aCx0, ddy = bCy0 - aCy0;
+      var centerDist = Math.sqrt(ddx * ddx + ddy * ddy);
+      if (centerDist < 1) centerDist = 1;
+      cachedNdx = ddx / centerDist;
+      cachedNdy = ddy / centerDist;
+
+      // Project entity A pixels onto A→B axis, find max forward extent from A center
+      var maxProjA = 0;
+      for (var j = 0; j < pixelsA.length; j++) {
+        var proj = (pixelsA[j].x - aCx0) * cachedNdx + (pixelsA[j].y - aCy0) * cachedNdy;
+        if (proj > maxProjA) maxProjA = proj;
+      }
+      // Project entity B pixels onto B→A axis, find max forward extent from B center
+      var maxProjB = 0;
+      for (var j = 0; j < pixelsB.length; j++) {
+        var proj = (pixelsB[j].x - bCx0) * (-cachedNdx) + (pixelsB[j].y - bCy0) * (-cachedNdy);
+        if (proj > maxProjB) maxProjB = proj;
+      }
+
+      // Gap along axis = center distance - forward extents of both entities
+      var gap = centerDist - maxProjA - maxProjB;
+      var contactDist = Math.max(0, gap);
+      cachedMoveA = contactDist / 2;
+      cachedMoveB = contactDist / 2;
+    }
+
+    var dxA = 0, dyA = 0, dxB = 0, dyB = 0;
 
     if (t < 0.4) {
-      // Attract toward each other
+      // Attract toward each other (diagonal)
       var progress = t / 0.4;
-      dxA = Math.round(attractPx / 2 * progress * dirAB);
-      dxB = Math.round(-attractPx / 2 * progress * dirAB);
+      dxA = Math.round(cachedMoveA * progress * cachedNdx);
+      dyA = Math.round(cachedMoveA * progress * cachedNdy);
+      dxB = Math.round(-cachedMoveB * progress * cachedNdx);
+      dyB = Math.round(-cachedMoveB * progress * cachedNdy);
     } else if (t < 0.7) {
-      // Hold close
-      dxA = Math.round(attractPx / 2 * dirAB);
-      dxB = Math.round(-attractPx / 2 * dirAB);
+      // Hold touching
+      dxA = Math.round(cachedMoveA * cachedNdx);
+      dyA = Math.round(cachedMoveA * cachedNdy);
+      dxB = Math.round(-cachedMoveB * cachedNdx);
+      dyB = Math.round(-cachedMoveB * cachedNdy);
 
-      // Sparkle at midpoint
+      // Sparkle at contact point (bigger burst)
       if (!sparkled) {
-        var midX = Math.round((boundsA.cx + boundsB.cx) / 2);
-        var midY = Math.round((boundsA.cy + boundsB.cy) / 2);
-        ps.burst(midX, midY, 8);
+        var midX = Math.round((boundsA.cx + dxA + boundsB.cx + dxB) / 2);
+        var midY = Math.round((boundsA.cy + dyA + boundsB.cy + dyB) / 2);
+        ps.burst(midX, midY, 20);
         sparkled = true;
       }
     } else {
-      // Drift back
+      // Drift back (diagonal)
       var release = (t - 0.7) / 0.3;
-      dxA = Math.round(attractPx / 2 * (1 - release) * dirAB);
-      dxB = Math.round(-attractPx / 2 * (1 - release) * dirAB);
+      dxA = Math.round(cachedMoveA * (1 - release) * cachedNdx);
+      dyA = Math.round(cachedMoveA * (1 - release) * cachedNdy);
+      dxB = Math.round(-cachedMoveB * (1 - release) * cachedNdx);
+      dyB = Math.round(-cachedMoveB * (1 - release) * cachedNdy);
     }
 
     _blankEntityPixels(buf, pixelsA);
     _blankEntityPixels(buf, pixelsB);
-    _redrawEntityPixels(buf, PW, PH, pixelsA, dxA, 0);
-    _redrawEntityPixels(buf, PW, PH, pixelsB, dxB, 0);
+    _redrawEntityPixels(buf, PW, PH, pixelsA, dxA, dyA);
+    _redrawEntityPixels(buf, PW, PH, pixelsB, dxB, dyB);
 
-    // Draw small magnet indicators near each entity
+    // Draw U-shaped horseshoe magnets centered on each entity, rotated to face each other
     var magnetAlpha = _easeEnvelope(t, 0.1, 0.15);
     if (magnetAlpha > 0.05) {
-      // Red pole near A, blue pole near B
-      var mxA = boundsA.cx + dxA + 4 * dirAB;
-      var myA = boundsA.cy - 5;
-      var mxB = boundsB.cx + dxB - 4 * dirAB;
-      var myB = boundsB.cy - 5;
+      // Magnet bitmap (opening RIGHT), 9w × 10h
+      // 0=transparent, 1=blue, 2=dkBlue, 3=red, 4=dkRed, 5=grey, 6=white
+      var MG = [
+        [0,0,0,0,0,0,5,6,0],
+        [0,0,2,1,1,1,5,6,0],
+        [0,2,1,1,1,1,1,0,0],
+        [2,1,1,0,0,0,0,0,0],
+        [2,1,0,0,0,0,0,0,0],
+        [4,3,0,0,0,0,0,0,0],
+        [4,3,3,0,0,0,0,0,0],
+        [0,4,3,3,3,3,3,0,0],
+        [0,0,4,3,3,3,5,6,0],
+        [0,0,0,0,0,0,5,6,0],
+      ];
+      var MGW = 9, MGH = 10;
+      // Rotation center of bitmap (center of the U gap)
+      var mcx = 3.5, mcy = 4.5;
+      var pal = [
+        null,
+        [50, 130, 230],   // 1: blue
+        [30,  80, 170],   // 2: dark blue
+        [220, 50,  70],   // 3: red
+        [160, 30,  50],   // 4: dark red
+        [140, 140, 148],  // 5: grey
+        [220, 222, 228],  // 6: white
+      ];
 
-      // Simple U-magnet shape: 3x4px
-      var magnetA = [[255,60,60],[255,60,60],[255,60,60]];
-      var magnetB = [[60,60,255],[60,60,255],[60,60,255]];
-      for (var my = 0; my < 3; my++) {
-        for (var mx = 0; mx < 3; mx++) {
-          if (my === 1 && mx === 1) continue; // U-shape hollow
-          _setPixel(buf, PW, PH,
-            mxA + mx, myA + my,
-            Math.round(magnetA[mx][0] * magnetAlpha), Math.round(magnetA[mx][1] * magnetAlpha), Math.round(magnetA[mx][2] * magnetAlpha));
-          _setPixel(buf, PW, PH,
-            mxB + mx, myB + my,
-            Math.round(magnetB[mx][0] * magnetAlpha), Math.round(magnetB[mx][1] * magnetAlpha), Math.round(magnetB[mx][2] * magnetAlpha));
+      // Compute angle from A toward B (accounts for diagonal shifting)
+      var aCx = boundsA.cx + dxA, aCy = boundsA.cy + dyA;
+      var bCx = boundsB.cx + dxB, bCy = boundsB.cy + dyB;
+      var angleA = Math.atan2(bCy - aCy, bCx - aCx); // A's opening faces B
+      var angleB = angleA + Math.PI;                    // B's opening faces A
+
+      // Draw rotated magnet at each entity center
+      for (var mgy = 0; mgy < MGH; mgy++) {
+        for (var mgx = 0; mgx < MGW; mgx++) {
+          var ci = MG[mgy][mgx];
+          if (ci === 0) continue;
+          var co = pal[ci];
+          var cr = Math.round(co[0] * magnetAlpha);
+          var cg = Math.round(co[1] * magnetAlpha);
+          var cb = Math.round(co[2] * magnetAlpha);
+          var dx = mgx - mcx, dy = mgy - mcy;
+
+          // Magnet A: centered on entity A, opening toward B
+          var cosA = Math.cos(angleA), sinA = Math.sin(angleA);
+          var rxA = Math.round(aCx + dx * cosA - dy * sinA);
+          var ryA = Math.round(aCy + dx * sinA + dy * cosA);
+          _setPixel(buf, PW, PH, rxA, ryA, cr, cg, cb);
+
+          // Magnet B: centered on entity B, opening toward A
+          var cosB = Math.cos(angleB), sinB = Math.sin(angleB);
+          var rxB = Math.round(bCx + dx * cosB - dy * sinB);
+          var ryB = Math.round(bCy + dx * sinB + dy * cosB);
+          _setPixel(buf, PW, PH, rxB, ryB, cr, cg, cb);
         }
       }
     }
@@ -1815,8 +1993,15 @@ AnimationTemplates.register('repel', function(params) {
   var prefixA = params.entityPrefixA || params.entityPrefix || '';
   var prefixB = params.entityPrefixB || '';
   var repelPx = _clamp(params.repelPixels || 12, 2, 25);
-  var ps = new ParticleSystem(ParticlePresets.sparkle);
-  var sparkled = false;
+
+  // Pre-generate zigzag bolt offsets (deterministic)
+  var _seed = 42;
+  function _srand() { _seed = (_seed * 16807) % 2147483647; return (_seed & 0xffff) / 0xffff; }
+  var boltSegments = 7; // number of zigzag points between endpoints
+  var boltOffsets = [];  // perpendicular offsets for each interior point
+  for (var i = 0; i < boltSegments; i++) {
+    boltOffsets.push((_srand() - 0.5) * 16); // ±8px perpendicular jitter
+  }
 
   return function animate(buf, PW, PH, t) {
     var boundsA = _computeEntityBounds(buf, PW, prefixA);
@@ -1826,45 +2011,124 @@ AnimationTemplates.register('repel', function(params) {
     var pixelsA = _collectEntityPixels(buf, PW, prefixA);
     var pixelsB = _collectEntityPixels(buf, PW, prefixB);
 
-    var dirAB = boundsB.cx > boundsA.cx ? 1 : -1;
-    var dxA = 0, dxB = 0;
+    // Direction unit vector from A toward B (diagonal axis)
+    var ddx = boundsB.cx - boundsA.cx, ddy = boundsB.cy - boundsA.cy;
+    var dist = Math.sqrt(ddx * ddx + ddy * ddy);
+    if (dist < 1) dist = 1;
+    var ndx = ddx / dist, ndy = ddy / dist;
+    // Perpendicular vector
+    var pnx = -ndy, pny = ndx;
+
+    var dxA = 0, dyA = 0, dxB = 0, dyB = 0;
 
     if (t < 0.1) {
-      // Brief attract (tension)
+      // Brief attract (tension) — diagonal
       var attract = t / 0.1;
-      dxA = Math.round(2 * attract * dirAB);
-      dxB = Math.round(-2 * attract * dirAB);
+      dxA = Math.round(2 * attract * ndx);
+      dyA = Math.round(2 * attract * ndy);
+      dxB = Math.round(-2 * attract * ndx);
+      dyB = Math.round(-2 * attract * ndy);
     } else if (t < 0.4) {
-      // Push apart
+      // Push apart — diagonal (away from each other)
       var progress = (t - 0.1) / 0.3;
-      dxA = Math.round(-repelPx / 2 * progress * dirAB);
-      dxB = Math.round(repelPx / 2 * progress * dirAB);
-
-      // Sparkle at midpoint
-      if (!sparkled && t > 0.15) {
-        var midX = Math.round((boundsA.cx + boundsB.cx) / 2);
-        var midY = Math.round((boundsA.cy + boundsB.cy) / 2);
-        ps.burst(midX, midY, 8);
-        sparkled = true;
-      }
+      dxA = Math.round(-repelPx / 2 * progress * ndx);
+      dyA = Math.round(-repelPx / 2 * progress * ndy);
+      dxB = Math.round(repelPx / 2 * progress * ndx);
+      dyB = Math.round(repelPx / 2 * progress * ndy);
     } else if (t < 0.7) {
-      // Hold apart
-      dxA = Math.round(-repelPx / 2 * dirAB);
-      dxB = Math.round(repelPx / 2 * dirAB);
+      // Hold apart — diagonal
+      dxA = Math.round(-repelPx / 2 * ndx);
+      dyA = Math.round(-repelPx / 2 * ndy);
+      dxB = Math.round(repelPx / 2 * ndx);
+      dyB = Math.round(repelPx / 2 * ndy);
     } else {
-      // Drift back
+      // Drift back — diagonal
       var release = (t - 0.7) / 0.3;
-      dxA = Math.round(-repelPx / 2 * (1 - release) * dirAB);
-      dxB = Math.round(repelPx / 2 * (1 - release) * dirAB);
+      dxA = Math.round(-repelPx / 2 * (1 - release) * ndx);
+      dyA = Math.round(-repelPx / 2 * (1 - release) * ndy);
+      dxB = Math.round(repelPx / 2 * (1 - release) * ndx);
+      dyB = Math.round(repelPx / 2 * (1 - release) * ndy);
     }
 
     _blankEntityPixels(buf, pixelsA);
     _blankEntityPixels(buf, pixelsB);
-    _redrawEntityPixels(buf, PW, PH, pixelsA, dxA, 0);
-    _redrawEntityPixels(buf, PW, PH, pixelsB, dxB, 0);
+    _redrawEntityPixels(buf, PW, PH, pixelsA, dxA, dyA);
+    _redrawEntityPixels(buf, PW, PH, pixelsB, dxB, dyB);
 
-    ps.update(1 / 60);
-    ps.draw(buf, PW, PH);
+    // ── Lightning bolt between entities ──
+    // Visible from t=0.08 (just before repel) to t=0.30, peak brightness at t=0.12
+    var boltStart = 0.08, boltPeak = 0.12, boltEnd = 0.30;
+    if (t >= boltStart && t <= boltEnd) {
+      var boltAlpha;
+      if (t < boltPeak) {
+        boltAlpha = (t - boltStart) / (boltPeak - boltStart); // fade in
+      } else {
+        boltAlpha = 1 - (t - boltPeak) / (boltEnd - boltPeak); // fade out
+      }
+      boltAlpha = Math.max(0, Math.min(1, boltAlpha));
+
+      // Endpoints: entity centers (with current displacement)
+      var ax = boundsA.cx + dxA, ay = boundsA.cy + dyA;
+      var bx = boundsB.cx + dxB, by = boundsB.cy + dyB;
+
+      // Build zigzag path from A to B
+      var pts = [{x: ax, y: ay}];
+      for (var s = 0; s < boltSegments; s++) {
+        var frac = (s + 1) / (boltSegments + 1);
+        var mx = ax + (bx - ax) * frac;
+        var my = ay + (by - ay) * frac;
+        // Perpendicular offset for zigzag
+        mx += pnx * boltOffsets[s];
+        my += pny * boltOffsets[s];
+        pts.push({x: Math.round(mx), y: Math.round(my)});
+      }
+      pts.push({x: bx, y: by});
+
+      // Draw each segment as a thick bright line (core + glow)
+      for (var seg = 0; seg < pts.length - 1; seg++) {
+        var x0 = pts[seg].x, y0 = pts[seg].y;
+        var x1 = pts[seg + 1].x, y1 = pts[seg + 1].y;
+        var sdx = x1 - x0, sdy = y1 - y0;
+        var slen = Math.max(1, Math.sqrt(sdx * sdx + sdy * sdy));
+        var steps = Math.ceil(slen);
+
+        for (var st = 0; st <= steps; st++) {
+          var f = st / steps;
+          var px = Math.round(x0 + sdx * f);
+          var py = Math.round(y0 + sdy * f);
+
+          // Glow (2px radius, blue-white tint)
+          for (var gy = -2; gy <= 2; gy++) {
+            for (var gx = -2; gx <= 2; gx++) {
+              if (gx * gx + gy * gy > 5) continue; // rough circle
+              var fx = px + gx, fy = py + gy;
+              if (fx < 0 || fx >= PW || fy < 0 || fy >= PH) continue;
+              var gi = fy * PW + fx;
+              var gAlpha = boltAlpha * 0.3;
+              buf[gi].r = Math.min(255, Math.round(buf[gi].r * (1 - gAlpha) + 180 * gAlpha));
+              buf[gi].g = Math.min(255, Math.round(buf[gi].g * (1 - gAlpha) + 200 * gAlpha));
+              buf[gi].b = Math.min(255, Math.round(buf[gi].b * (1 - gAlpha) + 255 * gAlpha));
+            }
+          }
+
+          // Core (1px, bright white-yellow)
+          if (px >= 0 && px < PW && py >= 0 && py < PH) {
+            var ci = py * PW + px;
+            buf[ci].r = Math.min(255, Math.round(buf[ci].r * (1 - boltAlpha) + 255 * boltAlpha));
+            buf[ci].g = Math.min(255, Math.round(buf[ci].g * (1 - boltAlpha) + 255 * boltAlpha));
+            buf[ci].b = Math.min(255, Math.round(buf[ci].b * (1 - boltAlpha) + 220 * boltAlpha));
+          }
+          // Second core pixel perpendicular for thickness
+          var px2 = px + Math.round(pnx * 0.5), py2 = py + Math.round(pny * 0.5);
+          if (px2 >= 0 && px2 < PW && py2 >= 0 && py2 < PH) {
+            var ci2 = py2 * PW + px2;
+            buf[ci2].r = Math.min(255, Math.round(buf[ci2].r * (1 - boltAlpha) + 255 * boltAlpha));
+            buf[ci2].g = Math.min(255, Math.round(buf[ci2].g * (1 - boltAlpha) + 255 * boltAlpha));
+            buf[ci2].b = Math.min(255, Math.round(buf[ci2].b * (1 - boltAlpha) + 220 * boltAlpha));
+          }
+        }
+      }
+    }
   };
 }, 1500);
 
