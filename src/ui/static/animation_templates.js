@@ -669,9 +669,28 @@ AnimationTemplates.register('nametag', function(params) {
     var holeScreenX = tagX + holeCenterLx;
     var holeScreenY = tagY + holeCenterLy;
 
-    // String endpoint: closest point on entity edge
-    var stringEndX = offsetRight ? bounds.x2 : bounds.x1;
-    var stringEndY = bounds.cy;
+    // String endpoint: actual entity contour pixel via horizontal ray-cast
+    var stringDirX = offsetRight ? 1 : -1;
+    var rayCY = Math.round(bounds.cy);
+    var rayStartX = Math.round(bounds.cx);
+    var stringEndX = rayStartX, stringEndY = rayCY;
+    var rayFoundEntity = false;
+    for (var rd = 1; rd <= Math.ceil(Math.max(bounds.x2 - bounds.cx, bounds.cx - bounds.x1)) + 2; rd++) {
+      var rtx = rayStartX + stringDirX * rd;
+      if (rtx < 0 || rtx >= PW) break;
+      var rti = rayCY * PW + rtx;
+      if (buf[rti].e && buf[rti].e.startsWith(prefix)) {
+        stringEndX = rtx; stringEndY = rayCY;
+        rayFoundEntity = true;
+      } else if (rayFoundEntity) {
+        break;
+      }
+    }
+    // Fall back to bounding box edge if ray found nothing
+    if (!rayFoundEntity) {
+      stringEndX = offsetRight ? bounds.x2 : bounds.x1;
+      stringEndY = rayCY;
+    }
 
     // Draw the undulating red string from hole to entity edge (only string moves)
     var stringDx = stringEndX - holeScreenX;
@@ -773,38 +792,135 @@ AnimationTemplates.register('nametag', function(params) {
   };
 }, 3000);
 
-// ── S2: Settle ──
-AnimationTemplates.register('settle', function(params) {
+// ── S2: Stamp ──
+// Phase 1 (0→0.667): entity lifts diagonally (up-right), black silhouette at original position.
+// Phase 2 (0.667→0.833): sharp ease-in snap back to original, no bounce.
+// Phase 3 (0.833→1.0): crack lines radiate from all around the entity contour, then fade.
+AnimationTemplates.register('stamp', function(params) {
   var prefix = params.entityPrefix || '';
-  var dropPx = _clamp(params.dropPixels || 8, 1, 20);
-  var bounces = _clamp(params.bounceCount || 3, 1, 6);
+  var maxLift = params.liftPixels || 22;
+  // Diagonal direction: up-right (negative dy, positive dx)
+  var liftDY = -maxLift;
+  var liftDX = Math.round(maxLift * 0.7);
 
   return function animate(buf, PW, PH, t) {
-    var offset = Math.round(dropPx * Math.sin(t * Math.PI * bounces) * (1 - t));
-    if (offset === 0 && t > 0.05) return;
+    var LIFT_END = 0.667;
+    var SNAP_END = 0.833;
+    var crackRange = 14;
 
-    var pixels = _collectEntityPixels(buf, PW, prefix);
-    _blankEntityPixels(buf, pixels);
-    _redrawEntityPixels(buf, PW, PH, pixels, 0, offset);
+    // ── Collect entity pixels and bounding box ──
+    var minX = PW, maxX = 0, minY = PH, maxY = 0;
+    var indices = [];
+    for (var i = 0; i < buf.length; i++) {
+      if (buf[i].e && buf[i].e.startsWith(prefix)) {
+        var x = i % PW, y = Math.floor(i / PW);
+        indices.push(i);
+        if (x < minX) minX = x; if (x > maxX) maxX = x;
+        if (y < minY) minY = y; if (y > maxY) maxY = y;
+      }
+    }
+    if (indices.length === 0) return;
+    var ecx = (minX + maxX) / 2;
+    var ecy = (minY + maxY) / 2;
+    var halfW = (maxX - minX) / 2;
+    var halfH = (maxY - minY) / 2;
 
-    // Shadow grows as entity settles
-    if (pixels.length > 0) {
-      var bounds = _computeEntityBounds(buf, PW, prefix);
-      var shadowY = bounds.y2 + offset + 1;
-      var shadowWidth = Math.round((bounds.x2 - bounds.x1) * 0.6);
-      var shadowX = bounds.cx - Math.round(shadowWidth / 2);
-      var shadowAlpha = 0.2 * (1 - Math.abs(offset) / dropPx);
-      for (var sx = shadowX; sx < shadowX + shadowWidth; sx++) {
-        if (sx >= 0 && sx < PW && shadowY >= 0 && shadowY < PH) {
-          var si = shadowY * PW + sx;
-          buf[si].r = Math.round(buf[si].r * (1 - shadowAlpha));
-          buf[si].g = Math.round(buf[si].g * (1 - shadowAlpha));
-          buf[si].b = Math.round(buf[si].b * (1 - shadowAlpha));
+    // ── Compute displacement (progress: 0=at origin, 1=fully lifted) ──
+    var prog = 0;
+    if (t <= LIFT_END) {
+      prog = t / LIFT_END; // linear lift
+    } else if (t <= SNAP_END) {
+      var lt = (t - LIFT_END) / (SNAP_END - LIFT_END);
+      // Ease-in quadratic snap: accelerates toward ground, no bounce
+      prog = 1 - lt * lt;
+    }
+    var dispX = Math.round(liftDX * prog);
+    var dispY = Math.round(liftDY * prog);
+
+    // ── Restore extended bounding box (cleans trail from previous frame) ──
+    var restMinY = Math.max(0, minY + Math.min(0, dispY) - 2);
+    var restMaxY = Math.min(PH - 1, maxY + crackRange + 2);
+    var restMinX = Math.max(0, minX + Math.min(0, dispX) - 2);
+    var restMaxX = Math.min(PW - 1, maxX + Math.max(0, dispX) + crackRange + 2);
+    for (var sy = restMinY; sy <= restMaxY; sy++) {
+      for (var sx = restMinX; sx <= restMaxX; sx++) {
+        var si = sy * PW + sx;
+        if (buf[si].e && buf[si].e.startsWith(prefix)) {
+          buf[si].r = buf[si]._r; buf[si].g = buf[si]._g; buf[si].b = buf[si]._b;
+        } else {
+          buf[si].r = buf[si]._br; buf[si].g = buf[si]._bg; buf[si].b = buf[si]._bb;
+        }
+      }
+    }
+
+    // ── Draw entity at displaced position ──
+    if (dispX !== 0 || dispY !== 0) {
+      // Black silhouette at original position
+      for (var k = 0; k < indices.length; k++) {
+        var idx = indices[k];
+        buf[idx].r = 0; buf[idx].g = 0; buf[idx].b = 0;
+      }
+      // Entity drawn at displaced position
+      for (var k = 0; k < indices.length; k++) {
+        var idx = indices[k];
+        var py = Math.floor(idx / PW), px = idx % PW;
+        var nx = px + dispX, ny = py + dispY;
+        if (nx >= 0 && nx < PW && ny >= 0 && ny < PH) {
+          var nidx = ny * PW + nx;
+          buf[nidx].r = buf[idx]._r; buf[nidx].g = buf[idx]._g; buf[nidx].b = buf[idx]._b;
+        }
+      }
+    }
+    // prog===0: entity at original position, already restored above
+
+    // ── Phase 3: cracks radiating from all around the entity contour ──
+    if (t > SNAP_END) {
+      var crackT = (t - SNAP_END) / (1 - SNAP_END); // 0→1
+      var crackGrow = Math.min(1, crackT / 0.6);
+      var crackFade = crackT < 0.6 ? 1.0 : 1.0 - (crackT - 0.6) / 0.4;
+      var maxCrackLen = 10;
+
+      // 12 cracks evenly spaced around the entity contour.
+      // Ray-cast from center outward to find the actual entity edge per direction.
+      var N = 12;
+      var maxSearch = Math.ceil(Math.max(halfW, halfH)) + 2;
+      for (var ci = 0; ci < N; ci++) {
+        var ang = (ci / N) * 2 * Math.PI;
+        var cosA = Math.cos(ang), sinA = Math.sin(ang);
+        // Find outermost entity pixel in this direction via ray-cast
+        var cox = -1, coy = -1;
+        var foundEntity = false;
+        for (var d = 1; d <= maxSearch; d++) {
+          var tx = Math.round(ecx + cosA * d);
+          var ty = Math.round(ecy + sinA * d);
+          if (tx < 0 || tx >= PW || ty < 0 || ty >= PH) break;
+          var ti = ty * PW + tx;
+          if (buf[ti].e && buf[ti].e.startsWith(prefix)) {
+            cox = tx; coy = ty;
+            foundEntity = true;
+          } else if (foundEntity) {
+            break; // stop at first background pixel after entity
+          }
+        }
+        if (!foundEntity) continue; // no entity in this direction, skip crack
+        // Crack extends outward from the actual contour pixel
+        var crackLen = maxCrackLen - (ci % 3);
+        var len = Math.round(crackLen * crackGrow);
+        var zig = (ci % 2 === 0) ? 1 : -1;
+        for (var cl = 1; cl <= len; cl++) {
+          var zOff = (cl % 3 === 0) ? zig : 0;
+          var cpx = Math.round(cox + cosA * cl + sinA * zOff);
+          var cpy = Math.round(coy + sinA * cl - cosA * zOff);
+          if (cpx >= 0 && cpx < PW && cpy >= 0 && cpy < PH) {
+            var cidx = cpy * PW + cpx;
+            var cv = Math.round(30 * crackFade);
+            buf[cidx].r = cv; buf[cidx].g = cv; buf[cidx].b = cv;
+          }
         }
       }
     }
   };
-}, 1200);
+}, 3000);
 
 // ── P1: Color Pop ──
 // Each pixel of the entity transitions to its RGB complement (color wheel
