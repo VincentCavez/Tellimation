@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tellimations — Animation Template Test</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      background: #1a1a2e;
+      color: #e0e0e0;
+      font-family: monospace;
+      margin: 0;
+      padding: 1.5rem;
+    }
+    h1 { color: #66ccff; margin: 0 0 0.5rem; font-size: 1.4rem; }
+    h2 { color: #88ddaa; margin: 1.2rem 0 0.4rem; font-size: 1rem; }
+    canvas {
+      border: 2px solid #444;
+      display: block;
+      margin-bottom: 0.8rem;
+      image-rendering: pixelated;
+      width: 840px;
+      height: 540px;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 0.4rem;
+    }
+    .config-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      margin-bottom: 0.8rem;
+      align-items: center;
+    }
+    .config-row label {
+      font-size: 0.8rem;
+      color: #aaa;
+    }
+    button {
+      background: #2a2a4e;
+      color: #e0e0e0;
+      border: 1px solid #555;
+      padding: 0.35rem 0.7rem;
+      font-family: monospace;
+      font-size: 0.85rem;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    button:hover { background: #3a3a6e; }
+    button:disabled { opacity: 0.4; cursor: not-allowed; }
+    button.active { background: #4a6a4a; border-color: #88ddaa; }
+    button.stop-btn { background: #4a2020; }
+    button.stop-btn:hover { background: #6a3030; }
+    button.play-all { background: #2a4a2a; }
+    button.play-all:hover { background: #3a5a3a; }
+
+    select, input[type="text"] {
+      background: #2a2a4e;
+      color: #e0e0e0;
+      border: 1px solid #555;
+      padding: 0.3rem 0.5rem;
+      font-family: monospace;
+      font-size: 0.8rem;
+      border-radius: 4px;
+    }
+    input[type="text"] { width: 120px; }
+
+    #status {
+      padding: 0.4rem 0.8rem;
+      margin-bottom: 0.5rem;
+      border-radius: 4px;
+      font-weight: bold;
+      font-size: 0.85rem;
+    }
+    .status-idle { background: #1a3a1a; color: #4caf50; }
+    .status-playing { background: #3a3a1a; color: #ffcc00; }
+
+    .family-label {
+      color: #888;
+      font-size: 0.75rem;
+      width: 100%;
+      margin-top: 0.3rem;
+    }
+
+    #log {
+      background: #0d0d1a;
+      padding: 0.8rem;
+      border-radius: 4px;
+      max-height: 260px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      font-size: 0.8rem;
+      margin-top: 0.8rem;
+    }
+    .log-ok   { color: #4caf50; }
+    .log-info { color: #66ccff; }
+    .log-warn { color: #ffaa33; }
+    .log-err  { color: #ff5555; }
+  </style>
+</head>
+<body>
+
+<h1>Tellimations — Animation Template Test (20 active)</h1>
+
+<canvas id="scene"></canvas>
+<div id="status" class="status-idle">Idle</div>
+
+<h2>Target</h2>
+    <div class="config-row">
+      <label>Entity A:
+        <select id="targetA">
+          <option value="fox_01">fox_01 (orange fox)</option>
+          <option value="owl_01">owl_01 (blue-grey owl)</option>
+          <option value="mushroom_01">mushroom_01 (red mushroom)</option>
+        </select>
+      </label>
+      <label>Entity B:
+        <select id="targetB">
+          <option value="owl_01">owl_01</option>
+          <option value="fox_01">fox_01</option>
+          <option value="mushroom_01">mushroom_01</option>
+        </select>
+      </label>
+    </div>
+    <div class="config-row">
+      <label>Text: <input type="text" id="cfgText" value="Hello!" /></label>
+      <label>Word: <input type="text" id="cfgWord" value="runned" /></label>
+      <label>Particles:
+        <select id="cfgParticle">
+          <option value="steam">steam</option>
+          <option value="frost">frost</option>
+          <option value="sparkle">sparkle</option>
+          <option value="dust">dust</option>
+        </select>
+      </label>
+      <label>Direction:
+        <select id="cfgDir">
+          <option value="right">right</option>
+          <option value="left">left</option>
+          <option value="up">up</option>
+          <option value="down">down</option>
+        </select>
+      </label>
+    </div>
+
+    <!-- Animation buttons by family -->
+    <div class="family-label">I — Identity</div>
+    <div class="controls">
+      <button onclick="playT('spotlight')">spotlight</button>
+      <button onclick="playT('nametag')">nametag</button>
+    </div>
+
+    <div class="family-label">S — Space</div>
+    <div class="controls">
+      <button onclick="playT('reveal')">reveal</button>
+      <button onclick="playT('settle')">settle</button>
+    </div>
+
+    <div class="family-label">P — Property</div>
+    <div class="controls">
+      <button onclick="playT('color_pop')">color_pop</button>
+      <button onclick="playT('emanation')">emanation</button>
+    </div>
+
+    <div class="family-label">T — Time</div>
+    <div class="controls">
+      <button onclick="playT('flashback')">flashback</button>
+      <button onclick="playT('timelapse')">timelapse</button>
+    </div>
+
+    <div class="family-label">A — Action</div>
+    <div class="controls">
+      <button onclick="playT('motion_lines')">motion_lines</button>
+      <button onclick="playT('anticipation')">anticipation</button>
+    </div>
+
+    <div class="family-label">R — Relation (uses A + B)</div>
+    <div class="controls">
+      <button onclick="playT('magnetism')">magnetism</button>
+      <button onclick="playT('repel')">repel</button>
+      <button onclick="playT('causal_push')">causal_push</button>
+    </div>
+
+    <div class="family-label">Q — Quantity</div>
+    <div class="controls">
+      <button onclick="playT('bonk')">bonk</button>
+      <button onclick="playT('sequential_glow')">sequential_glow</button>
+      <button onclick="playT('ghost_outline')">ghost_outline</button>
+    </div>
+
+    <div class="family-label">D — Discourse</div>
+    <div class="controls">
+      <button onclick="playT('speech_bubble')">speech_bubble</button>
+      <button onclick="playT('thought_bubble')">thought_bubble</button>
+      <button onclick="playT('alert')">alert</button>
+      <button onclick="playT('interjection')">interjection</button>
+    </div>
+
+    <h2>Controls</h2>
+    <div class="controls">
+      <button class="play-all" onclick="playAll()">Play All Sequentially</button>
+      <button class="stop-btn" onclick="stopAnim()">Stop</button>
+      <button onclick="redraw()">Redraw Scene</button>
+      <button onclick="runVerification()">Snapshot/Restore Test</button>
+<div id="log"></div>
+
+<script src="engine.js"></script>
+<script src="animations.js"></script>
+<script src="animation_templates.js"></script>
+<script>
+// ═══════════════════════════════════════════════════════════════════
+// Setup
+// ═══════════════════════════════════════════════════════════════════
+
+var buf = new PixelBuffer();
+var canvas = document.getElementById('scene');
+var renderer = new Renderer(canvas, buf);
+var runner = new AnimationRunner(buf, renderer);
+var logEl = document.getElementById('log');
+var statusEl = document.getElementById('status');
+var _stopPlayAll = false;
+
+// ── Logging ──
+
+function log(msg, cls) {
+  cls = cls || 'log-info';
+  var line = document.createElement('div');
+  line.className = cls;
+  line.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg;
+  logEl.prepend(line);
+}
+
+function updateStatus(text) {
+  if (text) {
+    statusEl.textContent = text;
+    statusEl.className = 'status-playing';
+  } else if (runner.isPlaying) {
+    statusEl.className = 'status-playing';
+  } else {
+    statusEl.textContent = 'Idle';
+    statusEl.className = 'status-idle';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// Scene Drawing (art-grid: 560×360, flat entity IDs)
+// ═══════════════════════════════════════════════════════════════════
+
+function drawScene() {
+  buf.clear();
+
+  // ── Background ──
+  // Sky
+  buf.rect(0, 0, PW, Math.round(PH * 0.7), 135, 206, 235, 'bg');
+  // Ground
+  buf.rect(0, Math.round(PH * 0.7), PW, Math.round(PH * 0.3), 76, 153, 76, 'bg');
+  // Horizon grass highlight
+  buf.rect(0, Math.round(PH * 0.7) - 2, PW, 4, 90, 170, 60, 'bg');
+
+  // Snapshot background BEFORE drawing entities
+  // so animations like 'reveal' and 'ghost_outline' can blend to bg
+  buf.snapshotBackground();
+
+  // ── Fox (fox_01) — orange, left side ──
+  var fx = 120, fy = 220;
+  // Body
+  buf.ellip(fx, fy, 18, 12, 230, 140, 30, 'fox_01');
+  // Head
+  buf.circ(fx - 16, fy - 10, 9, 240, 155, 45, 'fox_01');
+  // Ears
+  buf.tri(fx - 24, fy - 12, fx - 21, fy - 24, fx - 18, fy - 13, 240, 140, 30, 'fox_01');
+  buf.tri(fx - 14, fy - 14, fx - 11, fy - 25, fx - 8, fy - 13, 240, 140, 30, 'fox_01');
+  // Eyes
+  buf.circ(fx - 20, fy - 12, 2, 255, 255, 220, 'fox_01');
+  buf.circ(fx - 12, fy - 12, 2, 255, 255, 220, 'fox_01');
+  buf.circ(fx - 20, fy - 12, 1, 30, 30, 30, 'fox_01');
+  buf.circ(fx - 12, fy - 12, 1, 30, 30, 30, 'fox_01');
+  // Nose
+  buf.circ(fx - 18, fy - 7, 1, 30, 20, 20, 'fox_01');
+  // Tail
+  buf.ellip(fx + 22, fy - 5, 10, 5, 230, 130, 20, 'fox_01');
+  buf.circ(fx + 30, fy - 7, 3, 255, 255, 240, 'fox_01');
+  // Legs
+  buf.rect(fx - 10, fy + 10, 4, 8, 200, 120, 20, 'fox_01');
+  buf.rect(fx + 6, fy + 10, 4, 8, 200, 120, 20, 'fox_01');
+
+  // ── Owl (owl_01) — blue-grey, right side ──
+  var ox = 400, oy = 190;
+  // Body
+  buf.ellip(ox, oy + 5, 14, 18, 120, 120, 160, 'owl_01');
+  // Head
+  buf.circ(ox, oy - 14, 10, 140, 140, 180, 'owl_01');
+  // Ear tufts
+  buf.tri(ox - 10, oy - 18, ox - 7, oy - 28, ox - 4, oy - 18, 120, 110, 150, 'owl_01');
+  buf.tri(ox + 4, oy - 18, ox + 7, oy - 28, ox + 10, oy - 18, 120, 110, 150, 'owl_01');
+  // Eyes (big owl eyes)
+  buf.circ(ox - 5, oy - 16, 4, 255, 240, 100, 'owl_01');
+  buf.circ(ox + 5, oy - 16, 4, 255, 240, 100, 'owl_01');
+  buf.circ(ox - 5, oy - 16, 2, 20, 20, 20, 'owl_01');
+  buf.circ(ox + 5, oy - 16, 2, 20, 20, 20, 'owl_01');
+  // Beak
+  buf.tri(ox - 2, oy - 10, ox + 2, oy - 10, ox, oy - 6, 220, 180, 60, 'owl_01');
+  // Wings
+  buf.ellip(ox - 16, oy + 2, 6, 14, 100, 100, 140, 'owl_01');
+  buf.ellip(ox + 16, oy + 2, 6, 14, 100, 100, 140, 'owl_01');
+  // Feet
+  buf.rect(ox - 6, oy + 21, 3, 4, 180, 150, 50, 'owl_01');
+  buf.rect(ox + 3, oy + 21, 3, 4, 180, 150, 50, 'owl_01');
+
+  // ── Mushroom (mushroom_01) — red cap, center-ish ──
+  var mx = 260, my = 237;
+  // Stem
+  buf.rect(mx - 4, my, 8, 14, 220, 200, 170, 'mushroom_01');
+  // Cap
+  buf.ellip(mx, my - 2, 14, 8, 200, 40, 40, 'mushroom_01');
+  // Spots
+  buf.circ(mx - 6, my - 5, 2, 255, 255, 255, 'mushroom_01');
+  buf.circ(mx + 5, my - 6, 2, 255, 255, 255, 'mushroom_01');
+  buf.circ(mx + 1, my - 8, 1, 255, 255, 255, 'mushroom_01');
+
+  renderer.render();
+  log('Scene drawn: fox_01, owl_01, mushroom_01');
+}
+
+drawScene();
+
+// ═══════════════════════════════════════════════════════════════════
+// Snapshot / Restore Verification
+// ═══════════════════════════════════════════════════════════════════
+
+function captureState() {
+  var checks = [];
+  var positions = [
+    { x: 120, y: 220, label: 'fox_01 body center' },
+    { x: 400, y: 190, label: 'owl_01 body center' },
+    { x: 260, y: 237, label: 'mushroom_01 stem' },
+    { x: 260, y: 232, label: 'mushroom_01 cap' },
+    { x: 50,  y: 50,  label: 'sky' },
+    { x: 50,  y: 330, label: 'ground' },
+    { x: 300, y: 100, label: 'empty sky' },
+  ];
+  for (var i = 0; i < positions.length; i++) {
+    var pos = positions[i];
+    var p = buf.getPixel(pos.x, pos.y);
+    checks.push({ x: pos.x, y: pos.y, label: pos.label, r: p.r, g: p.g, b: p.b, e: p.e });
+  }
+  return checks;
+}
+
+function verifyState(before, label) {
+  var after = captureState();
+  var allMatch = true;
+  for (var i = 0; i < before.length; i++) {
+    var b = before[i], a = after[i];
+    if (b.r !== a.r || b.g !== a.g || b.b !== a.b) {
+      log('FAIL ' + label + ': pixel (' + b.x + ',' + b.y + ') [' + b.label + '] ' +
+          '(' + b.r + ',' + b.g + ',' + b.b + ') -> (' + a.r + ',' + a.g + ',' + a.b + ')', 'log-warn');
+      allMatch = false;
+    }
+  }
+  if (allMatch) {
+    log('PASS ' + label + ': all pixels restored', 'log-ok');
+  }
+  return allMatch;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// Template Configuration
+// ═══════════════════════════════════════════════════════════════════
+
+var ENTITY_LIST = ['fox_01', 'owl_01', 'mushroom_01'];
+
+var TEMPLATE_ORDER = [
+  'spotlight', 'nametag',
+  'reveal', 'settle',
+  'color_pop', 'emanation',
+  'flashback', 'timelapse',
+  'motion_lines', 'anticipation',
+  'magnetism', 'repel', 'causal_push',
+  'bonk', 'sequential_glow', 'ghost_outline',
+  'speech_bubble', 'thought_bubble', 'alert', 'interjection'
+];
+
+var TEMPLATE_CONFIG = {
+  // Single-entity
+  spotlight:     { duration: 1500 },
+  nametag:       { duration: 1500 },
+  settle:        { duration: 1200 },
+  color_pop:     { duration: 1200 },
+  reveal:        { duration: 1500 },
+  emanation:     { duration: 1500, useParticle: true },
+  flashback:     { duration: 1500 },
+  ghost_outline: { duration: 1500 },
+  alert:         { duration: 1200 },
+  motion_lines:  { duration: 1200, useDirection: true },
+  anticipation:  { duration: 1500, useDirection: true, dirParam: 'lurchDirection' },
+
+  // Two-entity
+  causal_push: { duration: 1500, twoEntity: true },
+  bonk:        { duration: 1200, twoEntity: true },
+  magnetism:   { duration: 1500, twoEntity: true },
+  repel:       { duration: 1500, twoEntity: true },
+
+  // Multi-entity
+  sequential_glow: { duration: 1600, allEntities: true },
+
+  // Scene-wide
+  timelapse: { duration: 2000, sceneWide: true },
+
+  // Text-based
+  speech_bubble:  { duration: 1500, useText: true },
+  thought_bubble: { duration: 1500, useText: true },
+  interjection:   { duration: 1500, useWord: true },
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// Play a Template
+// ═══════════════════════════════════════════════════════════════════
+
+function buildSpec(templateName) {
+  var cfg = TEMPLATE_CONFIG[templateName];
+  if (!cfg) {
+    log('Unknown template: ' + templateName, 'log-err');
+    return null;
+  }
+
+  var targetA = document.getElementById('targetA').value;
+  var targetB = document.getElementById('targetB').value;
+  var text = document.getElementById('cfgText').value || '...';
+  var word = document.getElementById('cfgWord').value || '???';
+  var particle = document.getElementById('cfgParticle').value;
+  var direction = document.getElementById('cfgDir').value;
+
+  var params = {};
+
+  if (cfg.twoEntity) {
+    params.entityPrefixA = targetA;
+    params.entityPrefixB = targetB;
+  } else if (cfg.allEntities) {
+    params.entityPrefixes = ENTITY_LIST.slice(); // all 3
+  } else if (!cfg.sceneWide) {
+    params.entityPrefix = targetA;
+  }
+
+  if (cfg.useParticle) {
+    params.particleType = particle;
+  }
+  if (cfg.useDirection) {
+    var dirKey = cfg.dirParam || 'direction';
+    params[dirKey] = direction;
+  }
+  if (cfg.useText) {
+    params.text = text;
+  }
+  if (cfg.useWord) {
+    params.word = word;
+  }
+
+  return {
+    template: templateName,
+    params: params,
+    duration_ms: cfg.duration
+  };
+}
+
+async function playT(templateName) {
+  var spec = buildSpec(templateName);
+  if (!spec) return;
+
+  var cfg = TEMPLATE_CONFIG[templateName];
+  var targetDesc = cfg.twoEntity
+    ? spec.params.entityPrefixA + ' → ' + spec.params.entityPrefixB
+    : cfg.allEntities
+    ? ENTITY_LIST.join(', ')
+    : cfg.sceneWide
+    ? '(whole scene)'
+    : spec.params.entityPrefix;
+
+  log('Playing ' + templateName + ' on ' + targetDesc + ' (' + spec.duration_ms + 'ms)...');
+  updateStatus('Playing: ' + templateName + ' on ' + targetDesc);
+
+  var before = captureState();
+  var poll = setInterval(function() { updateStatus(); }, 100);
+
+  await runner.play(spec);
+
+  clearInterval(poll);
+  updateStatus();
+  log(templateName + ' finished.');
+  verifyState(before, templateName);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// Play All Sequentially
+// ═══════════════════════════════════════════════════════════════════
+
+async function playAll() {
+  _stopPlayAll = false;
+  log('--- Playing all 20 templates sequentially ---', 'log-info');
+  var passed = 0, failed = 0;
+
+  for (var i = 0; i < TEMPLATE_ORDER.length; i++) {
+    if (_stopPlayAll) {
+      log('Play-all stopped by user.', 'log-warn');
+      break;
+    }
+    var name = TEMPLATE_ORDER[i];
+    var spec = buildSpec(name);
+    if (!spec) { failed++; continue; }
+
+    log('  [' + (i + 1) + '/20] ' + name + '...');
+    updateStatus('[' + (i + 1) + '/20] ' + name);
+
+    var before = captureState();
+    await runner.play(spec);
+
+    if (verifyState(before, name)) {
+      passed++;
+    } else {
+      failed++;
+    }
+
+    // Pause between animations
+    if (i < TEMPLATE_ORDER.length - 1 && !_stopPlayAll) {
+      await new Promise(function(r) { setTimeout(r, 500); });
+    }
+  }
+
+  updateStatus();
+  if (failed === 0) {
+    log('=== ALL ' + passed + '/20 TEMPLATES PASSED ===', 'log-ok');
+  } else {
+    log('=== ' + passed + ' passed, ' + failed + ' failed ===', 'log-warn');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// Verification (fast, no visual delay)
+// ═══════════════════════════════════════════════════════════════════
+
+async function runVerification() {
+  log('--- Snapshot/Restore verification (fast) ---', 'log-info');
+  var passed = 0, failed = 0;
+
+  for (var i = 0; i < TEMPLATE_ORDER.length; i++) {
+    var name = TEMPLATE_ORDER[i];
+    var spec = buildSpec(name);
+    if (!spec) { failed++; continue; }
+
+    // Override duration for speed
+    spec.duration_ms = 300;
+    log('  Testing ' + name + '...');
+
+    var before = captureState();
+    await runner.play(spec);
+
+    if (verifyState(before, name)) {
+      passed++;
+    } else {
+      failed++;
+    }
+  }
+
+  updateStatus();
+  if (failed === 0) {
+    log('=== ALL ' + passed + '/20 SNAPSHOT TESTS PASSED ===', 'log-ok');
+  } else {
+    log('=== ' + passed + ' passed, ' + failed + ' failed ===', 'log-warn');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// Utility
+// ═══════════════════════════════════════════════════════════════════
+
+function stopAnim() {
+  _stopPlayAll = true;
+  runner.stop();
+  updateStatus();
+  log('Stopped.', 'log-warn');
+}
+
+function redraw() {
+  runner.stop();
+  drawScene();
+  updateStatus();
+}
+</script>
+</body>
+</html>

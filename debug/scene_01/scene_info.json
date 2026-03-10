@@ -1,0 +1,1432 @@
+{
+  "scene_id": "scene_01",
+  "manifest": {
+    "entities": [
+      {
+        "id": "axolotl_01",
+        "type": "axolotl",
+        "position": {
+          "x": 560,
+          "y": 480
+        },
+        "width_hint": 220,
+        "height_hint": 180,
+        "properties": {
+          "color": "shimmering neon pink with iridescent pearly scales",
+          "size": "medium character size",
+          "texture": "smooth, slick, and slightly rubbery",
+          "pattern": "tiny glitter-like silver speckles across the back",
+          "distinctive_features": "bright purple feathery external gills and large, curious golden eyes"
+        }
+      },
+      {
+        "id": "floating_mat_01",
+        "type": "pool float",
+        "position": {
+          "x": 560,
+          "y": 520
+        },
+        "width_hint": 380,
+        "height_hint": 120,
+        "properties": {
+          "color": "vibrant turquoise and sunny yellow stripes",
+          "size": "large rectangular mat",
+          "texture": "glossy vinyl with visible air-filled ridges",
+          "pattern": "bold diagonal alternating stripes",
+          "distinctive_features": "a raised pillow section at one end and a small cup holder hole"
+        }
+      },
+      {
+        "id": "beach_ball_01",
+        "type": "beach ball",
+        "position": {
+          "x": 200,
+          "y": 550
+        },
+        "width_hint": 110,
+        "height_hint": 110,
+        "properties": {
+          "color": "translucent red, blue, and white panels",
+          "size": "medium spherical object",
+          "texture": "smooth, thin, reflective plastic",
+          "pattern": "six vertical wedge-shaped colored segments",
+          "distinctive_features": "a small white plastic air valve on the top pole"
+        }
+      },
+      {
+        "id": "palm_tree_01",
+        "type": "potted palm",
+        "position": {
+          "x": 950,
+          "y": 380
+        },
+        "width_hint": 280,
+        "height_hint": 400,
+        "properties": {
+          "color": "deep emerald green fronds with a rugged sandy-brown trunk",
+          "size": "tall decorative plant",
+          "texture": "rough fibrous bark and papery sharp leaves",
+          "pattern": "criss-cross diamond pattern on the trunk",
+          "distinctive_features": "long drooping leaves that fan out like a giant umbrella"
+        }
+      }
+    ],
+    "relations": [
+      {
+        "entity_a": "axolotl_01",
+        "entity_b": "floating_mat_01",
+        "type": "spatial",
+        "preposition": "on"
+      },
+      {
+        "entity_a": "beach_ball_01",
+        "entity_b": "floating_mat_01",
+        "type": "spatial",
+        "preposition": "beside"
+      }
+    ]
+  },
+  "semantic_scan_c1": {
+    "entities": {
+      "axolotl_01": {
+        "entity_type": "axolotl",
+        "global_features": {
+          "posture": "crouched on all fours, head tilted slightly upward",
+          "expression": "cheerful and curious",
+          "overall_shape": "plump and elongated with feathery appendages",
+          "overall_size": "medium",
+          "dominant_colors": [
+            "shimmering pink",
+            "purple",
+            "gold"
+          ],
+          "extra": [
+            "covered in glittering speckles"
+          ]
+        },
+        "sub_entities": [
+          {
+            "sub_entity_id": "axolotl_01.body",
+            "description": "main torso of the axolotl",
+            "features": {
+              "colors": [
+                "shimmering pink",
+                "light pink"
+              ],
+              "texture": "smooth and slick",
+              "material": "fleshy",
+              "shape": "plump and rounded",
+              "size": "large",
+              "state": "wet",
+              "pattern": "glittery speckles",
+              "extra": [
+                "faint vertical ridges along the side"
+              ]
+            },
+            "bbox_hd": [
+              510.0,
+              500.0,
+              750.0,
+              680.0
+            ]
+          },
+          {
+            "sub_entity_id": "axolotl_01.head",
+            "description": "large, wide head",
+            "features": {
+              "colors": [
+                "shimmering pink"
+              ],
+              "texture": "smooth",
+              "material": "fleshy",
+              "shape": "wide and rounded",
+              "size": "large",
+              "state": "wet",
+              "pattern": "glittery speckles",
+              "extra": [
+                "prominent smile"
+              ]
+            },
+            "bbox_hd": [
+              720.0,
+              410.0,
+              890.0,
+              560.0
+            ]
+          },
+          {
+            "sub_entity_id": "axolotl_01.head.eyes.right",
+            "description": "right eye (viewer's left)",
+            "features": {
+              "colors": [
+                "gold",
+                "black"
+              ],
+              "texture": "glossy",
+              "material": null,
+              "shape": "round",
+              "size": "small",
+              "state": "bright",
+              "pattern": "solid with dark pupil",
+              "extra": [
+                "reflective highlight"
+              ]
+            },
+            "bbox_hd": [
+              770.0,
+              430.0,
+              800.0,
+              460.0
+            ]
+          },
+          {
+            "sub_entity_id": "axolotl_01.head.mouth",
+            "description": "wide, smiling mouth",
+            "features": {
+              "colors": [
+                "dark pink"
+              ],
+              "texture": "smooth",
+              "material": null,
+              "shape": "curved line",
+              "size": "medium",
+              "state": "open slightly",
+              "pattern": null,
+              "extra": [
+                "gives a cheerful expression"
+              ]
+            },
+            "bbox_hd": [
+              810.0,
+              460.0,
+              880.0,
+              500.0
+            ]
+          },
+          {
+            "sub_entity_id": "axolotl_01.head.gills",
+            "description": "feathery external gills on the side of the head",
+            "features": {
+              "colors": [
+                "bright purple",
+                "dark purple"
+              ],
+              "texture": "feathery and bristly",
+              "material": null,
+              "shape": "branching",
+              "size": "medium",
+              "state": "extended",
+              "pattern": null,
+              "extra": [
+                "three distinct stalks visible on the left side"
+              ]
+            },
+            "bbox_hd": [
+              600.0,
+              380.0,
+              730.0,
+              550.0
+            ]
+          },
+          {
+            "sub_entity_id": "axolotl_01.legs.front_right",
+            "description": "front right leg gripping the float",
+            "features": {
+              "colors": [
+                "shimmering pink"
+              ],
+              "texture": "smooth",
+              "material": "fleshy",
+              "shape": "elongated with webbed toes",
+              "size": "medium",
+              "state": "planted firmly",
+              "pattern": "glittery speckles",
+              "extra": [
+                "four distinct toes"
+              ]
+            },
+            "bbox_hd": [
+              650.0,
+              590.0,
+              740.0,
+              770.0
+            ]
+          },
+          {
+            "sub_entity_id": "axolotl_01.legs.front_left",
+            "description": "front left leg gripping the float",
+            "features": {
+              "colors": [
+                "shimmering pink"
+              ],
+              "texture": "smooth",
+              "material": "fleshy",
+              "shape": "elongated with webbed toes",
+              "size": "medium",
+              "state": "planted firmly",
+              "pattern": "glittery speckles",
+              "extra": [
+                "partially visible behind the head"
+              ]
+            },
+            "bbox_hd": [
+              820.0,
+              590.0,
+              910.0,
+              730.0
+            ]
+          },
+          {
+            "sub_entity_id": "axolotl_01.legs.back_right",
+            "description": "back right leg resting on the float",
+            "features": {
+              "colors": [
+                "shimmering pink"
+              ],
+              "texture": "smooth",
+              "material": "fleshy",
+              "shape": "bent and elongated",
+              "size": "medium",
+              "state": "relaxed",
+              "pattern": "glittery speckles",
+              "extra": [
+                "webbed toes visible"
+              ]
+            },
+            "bbox_hd": [
+              520.0,
+              630.0,
+              610.0,
+              730.0
+            ]
+          }
+        ]
+      },
+      "floating_mat_01": {
+        "entity_type": "pool float",
+        "global_features": {
+          "posture": "floating horizontally",
+          "expression": null,
+          "overall_shape": "rectangular with a raised pillow",
+          "overall_size": "large",
+          "dominant_colors": [
+            "turquoise",
+            "yellow"
+          ],
+          "extra": [
+            "striped pattern"
+          ]
+        },
+        "sub_entities": [
+          {
+            "sub_entity_id": "floating_mat_01.surface",
+            "description": "main flat area of the float",
+            "features": {
+              "colors": [
+                "turquoise",
+                "yellow"
+              ],
+              "texture": "smooth",
+              "material": "vinyl",
+              "shape": "rectangular",
+              "size": "large",
+              "state": "inflated",
+              "pattern": "diagonal stripes",
+              "extra": [
+                "visible seams and ridges"
+              ]
+            },
+            "bbox_hd": [
+              250.0,
+              600.0,
+              1240.0,
+              768.0
+            ]
+          },
+          {
+            "sub_entity_id": "floating_mat_01.pillow",
+            "description": "raised headrest section",
+            "features": {
+              "colors": [
+                "turquoise",
+                "yellow"
+              ],
+              "texture": "smooth",
+              "material": "vinyl",
+              "shape": "cylindrical",
+              "size": "medium",
+              "state": "inflated",
+              "pattern": "diagonal stripes",
+              "extra": [
+                "attached to the main surface"
+              ]
+            },
+            "bbox_hd": [
+              260.0,
+              530.0,
+              530.0,
+              680.0
+            ]
+          },
+          {
+            "sub_entity_id": "floating_mat_01.cup_holder",
+            "description": "recessed hole for holding drinks",
+            "features": {
+              "colors": [
+                "turquoise"
+              ],
+              "texture": "smooth",
+              "material": "vinyl",
+              "shape": "circular",
+              "size": "small",
+              "state": "empty",
+              "pattern": "solid",
+              "extra": [
+                "located near the edge"
+              ]
+            },
+            "bbox_hd": [
+              1050.0,
+              700.0,
+              1150.0,
+              750.0
+            ]
+          }
+        ]
+      },
+      "beach_ball_01": {
+        "entity_type": "beach ball",
+        "global_features": {
+          "posture": "floating in the water",
+          "expression": null,
+          "overall_shape": "spherical",
+          "overall_size": "medium",
+          "dominant_colors": [
+            "red",
+            "blue",
+            "white"
+          ],
+          "extra": [
+            "translucent panels"
+          ]
+        },
+        "sub_entities": [
+          {
+            "sub_entity_id": "beach_ball_01.surface",
+            "description": "the entire visible outer shell of the ball",
+            "features": {
+              "colors": [
+                "red",
+                "blue",
+                "white"
+              ],
+              "texture": "smooth and glossy",
+              "material": "plastic",
+              "shape": "spherical",
+              "size": "large",
+              "state": "inflated and wet",
+              "pattern": "vertical colored segments",
+              "extra": [
+                "reflecting light"
+              ]
+            },
+            "bbox_hd": [
+              60.0,
+              590.0,
+              290.0,
+              768.0
+            ]
+          },
+          {
+            "sub_entity_id": "beach_ball_01.valve",
+            "description": "air valve at the top of the ball",
+            "features": {
+              "colors": [
+                "white",
+                "light blue"
+              ],
+              "texture": "smooth",
+              "material": "plastic",
+              "shape": "circular",
+              "size": "tiny",
+              "state": "closed",
+              "pattern": "concentric circles",
+              "extra": [
+                "located at the pole where panels meet"
+              ]
+            },
+            "bbox_hd": [
+              200.0,
+              640.0,
+              230.0,
+              670.0
+            ]
+          },
+          {
+            "sub_entity_id": "beach_ball_01.red_panel",
+            "description": "red segment of the ball",
+            "features": {
+              "colors": [
+                "red"
+              ],
+              "texture": "smooth",
+              "material": "plastic",
+              "shape": "curved wedge",
+              "size": "medium",
+              "state": "inflated",
+              "pattern": "solid",
+              "extra": [
+                "slightly translucent"
+              ]
+            },
+            "bbox_hd": [
+              150.0,
+              680.0,
+              270.0,
+              768.0
+            ]
+          }
+        ]
+      },
+      "palm_tree_01": {
+        "entity_type": "potted palm",
+        "global_features": {
+          "posture": "standing upright",
+          "expression": null,
+          "overall_shape": "tall with a wide canopy",
+          "overall_size": "large",
+          "dominant_colors": [
+            "green",
+            "brown",
+            "beige"
+          ],
+          "extra": [
+            "planted in a large pot"
+          ]
+        },
+        "sub_entities": [
+          {
+            "sub_entity_id": "palm_tree_01.trunk",
+            "description": "main stem of the palm tree",
+            "features": {
+              "colors": [
+                "sandy brown",
+                "tan"
+              ],
+              "texture": "rough and scaly",
+              "material": "wood",
+              "shape": "cylindrical",
+              "size": "large",
+              "state": "sturdy",
+              "pattern": "criss-cross diamond pattern",
+              "extra": [
+                "thickest at the bottom"
+              ]
+            },
+            "bbox_hd": [
+              1030.0,
+              160.0,
+              1150.0,
+              600.0
+            ]
+          },
+          {
+            "sub_entity_id": "palm_tree_01.canopy",
+            "description": "leaves at the top of the tree",
+            "features": {
+              "colors": [
+                "emerald green",
+                "dark green"
+              ],
+              "texture": "papery and ribbed",
+              "material": "plant matter",
+              "shape": "fanning out like an umbrella",
+              "size": "large",
+              "state": "healthy",
+              "pattern": "linear leaflets",
+              "extra": [
+                "drooping downwards"
+              ]
+            },
+            "bbox_hd": [
+              730.0,
+              0.0,
+              1376.0,
+              350.0
+            ]
+          },
+          {
+            "sub_entity_id": "palm_tree_01.base",
+            "description": "the pot holding the tree",
+            "features": {
+              "colors": [
+                "grey",
+                "beige"
+              ],
+              "texture": "rough",
+              "material": "ceramic or stone",
+              "shape": "cylindrical with a rim",
+              "size": "medium",
+              "state": "weathered",
+              "pattern": "solid",
+              "extra": [
+                "sitting on the pool deck"
+              ]
+            },
+            "bbox_hd": [
+              950.0,
+              580.0,
+              1220.0,
+              720.0
+            ]
+          }
+        ]
+      }
+    },
+    "background": {
+      "entity_type": "background",
+      "global_features": {
+        "time_of_day": "daytime",
+        "weather": "clear and sunny",
+        "mood": "cheerful and relaxing",
+        "dominant_colors": [
+          "blue",
+          "green",
+          "beige"
+        ],
+        "extra": [
+          "backyard pool setting"
+        ]
+      },
+      "sub_entities": [
+        {
+          "sub_entity_id": "bg.sky",
+          "description": "sky above the scene",
+          "features": {
+            "colors": [
+              "light blue",
+              "white"
+            ],
+            "texture": "smooth",
+            "material": null,
+            "pattern": "soft gradients",
+            "state": "clear",
+            "extra": [
+              "scattered faint clouds"
+            ]
+          },
+          "bbox_hd": [
+            0.0,
+            0.0,
+            1376.0,
+            350.0
+          ]
+        },
+        {
+          "sub_entity_id": "bg.water",
+          "description": "water in the swimming pool",
+          "features": {
+            "colors": [
+              "bright blue",
+              "cyan"
+            ],
+            "texture": "rippled",
+            "material": "water",
+            "pattern": "wave reflections",
+            "state": "calm",
+            "extra": [
+              "reflects the sky and objects"
+            ]
+          },
+          "bbox_hd": [
+            0.0,
+            480.0,
+            1376.0,
+            768.0
+          ]
+        },
+        {
+          "sub_entity_id": "bg.ground.deck",
+          "description": "stone paving around the pool",
+          "features": {
+            "colors": [
+              "beige",
+              "tan"
+            ],
+            "texture": "rough and porous",
+            "material": "stone",
+            "pattern": "irregular slabs",
+            "state": "dry",
+            "extra": [
+              "forms the edge of the pool"
+            ]
+          },
+          "bbox_hd": [
+            0.0,
+            440.0,
+            1376.0,
+            520.0
+          ]
+        },
+        {
+          "sub_entity_id": "bg.vegetation",
+          "description": "trees and bushes in the background",
+          "features": {
+            "colors": [
+              "dark green",
+              "olive"
+            ],
+            "texture": "leafy",
+            "material": "plant matter",
+            "pattern": "dense foliage",
+            "state": "lush",
+            "extra": [
+              "out of focus"
+            ]
+          },
+          "bbox_hd": [
+            0.0,
+            250.0,
+            1376.0,
+            460.0
+          ]
+        }
+      ]
+    }
+  },
+  "hd_masks": {
+    "axolotl_01.body": {
+      "shape": [
+        768,
+        1376
+      ],
+      "true_pixels": 29672,
+      "coverage_pct": 2.81
+    },
+    "axolotl_01.head": {
+      "shape": [
+        768,
+        1376
+      ],
+      "true_pixels": 16142,
+      "coverage_pct": 1.53
+    },
+    "axolotl_01.head.eyes.right": {
+      "shape": [
+        768,
+        1376
+      ],
+      "true_pixels": 900,
+      "coverage_pct": 0.09
+    },
+    "axolotl_01.head.gills": {
+      "shape": [
+        768,
+        1376
+      ],
+      "true_pixels": 594,
+      "coverage_pct": 0.06
+    },
+    "axolotl_01.head.mouth": {
+      "shape": [
+        768,
+        1376
+      ],
+      "true_pixels": 948,
+      "coverage_pct": 0.09
+    },
+    "axolotl_01.legs.back_right": {
+      "shape": [
+        768,
+        1376
+      ],
+      "true_pixels": 9000,
+      "coverage_pct": 0.85
+    },
+    "axolotl_01.legs.front_left": {
+      "shape": [
+        768,
+        1376
+      ],
+      "true_pixels": 5493,
+      "coverage_pct": 0.52
+    },
+    "axolotl_01.legs.front_right": {
+      "shape": [
+        768,
+        1376
+      ],
+      "true_pixels": 8725,
+      "coverage_pct": 0.83
+    },
+    "beach_ball_01.red_panel": {
+      "shape": [
+        768,
+        1376
+      ],
+      "true_pixels": 9417,
+      "coverage_pct": 0.89
+    },
+    "beach_ball_01.surface": {
+      "shape": [
+        768,
+        1376
+      ],
+      "true_pixels": 37735,
+      "coverage_pct": 3.57
+    },
+    "beach_ball_01.valve": {
+      "shape": [
+        768,
+        1376
+      ],
+      "true_pixels": 900,
+      "coverage_pct": 0.09
+    },
+    "bg.ground.deck": {
+      "shape": [
+        768,
+        1376
+      ],
+      "true_pixels": 17915,
+      "coverage_pct": 1.7
+    },
+    "bg.sky": {
+      "shape": [
+        768,
+        1376
+      ],
+      "true_pixels": 471163,
+      "coverage_pct": 44.59
+    },
+    "bg.vegetation": {
+      "shape": [
+        768,
+        1376
+      ],
+      "true_pixels": 218868,
+      "coverage_pct": 20.71
+    },
+    "bg.water": {
+      "shape": [
+        768,
+        1376
+      ],
+      "true_pixels": 336949,
+      "coverage_pct": 31.88
+    },
+    "floating_mat_01.cup_holder": {
+      "shape": [
+        768,
+        1376
+      ],
+      "true_pixels": 5000,
+      "coverage_pct": 0.47
+    },
+    "floating_mat_01.pillow": {
+      "shape": [
+        768,
+        1376
+      ],
+      "true_pixels": 30757,
+      "coverage_pct": 2.91
+    },
+    "floating_mat_01.surface": {
+      "shape": [
+        768,
+        1376
+      ],
+      "true_pixels": 126208,
+      "coverage_pct": 11.94
+    },
+    "palm_tree_01.base": {
+      "shape": [
+        768,
+        1376
+      ],
+      "true_pixels": 4128,
+      "coverage_pct": 0.39
+    },
+    "palm_tree_01.canopy": {
+      "shape": [
+        768,
+        1376
+      ],
+      "true_pixels": 202381,
+      "coverage_pct": 19.15
+    },
+    "palm_tree_01.trunk": {
+      "shape": [
+        768,
+        1376
+      ],
+      "true_pixels": 32171,
+      "coverage_pct": 3.04
+    }
+  },
+  "pixel_masks_artgrid": {
+    "axolotl_01.body": {
+      "shape": [
+        180,
+        280
+      ],
+      "true_pixels": 1411,
+      "coverage_pct": 2.8
+    },
+    "axolotl_01.head": {
+      "shape": [
+        180,
+        280
+      ],
+      "true_pixels": 754,
+      "coverage_pct": 1.5
+    },
+    "axolotl_01.head.eyes.right": {
+      "shape": [
+        180,
+        280
+      ],
+      "true_pixels": 42,
+      "coverage_pct": 0.08
+    },
+    "axolotl_01.head.gills": {
+      "shape": [
+        180,
+        280
+      ],
+      "true_pixels": 22,
+      "coverage_pct": 0.04
+    },
+    "axolotl_01.head.mouth": {
+      "shape": [
+        180,
+        280
+      ],
+      "true_pixels": 43,
+      "coverage_pct": 0.09
+    },
+    "axolotl_01.legs.back_right": {
+      "shape": [
+        180,
+        280
+      ],
+      "true_pixels": 414,
+      "coverage_pct": 0.82
+    },
+    "axolotl_01.legs.front_left": {
+      "shape": [
+        180,
+        280
+      ],
+      "true_pixels": 263,
+      "coverage_pct": 0.52
+    },
+    "axolotl_01.legs.front_right": {
+      "shape": [
+        180,
+        280
+      ],
+      "true_pixels": 424,
+      "coverage_pct": 0.84
+    },
+    "beach_ball_01.red_panel": {
+      "shape": [
+        180,
+        280
+      ],
+      "true_pixels": 438,
+      "coverage_pct": 0.87
+    },
+    "beach_ball_01.surface": {
+      "shape": [
+        180,
+        280
+      ],
+      "true_pixels": 1799,
+      "coverage_pct": 3.57
+    },
+    "beach_ball_01.valve": {
+      "shape": [
+        180,
+        280
+      ],
+      "true_pixels": 42,
+      "coverage_pct": 0.08
+    },
+    "bg.ground.deck": {
+      "shape": [
+        180,
+        280
+      ],
+      "true_pixels": 860,
+      "coverage_pct": 1.71
+    },
+    "bg.sky": {
+      "shape": [
+        180,
+        280
+      ],
+      "true_pixels": 22495,
+      "coverage_pct": 44.63
+    },
+    "bg.vegetation": {
+      "shape": [
+        180,
+        280
+      ],
+      "true_pixels": 10398,
+      "coverage_pct": 20.63
+    },
+    "bg.water": {
+      "shape": [
+        180,
+        280
+      ],
+      "true_pixels": 16020,
+      "coverage_pct": 31.79
+    },
+    "floating_mat_01.cup_holder": {
+      "shape": [
+        180,
+        280
+      ],
+      "true_pixels": 240,
+      "coverage_pct": 0.48
+    },
+    "floating_mat_01.pillow": {
+      "shape": [
+        180,
+        280
+      ],
+      "true_pixels": 1473,
+      "coverage_pct": 2.92
+    },
+    "floating_mat_01.surface": {
+      "shape": [
+        180,
+        280
+      ],
+      "true_pixels": 5983,
+      "coverage_pct": 11.87
+    },
+    "palm_tree_01.base": {
+      "shape": [
+        180,
+        280
+      ],
+      "true_pixels": 200,
+      "coverage_pct": 0.4
+    },
+    "palm_tree_01.canopy": {
+      "shape": [
+        180,
+        280
+      ],
+      "true_pixels": 9663,
+      "coverage_pct": 19.17
+    },
+    "palm_tree_01.trunk": {
+      "shape": [
+        180,
+        280
+      ],
+      "true_pixels": 1524,
+      "coverage_pct": 3.02
+    }
+  },
+  "entity_sprites": {
+    "axolotl_01": {
+      "x": 104,
+      "y": 97,
+      "w": 79,
+      "h": 74,
+      "visible_pixels": 2817
+    },
+    "beach_ball_01": {
+      "x": 13,
+      "y": 138,
+      "w": 46,
+      "h": 42,
+      "visible_pixels": 1799
+    },
+    "bg": {
+      "x": 0,
+      "y": 0,
+      "w": 280,
+      "h": 180,
+      "visible_pixels": 28368
+    },
+    "floating_mat_01": {
+      "x": 53,
+      "y": 124,
+      "w": 199,
+      "h": 56,
+      "visible_pixels": 6854
+    },
+    "palm_tree_01": {
+      "x": 151,
+      "y": 0,
+      "w": 129,
+      "h": 149,
+      "visible_pixels": 10562
+    }
+  },
+  "layers": {
+    "axolotl_01": {
+      "x": 104,
+      "y": 97,
+      "w": 79,
+      "h": 74,
+      "visible_pixels": 2817,
+      "has_inpainted_parent": true,
+      "children": [
+        "axolotl_01.body",
+        "axolotl_01.head",
+        "axolotl_01.legs"
+      ]
+    },
+    "axolotl_01.body": {
+      "x": 104,
+      "y": 118,
+      "w": 49,
+      "h": 41,
+      "visible_pixels": 1411,
+      "has_inpainted_parent": true,
+      "children": []
+    },
+    "axolotl_01.head": {
+      "x": 147,
+      "y": 97,
+      "w": 34,
+      "h": 34,
+      "visible_pixels": 754,
+      "has_inpainted_parent": true,
+      "children": [
+        "axolotl_01.head.eyes",
+        "axolotl_01.head.gills",
+        "axolotl_01.head.mouth"
+      ]
+    },
+    "axolotl_01.head.eyes": {
+      "x": 157,
+      "y": 101,
+      "w": 6,
+      "h": 7,
+      "visible_pixels": 42,
+      "has_inpainted_parent": true,
+      "children": [
+        "axolotl_01.head.eyes.right"
+      ]
+    },
+    "axolotl_01.head.eyes.right": {
+      "x": 157,
+      "y": 101,
+      "w": 6,
+      "h": 7,
+      "visible_pixels": 42,
+      "has_inpainted_parent": true,
+      "children": []
+    },
+    "axolotl_01.head.gills": {
+      "x": 147,
+      "y": 107,
+      "w": 2,
+      "h": 18,
+      "visible_pixels": 22,
+      "has_inpainted_parent": true,
+      "children": []
+    },
+    "axolotl_01.head.mouth": {
+      "x": 165,
+      "y": 108,
+      "w": 7,
+      "h": 9,
+      "visible_pixels": 43,
+      "has_inpainted_parent": true,
+      "children": []
+    },
+    "axolotl_01.legs": {
+      "x": 106,
+      "y": 138,
+      "w": 77,
+      "h": 33,
+      "visible_pixels": 1101,
+      "has_inpainted_parent": true,
+      "children": [
+        "axolotl_01.legs.back_right",
+        "axolotl_01.legs.front_left",
+        "axolotl_01.legs.front_right"
+      ]
+    },
+    "axolotl_01.legs.back_right": {
+      "x": 106,
+      "y": 148,
+      "w": 18,
+      "h": 23,
+      "visible_pixels": 414,
+      "has_inpainted_parent": true,
+      "children": []
+    },
+    "axolotl_01.legs.front_left": {
+      "x": 168,
+      "y": 138,
+      "w": 15,
+      "h": 23,
+      "visible_pixels": 263,
+      "has_inpainted_parent": true,
+      "children": []
+    },
+    "axolotl_01.legs.front_right": {
+      "x": 132,
+      "y": 138,
+      "w": 19,
+      "h": 25,
+      "visible_pixels": 424,
+      "has_inpainted_parent": true,
+      "children": []
+    },
+    "beach_ball_01": {
+      "x": 13,
+      "y": 138,
+      "w": 46,
+      "h": 42,
+      "visible_pixels": 1799,
+      "has_inpainted_parent": true,
+      "children": [
+        "beach_ball_01.red_panel",
+        "beach_ball_01.surface",
+        "beach_ball_01.valve"
+      ]
+    },
+    "beach_ball_01.red_panel": {
+      "x": 31,
+      "y": 160,
+      "w": 24,
+      "h": 20,
+      "visible_pixels": 438,
+      "has_inpainted_parent": true,
+      "children": []
+    },
+    "beach_ball_01.surface": {
+      "x": 13,
+      "y": 138,
+      "w": 46,
+      "h": 42,
+      "visible_pixels": 1799,
+      "has_inpainted_parent": true,
+      "children": []
+    },
+    "beach_ball_01.valve": {
+      "x": 41,
+      "y": 150,
+      "w": 6,
+      "h": 7,
+      "visible_pixels": 42,
+      "has_inpainted_parent": true,
+      "children": []
+    },
+    "bg": {
+      "x": 0,
+      "y": 0,
+      "w": 280,
+      "h": 180,
+      "visible_pixels": 50400,
+      "has_inpainted_parent": false,
+      "children": []
+    },
+    "floating_mat_01": {
+      "x": 53,
+      "y": 124,
+      "w": 199,
+      "h": 56,
+      "visible_pixels": 6854,
+      "has_inpainted_parent": true,
+      "children": [
+        "floating_mat_01.cup_holder",
+        "floating_mat_01.pillow",
+        "floating_mat_01.surface"
+      ]
+    },
+    "floating_mat_01.cup_holder": {
+      "x": 214,
+      "y": 164,
+      "w": 20,
+      "h": 12,
+      "visible_pixels": 240,
+      "has_inpainted_parent": true,
+      "children": []
+    },
+    "floating_mat_01.pillow": {
+      "x": 53,
+      "y": 124,
+      "w": 55,
+      "h": 33,
+      "visible_pixels": 1473,
+      "has_inpainted_parent": true,
+      "children": []
+    },
+    "floating_mat_01.surface": {
+      "x": 57,
+      "y": 141,
+      "w": 195,
+      "h": 39,
+      "visible_pixels": 5983,
+      "has_inpainted_parent": true,
+      "children": []
+    },
+    "palm_tree_01": {
+      "x": 151,
+      "y": 0,
+      "w": 129,
+      "h": 149,
+      "visible_pixels": 10562,
+      "has_inpainted_parent": true,
+      "children": [
+        "palm_tree_01.base",
+        "palm_tree_01.canopy",
+        "palm_tree_01.trunk"
+      ]
+    },
+    "palm_tree_01.base": {
+      "x": 197,
+      "y": 136,
+      "w": 51,
+      "h": 13,
+      "visible_pixels": 200,
+      "has_inpainted_parent": true,
+      "children": []
+    },
+    "palm_tree_01.canopy": {
+      "x": 151,
+      "y": 0,
+      "w": 129,
+      "h": 82,
+      "visible_pixels": 9663,
+      "has_inpainted_parent": true,
+      "children": []
+    },
+    "palm_tree_01.trunk": {
+      "x": 211,
+      "y": 38,
+      "w": 23,
+      "h": 74,
+      "visible_pixels": 1524,
+      "has_inpainted_parent": true,
+      "children": []
+    }
+  },
+  "sprite_code": {
+    "bg": {
+      "format": "image_background",
+      "x": null,
+      "y": null,
+      "w": 280,
+      "h": 180,
+      "mask_total": 50400,
+      "mask_assigned": 43933,
+      "mask_unique_ids": [
+        "bg.ground.deck",
+        "bg.sky",
+        "bg.vegetation",
+        "bg.water"
+      ]
+    },
+    "axolotl_01": {
+      "format": "raw_sprite",
+      "x": 104,
+      "y": 97,
+      "w": 79,
+      "h": 74,
+      "total_pixels": 5846,
+      "visible_pixels": 2817,
+      "mask_total": 5846,
+      "mask_assigned": 2817,
+      "mask_unique_ids": [
+        "axolotl_01.body",
+        "axolotl_01.head",
+        "axolotl_01.head.eyes.right",
+        "axolotl_01.head.gills",
+        "axolotl_01.head.mouth",
+        "axolotl_01.legs.back_right",
+        "axolotl_01.legs.front_left",
+        "axolotl_01.legs.front_right"
+      ],
+      "layer_count": 10,
+      "layer_ids": [
+        "axolotl_01.body",
+        "axolotl_01.head",
+        "axolotl_01.head.eyes",
+        "axolotl_01.head.eyes.right",
+        "axolotl_01.head.gills",
+        "axolotl_01.head.mouth",
+        "axolotl_01.legs",
+        "axolotl_01.legs.back_right",
+        "axolotl_01.legs.front_left",
+        "axolotl_01.legs.front_right"
+      ]
+    },
+    "floating_mat_01": {
+      "format": "raw_sprite",
+      "x": 53,
+      "y": 124,
+      "w": 199,
+      "h": 56,
+      "total_pixels": 11144,
+      "visible_pixels": 6854,
+      "mask_total": 11144,
+      "mask_assigned": 6854,
+      "mask_unique_ids": [
+        "floating_mat_01.pillow",
+        "floating_mat_01.surface"
+      ],
+      "layer_count": 3,
+      "layer_ids": [
+        "floating_mat_01.cup_holder",
+        "floating_mat_01.pillow",
+        "floating_mat_01.surface"
+      ]
+    },
+    "beach_ball_01": {
+      "format": "raw_sprite",
+      "x": 13,
+      "y": 138,
+      "w": 46,
+      "h": 42,
+      "total_pixels": 1932,
+      "visible_pixels": 1799,
+      "mask_total": 1932,
+      "mask_assigned": 1799,
+      "mask_unique_ids": [
+        "beach_ball_01.surface"
+      ],
+      "layer_count": 3,
+      "layer_ids": [
+        "beach_ball_01.red_panel",
+        "beach_ball_01.surface",
+        "beach_ball_01.valve"
+      ]
+    },
+    "palm_tree_01": {
+      "format": "raw_sprite",
+      "x": 151,
+      "y": 0,
+      "w": 129,
+      "h": 149,
+      "total_pixels": 19221,
+      "visible_pixels": 10562,
+      "mask_total": 19221,
+      "mask_assigned": 10562,
+      "mask_unique_ids": [
+        "palm_tree_01.base",
+        "palm_tree_01.canopy",
+        "palm_tree_01.trunk"
+      ],
+      "layer_count": 3,
+      "layer_ids": [
+        "palm_tree_01.base",
+        "palm_tree_01.canopy",
+        "palm_tree_01.trunk"
+      ]
+    }
+  }
+}
