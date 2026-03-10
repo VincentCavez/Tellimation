@@ -197,7 +197,7 @@ ANIMATION_IDS = {
     "A2_anticipation": "Entity compresses and lurches forward, freezes mid-motion",
     # S = Space
     "S1_reveal": "Occluding layer becomes semi-transparent to show hidden elements",
-    "S2_settle": "Object sinks into its actual position with soft bounce and shadow",
+    "S2_stamp": "Entity lifts slowly revealing a black silhouette, snaps back elastically, cracks radiate at impact",
     # T = Time
     "T1_flashback": "Target desaturates briefly (palette swap to grey) then re-saturates",
     "T2_timelapse": "Day-night cycle effect signaling temporal progression",
@@ -223,7 +223,7 @@ ANIMATION_IDS = {
 MISL_TO_ANIMATIONS: Dict[str, List[str]] = {
     # Macrostructure
     "character":         ["I1_spotlight", "I2_nametag"],
-    "setting":           ["S1_reveal", "S2_settle", "T2_timelapse"],
+    "setting":           ["S1_reveal", "S2_stamp", "T2_timelapse"],
     "initiating_event":  ["A1_motion_line", "A2_anticipation", "R3_causal_push", "D3_alert"],
     "internal_response": ["P2_emanation", "D2_thought_bubble", "D3_alert"],
     "plan":              ["D2_thought_bubble"],
