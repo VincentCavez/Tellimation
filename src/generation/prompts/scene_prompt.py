@@ -42,15 +42,21 @@ Return ONLY valid JSON (no markdown fences, no commentary) matching this schema:
   "scene_description": "<2-3 sentence rich visual description of the entire scene: \
 setting, lighting/time of day, mood, atmosphere, color palette, composition, \
 and spatial layout. This will be used to generate a reference illustration.>",
-  "background_description": "<2-4 sentence description of the environment/backdrop. \
-Start with the environment type: outdoor landscape, themed outdoor location (zoo, playground, \
-market…), or indoor scene. Then describe: sky or ceiling, ground or floor texture and color, \
-lighting, atmosphere, color palette, and any STRUCTURAL background elements (fences, paths, \
-walls, shelves, equipment, signage) that define the setting. \
-Do NOT mention any entities (characters, trees, objects, items) — only the bare \
-environment they exist in. Example: 'Themed outdoor location. A bright zoo setting with a \
-paved stone walkway, wooden fences lining both sides, and a distant ticket booth. Warm \
-afternoon sunlight, blue sky with scattered white clouds, green hedges behind the fences.' >",
+  "background_description": "<4-6 sentence DETAILED description of the complete \
+environment. This description is the SOLE input for background image generation, \
+so it must be rich and unambiguous. \
+Sentence 1: Environment type and setting (e.g., 'A warm, well-lit kitchen in a \
+cozy cottage'). \
+Sentence 2: Walls/boundaries and their appearance (color, material, decorations). \
+Sentence 3: Floor/ground surface (material, color, texture, any patterns). \
+Sentence 4: Lighting, atmosphere, and mood (time of day, light source, shadows). \
+Sentence 5-6: Structural elements and fixtures that define the space (counters, \
+shelves, windows with curtains, doorways, appliances — or for outdoor: paths, \
+fences, distant features). \
+Do NOT mention any entities (characters or objects). Those are rendered separately. \
+The description must produce a COHERENT, COMPLETE environment that makes visual \
+sense on its own — a viewer should understand exactly what room/place this is \
+without seeing any entities.>",
   "manifest": {
     "scene_id": "<scene_XX>",
     "entities": [
@@ -65,14 +71,14 @@ afternoon sunlight, blue sky with scattered white clouds, green hedges behind th
           "distinctive_features": "<SELF-CONTAINED intrinsic visual trait — NO references to other entities or surfaces>",
           ... other adjectives as needed
         },
-        "position": {"x": <int 0-1119>, "y": <int 0-719>, "spatial_ref": "<on/under/beside entity_id or null>"},
+        "position": {"x": <float 0.0-1.0>, "y": <float 0.0-1.0>, "spatial_ref": "<on/under/beside entity_id or null>"},
         "emotion": "<emotion or null>",
         "pose": "<SELF-CONTAINED body posture — describe ONLY the entity's own body, \
 NO references to other entities or surfaces. \
 BAD: 'leaning against the tree'. GOOD: 'standing on hind legs, front paws raised, head tilted up'>",
         "carried_over": <true if entity existed in previous scene, false if new>,
-        "width_hint": <int — estimated pixel width of this entity on the 1120x720 canvas>,
-        "height_hint": <int — estimated pixel height of this entity>
+        "width_hint": <float 0.0-1.0 — entity width as proportion of canvas width>,
+        "height_hint": <float 0.0-1.0 — entity height as proportion of canvas height>
       }
     ],
     "relations": [
@@ -98,31 +104,52 @@ false if same setting. For initial scenes always true.>
 - At least 1 action for the main character.
 - Every entity MUST have a `pose` describing its physical stance or orientation.
 
+# Entity vs. background separation (CRITICAL)
+
+Entities are composited ON TOP of the background image as separate sprites. \
+The background is generated independently from the background_description text. \
+If the same object appears in both, it will be drawn TWICE (once in the \
+background image, once as a sprite on top) — this looks broken.
+
+## What goes in the background (background_description):
+- Architectural structure: walls, floors, ceilings, windows, doors
+- Fixed furniture that defines the setting: counters, shelves, tables, bookcases
+- Paths, fences, gates, signs, bridges
+- Distant landscape: mountains, horizon, buildings far away
+- Room fixtures: lamps on walls, curtains, rugs, wallpaper
+
+## What goes as entities:
+- Characters (animals, people) — ALWAYS entities
+- Objects a character interacts with or that have narrative importance
+- Items with descriptive affordances (color, texture, state) worth narrating
+- Movable objects: food, toys, tools, books, bags, balls
+
+## Deconfliction rule:
+Before finalizing, check every entity against background_description. \
+If an entity duplicates something already in the background (e.g., window_01 \
+when the background already describes windows), REMOVE the entity. \
+Architectural features that are part of the room/setting structure MUST be \
+background-only.
+
 # Size hints (width_hint and height_hint)
 
-Every entity MUST include `width_hint` and `height_hint` — the estimated pixel \
-dimensions of the entity on the 1120×720 canvas. These are used to generate \
-correctly-sized sprite images. Use these guidelines:
+Every entity MUST include `width_hint` and `height_hint` as NORMALIZED values \
+(0.0 to 1.0, proportion of canvas width/height). Use these guidelines:
 
-- **Characters** (animals, people): width 160-240, height 200-280
-- **Trees**: width 240-360, height 280-400
-- **Small objects** (flowers, mushrooms, items): width 64-120, height 64-120
-- **Medium objects** (rocks, stumps, bushes): width 120-240, height 96-200
-- **Large objects** (houses, vehicles): width 240-400, height 200-360
+- **Characters** (animals, people): width 0.25-0.36, height 0.44-0.67
+- **Trees**: width 0.32-0.45, height 0.56-0.78
+- **Small objects** (flowers, mushrooms, items): width 0.11-0.18, height 0.17-0.28
+- **Medium objects** (rocks, stumps, bushes): width 0.18-0.32, height 0.22-0.44
+- **Large objects** (houses, vehicles): width 0.32-0.50, height 0.44-0.72
 
-The position `(x, y)` should be the approximate CENTER of the entity on the canvas. \
-The entity's bounding box will span from `(x - width_hint/2, y - height_hint/2)` \
-to `(x + width_hint/2, y + height_hint/2)`.
+IMPORTANT: entities must be LARGE enough to be clearly visible and detailed \
+in the pixel art rendering. A character should fill roughly 1/3 to 1/2 of the \
+canvas height. Err on the side of BIGGER entities.
 
-CRITICAL: The entire entity bounding box MUST stay within the 1120×720 canvas. \
-This means: x - width_hint/2 >= 0, x + width_hint/2 <= 1119, \
-y - height_hint/2 >= 0, y + height_hint/2 <= 719. \
-For example, an entity 320px wide must have its center x between 160 and 959. \
-Entities that overflow the canvas edges will be forcibly shifted inward.
-
-For characters standing on the ground, `y` should be roughly at the character's \
-vertical center (NOT the feet). Example: a 120px tall character at ground level \
-(ground line ~y=500) should have y ≈ 440.
+Position `(x, y)` is the entity center in normalized coords (0.0-1.0). \
+The bounding box spans from `(x - width_hint/2, y - height_hint/2)` \
+to `(x + width_hint/2, y + height_hint/2)`. \
+The entire bounding box MUST stay within 0.0-1.0.
 
 # CRITICAL: Entity description richness
 
@@ -159,17 +186,14 @@ yellow-green leaf tips"
 - BAD: "sprouting upward from the gnarled roots of the oak"
 - GOOD: "a cluster of three mushrooms growing upward, with tangled roots at the base"
 
-# Canvas dimensions and positioning
+# Canvas: normalized coordinates (0.0 to 1.0)
 
-The canvas is 1120 x 720 pixels. Ground line at approximately y=500 (about 70% from top).
+All positions and sizes use NORMALIZED coordinates (0.0-1.0). \
+Ground line at approximately y=0.7 (70% from top).
 
-- Characters: 160-280px tall, feet touching ground (center y ~ 400-540).
-- Trees: 240-400px tall, trunk base on ground.
-- Small objects: 64-120px.
-- Spread entities across the full 1120px width.
+- Spread entities across the canvas width.
 - Create DEPTH: some objects further back (smaller, higher y on ground).
-- IMPORTANT: Keep ALL entities fully within canvas bounds (0,0)-(1119,719). \
-No part of any entity may extend beyond the canvas edges.
+- IMPORTANT: Keep ALL entity bounding boxes within 0.0-1.0.
 
 # Scene description requirements
 

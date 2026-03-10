@@ -22,7 +22,7 @@ class TestScene:
             id="cat_01",
             type="cat",
             properties={"color": "orange", "size": "small"},
-            position=Position(x=100, y=50, spatial_ref="on fence_01"),
+            position=Position(x=0.09, y=0.07, spatial_ref="on fence_01"),
             emotion="happy",
             carried_over=False,
         )
@@ -37,8 +37,8 @@ class TestScene:
         m = SceneManifest(
             scene_id="s1",
             entities=[
-                Entity(id="a", type="rabbit", position=Position(x=0, y=0)),
-                Entity(id="b", type="owl", position=Position(x=10, y=10)),
+                Entity(id="a", type="rabbit", position=Position(x=0.0, y=0.0)),
+                Entity(id="b", type="owl", position=Position(x=0.1, y=0.1)),
             ],
         )
         assert m.get_entity("a") is not None
@@ -49,8 +49,8 @@ class TestScene:
         m = SceneManifest(
             scene_id="s1",
             entities=[
-                Entity(id="x", type="fox", position=Position(x=0, y=0)),
-                Entity(id="y", type="tree", position=Position(x=5, y=5)),
+                Entity(id="x", type="fox", position=Position(x=0.0, y=0.0)),
+                Entity(id="y", type="tree", position=Position(x=0.05, y=0.05)),
             ],
         )
         assert m.entity_ids() == ["x", "y"]
@@ -63,7 +63,7 @@ class TestScene:
                     id="rabbit_01",
                     type="rabbit",
                     properties={"color": "brown"},
-                    position=Position(x=90, y=104, spatial_ref="on rock_01"),
+                    position=Position(x=0.08, y=0.14, spatial_ref="on rock_01"),
                     emotion="curious",
                     carried_over=True,
                 ),
@@ -211,12 +211,12 @@ class TestStoryState:
             entities=[
                 Entity(
                     id="rabbit_01", type="rabbit",
-                    position=Position(x=100, y=80),
+                    position=Position(x=0.09, y=0.11),
                     carried_over=True,
                 ),
                 Entity(
                     id="owl_01", type="owl",
-                    position=Position(x=200, y=60),
+                    position=Position(x=0.18, y=0.08),
                     carried_over=False,
                 ),
             ],
@@ -224,7 +224,7 @@ class TestStoryState:
         carried, new = state.carry_over_entities(manifest)
         assert carried == ["rabbit_01"]
         assert new == ["owl_01"]
-        assert state.active_entities["rabbit_01"].last_position == {"x": 100, "y": 80}
+        assert state.active_entities["rabbit_01"].last_position == {"x": 0.09, "y": 0.11}
 
     def test_json_roundtrip(self):
         state = StoryState(
