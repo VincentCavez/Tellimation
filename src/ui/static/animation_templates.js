@@ -2556,13 +2556,10 @@ AnimationTemplates.register('repel', function(params) {
 
 
 // ── D1: Speech Bubble ──
-// Pixelated speech bubble with "..." or keyword above character.
-// Scaffolds dialogue and direct speech (linguistic_verbs).
+// Elliptical speech bubble with black 1px border, a pointed horn toward the
+// entity's head, and "..." (three bold dots) centered inside.
 AnimationTemplates.register('speech_bubble', function(params) {
   var prefix = params.entityPrefix || '';
-  var text = params.text || '...';
-  var bubbleColor = params.bubbleColor || [255, 255, 255];
-  var textColor = params.textColor || [40, 40, 40];
 
   return function animate(buf, PW, PH, t) {
     var env = _easeEnvelope(t, 0.2, 0.2);
@@ -2571,58 +2568,121 @@ AnimationTemplates.register('speech_bubble', function(params) {
     var bounds = _computeEntityBounds(buf, PW, prefix);
     if (bounds.x2 < 0) return;
 
-    // Position bubble above entity
-    var textLen = text.length;
-    var bw = Math.max(24, textLen * 7 + 8);
-    var bh = 14;
-    var bx = Math.round(bounds.cx - bw / 2);
-    var by = bounds.y1 - bh - 8;
-
-    // Clamp to canvas
-    bx = Math.max(1, Math.min(PW - bw - 1, bx));
-    by = Math.max(1, by);
-
     var alpha = env;
 
-    // Draw bubble background
-    for (var y = by; y < by + bh; y++) {
-      for (var x = bx; x < bx + bw; x++) {
-        if (x >= 0 && x < PW && y >= 0 && y < PH) {
+    // Ray-cast upward from entity center to find actual top contour pixel
+    var rayCX = Math.round(bounds.cx);
+    var entityTopY = bounds.y1;
+    var foundTop = false;
+    for (var rd = 1; rd <= Math.ceil(bounds.cy - bounds.y1) + 2; rd++) {
+      var rty = Math.round(bounds.cy) - rd;
+      if (rty < 0) break;
+      var rti = rty * PW + rayCX;
+      if (buf[rti].e && buf[rti].e.startsWith(prefix)) {
+        entityTopY = rty; foundTop = true;
+      } else if (foundTop) { break; }
+    }
+
+    // Ellipse half-radii and horn dimensions
+    var rx = 18, ry = 11;
+    var hornH = 9, hornHalfW = 4, gap = 2;
+
+    var hornTipX = rayCX;
+    var hornTipY = entityTopY - gap;
+    var bubbleCX = rayCX;
+    var bubbleCY = hornTipY - hornH - ry;
+
+    // Clamp bubble to canvas
+    bubbleCX = Math.max(rx + 2, Math.min(PW - rx - 2, bubbleCX));
+    if (bubbleCY < ry + 1) bubbleCY = ry + 1;
+
+    var hornBaseY = bubbleCY + ry;
+
+    // 1. Fill outer ellipse (rx+1, ry+1) black → 1px border ring
+    for (var y = bubbleCY - ry - 1; y <= bubbleCY + ry + 1; y++) {
+      if (y < 0 || y >= PH) continue;
+      for (var x = bubbleCX - rx - 1; x <= bubbleCX + rx + 1; x++) {
+        if (x < 0 || x >= PW) continue;
+        var nx = (x - bubbleCX) / (rx + 1), ny = (y - bubbleCY) / (ry + 1);
+        if (nx * nx + ny * ny <= 1.0) {
           var idx = y * PW + x;
-          buf[idx].r = Math.round(buf[idx].r * (1 - alpha) + bubbleColor[0] * alpha);
-          buf[idx].g = Math.round(buf[idx].g * (1 - alpha) + bubbleColor[1] * alpha);
-          buf[idx].b = Math.round(buf[idx].b * (1 - alpha) + bubbleColor[2] * alpha);
+          buf[idx].r = Math.round(buf[idx].r * (1 - alpha));
+          buf[idx].g = Math.round(buf[idx].g * (1 - alpha));
+          buf[idx].b = Math.round(buf[idx].b * (1 - alpha));
         }
       }
     }
 
-    // Draw bubble border
-    for (var x = bx; x < bx + bw; x++) {
-      _setPixel(buf, PW, PH, x, by, Math.round(120 * alpha), Math.round(120 * alpha), Math.round(120 * alpha));
-      _setPixel(buf, PW, PH, x, by + bh - 1, Math.round(120 * alpha), Math.round(120 * alpha), Math.round(120 * alpha));
-    }
-    for (var y = by; y < by + bh; y++) {
-      _setPixel(buf, PW, PH, bx, y, Math.round(120 * alpha), Math.round(120 * alpha), Math.round(120 * alpha));
-      _setPixel(buf, PW, PH, bx + bw - 1, y, Math.round(120 * alpha), Math.round(120 * alpha), Math.round(120 * alpha));
-    }
-
-    // Draw tail (triangle pointing down to entity)
-    var tailX = Math.round(bounds.cx);
-    for (var td = 0; td < 4; td++) {
-      if (tailX >= 0 && tailX < PW && by + bh + td >= 0 && by + bh + td < PH) {
-        var ti = (by + bh + td) * PW + tailX;
-        buf[ti].r = Math.round(buf[ti].r * (1 - alpha) + bubbleColor[0] * alpha);
-        buf[ti].g = Math.round(buf[ti].g * (1 - alpha) + bubbleColor[1] * alpha);
-        buf[ti].b = Math.round(buf[ti].b * (1 - alpha) + bubbleColor[2] * alpha);
+    // 2. Fill inner ellipse (rx, ry) white → interior
+    for (var y = bubbleCY - ry; y <= bubbleCY + ry; y++) {
+      if (y < 0 || y >= PH) continue;
+      for (var x = bubbleCX - rx; x <= bubbleCX + rx; x++) {
+        if (x < 0 || x >= PW) continue;
+        var nx = (x - bubbleCX) / rx, ny = (y - bubbleCY) / ry;
+        if (nx * nx + ny * ny <= 1.0) {
+          var idx = y * PW + x;
+          buf[idx].r = Math.round(buf[idx].r * (1 - alpha) + 255 * alpha);
+          buf[idx].g = Math.round(buf[idx].g * (1 - alpha) + 255 * alpha);
+          buf[idx].b = Math.round(buf[idx].b * (1 - alpha) + 255 * alpha);
+        }
       }
     }
 
-    // Draw text inside bubble
-    var tx = bx + 4;
-    var ty = by + 3;
-    drawText(buf, PW, PH, text, tx, ty,
-      Math.round(textColor[0] * alpha), Math.round(textColor[1] * alpha), Math.round(textColor[2] * alpha),
-      'temp.speech_bubble');
+    // 3. Horn (white fill + black outline edges), only if room exists
+    if (hornTipY > hornBaseY) {
+      // Fill horn white
+      for (var y = hornBaseY; y <= hornTipY; y++) {
+        if (y < 0 || y >= PH) continue;
+        var frac = (y - hornBaseY) / (hornTipY - hornBaseY);
+        var hw = Math.round(hornHalfW * (1 - frac));
+        var hcx = Math.round(bubbleCX + (hornTipX - bubbleCX) * frac);
+        for (var x = hcx - hw; x <= hcx + hw; x++) {
+          if (x < 0 || x >= PW) continue;
+          var idx = y * PW + x;
+          buf[idx].r = Math.round(buf[idx].r * (1 - alpha) + 255 * alpha);
+          buf[idx].g = Math.round(buf[idx].g * (1 - alpha) + 255 * alpha);
+          buf[idx].b = Math.round(buf[idx].b * (1 - alpha) + 255 * alpha);
+        }
+      }
+      // Draw horn outline edges (black lines)
+      var edgePts = [
+        [bubbleCX - hornHalfW, hornBaseY, hornTipX, hornTipY],
+        [bubbleCX + hornHalfW, hornBaseY, hornTipX, hornTipY]
+      ];
+      for (var ei = 0; ei < 2; ei++) {
+        var ex0 = edgePts[ei][0], ey0 = edgePts[ei][1];
+        var ex1 = edgePts[ei][2], ey1 = edgePts[ei][3];
+        var edx = ex1 - ex0, edy = ey1 - ey0;
+        var esteps = Math.max(Math.abs(edx), Math.abs(edy));
+        for (var es = 0; es <= esteps; es++) {
+          var epx = Math.round(ex0 + edx * es / esteps);
+          var epy = Math.round(ey0 + edy * es / esteps);
+          if (epx >= 0 && epx < PW && epy >= 0 && epy < PH) {
+            var epi = epy * PW + epx;
+            buf[epi].r = Math.round(buf[epi].r * (1 - alpha));
+            buf[epi].g = Math.round(buf[epi].g * (1 - alpha));
+            buf[epi].b = Math.round(buf[epi].b * (1 - alpha));
+          }
+        }
+      }
+    }
+
+    // 4. Draw "..." — three 3×3 black squares, centered in ellipse
+    var dotTopY = bubbleCY - 1;
+    var dotCXs = [bubbleCX - 5, bubbleCX, bubbleCX + 5];
+    for (var di = 0; di < 3; di++) {
+      for (var ddy = 0; ddy < 3; ddy++) {
+        for (var ddx = 0; ddx < 3; ddx++) {
+          var dpx = dotCXs[di] - 1 + ddx, dpy = dotTopY + ddy;
+          if (dpx >= 0 && dpx < PW && dpy >= 0 && dpy < PH) {
+            var dpi = dpy * PW + dpx;
+            buf[dpi].r = Math.round(buf[dpi].r * (1 - alpha));
+            buf[dpi].g = Math.round(buf[dpi].g * (1 - alpha));
+            buf[dpi].b = Math.round(buf[dpi].b * (1 - alpha));
+          }
+        }
+      }
+    }
   };
 }, 1500);
 
@@ -2631,72 +2691,132 @@ AnimationTemplates.register('speech_bubble', function(params) {
 // Scaffolds Internal Response and Plan (mental_verbs).
 AnimationTemplates.register('thought_bubble', function(params) {
   var prefix = params.entityPrefix || '';
-  var text = params.text || '...';
-  var bubbleColor = params.bubbleColor || [240, 240, 255];
-  var textColor = params.textColor || [60, 60, 80];
+  // Cloud shape = union of overlapping circles
+  var CC = [
+    { dx:  0,  dy:  2, r: 10 },  // main body
+    { dx: -8,  dy: -5, r:  7 },  // top-left bump
+    { dx:  0,  dy: -9, r:  7 },  // top-center bump
+    { dx:  8,  dy: -5, r:  7 },  // top-right bump
+    { dx:-13,  dy:  2, r:  5 },  // left side
+    { dx: 13,  dy:  2, r:  5 },  // right side
+  ];
+  var CLOUD_BOTTOM_DY = 12; // distance from cloud center to bottom
+
+  function inCloud(px, py, bcx, bcy, extra) {
+    for (var ci = 0; ci < CC.length; ci++) {
+      var cdx = px - (bcx + CC[ci].dx), cdy = py - (bcy + CC[ci].dy);
+      var r = CC[ci].r + extra;
+      if (cdx * cdx + cdy * cdy <= r * r) return true;
+    }
+    return false;
+  }
 
   return function animate(buf, PW, PH, t) {
-    var env = _easeEnvelope(t, 0.25, 0.25);
+    var env = _easeEnvelope(t, 0.2, 0.2);
     if (env < 0.01) return;
-
     var bounds = _computeEntityBounds(buf, PW, prefix);
     if (bounds.x2 < 0) return;
-
     var alpha = env;
 
-    // Main thought bubble (ellipse)
-    var textLen = text.length;
-    var bw = Math.max(20, textLen * 7 + 10);
-    var bh = 14;
-    var bx = Math.round(bounds.cx - bw / 2 + 8);
-    var by = bounds.y1 - bh - 12;
-    bx = Math.max(1, Math.min(PW - bw - 1, bx));
-    by = Math.max(1, by);
+    // Ray-cast upward to find entity top contour
+    var rayCX = Math.round(bounds.cx);
+    var entityTopY = bounds.y1;
+    var foundTop = false;
+    for (var rd = 1; rd <= Math.ceil(bounds.cy - bounds.y1) + 2; rd++) {
+      var rty = Math.round(bounds.cy) - rd;
+      if (rty < 0) break;
+      var rti = rty * PW + rayCX;
+      if (buf[rti].e && buf[rti].e.startsWith(prefix)) {
+        entityTopY = rty; foundTop = true;
+      } else if (foundTop) { break; }
+    }
 
-    // Draw main elliptical bubble
-    var rx = bw / 2, ry = bh / 2;
-    var cx = bx + rx, cy = by + ry;
-    for (var y = by - 1; y <= by + bh; y++) {
-      for (var x = bx - 1; x <= bx + bw; x++) {
-        var dx = (x - cx) / rx, dy = (y - cy) / ry;
-        if (dx * dx + dy * dy <= 1.0 && x >= 0 && x < PW && y >= 0 && y < PH) {
-          var idx = y * PW + x;
-          buf[idx].r = Math.round(buf[idx].r * (1 - alpha) + bubbleColor[0] * alpha);
-          buf[idx].g = Math.round(buf[idx].g * (1 - alpha) + bubbleColor[1] * alpha);
-          buf[idx].b = Math.round(buf[idx].b * (1 - alpha) + bubbleColor[2] * alpha);
+    var gap = 12;
+    var bcx = rayCX;
+    var bcy = (entityTopY - gap) - CLOUD_BOTTOM_DY;
+    bcx = Math.max(19, Math.min(PW - 19, bcx));
+    if (bcy < 17) bcy = 17;
+
+    // 1. Cloud border (black) — fill outer shape
+    var sxMin = Math.max(0, bcx - 20), sxMax = Math.min(PW - 1, bcx + 20);
+    var syMin = Math.max(0, bcy - 17), syMax = Math.min(PH - 1, bcy + 14);
+    for (var sy = syMin; sy <= syMax; sy++) {
+      for (var sx = sxMin; sx <= sxMax; sx++) {
+        if (inCloud(sx, sy, bcx, bcy, 1)) {
+          var si = sy * PW + sx;
+          buf[si].r = Math.round(buf[si].r * (1 - alpha));
+          buf[si].g = Math.round(buf[si].g * (1 - alpha));
+          buf[si].b = Math.round(buf[si].b * (1 - alpha));
         }
       }
     }
 
-    // Draw trailing thought dots (3 small circles)
-    var dotTrail = [
-      { x: Math.round(bounds.cx + 2), y: by + bh + 3, r: 2 },
-      { x: Math.round(bounds.cx - 1), y: by + bh + 7, r: 1.5 },
-      { x: Math.round(bounds.cx - 3), y: by + bh + 10, r: 1 },
-    ];
-    for (var d = 0; d < dotTrail.length; d++) {
-      var dot = dotTrail[d];
-      for (var dy = -Math.ceil(dot.r); dy <= Math.ceil(dot.r); dy++) {
-        for (var dx = -Math.ceil(dot.r); dx <= Math.ceil(dot.r); dx++) {
-          if (dx * dx + dy * dy <= dot.r * dot.r) {
-            var px = Math.round(dot.x + dx), py = Math.round(dot.y + dy);
-            if (px >= 0 && px < PW && py >= 0 && py < PH) {
-              var di = py * PW + px;
-              buf[di].r = Math.round(buf[di].r * (1 - alpha) + bubbleColor[0] * alpha);
-              buf[di].g = Math.round(buf[di].g * (1 - alpha) + bubbleColor[1] * alpha);
-              buf[di].b = Math.round(buf[di].b * (1 - alpha) + bubbleColor[2] * alpha);
-            }
+    // 2. Cloud interior (white fill)
+    for (var sy = syMin; sy <= syMax; sy++) {
+      for (var sx = sxMin; sx <= sxMax; sx++) {
+        if (inCloud(sx, sy, bcx, bcy, 0)) {
+          var si = sy * PW + sx;
+          buf[si].r = Math.round(buf[si].r * (1 - alpha) + 255 * alpha);
+          buf[si].g = Math.round(buf[si].g * (1 - alpha) + 255 * alpha);
+          buf[si].b = Math.round(buf[si].b * (1 - alpha) + 255 * alpha);
+        }
+      }
+    }
+
+    // 3. Trail circles just below cloud, touching each other, not reaching entity
+    var cloudBottomY = bcy + CLOUD_BOTTOM_DY;
+    var tr1 = 2, tr2 = 1;
+    var tc1y = cloudBottomY + 1 + tr1;   // 1px gap from cloud outer border
+    var tc2y = tc1y + tr1 + tr2;          // touching circle 1
+    var trailCircles = [{cx: bcx, cy: tc1y, r: tr1}, {cx: bcx, cy: tc2y, r: tr2}];
+    for (var ti = 0; ti < trailCircles.length; ti++) {
+      var tcx = trailCircles[ti].cx;
+      var tcy = trailCircles[ti].cy;
+      var tr = trailCircles[ti].r;
+      // outer black border
+      for (var ty = tcy - tr - 1; ty <= tcy + tr + 1; ty++) {
+        for (var tx = tcx - tr - 1; tx <= tcx + tr + 1; tx++) {
+          if (tx < 0 || tx >= PW || ty < 0 || ty >= PH) continue;
+          var tdx = tx - tcx, tdy = ty - tcy, outerR = tr + 1;
+          if (tdx * tdx + tdy * tdy <= outerR * outerR) {
+            var toi = ty * PW + tx;
+            buf[toi].r = Math.round(buf[toi].r * (1 - alpha));
+            buf[toi].g = Math.round(buf[toi].g * (1 - alpha));
+            buf[toi].b = Math.round(buf[toi].b * (1 - alpha));
+          }
+        }
+      }
+      // inner white fill
+      for (var ty = tcy - tr; ty <= tcy + tr; ty++) {
+        for (var tx = tcx - tr; tx <= tcx + tr; tx++) {
+          if (tx < 0 || tx >= PW || ty < 0 || ty >= PH) continue;
+          var tdx = tx - tcx, tdy = ty - tcy;
+          if (tdx * tdx + tdy * tdy <= tr * tr) {
+            var twi = ty * PW + tx;
+            buf[twi].r = Math.round(buf[twi].r * (1 - alpha) + 255 * alpha);
+            buf[twi].g = Math.round(buf[twi].g * (1 - alpha) + 255 * alpha);
+            buf[twi].b = Math.round(buf[twi].b * (1 - alpha) + 255 * alpha);
           }
         }
       }
     }
 
-    // Draw text inside bubble
-    var tx = bx + 5;
-    var ty = by + 3;
-    drawText(buf, PW, PH, text, tx, ty,
-      Math.round(textColor[0] * alpha), Math.round(textColor[1] * alpha), Math.round(textColor[2] * alpha),
-      'temp.thought_bubble');
+    // 4. "..." three 3×3 black squares inside cloud
+    var dotTopY = bcy - 1;
+    var dotCXs = [bcx - 5, bcx, bcx + 5];
+    for (var di = 0; di < 3; di++) {
+      for (var ddy = 0; ddy < 3; ddy++) {
+        for (var ddx = 0; ddx < 3; ddx++) {
+          var dpx = dotCXs[di] - 1 + ddx, dpy = dotTopY + ddy;
+          if (dpx >= 0 && dpx < PW && dpy >= 0 && dpy < PH) {
+            var dpi = dpy * PW + dpx;
+            buf[dpi].r = Math.round(buf[dpi].r * (1 - alpha));
+            buf[dpi].g = Math.round(buf[dpi].g * (1 - alpha));
+            buf[dpi].b = Math.round(buf[dpi].b * (1 - alpha));
+          }
+        }
+      }
+    }
   };
 }, 1500);
 
