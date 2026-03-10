@@ -5,12 +5,12 @@
 var ScenePicker = (function() {
   'use strict';
 
-  // Thumbnails are 1/2 the art grid (560x360 → 280x180).
+  // Thumbnails are 1/2 the art grid (PW×PH → PW/2 × PH/2).
   // We render sprites at art-grid resolution then downsample by averaging
   // each 2x2 block of pixels, so nothing gets cropped.
-  // Canvas is rendered at native 1:1 (280×180); CSS handles display scaling.
-  var THUMB_PW = 280;
-  var THUMB_PH = 180;
+  // Canvas is rendered at native 1:1; CSS handles display scaling.
+  var THUMB_PW = Math.ceil(PW / 2);
+  var THUMB_PH = Math.ceil(PH / 2);
   var DOWNSAMPLE_FACTOR = 2;
 
   /**

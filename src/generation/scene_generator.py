@@ -44,11 +44,11 @@ IMAGE_TIMEOUT = 120
 IMAGE_MAX_RETRIES = 2
 
 # Resolution model (must match engine.js)
-SOURCE_W = 1120   # manifest coordinates
+SOURCE_W = 1120   # HD image resolution (not used for manifest coords — those are normalized)
 SOURCE_H = 720
-K = 2             # pixel-art aggregation factor (2×2 HD pixels → 1 art pixel)
-ART_W = SOURCE_W // K   # 560
-ART_H = SOURCE_H // K   # 360
+K = 4             # pixel-art aggregation factor (4×4 HD pixels → 1 art pixel)
+ART_W = SOURCE_W // K   # 280
+ART_H = SOURCE_H // K   # 180
 
 
 # ---------------------------------------------------------------------------
@@ -106,27 +106,37 @@ def _build_scene_image_prompt(manifest_data: Dict[str, Any]) -> str:
     if not bg_desc:
         bg_desc = manifest_data.get("scene_description", "")
 
-    # Compute ground level from entity foot positions in manifest
-    entities = manifest_data.get("manifest", {}).get("entities", [])
-    foot_positions: list[int] = []
-    for ent in entities:
-        pos = ent.get("position", {})
-        y_center = pos.get("y", 0)
-        h_hint = ent.get("height_hint", 200)
-        foot_positions.append(y_center + h_hint // 2)
-
-    if foot_positions:
-        avg_foot = sum(foot_positions) // len(foot_positions)
-        pct = round(avg_foot / SOURCE_H * 100)
+    # Use background.ground_line if available, else compute from entity feet
+    bg_data = manifest_data.get("manifest", {}).get("background")
+    if bg_data and isinstance(bg_data, dict) and "ground_line" in bg_data:
+        pct = round(bg_data["ground_line"] * 100)
         ground_level_hint = (
-            f"Characters will stand with their feet at approximately "
+            f"The ground/floor surface MUST be at approximately "
             f"{pct}% from the top of the image. "
-            f"The ground/floor surface MUST be clearly visible at this level."
+            f"Characters will be composited on top of this background at that level."
         )
     else:
-        ground_level_hint = (
-            "The ground or floor should be at approximately 70% from the top."
-        )
+        # Fallback: compute ground level from entity foot positions (normalized)
+        entities = manifest_data.get("manifest", {}).get("entities", [])
+        foot_positions: list[float] = []
+        for ent in entities:
+            pos = ent.get("position", {})
+            y_center = pos.get("y", 0.0)
+            h_hint = ent.get("height_hint", 0.28)
+            foot_positions.append(y_center + h_hint / 2)
+
+        if foot_positions:
+            avg_foot = sum(foot_positions) / len(foot_positions)
+            pct = round(avg_foot * 100)
+            ground_level_hint = (
+                f"Characters will stand with their feet at approximately "
+                f"{pct}% from the top of the image. "
+                f"The ground/floor surface MUST be clearly visible at this level."
+            )
+        else:
+            ground_level_hint = (
+                "The ground or floor should be at approximately 70% from the top."
+            )
 
     return BACKGROUND_IMAGE_PROMPT_TEMPLATE.format(
         scene_description=bg_desc,
@@ -191,6 +201,14 @@ def _build_entity_description(entity: Dict[str, Any]) -> str:
             desc += f", {sanitized_pose}"
     if distinctive:
         desc += f". {distinctive}"
+
+    # Sensory properties (temperature, sound, smell) — enriches image prompt
+    sensory = entity.get("sensory")
+    if sensory and isinstance(sensory, dict):
+        sensory_parts = [f"{k}: {v}" for k, v in sensory.items() if v]
+        if sensory_parts:
+            desc += f". Sensory qualities: {', '.join(sensory_parts)}"
+
     return desc
 
 
@@ -634,7 +652,7 @@ def _compute_entity_positions(
 ) -> Dict[str, Dict[str, int]]:
     """Compute top-left positions and sizes in art-grid coordinates.
 
-    Manifest positions are in source coordinates (0-1119, 0-719).
+    Manifest positions are NORMALIZED (0.0-1.0).
     Converts to art-grid coordinates (0-ART_W-1, 0-ART_H-1).
 
     Returns:
@@ -646,17 +664,18 @@ def _compute_entity_positions(
         eid = ent["id"]
         pos = ent.get("position", {})
 
-        # Sprite dimensions (already in art-grid coords)
+        # Sprite dimensions (already in art-grid coords from downscale)
         if entity_sprites and eid in entity_sprites:
             w = entity_sprites[eid]["w"]
             h = entity_sprites[eid]["h"]
         else:
-            w = max(1, ent.get("width_hint", 50) // K)
-            h = max(1, ent.get("height_hint", 60) // K)
+            w = max(1, int(ent.get("width_hint", 0.05) * ART_W))
+            h = max(1, int(ent.get("height_hint", 0.08) * ART_H))
 
-        # Convert source center to art-grid center, then to top-left
-        art_cx = pos.get("x", 0) // K
-        art_cy = pos.get("y", 0) // K
+        # Convert normalized center to art-grid center
+        art_cx = int(pos.get("x", 0.0) * ART_W)
+        art_cy = int(pos.get("y", 0.0) * ART_H)
+
         x = art_cx - w // 2
         y = art_cy - h // 2
 
@@ -673,7 +692,7 @@ def _compute_entity_positions(
         positions[eid] = {"x": x, "y": y, "w": w, "h": h}
 
     # Diagnostic: warn if entity feet are above canonical ground line
-    canonical_ground_art_y = SOURCE_H * 70 // (100 * K)  # ~126
+    canonical_ground_art_y = int(0.7 * ART_H)  # ~126
     float_threshold = ART_H // 6  # ~30 px
     for eid, pos in positions.items():
         foot_y = pos["y"] + pos["h"]
@@ -776,6 +795,130 @@ def _compose_scene(
 
 
 # ---------------------------------------------------------------------------
+# Entity / background deconfliction (code-level enforcement)
+# ---------------------------------------------------------------------------
+
+
+# Material/modifier words to SKIP when matching entity types against background.
+# These describe properties, not structural objects.
+_MODIFIER_WORDS = frozenset({
+    # Materials
+    "wooden", "metal", "stone", "brick", "glass", "plastic",
+    "iron", "steel", "concrete", "marble", "ceramic",
+    # Sizes
+    "small", "medium", "large", "big", "tiny", "tall", "short",
+    # Colors
+    "red", "blue", "green", "yellow", "white", "black", "brown",
+    "grey", "gray", "orange", "pink", "purple", "golden",
+    # Age/state
+    "old", "new", "broken", "rusty", "dusty", "shiny",
+})
+
+
+def _fuzzy_word_match(entity_word: str, text_word: str) -> bool:
+    """Check if two words are likely the same concept (singular/plural/variant).
+
+    Uses common-prefix length ratio. The shared prefix must be:
+    - At least 75% of the shorter word
+    - At least 60% of the longer word
+    - At least 4 characters
+
+    This catches: bookshelf↔bookshelves, lamp↔lamps, fence↔fences, pool↔pools
+    but rejects: book↔bookshelves, pot↔pottery, tide↔tidepool
+    """
+    if entity_word == text_word:
+        return True
+    common = 0
+    for a, b in zip(entity_word, text_word):
+        if a == b:
+            common += 1
+        else:
+            break
+    if common < 4:
+        return False
+    min_len = min(len(entity_word), len(text_word))
+    max_len = max(len(entity_word), len(text_word))
+    return common >= min_len * 0.75 and common >= max_len * 0.6
+
+
+def _word_matches_text(word: str, text: str) -> bool:
+    """Check if a word fuzzy-matches any word in a text string."""
+    for tw in text.split():
+        # Strip punctuation from text words
+        tw_clean = re.sub(r'[^a-z]', '', tw)
+        if len(tw_clean) < 3:
+            continue
+        if _fuzzy_word_match(word, tw_clean):
+            return True
+    return False
+
+
+def _filter_overlapping_entities(
+    manifest_data: Dict[str, Any],
+) -> List[str]:
+    """Return entity IDs to SKIP because they duplicate background elements.
+
+    Data-driven checks only — no hardcoded keyword list. Uses the LLM's own
+    structural_elements and background_description to detect overlap via
+    fuzzy word matching (handles singular/plural).
+
+    Entities with an 'emotion' field are assumed to be characters and are
+    NEVER filtered.
+    """
+    skip_ids: List[str] = []
+
+    bg_data = manifest_data.get("manifest", {}).get("background", {})
+    structural = bg_data.get("structural_elements", []) if isinstance(bg_data, dict) else []
+    structural_text = " ".join(s.lower() for s in structural if isinstance(s, str))
+
+    bg_desc = manifest_data.get("background_description", "").lower()
+
+    for ent in manifest_data.get("manifest", {}).get("entities", []):
+        eid = ent.get("id", "")
+        etype = ent.get("type", "").lower().strip()
+
+        # Characters (have emotion) are NEVER filtered
+        if ent.get("emotion"):
+            continue
+
+        # Check each word in the entity type against structural_elements
+        # Skip modifier words — they describe materials/properties, not objects
+        type_words = [
+            tw for tw in etype.replace("_", " ").split()
+            if tw not in _MODIFIER_WORDS
+        ]
+        matched = False
+        for tw in type_words:
+            if len(tw) < 3:
+                continue
+            if _word_matches_text(tw, structural_text):
+                skip_ids.append(eid)
+                logger.warning(
+                    "[deconflict] Removing %s (type='%s'): word '%s' "
+                    "matches structural_elements",
+                    eid, etype, tw,
+                )
+                matched = True
+                break
+
+        if not matched:
+            # Check entity type against background_description
+            for tw in type_words:
+                if len(tw) < 4:
+                    continue
+                if _word_matches_text(tw, bg_desc):
+                    skip_ids.append(eid)
+                    logger.warning(
+                        "[deconflict] Removing %s (type='%s'): word '%s' "
+                        "found in background_description",
+                        eid, etype, tw,
+                    )
+                    break
+
+    return skip_ids
+
+
+# ---------------------------------------------------------------------------
 # Public API: generate_scene_assets
 # ---------------------------------------------------------------------------
 
@@ -834,11 +977,19 @@ async def generate_scene_assets(
             reused_bg_sprite = old_bg
             logger.info("[assets] Reusing background (background_changed=false)")
 
-    # --- Collect entities to generate (skip carried_over) ---
+    # --- Filter entities that duplicate background structural elements ---
+    skip_ids = _filter_overlapping_entities(manifest_data)
+    if skip_ids:
+        logger.info("[assets] Filtered %d overlapping entities: %s",
+                     len(skip_ids), skip_ids)
+
+    # --- Collect entities to generate (skip carried_over + overlapping) ---
     entities_to_generate = []
     for ent in manifest_data.get("manifest", {}).get("entities", []):
         if ent.get("id") in carried_over or ent.get("carried_over"):
             continue
+        if ent.get("id") in skip_ids:
+            continue  # Would duplicate background
         entities_to_generate.append(ent)
 
     # --- Step 1+2: Background + Entity images (PARALLEL) ---
@@ -911,9 +1062,9 @@ async def generate_scene_assets(
         eid = ent["id"]
         if eid not in entity_images:
             continue
-        # Target dimensions in art-grid coordinates
-        art_w = max(1, ent.get("width_hint", 50) // K)
-        art_h = max(1, ent.get("height_hint", 60) // K)
+        # Target dimensions in art-grid coordinates (normalized → pixels)
+        art_w = max(20, int(ent.get("width_hint", 0.05) * ART_W))
+        art_h = max(20, int(ent.get("height_hint", 0.08) * ART_H))
 
         t_proc = time.time()
         rgba = _remove_magenta(entity_images[eid])
