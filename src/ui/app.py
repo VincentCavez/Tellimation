@@ -85,6 +85,22 @@ async def story_page():
 # REST API endpoints
 # ---------------------------------------------------------------------------
 
+@app.get("/api/simulation-scene")
+async def api_simulation_scene():
+    """Return the cached simulation scene (no Gemini call)."""
+    p = BASE_DIR.resolve()
+    scene_path = None
+    for _ in range(8):
+        candidate = p / "data" / "users" / "simulation" / "story_001" / "scene_01.json"
+        if candidate.exists():
+            scene_path = candidate
+            break
+        p = p.parent
+    if scene_path is None:
+        return JSONResponse(status_code=404, content={"error": "Simulation scene not found"})
+    return JSONResponse(content=json.loads(scene_path.read_text()))
+
+
 @app.post("/api/report")
 async def api_report(request: Request):
     """Generate a post-session SLP report."""
