@@ -1589,9 +1589,12 @@ AnimationTemplates.register('decomposition', function(params) {
 AnimationTemplates.register('causal_push', function(params) {
   var prefixA = params.entityPrefixA || params.entityPrefix || '';
   var prefixB = params.entityPrefixB || '';
-  var rushPx = _clamp(params.rushPixels || 15, 3, 30);
   var ps = new ParticleSystem(ParticlePresets.explosion);
   var impacted = false;
+  // Cached: contour gap along A→B axis, computed once
+  var cachedRushDist = null;
+  var cachedNdx = 0, cachedNdy = 0; // unit direction A→B
+  var cachedImpactX = 0, cachedImpactY = 0; // impact point on B's contour
 
   return function animate(buf, PW, PH, t) {
     var boundsA = _computeEntityBounds(buf, PW, prefixA);
@@ -1599,43 +1602,77 @@ AnimationTemplates.register('causal_push', function(params) {
     if (!boundsB || boundsA.x2 < 0) return;
 
     var pixelsA = _collectEntityPixels(buf, PW, prefixA);
-    var dirAB = boundsB.cx > boundsA.cx ? 1 : -1;
-    var dxA = 0;
+
+    // Compute diagonal contour gap on first frame (cached)
+    if (cachedRushDist === null) {
+      var pixelsB_init = _collectEntityPixels(buf, PW, prefixB);
+      var aCx0 = boundsA.cx, aCy0 = boundsA.cy;
+      var bCx0 = boundsB.cx, bCy0 = boundsB.cy;
+      var ddx = bCx0 - aCx0, ddy = bCy0 - aCy0;
+      var centerDist = Math.sqrt(ddx * ddx + ddy * ddy);
+      if (centerDist < 1) centerDist = 1;
+      cachedNdx = ddx / centerDist;
+      cachedNdy = ddy / centerDist;
+
+      // Project A pixels onto A→B axis: max forward extent from A center
+      var maxProjA = 0;
+      for (var j = 0; j < pixelsA.length; j++) {
+        var proj = (pixelsA[j].x - aCx0) * cachedNdx + (pixelsA[j].y - aCy0) * cachedNdy;
+        if (proj > maxProjA) maxProjA = proj;
+      }
+      // Project B pixels onto B→A axis: max forward extent from B center
+      var maxProjB = 0;
+      for (var j = 0; j < pixelsB_init.length; j++) {
+        var proj = (pixelsB_init[j].x - bCx0) * (-cachedNdx) + (pixelsB_init[j].y - bCy0) * (-cachedNdy);
+        if (proj > maxProjB) maxProjB = proj;
+      }
+
+      var gap = centerDist - maxProjA - maxProjB;
+      cachedRushDist = Math.max(0, gap);
+
+      // Impact point: B's contour edge facing A (B center minus B's forward extent along A→B)
+      cachedImpactX = Math.round(bCx0 - maxProjB * cachedNdx);
+      cachedImpactY = Math.round(bCy0 - maxProjB * cachedNdy);
+    }
+
+    var dxA = 0, dyA = 0;
 
     if (t < 0.4) {
-      // Rush toward B
+      // Rush toward B — diagonal, ease-in (acceleration)
       var progress = t / 0.4;
-      // Ease-in curve for acceleration
-      dxA = Math.round(rushPx * progress * progress * dirAB);
+      dxA = Math.round(cachedRushDist * progress * progress * cachedNdx);
+      dyA = Math.round(cachedRushDist * progress * progress * cachedNdy);
     } else if (t < 0.5) {
-      // Impact — hold at max displacement
-      dxA = Math.round(rushPx * dirAB);
+      // Impact — hold at contact
+      dxA = Math.round(cachedRushDist * cachedNdx);
+      dyA = Math.round(cachedRushDist * cachedNdy);
 
-      // Spawn impact burst
+      // Spawn impact burst at contour contact point
       if (!impacted) {
-        var impactX = Math.round((boundsA.cx + rushPx * dirAB + boundsB.cx) / 2);
-        var impactY = Math.round((boundsA.cy + boundsB.cy) / 2);
-        ps.burst(impactX, impactY, 12);
+        ps.burst(cachedImpactX, cachedImpactY, 14);
         impacted = true;
       }
     } else {
-      // Recoil — bounce back
+      // Recoil — bounce back diagonally
       var recoil = (t - 0.5) / 0.5;
-      dxA = Math.round(rushPx * (1 - recoil) * dirAB);
+      dxA = Math.round(cachedRushDist * (1 - recoil) * cachedNdx);
+      dyA = Math.round(cachedRushDist * (1 - recoil) * cachedNdy);
     }
 
-    if (dxA !== 0) {
+    if (dxA !== 0 || dyA !== 0) {
       _blankEntityPixels(buf, pixelsA);
-      _redrawEntityPixels(buf, PW, PH, pixelsA, dxA, 0);
+      _redrawEntityPixels(buf, PW, PH, pixelsA, dxA, dyA);
     }
 
-    // B shakes slightly on impact
+    // B shakes along impact axis on impact
     if (t >= 0.4 && t < 0.65) {
       var pixelsB = _collectEntityPixels(buf, PW, prefixB);
-      var shake = Math.round(3 * Math.sin((t - 0.4) / 0.25 * Math.PI * 6) * (1 - (t - 0.4) / 0.25));
-      if (shake !== 0 && pixelsB.length > 0) {
+      var shakeMag = Math.round(3 * Math.sin((t - 0.4) / 0.25 * Math.PI * 6) * (1 - (t - 0.4) / 0.25));
+      if (shakeMag !== 0 && pixelsB.length > 0) {
+        var shakeX = Math.round(shakeMag * cachedNdx);
+        var shakeY = Math.round(shakeMag * cachedNdy);
         _blankEntityPixels(buf, pixelsB);
-        _redrawEntityPixels(buf, PW, PH, pixelsB, shake, 0);
+        _redrawEntityPixels(buf, PW, PH, pixelsB, shakeX, shakeY);
       }
     }
 
