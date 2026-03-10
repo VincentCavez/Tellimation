@@ -1814,8 +1814,9 @@ AnimationTemplates.register('bonk', function(params) {
 
     // Large star burst at impact point during collision
     if (t >= 0.25 && t < 0.50) {
-      // Impact point: use contour contact point (displaced by movement)
-      var ipx = cachedImpactX, ipy = cachedImpactY;
+      // Impact point: midpoint of displaced centers (same as magnetism sparkles)
+      var ipx = Math.round((boundsA.cx + dxA + (boundsB ? boundsB.cx + dxB : boundsA.cx)) / 2);
+      var ipy = Math.round((boundsA.cy + dyA + (boundsB ? boundsB.cy + dyB : boundsA.cy)) / 2);
       var starAlpha = t < 0.32
         ? (t - 0.25) / 0.07       // fade in
         : 1 - (t - 0.32) / 0.18;  // fade out
