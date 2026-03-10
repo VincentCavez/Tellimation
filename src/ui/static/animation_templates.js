@@ -1674,12 +1674,10 @@ AnimationTemplates.register('decomposition', function(params) {
 AnimationTemplates.register('causal_push', function(params) {
   var prefixA = params.entityPrefixA || params.entityPrefix || '';
   var prefixB = params.entityPrefixB || '';
-  var ps = new ParticleSystem(ParticlePresets.explosion);
-  var impacted = false;
-  // Cached: contour gap along A→B axis, computed once
+  var knockPx = _clamp(params.knockPixels || 15, 5, 30);
+  // Cached contour gap data
   var cachedRushDist = null;
-  var cachedNdx = 0, cachedNdy = 0; // unit direction A→B
-  var cachedImpactX = 0, cachedImpactY = 0; // impact point on B's contour
+  var cachedNdx = 0, cachedNdy = 0;
 
   return function animate(buf, PW, PH, t) {
     var boundsA = _computeEntityBounds(buf, PW, prefixA);
@@ -1687,61 +1685,108 @@ AnimationTemplates.register('causal_push', function(params) {
     if (!boundsB || boundsA.x2 < 0) return;
 
     var pixelsA = _collectEntityPixels(buf, PW, prefixA);
+    var pixelsB = _collectEntityPixels(buf, PW, prefixB);
 
     // Compute true contour gap on first frame (cached)
     if (cachedRushDist === null) {
-      var pixelsB_init = _collectEntityPixels(buf, PW, prefixB);
-      var cg = _computeContourGap(pixelsA, pixelsB_init, boundsA, boundsB);
+      var cg = _computeContourGap(pixelsA, pixelsB, boundsA, boundsB);
       cachedNdx = cg.ndx;
       cachedNdy = cg.ndy;
       cachedRushDist = cg.gap;
-      cachedImpactX = cg.impactX;
-      cachedImpactY = cg.impactY;
     }
 
-    var dxA = 0, dyA = 0;
+    var dxA = 0, dyA = 0, dxB = 0, dyB = 0;
 
-    if (t < 0.4) {
-      // Rush toward B — diagonal, ease-in (acceleration)
-      var progress = t / 0.4;
+    if (t < 0.35) {
+      // A rushes toward B — ease-in acceleration
+      var progress = t / 0.35;
       dxA = Math.round(cachedRushDist * progress * progress * cachedNdx);
       dyA = Math.round(cachedRushDist * progress * progress * cachedNdy);
-    } else if (t < 0.5) {
-      // Impact — hold at contact
-      dxA = Math.round(cachedRushDist * cachedNdx);
-      dyA = Math.round(cachedRushDist * cachedNdy);
-
-      // Spawn impact burst at contour contact point
-      if (!impacted) {
-        ps.burst(cachedImpactX, cachedImpactY, 14);
-        impacted = true;
-      }
+    } else if (t < 0.40) {
+      // Impact: A holds at contact, jitter both
+      var jitter = Math.round((Math.random() - 0.5) * 3);
+      dxA = Math.round(cachedRushDist * cachedNdx + jitter * cachedNdx);
+      dyA = Math.round(cachedRushDist * cachedNdy + jitter * cachedNdy);
+      dxB = Math.round(jitter * cachedNdx);
+      dyB = Math.round(jitter * cachedNdy);
     } else {
-      // Recoil — bounce back diagonally
-      var recoil = (t - 0.5) / 0.5;
-      dxA = Math.round(cachedRushDist * (1 - recoil) * cachedNdx);
-      dyA = Math.round(cachedRushDist * (1 - recoil) * cachedNdy);
+      // Post-impact: A recoils back, B gets knocked away
+      var postT = (t - 0.40) / 0.60;
+      // A recoils with damped oscillation
+      var decayA = (1 - postT);
+      var bounceA = Math.sin(postT * Math.PI * 2) * decayA;
+      dxA = Math.round(-cachedRushDist * 0.3 * bounceA * cachedNdx);
+      dyA = Math.round(-cachedRushDist * 0.3 * bounceA * cachedNdy);
+      // B knocked away in A→B direction with damped bounce
+      var decayB = (1 - postT);
+      var bounceB = Math.sin(postT * Math.PI * 3) * decayB;
+      dxB = Math.round(knockPx * bounceB * cachedNdx);
+      dyB = Math.round(knockPx * bounceB * cachedNdy);
     }
 
-    if (dxA !== 0 || dyA !== 0) {
-      _blankEntityPixels(buf, pixelsA);
-      _redrawEntityPixels(buf, PW, PH, pixelsA, dxA, dyA);
-    }
+    _blankEntityPixels(buf, pixelsA);
+    _blankEntityPixels(buf, pixelsB);
+    _redrawEntityPixels(buf, PW, PH, pixelsA, dxA, dyA);
+    _redrawEntityPixels(buf, PW, PH, pixelsB, dxB, dyB);
 
-    // B shakes along impact axis on impact
-    if (t >= 0.4 && t < 0.65) {
-      var pixelsB = _collectEntityPixels(buf, PW, prefixB);
-      var shakeMag = Math.round(3 * Math.sin((t - 0.4) / 0.25 * Math.PI * 6) * (1 - (t - 0.4) / 0.25));
-      if (shakeMag !== 0 && pixelsB.length > 0) {
-        var shakeX = Math.round(shakeMag * cachedNdx);
-        var shakeY = Math.round(shakeMag * cachedNdy);
-        _blankEntityPixels(buf, pixelsB);
-        _redrawEntityPixels(buf, PW, PH, pixelsB, shakeX, shakeY);
+    // Star burst at impact (same as bonk)
+    if (t >= 0.30 && t < 0.55) {
+      // Midpoint of displaced centers
+      var ipx = Math.round((boundsA.cx + dxA + boundsB.cx + dxB) / 2);
+      var ipy = Math.round((boundsA.cy + dyA + boundsB.cy + dyB) / 2);
+      var starAlpha;
+      if (t < 0.37) {
+        starAlpha = (t - 0.30) / 0.07;
+      } else {
+        starAlpha = 1 - (t - 0.37) / 0.18;
+      }
+      starAlpha = Math.max(0, Math.min(1, starAlpha));
+
+      // Core (3×3)
+      for (var dy = -1; dy <= 1; dy++) {
+        for (var dx = -1; dx <= 1; dx++) {
+          var sx = ipx + dx, sy = ipy + dy;
+          if (sx >= 0 && sx < PW && sy >= 0 && sy < PH) {
+            var si = sy * PW + sx;
+            buf[si].r = Math.min(255, Math.round(buf[si].r * (1 - starAlpha) + 255 * starAlpha));
+            buf[si].g = Math.min(255, Math.round(buf[si].g * (1 - starAlpha) + 255 * starAlpha));
+            buf[si].b = Math.min(255, Math.round(buf[si].b * (1 - starAlpha) + 180 * starAlpha));
+          }
+        }
+      }
+      // Cardinal spikes (length 6)
+      var spikeLen = 6;
+      var cardinals = [[1,0],[-1,0],[0,1],[0,-1]];
+      for (var c = 0; c < 4; c++) {
+        for (var d = 2; d <= spikeLen; d++) {
+          var fade = 1 - (d - 1) / spikeLen;
+          var sa = starAlpha * fade;
+          var sx = ipx + cardinals[c][0] * d, sy = ipy + cardinals[c][1] * d;
+          if (sx >= 0 && sx < PW && sy >= 0 && sy < PH) {
+            var si = sy * PW + sx;
+            buf[si].r = Math.min(255, Math.round(buf[si].r * (1 - sa) + 255 * sa));
+            buf[si].g = Math.min(255, Math.round(buf[si].g * (1 - sa) + 255 * sa));
+            buf[si].b = Math.min(255, Math.round(buf[si].b * (1 - sa) + 120 * sa));
+          }
+        }
+      }
+      // Diagonal spikes (length 4)
+      var diagLen = 4;
+      var diags = [[1,1],[-1,1],[1,-1],[-1,-1]];
+      for (var c = 0; c < 4; c++) {
+        for (var d = 2; d <= diagLen; d++) {
+          var fade = 1 - (d - 1) / diagLen;
+          var sa = starAlpha * fade;
+          var sx = ipx + diags[c][0] * d, sy = ipy + diags[c][1] * d;
+          if (sx >= 0 && sx < PW && sy >= 0 && sy < PH) {
+            var si = sy * PW + sx;
+            buf[si].r = Math.min(255, Math.round(buf[si].r * (1 - sa) + 255 * sa));
+            buf[si].g = Math.min(255, Math.round(buf[si].g * (1 - sa) + 230 * sa));
+            buf[si].b = Math.min(255, Math.round(buf[si].b * (1 - sa) + 80 * sa));
+          }
+        }
       }
     }
-
-    ps.update(1 / 60);
-    ps.draw(buf, PW, PH);
   };
 }, 1500);
 
