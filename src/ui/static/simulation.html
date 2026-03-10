@@ -587,12 +587,12 @@
     var SINGLE_ENTITY = [
       'spotlight', 'nametag', 'stamp', 'color_pop', 'reveal',
       'emanation', 'motion_lines', 'anticipation',
-      'disintegration', 'ghost_outline', 'speech_bubble', 'thought_bubble', 'alert'
+      'disintegration', 'ghost_outline', 'speech_bubble', 'thought_bubble', 'alert', 'interjection'
     ];
     var TWO_ENTITY = ['magnetism', 'repel', 'causal_push'];
     var SCENE_WIDE = ['timelapse', 'flashback'];
     var MULTI_ENTITY = ['sequential_glow'];
-    var WORD_ONLY = ['interjection'];
+    var WORD_ONLY = [];
 
     function getEntityA() { return document.getElementById('entityA').value; }
     function getEntityB() { return document.getElementById('entityB').value; }
@@ -622,6 +622,8 @@
       if (templateName === 'motion_lines') params.direction = document.getElementById('paramDirection').value;
       if (templateName === 'speech_bubble' || templateName === 'thought_bubble')
         params.text = document.getElementById('paramText').value || 'Hello!';
+      if (templateName === 'interjection')
+        params.word = document.getElementById('paramWord').value || 'Wow!';
 
       return { template: templateName, params: params };
     }
