@@ -2826,48 +2826,97 @@ AnimationTemplates.register('thought_bubble', function(params) {
 // Scaffolds Initiating Event (IE) and Internal Response (IR).
 AnimationTemplates.register('alert', function(params) {
   var prefix = params.entityPrefix || '';
-  var alertColor = params.alertColor || [255, 220, 50];
-  var bgColor = params.bgColor || [200, 60, 60];
+
+  // "!" bitmap: 5 wide × 20 tall — same height structure as ghost_outline "?"
+  // Body: rows 0-13 (3px wide bar), gap: rows 14-16, dot: rows 17-18, pad: row 19
+  var eMark = [
+    0,1,1,1,0,
+    0,1,1,1,0,
+    0,1,1,1,0,
+    0,1,1,1,0,
+    0,1,1,1,0,
+    0,1,1,1,0,
+    0,1,1,1,0,
+    0,1,1,1,0,
+    0,1,1,1,0,
+    0,1,1,1,0,
+    0,1,1,1,0,
+    0,1,1,1,0,
+    0,1,1,1,0,
+    0,1,1,1,0,
+    0,0,0,0,0,
+    0,0,0,0,0,
+    0,0,0,0,0,
+    0,1,1,1,0,
+    0,1,1,1,0,
+    0,0,0,0,0,
+  ];
+  var eW = 5, eH = 20;
+  var spacing = 5; // px gap between marks
 
   return function animate(buf, PW, PH, t) {
     var env = _easeEnvelope(t, 0.15, 0.2);
     if (env < 0.01) return;
+    var alpha = env;
 
     var bounds = _computeEntityBounds(buf, PW, prefix);
     if (bounds.x2 < 0) return;
 
-    // Pop-in scale effect
-    var scale;
-    if (t < 0.15) scale = t / 0.15 * 1.3;
-    else if (t < 0.25) scale = 1.3 - (t - 0.15) / 0.1 * 0.3;
-    else scale = 1;
+    // 3 marks centered above entity
+    var totalW = eW * 3 + spacing * 2;
+    var x0 = Math.round(bounds.cx - totalW / 2);
+    var y0 = Math.max(2, bounds.y1 - eH - 4);
 
-    var alpha = env;
+    for (var mi = 0; mi < 3; mi++) {
+      var mx0 = x0 + mi * (eW + spacing);
 
-    // Position "!" above entity
-    var exX = Math.round(bounds.cx);
-    var exY = bounds.y1 - 14;
-
-    // Draw red circle background
-    var circR = Math.round(5 * scale);
-    for (var dy = -circR; dy <= circR; dy++) {
-      for (var dx = -circR; dx <= circR; dx++) {
-        if (dx * dx + dy * dy <= circR * circR) {
-          var px = exX + dx, py = exY + dy;
-          if (px >= 0 && px < PW && py >= 0 && py < PH) {
-            var idx = py * PW + px;
-            buf[idx].r = Math.round(buf[idx].r * (1 - alpha) + bgColor[0] * alpha);
-            buf[idx].g = Math.round(buf[idx].g * (1 - alpha) + bgColor[1] * alpha);
-            buf[idx].b = Math.round(buf[idx].b * (1 - alpha) + bgColor[2] * alpha);
+      // Pass 1: 2px black outer outline
+      for (var ry = 0; ry < eH; ry++) {
+        for (var rx = 0; rx < eW; rx++) {
+          if (!eMark[ry * eW + rx]) continue;
+          for (var oy = -2; oy <= 2; oy++) {
+            for (var ox = -2; ox <= 2; ox++) {
+              var px = mx0 + rx + ox, py = y0 + ry + oy;
+              if (px < 0 || px >= PW || py < 0 || py >= PH) continue;
+              var pi = py * PW + px;
+              buf[pi].r = Math.round(buf[pi].r * (1 - alpha));
+              buf[pi].g = Math.round(buf[pi].g * (1 - alpha));
+              buf[pi].b = Math.round(buf[pi].b * (1 - alpha));
+            }
           }
         }
       }
-    }
 
-    // Draw "!" text
-    drawText(buf, PW, PH, '!', exX - 2, exY - 3,
-      Math.round(alertColor[0] * alpha), Math.round(alertColor[1] * alpha), Math.round(alertColor[2] * alpha),
-      'temp.alert');
+      // Pass 2: 1px red outline
+      for (var ry = 0; ry < eH; ry++) {
+        for (var rx = 0; rx < eW; rx++) {
+          if (!eMark[ry * eW + rx]) continue;
+          for (var oy = -1; oy <= 1; oy++) {
+            for (var ox = -1; ox <= 1; ox++) {
+              var px = mx0 + rx + ox, py = y0 + ry + oy;
+              if (px < 0 || px >= PW || py < 0 || py >= PH) continue;
+              var pi = py * PW + px;
+              buf[pi].r = Math.round(buf[pi].r * (1 - alpha) + 210 * alpha);
+              buf[pi].g = Math.round(buf[pi].g * (1 - alpha) + 40 * alpha);
+              buf[pi].b = Math.round(buf[pi].b * (1 - alpha) + 20 * alpha);
+            }
+          }
+        }
+      }
+
+      // Pass 3: yellow fill
+      for (var ry = 0; ry < eH; ry++) {
+        for (var rx = 0; rx < eW; rx++) {
+          if (!eMark[ry * eW + rx]) continue;
+          var px = mx0 + rx, py = y0 + ry;
+          if (px < 0 || px >= PW || py < 0 || py >= PH) continue;
+          var pi = py * PW + px;
+          buf[pi].r = Math.round(buf[pi].r * (1 - alpha) + 255 * alpha);
+          buf[pi].g = Math.round(buf[pi].g * (1 - alpha) + 220 * alpha);
+          buf[pi].b = Math.round(buf[pi].b * (1 - alpha) + 30 * alpha);
+        }
+      }
+    }
 
     // Gentle entity pulse
     var pulse = 1 + 0.12 * env * (0.5 + 0.5 * Math.sin(t * Math.PI * 5));
@@ -2882,73 +2931,132 @@ AnimationTemplates.register('alert', function(params) {
 }, 1200);
 
 // ── D4: Interjection ──
-// Comic-style burst displaying the problematic word with "?".
+// Comic-style starburst bubble (elliptical body + radiating spikes).
 // The ONLY animation that displays text from the child's speech.
-// Positioned at the top of the scene, centered. Size adapts to text length.
+// Positioned above entity if entityPrefix is given, otherwise finds free space.
 AnimationTemplates.register('interjection', function(params) {
+  var prefix = params.entityPrefix || '';
   var word = params.word || '???';
-  var burstColor = params.burstColor || [255, 240, 100];
-  var textColor = params.textColor || [50, 30, 30];
-  var borderColor = params.borderColor || [200, 80, 30];
+  var numSpikes = 12;
+  var spikeH = 8;  // recomputed proportionally on first animate call
+
+  var cachedBCX = null, cachedBCY, cachedRX, cachedRY;
+
+  function findFreeSpot(buf, PW, PH, rrx, rry) {
+    var pad = spikeH + 3;
+    var candidates = [
+      { x: Math.round(PW / 2),    y: rry + pad },
+      { x: Math.round(PW * 0.25), y: rry + pad },
+      { x: Math.round(PW * 0.75), y: rry + pad },
+      { x: Math.round(PW * 0.15), y: rry + pad },
+      { x: Math.round(PW * 0.85), y: rry + pad },
+    ];
+    for (var ci = 0; ci < candidates.length; ci++) {
+      var cx = _clamp(candidates[ci].x, rrx + pad, PW - rrx - pad);
+      var cy = candidates[ci].y;
+      var occupied = false;
+      for (var ty = cy - rry - pad; ty <= cy + rry + pad && !occupied; ty++) {
+        for (var tx = cx - rrx - pad; tx <= cx + rrx + pad && !occupied; tx++) {
+          if (tx < 0 || tx >= PW || ty < 0 || ty >= PH) continue;
+          var e = buf[ty * PW + tx].e;
+          if (e && e !== '' && e !== 'bg' && !e.startsWith('bg')) occupied = true;
+        }
+      }
+      if (!occupied) return { x: cx, y: cy };
+    }
+    return { x: Math.round(PW / 2), y: rry + spikeH + 3 };
+  }
 
   return function animate(buf, PW, PH, t) {
     var env = _easeEnvelope(t, 0.1, 0.25);
     if (env < 0.01) return;
-
-    // Pop-in scale
-    var scale;
-    if (t < 0.1) scale = t / 0.1 * 1.2;
-    else if (t < 0.2) scale = 1.2 - (t - 0.1) / 0.1 * 0.2;
-    else scale = 1;
-
     var alpha = env;
 
-    // Compute burst size based on text
-    var displayText = word.toUpperCase() + '?';
-    var textW = displayText.length * 7;
-    var burstW = Math.round((textW + 16) * scale);
-    var burstH = Math.round(20 * scale);
+    if (cachedBCX === null) {
+      var displayText = word.toUpperCase();
+      var textW = displayText.length * 7;
+      cachedRX = Math.max(22, Math.round((textW + 12) / 2));
+      cachedRY = Math.round(cachedRX * 0.6);
+      spikeH = Math.max(6, Math.round(cachedRX * 0.35));  // proportional to ellipse size
+      var pad = spikeH + 3;
+      var placed = false;
 
-    // Center at top of scene
-    var bx = Math.round(PW / 2 - burstW / 2);
-    var by = 15;
+      if (prefix && prefix !== 'none') {
+        var bounds = _computeEntityBounds(buf, PW, prefix);
+        if (bounds.x2 >= 0) {
+          cachedBCX = _clamp(Math.round(bounds.cx), cachedRX + pad, PW - cachedRX - pad);
+          // Place center so starburst bottom is 2px above entity top.
+          // No lower-bound clamp — canvas clips anything above y=0 naturally.
+          cachedBCY = bounds.y1 - cachedRY - spikeH - 2;
+          placed = true;
+        }
+      }
+      if (!placed) {
+        var spot = findFreeSpot(buf, PW, PH, cachedRX, cachedRY);
+        cachedBCX = spot.x; cachedBCY = spot.y;
+      }
+    }
 
-    // Draw spiky burst background
-    var cx = bx + burstW / 2, cy = by + burstH / 2;
-    var spikes = 12;
-    var innerR = Math.min(burstW, burstH) / 2 * 0.7;
-    var outerR = Math.max(burstW, burstH) / 2 * 1.1;
+    var bcx = cachedBCX, bcy = cachedBCY;
+    var rrx = cachedRX, rry = cachedRY;
 
-    for (var y = by - Math.round(outerR); y <= by + burstH + Math.round(outerR); y++) {
-      for (var x = bx - Math.round(outerR); x <= bx + burstW + Math.round(outerR); x++) {
-        if (x < 0 || x >= PW || y < 0 || y >= PH) continue;
-        var dx = x - cx, dy = y - cy;
-        var dist = Math.sqrt(dx * dx + dy * dy);
+    // Inner ellipse radius in direction `angle`
+    function rInner(cosA, sinA) {
+      var d = Math.sqrt((rry * cosA) * (rry * cosA) + (rrx * sinA) * (rrx * sinA));
+      return d > 0.001 ? (rrx * rry / d) : rrx;
+    }
+
+    // Max starburst radius in direction `angle` (inner ellipse + spike)
+    function rMax(angle) {
+      var cosA = Math.cos(angle), sinA = Math.sin(angle);
+      var ri = rInner(cosA, sinA);
+      var phase = ((angle * numSpikes / (2 * Math.PI)) % 1 + 1) % 1;
+      var profile = Math.max(0, 1 - Math.abs(phase - 0.5) * 2);
+      return ri + spikeH * profile;
+    }
+
+    var pad = spikeH + 3;
+    var sx0 = Math.max(0, bcx - rrx - pad);
+    var sx1 = Math.min(PW - 1, bcx + rrx + pad);
+    var sy0 = Math.max(0, bcy - rry - pad);
+    var sy1 = Math.min(PH - 1, bcy + rry + pad);
+
+    // Single pass: yellow inside starburst, black 2px outline outside
+    for (var sy = sy0; sy <= sy1; sy++) {
+      for (var sx = sx0; sx <= sx1; sx++) {
+        var dx = sx - bcx, dy = sy - bcy;
+        var r = Math.sqrt(dx * dx + dy * dy);
         var angle = Math.atan2(dy, dx);
-        // Spiky radius
-        var spikeR = innerR + (outerR - innerR) * 0.5 * (1 + Math.cos(angle * spikes));
-        if (dist <= spikeR) {
-          var idx = y * PW + x;
-          // Border: outer ring
-          if (dist > spikeR - 2) {
-            buf[idx].r = Math.round(buf[idx].r * (1 - alpha) + borderColor[0] * alpha);
-            buf[idx].g = Math.round(buf[idx].g * (1 - alpha) + borderColor[1] * alpha);
-            buf[idx].b = Math.round(buf[idx].b * (1 - alpha) + borderColor[2] * alpha);
-          } else {
-            buf[idx].r = Math.round(buf[idx].r * (1 - alpha) + burstColor[0] * alpha);
-            buf[idx].g = Math.round(buf[idx].g * (1 - alpha) + burstColor[1] * alpha);
-            buf[idx].b = Math.round(buf[idx].b * (1 - alpha) + burstColor[2] * alpha);
-          }
+        var rm = rMax(angle);
+        var pi = sy * PW + sx;
+        if (r <= rm) {
+          buf[pi].r = Math.round(buf[pi].r * (1 - alpha) + 255 * alpha);
+          buf[pi].g = Math.round(buf[pi].g * (1 - alpha) + 210 * alpha);
+          buf[pi].b = Math.round(buf[pi].b * (1 - alpha) + 20 * alpha);
+        } else if (r <= rm + 2) {
+          buf[pi].r = Math.round(buf[pi].r * (1 - alpha));
+          buf[pi].g = Math.round(buf[pi].g * (1 - alpha));
+          buf[pi].b = Math.round(buf[pi].b * (1 - alpha));
         }
       }
     }
 
-    // Draw text inside burst
-    var tx = Math.round(cx - textW / 2);
-    var ty = Math.round(cy - 3);
-    drawText(buf, PW, PH, displayText, tx, ty,
-      Math.round(textColor[0] * alpha), Math.round(textColor[1] * alpha), Math.round(textColor[2] * alpha),
-      'temp.interjection');
+    // Draw text centered, then re-blend with alpha so it fades identically to the bubble
+    var displayText = word.toUpperCase();
+    var textW = displayText.length * 7;
+    var ttx = Math.round(bcx - textW / 2);
+    var tty = Math.round(bcy - 3);
+    drawText(buf, PW, PH, displayText, ttx, tty, 30, 20, 10, 'temp.interjection');
+    for (var rty = Math.max(0, tty - 1); rty <= Math.min(PH - 1, tty + 7); rty++) {
+      for (var rtx = Math.max(0, ttx - 1); rtx <= Math.min(PW - 1, ttx + textW + 1); rtx++) {
+        var rpi = rty * PW + rtx;
+        if (buf[rpi].e === 'temp.interjection') {
+          buf[rpi].r = Math.round(buf[rpi]._r * (1 - alpha) + 30 * alpha);
+          buf[rpi].g = Math.round(buf[rpi]._g * (1 - alpha) + 20 * alpha);
+          buf[rpi].b = Math.round(buf[rpi]._b * (1 - alpha) + 10 * alpha);
+        }
+      }
+    }
   };
 }, 1500);
 
