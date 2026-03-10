@@ -843,13 +843,13 @@ AnimationTemplates.register('color_pop', function(params) {
 // Occluding layer becomes semi-transparent to show hidden elements.
 AnimationTemplates.register('reveal', function(params) {
   var prefix = params.entityPrefix || '';
-  var revealAlpha = params.revealAlpha != null ? params.revealAlpha : 0.35;
+  var revealAlpha = params.revealAlpha != null ? params.revealAlpha : 0.7;
 
   return function animate(buf, PW, PH, t) {
     var env = _easeEnvelope(t, 0.25, 0.25);
     var alpha = revealAlpha * env;
 
-    // Make occluding entity semi-transparent to peek at what's behind
+    // Make occluding entity more transparent to reveal what's behind
     for (var i = 0; i < buf.length; i++) {
       if (buf[i].e === prefix || buf[i].e.startsWith(prefix + '.')) {
         buf[i].r = Math.round(buf[i]._r * (1 - alpha) + buf[i]._br * alpha);
@@ -858,20 +858,17 @@ AnimationTemplates.register('reveal', function(params) {
       }
     }
 
-    // Gentle pulsing outline effect
-    if (env > 0.1) {
+    // White opaque outline on border pixels throughout the animation
+    if (env > 0.01) {
       var bounds = _computeEntityBounds(buf, PW, prefix);
-      var outlineAlpha = 0.3 * env * (0.5 + 0.5 * Math.sin(t * Math.PI * 4));
-      var olc = [200, 220, 255]; // light blue outline
+      var neighbors = [[-1,0],[1,0],[0,-1],[0,1]];
       for (var y = bounds.y1; y <= bounds.y2; y++) {
         for (var x = bounds.x1; x <= bounds.x2; x++) {
           if (x < 0 || x >= PW || y < 0 || y >= PH) continue;
           var idx = y * PW + x;
           var isEntity = buf[idx].e === prefix || buf[idx].e.startsWith(prefix + '.');
           if (!isEntity) continue;
-          // Check if border pixel (has a non-entity neighbor)
           var isBorder = false;
-          var neighbors = [[-1,0],[1,0],[0,-1],[0,1]];
           for (var n = 0; n < 4; n++) {
             var nx = x + neighbors[n][0], ny = y + neighbors[n][1];
             if (nx < 0 || nx >= PW || ny < 0 || ny >= PH) { isBorder = true; break; }
@@ -879,9 +876,9 @@ AnimationTemplates.register('reveal', function(params) {
             if (ne !== prefix && !ne.startsWith(prefix + '.')) { isBorder = true; break; }
           }
           if (isBorder) {
-            buf[idx].r = Math.min(255, Math.round(buf[idx].r * (1 - outlineAlpha) + olc[0] * outlineAlpha));
-            buf[idx].g = Math.min(255, Math.round(buf[idx].g * (1 - outlineAlpha) + olc[1] * outlineAlpha));
-            buf[idx].b = Math.min(255, Math.round(buf[idx].b * (1 - outlineAlpha) + olc[2] * outlineAlpha));
+            buf[idx].r = Math.round(buf[idx].r * (1 - env) + 255 * env);
+            buf[idx].g = Math.round(buf[idx].g * (1 - env) + 255 * env);
+            buf[idx].b = Math.round(buf[idx].b * (1 - env) + 255 * env);
           }
         }
       }
@@ -1580,51 +1577,91 @@ AnimationTemplates.register('motion_lines', function(params) {
 // Like a momentum that was interrupted. Scaffolds missing/uncompleted action verbs.
 AnimationTemplates.register('anticipation', function(params) {
   var prefix = params.entityPrefix || '';
-  var compressY = _clamp(params.compressY || 3, 1, 8);
-  var lurchPx = _clamp(params.lurchPixels || 10, 3, 20);
-  var lurchDir = params.lurchDirection || 'right';
-  var dirSign = lurchDir === 'left' ? -1 : 1;
 
   return function animate(buf, PW, PH, t) {
-    var pixels = _collectEntityPixels(buf, PW, prefix);
-    if (pixels.length === 0) return;
+    // Collect entity pixels and bounding box
+    var minX = PW, maxX = 0, minY = PH, maxY = 0;
+    var indices = [];
+    for (var i = 0; i < buf.length; i++) {
+      if (buf[i].e && buf[i].e.startsWith(prefix)) {
+        var x = i % PW, y = Math.floor(i / PW);
+        indices.push(i);
+        if (x < minX) minX = x;
+        if (x > maxX) maxX = x;
+        if (y < minY) minY = y;
+        if (y > maxY) maxY = y;
+      }
+    }
+    if (indices.length === 0) return;
 
-    var dy = 0, dx = 0;
-    if (t < 0.15) {
-      // Phase 1: Compress down (anticipation)
-      var p1 = t / 0.15;
-      dy = Math.round(compressY * p1);
-    } else if (t < 0.35) {
-      // Phase 2: Lurch forward with decompression
-      var p2 = (t - 0.15) / 0.2;
-      dy = Math.round(compressY * (1 - p2));
-      dx = Math.round(lurchPx * p2 * dirSign);
-    } else {
-      // Phase 3: Freeze mid-motion (hold displaced position)
-      dx = Math.round(lurchPx * dirSign);
-      // Subtle vibration during freeze
-      dx += Math.round((Math.random() - 0.5) * 0.8);
+    var cx = (minX + maxX) / 2;
+    var halfW = Math.max(cx - minX, maxX - cx);
+    if (halfW === 0) return;
+
+    // Step 1: Restore entire bounding box to snapshot — cleans up trail from previous frame.
+    // Mirror positions always land within [minX, maxX], so the box covers all modified pixels.
+    for (var sy = minY; sy <= maxY; sy++) {
+      for (var sx = minX; sx <= maxX; sx++) {
+        var sidx = sy * PW + sx;
+        if (buf[sidx].e && buf[sidx].e.startsWith(prefix)) {
+          buf[sidx].r = buf[sidx]._r;
+          buf[sidx].g = buf[sidx]._g;
+          buf[sidx].b = buf[sidx]._b;
+        } else {
+          buf[sidx].r = buf[sidx]._br;
+          buf[sidx].g = buf[sidx]._bg;
+          buf[sidx].b = buf[sidx]._bb;
+        }
+      }
     }
 
-    if (dy === 0 && dx === 0) return;
+    // Step 2: Blank entity pixels at their original positions (set to background).
+    for (var k = 0; k < indices.length; k++) {
+      var idx = indices[k];
+      buf[idx].r = buf[idx]._br;
+      buf[idx].g = buf[idx]._bg;
+      buf[idx].b = buf[idx]._bb;
+    }
 
-    var bounds = _computeEntityBounds(buf, PW, prefix);
-    _blankEntityPixels(buf, pixels);
+    // Step 3: Draw each entity pixel at its interpolated x position.
+    //
+    // dist = |px - cx| / halfW  (0 = on axis, 1 = at extremity)
+    // mirrorX = 2*cx - px  (horizontal mirror)
+    //
+    // Go phase (t: 0→0.5): pixel slides from px toward mirrorX.
+    //   Extremity (dist=1) starts at t=0; axis (dist=0) starts at t=0.25.
+    //   All pixels arrive at mirrorX at t=0.5.
+    //
+    // Return phase (t: 0.5→1.0): pixel slides back from mirrorX to px.
+    //   Same stagger: extremity starts at t=0.5, axis at t=0.75.
+    //   All pixels back at px at t=1.0.
+    for (var k = 0; k < indices.length; k++) {
+      var idx = indices[k];
+      var px = idx % PW, py = Math.floor(idx / PW);
+      var dist = Math.abs(px - cx) / halfW;
+      var mirrorX = 2 * cx - px;
+      var newX;
 
-    // Compress: bottom rows shift up proportionally during phase 1
-    for (var j = 0; j < pixels.length; j++) {
-      var p = pixels[j];
-      var relY = (p.y - bounds.y1) / Math.max(1, bounds.y2 - bounds.y1);
-      var pyOffset = Math.round(dy * relY);
-      var nx = p.x + dx;
-      var ny = p.y + pyOffset;
-      if (nx >= 0 && nx < PW && ny >= 0 && ny < PH) {
-        var ni = ny * PW + nx;
-        buf[ni].r = p.r; buf[ni].g = p.g; buf[ni].b = p.b;
+      if (t <= 0.5) {
+        var tStart = (1 - dist) * 0.25;
+        var p = _clamp((t - tStart) / (0.5 - tStart), 0, 1);
+        newX = px + (mirrorX - px) * p;
+      } else {
+        var tStart2 = 0.5 + (1 - dist) * 0.25;
+        var p2 = _clamp((t - tStart2) / (1.0 - tStart2), 0, 1);
+        newX = mirrorX + (px - mirrorX) * p2;
+      }
+
+      var nx = Math.round(newX);
+      if (nx >= 0 && nx < PW) {
+        var nidx = py * PW + nx;
+        buf[nidx].r = buf[idx]._r;
+        buf[nidx].g = buf[idx]._g;
+        buf[nidx].b = buf[idx]._b;
       }
     }
   };
-}, 1500);
+}, 2000);
 
 // ── Decomposition (not in new grammar — legacy support) ──
 AnimationTemplates.register('decomposition', function(params) {
@@ -2206,29 +2243,45 @@ AnimationTemplates.register('magnetism', function(params) {
       var bCx = boundsB.cx + dxB, bCy = boundsB.cy + dyB;
       var angleA = Math.atan2(bCy - aCy, bCx - aCx); // A's opening faces B
       var angleB = angleA + Math.PI;                    // B's opening faces A
+      var cosA = Math.cos(angleA), sinA = Math.sin(angleA);
+      var cosB = Math.cos(angleB), sinB = Math.sin(angleB);
 
-      // Draw rotated magnet at each entity center
-      for (var mgy = 0; mgy < MGH; mgy++) {
-        for (var mgx = 0; mgx < MGW; mgx++) {
-          var ci = MG[mgy][mgx];
-          if (ci === 0) continue;
-          var co = pal[ci];
-          var cr = Math.round(co[0] * magnetAlpha);
-          var cg = Math.round(co[1] * magnetAlpha);
-          var cb = Math.round(co[2] * magnetAlpha);
-          var dx = mgx - mcx, dy = mgy - mcy;
-
-          // Magnet A: centered on entity A, opening toward B
-          var cosA = Math.cos(angleA), sinA = Math.sin(angleA);
-          var rxA = Math.round(aCx + dx * cosA - dy * sinA);
-          var ryA = Math.round(aCy + dx * sinA + dy * cosA);
-          _setPixel(buf, PW, PH, rxA, ryA, cr, cg, cb);
-
-          // Magnet B: centered on entity B, opening toward A
-          var cosB = Math.cos(angleB), sinB = Math.sin(angleB);
-          var rxB = Math.round(bCx + dx * cosB - dy * sinB);
-          var ryB = Math.round(bCy + dx * sinB + dy * cosB);
-          _setPixel(buf, PW, PH, rxB, ryB, cr, cg, cb);
+      // Draw rotated magnets using reverse-mapping (no holes) at 2x scale with black outline
+      var mgScale = 2;
+      var halfExt = Math.ceil(Math.sqrt(MGW * MGW + MGH * MGH) * mgScale / 2) + 3;
+      var cardinals = [[0,-1],[0,1],[-1,0],[1,0]];
+      for (var ent = 0; ent < 2; ent++) {
+        var ex = ent === 0 ? aCx : bCx;
+        var ey = ent === 0 ? aCy : bCy;
+        var cosE = ent === 0 ? cosA : cosB;
+        var sinE = ent === 0 ? sinA : sinB;
+        for (var spy = -halfExt; spy <= halfExt; spy++) {
+          for (var spx = -halfExt; spx <= halfExt; spx++) {
+            // Inverse rotation: screen offset → bitmap coords
+            var bx = (spx * cosE + spy * sinE) / mgScale + mcx;
+            var by = (-spx * sinE + spy * cosE) / mgScale + mcy;
+            var ibx = Math.floor(bx), iby = Math.floor(by);
+            var inBounds = ibx >= 0 && ibx < MGW && iby >= 0 && iby < MGH;
+            var ci = inBounds ? MG[iby][ibx] : 0;
+            var cr, cg, cb;
+            if (ci !== 0) {
+              // Filled pixel
+              var co = pal[ci];
+              cr = Math.round(co[0] * magnetAlpha);
+              cg = Math.round(co[1] * magnetAlpha);
+              cb = Math.round(co[2] * magnetAlpha);
+            } else {
+              // Outline: draw black if any cardinal neighbor is filled (works even out-of-bounds)
+              var hasNeighbor = false;
+              for (var ni = 0; ni < 4 && !hasNeighbor; ni++) {
+                var nnbx = ibx + cardinals[ni][0], nnby = iby + cardinals[ni][1];
+                if (nnbx >= 0 && nnbx < MGW && nnby >= 0 && nnby < MGH && MG[nnby][nnbx] !== 0) hasNeighbor = true;
+              }
+              if (!hasNeighbor) continue;
+              cr = 0; cg = 0; cb = 0;
+            }
+            _setPixel(buf, PW, PH, Math.round(ex + spx), Math.round(ey + spy), cr, cg, cb);
+          }
         }
       }
     }
