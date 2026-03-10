@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tellimations Animation Simulation</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0d0d1a;
+      color: #e0e0e0;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-size: 14px;
+    }
+
+    /* -- Top bar ---------------------------------------------------------- */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem 1rem;
+      background: #151528;
+      border-bottom: 1px solid #2a2a4e;
+    }
+    .top-bar input {
+      background: #1a1a2e;
+      color: #e0e0e0;
+      border: 1px solid #444;
+      padding: 0.35rem 0.6rem;
+      border-radius: 4px;
+      font-size: 13px;
+      font-family: monospace;
+    }
+    .top-bar input[type="password"] { width: 280px; }
+    .top-bar .btn-generate {
+      background: #2e7d32;
+      color: #fff;
+      border: none;
+      padding: 0.35rem 1.2rem;
+      border-radius: 4px;
+      font-size: 13px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .top-bar .btn-generate:hover { background: #388e3c; }
+    .top-bar .btn-generate:disabled { opacity: 0.4; cursor: not-allowed; }
+    .top-bar .btn-load-saved {
+      background: #1a3a5a;
+      color: #66aaff;
+      border: 1px solid #335588;
+      padding: 0.35rem 1.2rem;
+      border-radius: 4px;
+      font-size: 13px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .top-bar .btn-load-saved:hover { background: #2a4a6a; }
+    .top-bar .btn-load-saved:disabled { opacity: 0.4; cursor: not-allowed; }
+    #status-text {
+      font-size: 12px;
+      color: #888;
+      margin-left: auto;
+    }
+
+    /* -- Stacked layout --------------------------------------------------- */
+    .canvas-wrap {
+      display: flex;
+      justify-content: center;
+      padding: 0.75rem 0.75rem 0;
+    }
+    #scene-canvas {
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      border: 2px solid #333;
+      background: #000;
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* -- Controls panel --------------------------------------------------- */
+    .controls {
+      max-width: 1140px;
+      margin: 0.75rem auto 1rem;
+      padding: 0 0.75rem;
+    }
+
+    .section-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #666;
+      margin: 0.75rem 0 0.4rem;
+      padding-bottom: 0.2rem;
+      border-bottom: 1px solid #222;
+    }
+
+    .param-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+    .param-row label {
+      font-size: 12px;
+      color: #aaa;
+      min-width: 55px;
+    }
+    .param-row select,
+    .param-row input[type="text"],
+    .param-row input[type="number"] {
+      background: #1a1a2e;
+      color: #e0e0e0;
+      border: 1px solid #444;
+      padding: 0.25rem 0.5rem;
+      border-radius: 3px;
+      font-size: 12px;
+      font-family: monospace;
+    }
+    .param-row select { min-width: 120px; }
+    .param-row input[type="text"] { width: 130px; }
+
+    /* -- Animation family rows -------------------------------------------- */
+    .families {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem 1.5rem;
+    }
+    .family {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.3rem;
+      margin-bottom: 0.3rem;
+    }
+    .family-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #888;
+      width: 82px;
+      flex-shrink: 0;
+    }
+    .anim-btn {
+      background: #1e1e3a;
+      color: #ccc;
+      border: 1px solid #444;
+      padding: 0.25rem 0.6rem;
+      border-radius: 3px;
+      font-size: 12px;
+      font-family: monospace;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+    .anim-btn:hover { background: #2e2e5a; color: #fff; }
+    .anim-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .anim-btn.two-entity { border-color: #665533; }
+
+    /* -- Utility buttons -------------------------------------------------- */
+    .util-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 0.5rem;
+    }
+    .btn-stop { background: #5a1a1a; color: #ff6666; border: 1px solid #883333; }
+    .btn-stop:hover { background: #7a2a2a; }
+    .btn-redraw { background: #1a3a5a; color: #66aaff; border: 1px solid #335588; }
+    .btn-redraw:hover { background: #2a4a6a; }
+    .btn-test { background: #3a3a1a; color: #cccc66; border: 1px solid #888833; }
+    .btn-test:hover { background: #4a4a2a; }
+    .btn-playall { background: #1a3a1a; color: #66cc66; border: 1px solid #338833; }
+    .btn-playall:hover { background: #2a4a2a; }
+
+    /* -- Log -------------------------------------------------------------- */
+    #log {
+      background: #080812;
+      border: 1px solid #222;
+      border-radius: 4px;
+      padding: 0.5rem;
+      max-height: 150px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 11px;
+      white-space: pre-wrap;
+    }
+    .log-ok { color: #4caf50; }
+    .log-info { color: #66aaff; }
+    .log-warn { color: #ffaa33; }
+    .log-err { color: #ff5555; }
+
+    /* -- Manifest / NEG preview ------------------------------------------- */
+    .data-preview {
+      background: #080812;
+      border: 1px solid #222;
+      border-radius: 4px;
+      padding: 0.5rem;
+      max-height: 300px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 11px;
+      white-space: pre-wrap;
+      color: #888;
+    }
+    .data-panels {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+    }
+    .data-panel-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: #66aaff;
+      margin-bottom: 0.3rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top bar -->
+  <div class="top-bar">
+    <button class="btn-load-saved" id="btnLoadSaved" onclick="loadSavedScene()">Load Saved Scene</button>
+    <span style="color:#555;font-size:12px;">|</span>
+    <input type="password" id="apiKey" placeholder="Gemini API key (optional)">
+    <button class="btn-generate" id="btnGenerate" onclick="generateScene()">Generate New Scene</button>
+    <span id="status-text">Loading saved scene...</span>
+  </div>
+
+  <!-- Canvas at full native size -->
+  <div class="canvas-wrap">
+    <canvas id="scene-canvas"></canvas>
+  </div>
+
+  <!-- Controls below canvas -->
+  <div class="controls">
+
+    <!-- Entity + params row -->
+    <div class="section-title">Entity Selection &amp; Parameters</div>
+    <div class="param-row">
+      <label>Entity A</label>
+      <select id="entityA"><option value="">-- loading --</option></select>
+      <label>Entity B</label>
+      <select id="entityB"><option value="">-- loading --</option></select>
+      <label>Text</label>
+      <input type="text" id="paramText" value="Hello!" placeholder="speech/thought">
+      <label>Word</label>
+      <input type="text" id="paramWord" value="Wow!" placeholder="interjection">
+      <label>Particles</label>
+      <select id="paramParticles">
+        <option value="steam">steam</option>
+        <option value="frost">frost</option>
+        <option value="sparkle" selected>sparkle</option>
+        <option value="dust">dust</option>
+        <option value="hearts">hearts</option>
+        <option value="anger">anger</option>
+        <option value="fear">fear</option>
+      </select>
+      <label>Direction</label>
+      <select id="paramDirection">
+        <option value="right" selected>right &rarr;</option>
+        <option value="left">left &larr;</option>
+        <option value="up">up &uarr;</option>
+        <option value="down">down &darr;</option>
+      </select>
+    </div>
+
+    <!-- Animation families -->
+    <div class="section-title">Animations (20 templates)</div>
+    <div class="families">
+      <div class="family">
+        <span class="family-label">I: Identity</span>
+        <button class="anim-btn" onclick="playTemplate('spotlight')">spotlight</button>
+        <button class="anim-btn" onclick="playTemplate('nametag')">nametag</button>
+      </div>
+      <div class="family">
+        <span class="family-label">S: Space</span>
+        <button class="anim-btn" onclick="playTemplate('reveal')">reveal</button>
+        <button class="anim-btn" onclick="playTemplate('settle')">settle</button>
+      </div>
+      <div class="family">
+        <span class="family-label">P: Property</span>
+        <button class="anim-btn" onclick="playTemplate('color_pop')">color_pop</button>
+        <button class="anim-btn" onclick="playTemplate('emanation')">emanation</button>
+      </div>
+      <div class="family">
+        <span class="family-label">T: Time</span>
+        <button class="anim-btn" onclick="playTemplate('flashback')">flashback</button>
+        <button class="anim-btn" onclick="playTemplate('timelapse')">timelapse</button>
+      </div>
+      <div class="family">
+        <span class="family-label">A: Action</span>
+        <button class="anim-btn" onclick="playTemplate('motion_lines')">motion_lines</button>
+        <button class="anim-btn" onclick="playTemplate('anticipation')">anticipation</button>
+      </div>
+      <div class="family">
+        <span class="family-label">R: Relation</span>
+        <button class="anim-btn two-entity" onclick="playTemplate('magnetism')">magnetism</button>
+        <button class="anim-btn two-entity" onclick="playTemplate('repel')">repel</button>
+        <button class="anim-btn two-entity" onclick="playTemplate('causal_push')">causal_push</button>
+      </div>
+      <div class="family">
+        <span class="family-label">Q: Quantity</span>
+        <button class="anim-btn two-entity" onclick="playTemplate('bonk')">bonk</button>
+        <button class="anim-btn" onclick="playTemplate('sequential_glow')">sequential_glow</button>
+        <button class="anim-btn" onclick="playTemplate('ghost_outline')">ghost_outline</button>
+      </div>
+      <div class="family">
+        <span class="family-label">D: Discourse</span>
+        <button class="anim-btn" onclick="playTemplate('speech_bubble')">speech_bubble</button>
+        <button class="anim-btn" onclick="playTemplate('thought_bubble')">thought_bubble</button>
+        <button class="anim-btn" onclick="playTemplate('alert')">alert</button>
+        <button class="anim-btn" onclick="playTemplate('interjection')">interjection</button>
+      </div>
+    </div>
+
+    <!-- Utility controls -->
+    <div class="section-title">Controls</div>
+    <div class="util-row">
+      <button class="anim-btn btn-playall" onclick="playAll()">Play All (sequential)</button>
+      <button class="anim-btn btn-stop" onclick="stopAnim()">Stop</button>
+      <button class="anim-btn btn-redraw" onclick="redrawScene()">Redraw</button>
+      <button class="anim-btn btn-test" onclick="runSnapshotTest()">Snapshot Test</button>
+    </div>
+
+    <!-- Manifest + NEG panels -->
+    <div class="section-title">Scene Data</div>
+    <div class="data-panels">
+      <div>
+        <div class="data-panel-title">Scene Manifest</div>
+        <div class="data-preview" id="manifest-preview"></div>
+      </div>
+      <div>
+        <div class="data-panel-title">NEG (Narrative Expectation Graph)</div>
+        <div class="data-preview" id="neg-preview"></div>
+      </div>
+    </div>
+
+    <!-- Log -->
+    <div class="section-title">Log</div>
+    <div id="log"></div>
+  </div>
+
+  <!-- Engine + animation scripts (same as production) -->
+  <script src="engine.js"></script>
+  <script src="animation_templates.js"></script>
+  <script src="animations.js"></script>
+
+  <script>
+    // =====================================================================
+    // Globals
+    // =====================================================================
+    var buf = new PixelBuffer(PW, PH);
+    var canvas = document.getElementById('scene-canvas');
+    var renderer = new Renderer(canvas, buf);
+    var runner = new AnimationRunner(buf, renderer);
+    var logEl = document.getElementById('log');
+    var statusEl = document.getElementById('status-text');
+    var manifestEl = document.getElementById('manifest-preview');
+    var negEl = document.getElementById('neg-preview');
+
+    var currentScene = null;
+    var ws = null;
+    var stopPlayAll = false;
+
+    // =====================================================================
+    // Logging
+    // =====================================================================
+    function log(msg, cls) {
+      cls = cls || 'log-info';
+      var line = document.createElement('div');
+      line.className = cls;
+      var now = new Date();
+      var ts = now.toLocaleTimeString() + '.' + String(now.getMilliseconds()).padStart(3, '0');
+      line.textContent = '[' + ts + '] ' + msg;
+      logEl.prepend(line);
+    }
+
+    function setStatus(msg) {
+      statusEl.textContent = msg;
+    }
+
+    // =====================================================================
+    // Entity dropdowns
+    // =====================================================================
+    function populateEntityDropdowns(entities) {
+      var selectA = document.getElementById('entityA');
+      var selectB = document.getElementById('entityB');
+      selectA.innerHTML = '';
+      selectB.innerHTML = '';
+
+      if (!entities || entities.length === 0) {
+        selectA.innerHTML = '<option value="">No entities</option>';
+        selectB.innerHTML = '<option value="">No entities</option>';
+        return;
+      }
+
+      for (var i = 0; i < entities.length; i++) {
+        var ent = entities[i];
+        var id = ent.id || ent;
+        var label = id;
+        if (ent.type) label = id + ' (' + ent.type + ')';
+
+        var optA = document.createElement('option');
+        optA.value = id;
+        optA.textContent = label;
+        selectA.appendChild(optA);
+
+        var optB = document.createElement('option');
+        optB.value = id;
+        optB.textContent = label;
+        selectB.appendChild(optB);
+      }
+
+      if (entities.length > 1) {
+        selectB.selectedIndex = 1;
+      }
+    }
+
+    // =====================================================================
+    // Scene rendering (mirrors story.html renderScene exactly)
+    // =====================================================================
+    function renderScene(scene) {
+      if (!scene) return;
+      currentScene = scene;
+      buf.clear();
+
+      var spriteCode = scene.sprite_code || {};
+      var bgEntry = spriteCode.bg || null;
+
+      var entityEids = [];
+      for (var eid in spriteCode) {
+        if (spriteCode.hasOwnProperty(eid) && eid !== 'bg') {
+          entityEids.push(eid);
+        }
+      }
+
+      function renderEntitiesAndFlush() {
+        buf.snapshotBackground();
+        for (var i = 0; i < entityEids.length; i++) {
+          try {
+            renderSpriteEntry(entityEids[i], spriteCode[entityEids[i]], buf);
+          } catch (e) {
+            log('Failed to render entity: ' + entityEids[i] + ' — ' + e.message, 'log-warn');
+          }
+        }
+        buf.computeDistanceFields(20);
+        renderer.render();
+        log('Scene rendered: ' + entityEids.length + ' entities', 'log-ok');
+      }
+
+      if (bgEntry && bgEntry.format === 'image_background') {
+        var p = executeImageBackground(bgEntry, buf);
+        if (p && typeof p.then === 'function') {
+          p.then(renderEntitiesAndFlush);
+        } else {
+          renderEntitiesAndFlush();
+        }
+      } else {
+        if (bgEntry) {
+          try { renderSpriteEntry('bg', bgEntry, buf); } catch (e) {
+            log('Failed to render bg: ' + e.message, 'log-warn');
+          }
+        }
+        renderEntitiesAndFlush();
+      }
+
+      var entities = (scene.manifest && scene.manifest.entities) || [];
+      populateEntityDropdowns(entities);
+      manifestEl.textContent = JSON.stringify(scene.manifest, null, 2);
+      negEl.textContent = JSON.stringify(scene.neg, null, 2);
+    }
+
+    function redrawScene() {
+      if (currentScene) {
+        renderScene(currentScene);
+        log('Scene redrawn');
+      } else {
+        log('No scene to redraw', 'log-warn');
+      }
+    }
+
+    // =====================================================================
+    // Load saved scene (no Gemini call)
+    // =====================================================================
+    function loadSavedScene() {
+      var btn = document.getElementById('btnLoadSaved');
+      btn.disabled = true;
+      setStatus('Loading saved scene...');
+      log('Fetching /api/simulation-scene...');
+
+      fetch('/api/simulation-scene')
+        .then(function(r) {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return r.json();
+        })
+        .then(function(scene) {
+          log('Saved scene loaded', 'log-ok');
+          setStatus('Saved scene (cached)');
+          renderScene(scene);
+          btn.disabled = false;
+        })
+        .catch(function(err) {
+          log('Failed to load saved scene: ' + err, 'log-err');
+          setStatus('Error loading scene');
+          btn.disabled = false;
+        });
+    }
+
+    // =====================================================================
+    // WebSocket + scene generation (Gemini)
+    // =====================================================================
+    function generateScene() {
+      var apiKey = document.getElementById('apiKey').value.trim();
+      if (!apiKey) {
+        log('Please enter a Gemini API key', 'log-warn');
+        return;
+      }
+
+      if (ws && ws.readyState <= 1) {
+        ws.close();
+      }
+
+      var btnGen = document.getElementById('btnGenerate');
+      btnGen.disabled = true;
+      setStatus('Connecting...');
+      log('Connecting to WebSocket...');
+
+      var protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+      ws = new WebSocket(
+        protocol + '//' + location.host + '/ws'
+        + '?api_key=' + encodeURIComponent(apiKey)
+        + '&participant_id=simulation'
+        + '&child_age=8'
+      );
+
+      ws.onopen = function() {
+        log('WebSocket connected');
+        setStatus('Generating scene (manifest + images)...');
+        ws.send(JSON.stringify({ type: 'generate_initial_scenes' }));
+      };
+
+      ws.onmessage = function(event) {
+        if (event.data instanceof ArrayBuffer) return;
+
+        var msg;
+        try { msg = JSON.parse(event.data); } catch (e) { return; }
+
+        switch (msg.type) {
+          case 'generation_step':
+            var step = msg.step || '';
+            setStatus('Generating: ' + step + '...');
+            log('Generation step: ' + step);
+            break;
+
+          case 'scene_ready':
+            log('Scene ready! Rendering...', 'log-ok');
+            setStatus('Scene ready (generated)');
+            renderScene(msg.scene);
+            btnGen.disabled = false;
+            btnGen.textContent = 'Generate New Scene';
+            break;
+
+          case 'initial_scenes_done':
+            log('All initial scenes generated', 'log-ok');
+            break;
+
+          case 'error':
+            log('Server error: ' + (msg.message || 'unknown'), 'log-err');
+            setStatus('Error: ' + (msg.message || 'unknown'));
+            btnGen.disabled = false;
+            break;
+        }
+      };
+
+      ws.onerror = function() {
+        log('WebSocket error', 'log-err');
+        setStatus('Connection error');
+        btnGen.disabled = false;
+      };
+
+      ws.onclose = function() {
+        log('WebSocket closed');
+      };
+    }
+
+    // =====================================================================
+    // Animation triggering
+    // =====================================================================
+    var SINGLE_ENTITY = [
+      'spotlight', 'nametag', 'settle', 'color_pop', 'reveal',
+      'emanation', 'flashback', 'motion_lines', 'anticipation',
+      'ghost_outline', 'speech_bubble', 'thought_bubble', 'alert'
+    ];
+    var TWO_ENTITY = ['magnetism', 'repel', 'causal_push', 'bonk'];
+    var SCENE_WIDE = ['timelapse'];
+    var MULTI_ENTITY = ['sequential_glow'];
+    var WORD_ONLY = ['interjection'];
+
+    function getEntityA() { return document.getElementById('entityA').value; }
+    function getEntityB() { return document.getElementById('entityB').value; }
+
+    function buildSpec(templateName) {
+      var params = {};
+      var a = getEntityA();
+      var b = getEntityB();
+
+      if (SINGLE_ENTITY.indexOf(templateName) >= 0) params.entityPrefix = a;
+      if (TWO_ENTITY.indexOf(templateName) >= 0) {
+        params.entityPrefixA = a;
+        params.entityPrefixB = b;
+      }
+      if (MULTI_ENTITY.indexOf(templateName) >= 0) {
+        var selectA = document.getElementById('entityA');
+        var prefixes = [];
+        for (var i = 0; i < selectA.options.length; i++) prefixes.push(selectA.options[i].value);
+        params.entityPrefixes = prefixes;
+      }
+      if (SCENE_WIDE.indexOf(templateName) >= 0) params.cycles = 2;
+      if (WORD_ONLY.indexOf(templateName) >= 0) params.word = document.getElementById('paramWord').value || 'Wow!';
+      if (templateName === 'emanation') params.particleType = document.getElementById('paramParticles').value;
+      if (templateName === 'motion_lines') params.direction = document.getElementById('paramDirection').value;
+      if (templateName === 'speech_bubble' || templateName === 'thought_bubble')
+        params.text = document.getElementById('paramText').value || 'Hello!';
+
+      return { template: templateName, params: params };
+    }
+
+    function playTemplate(templateName) {
+      if (!currentScene) { log('Load a scene first', 'log-warn'); return; }
+      var spec = buildSpec(templateName);
+      log('Playing: ' + templateName + ' ' + JSON.stringify(spec.params));
+      runner.play(spec).then(function() {
+        log(templateName + ' finished', 'log-ok');
+      }).catch(function(err) {
+        log(templateName + ' error: ' + err, 'log-err');
+      });
+    }
+
+    function stopAnim() {
+      runner.stop();
+      stopPlayAll = true;
+      log('Stopped');
+    }
+
+    // =====================================================================
+    // Play All (sequential)
+    // =====================================================================
+    var ALL_TEMPLATES = [
+      'spotlight', 'nametag', 'reveal', 'settle',
+      'color_pop', 'emanation', 'flashback', 'timelapse',
+      'motion_lines', 'anticipation',
+      'magnetism', 'repel', 'causal_push',
+      'bonk', 'sequential_glow', 'ghost_outline',
+      'speech_bubble', 'thought_bubble', 'alert', 'interjection'
+    ];
+
+    async function playAll() {
+      if (!currentScene) { log('Load a scene first', 'log-warn'); return; }
+      stopPlayAll = false;
+      log('--- Playing all 20 animations sequentially ---');
+      for (var i = 0; i < ALL_TEMPLATES.length; i++) {
+        if (stopPlayAll) { log('Play All stopped by user'); break; }
+        var name = ALL_TEMPLATES[i];
+        var spec = buildSpec(name);
+        log('Playing ' + (i + 1) + '/20: ' + name);
+        try {
+          await runner.play(spec, spec.duration_ms);
+          log(name + ' OK', 'log-ok');
+        } catch (err) {
+          log(name + ' error: ' + err, 'log-err');
+        }
+        if (!stopPlayAll) await new Promise(function(r) { setTimeout(r, 300); });
+      }
+      log('--- Play All complete ---', 'log-ok');
+    }
+
+    // =====================================================================
+    // Snapshot/Restore test
+    // =====================================================================
+    function captureState() {
+      var checks = [];
+      var positions = [
+        { x: 50, y: 50 }, { x: 100, y: 100 }, { x: 200, y: 150 }, { x: 300, y: 200 },
+        { x: 400, y: 250 }, { x: 150, y: 300 }, { x: 450, y: 100 }, { x: 280, y: 180 },
+      ];
+      for (var i = 0; i < positions.length; i++) {
+        var p = buf.getPixel(positions[i].x, positions[i].y);
+        checks.push({ x: positions[i].x, y: positions[i].y, r: p.r, g: p.g, b: p.b, e: p.e });
+      }
+      return checks;
+    }
+
+    function verifyState(before, label) {
+      var allMatch = true;
+      for (var i = 0; i < before.length; i++) {
+        var b = before[i];
+        var a = buf.getPixel(b.x, b.y);
+        if (b.r !== a.r || b.g !== a.g || b.b !== a.b) {
+          log('FAIL ' + label + ': pixel (' + b.x + ',' + b.y + ') ' +
+              '(' + b.r + ',' + b.g + ',' + b.b + ') -> (' + a.r + ',' + a.g + ',' + a.b + ')', 'log-warn');
+          allMatch = false;
+        }
+      }
+      if (allMatch) log('PASS ' + label, 'log-ok');
+      return allMatch;
+    }
+
+    async function runSnapshotTest() {
+      if (!currentScene) { log('Load a scene first', 'log-warn'); return; }
+      log('--- Snapshot/Restore test: all 20 templates ---');
+      var allPassed = true;
+      for (var i = 0; i < ALL_TEMPLATES.length; i++) {
+        var name = ALL_TEMPLATES[i];
+        var spec = buildSpec(name);
+        spec.duration_ms = 400;
+        var before = captureState();
+        try {
+          await runner.play(spec, spec.duration_ms);
+          if (!verifyState(before, name)) allPassed = false;
+        } catch (err) {
+          log('ERROR ' + name + ': ' + err, 'log-err');
+          allPassed = false;
+        }
+      }
+      log(allPassed ? '=== ALL 20/20 SNAPSHOT TESTS PASSED ===' : '=== SOME TESTS FAILED ===',
+          allPassed ? 'log-ok' : 'log-warn');
+    }
+
+    // =====================================================================
+    // Auto-load saved scene on page load
+    // =====================================================================
+    window.addEventListener('load', function() {
+      loadSavedScene();
+    });
+
+  </script>
+</body>
+</html>
