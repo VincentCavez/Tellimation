@@ -98,6 +98,8 @@
               console.warn('[renderScene] Failed to render', entityEids[i], e);
             }
           }
+          // Pre-compute distance fields for all entities (used by animations)
+          buf.computeDistanceFields(20);
           // Render temporary sprites on top of normal entities
           renderTempSprites(buf);
           renderer.render();

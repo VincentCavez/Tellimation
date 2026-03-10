@@ -34,8 +34,8 @@ class Background(BaseModel):
 
 
 class Position(BaseModel):
-    x: int                                   # 0-1119, entity center
-    y: int                                   # 0-719, entity center
+    x: float                                 # 0.0-1.0, normalized horizontal center
+    y: float                                 # 0.0-1.0, normalized vertical center (0=top, 1=bottom)
     spatial_ref: Optional[str] = None
     zone: Optional[str] = None               # "foreground", "midground", "background"
     depth_order: Optional[int] = None        # rendering order (0=back, higher=front)
@@ -50,9 +50,9 @@ class Entity(BaseModel):
     emotion: Optional[str] = None
     pose: Optional[str] = None
     carried_over: bool = False
-    width_hint: Optional[int] = None
-    height_hint: Optional[int] = None
-    orientation: Optional[str] = None          # "facing_left", "facing_right", "facing_viewer"
+    width_hint: Optional[float] = None         # 0.0-1.0, proportion of canvas width
+    height_hint: Optional[float] = None        # 0.0-1.0, proportion of canvas height
+    orientation: Optional[str] = None          # "facing_left", "facing_right", "facing_viewer", or "facing:<entity_id>"
     scale_factor: Optional[float] = None       # 0.5-1.5 relative scale hint
     sensory: Optional[Dict[str, str]] = None   # {"temperature": "cold", "sound": "chirping"}
 

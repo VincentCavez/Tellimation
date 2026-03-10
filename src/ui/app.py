@@ -58,6 +58,25 @@ STATIC_DIR = BASE_DIR / "static"
 MAX_SCENES = 5
 INITIAL_SCENE_COUNT = 1  # number of scenes offered on the selection page
 
+
+def _find_data_dir() -> Path | None:
+    p = BASE_DIR.resolve()
+    for _ in range(8):
+        if (p / "data").exists():
+            return p / "data"
+        p = p.parent
+    return None
+
+
+def _save_simulation_cache(scene: dict) -> None:
+    data_dir = _find_data_dir()
+    if data_dir is None:
+        logger.warning("Could not find data/ directory to save simulation cache")
+        return
+    cache_path = data_dir / "simulation_scene_cache.json"
+    cache_path.write_text(json.dumps(scene))
+    logger.info("Simulation scene cache saved to %s", cache_path)
+
 app = FastAPI(title="Tellimations")
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
@@ -87,18 +106,14 @@ async def story_page():
 
 @app.get("/api/simulation-scene")
 async def api_simulation_scene():
-    """Return the cached simulation scene (no Gemini call)."""
-    p = BASE_DIR.resolve()
-    scene_path = None
-    for _ in range(8):
-        candidate = p / "data" / "users" / "simulation" / "story_001" / "scene_01.json"
-        if candidate.exists():
-            scene_path = candidate
-            break
-        p = p.parent
-    if scene_path is None:
-        return JSONResponse(status_code=404, content={"error": "Simulation scene not found"})
-    return JSONResponse(content=json.loads(scene_path.read_text()))
+    """Return the last scene generated with participant_id=simulation."""
+    data_dir = _find_data_dir()
+    if data_dir is None:
+        return JSONResponse(status_code=404, content={"error": "data/ directory not found"})
+    cache_path = data_dir / "simulation_scene_cache.json"
+    if not cache_path.exists():
+        return JSONResponse(status_code=404, content={"error": "No simulation scene cached yet — generate one first"})
+    return JSONResponse(content=json.loads(cache_path.read_text()))
 
 
 @app.post("/api/report")
@@ -380,6 +395,9 @@ async def _handle_generate_initial_scenes(
                 "scene": scene,
                 "scene_index": index,
             })
+
+            if session.participant_id == "simulation":
+                _save_simulation_cache(scene)
 
             logger.info(
                 "[pipeline] Scene %d: total %.1fs",
