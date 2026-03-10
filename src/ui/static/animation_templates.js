@@ -3011,7 +3011,8 @@ AnimationTemplates.register('interjection', function(params) {
       var cosA = Math.cos(angle), sinA = Math.sin(angle);
       var ri = rInner(cosA, sinA);
       var phase = ((angle * numSpikes / (2 * Math.PI)) % 1 + 1) % 1;
-      var profile = Math.max(0, 1 - Math.abs(phase - 0.5) * 2);
+      var lin = Math.max(0, 1 - Math.abs(phase - 0.5) * 2);
+      var profile = lin * lin * lin;  // concave sides (cube makes edges hollow)
       return ri + spikeH * profile;
     }
 
