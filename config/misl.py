@@ -205,10 +205,10 @@ ANIMATION_IDS = {
     "R1_magnetism": "Magnet sprites appear, elements drift toward each other",
     "R2_repel": "Two elements push apart from each other like same-polarity magnets",
     "R3_causal_push": "Element A rushes toward B + impact burst at collision",
-    # Q = Quantity
-    "Q1_bonk": "Redundant elements collide with star particles, bounce back",
-    "Q2_sequential_glow": "Objects glow in sequence creating visual count",
-    "Q3_ghost_outline": "Faint dotted outline where missing element should be, dissolves",
+    # C = Count
+    "C1_sequential_glow": "Objects glow in sequence creating visual count",
+    "C2_disintegration": "Entity pixelates progressively then dissolves into particles",
+    "C3_ghost_outline": "Amorphous shape with '?' dissolves to nothing, scaffolds absence",
     # D = Discourse
     "D1_speech_bubble": "Pixelated speech bubble with '...' or keyword",
     "D2_thought_bubble": "Pixelated thought bubble with '...' or symbol",
@@ -240,8 +240,8 @@ MISL_TO_ANIMATIONS: Dict[str, List[str]] = {
     "tense":                      ["T1_flashback", "T2_timelapse", "D4_interjection"],
 }
 
-# Quantity animations apply to any element when the problem is incorrect count.
-QUANTITY_ANIMATIONS: List[str] = ["Q1_bonk", "Q2_sequential_glow", "Q3_ghost_outline"]
+# Count animations apply to any element when the problem is incorrect count.
+COUNT_ANIMATIONS: List[str] = ["C1_sequential_glow", "C2_disintegration", "C3_ghost_outline"]
 
 # ============================================================================
 # All MISL element keys (convenience)

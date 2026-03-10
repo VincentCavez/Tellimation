@@ -32,7 +32,7 @@ from config.misl import (
     MICRO_KEYS,
     MICROSTRUCTURE,
     MISL_TO_ANIMATIONS,
-    QUANTITY_ANIMATIONS,
+    COUNT_ANIMATIONS,
 )
 from src.generation.prompts.scene_neg_prompt import (
     CONTINUATION_SCENE_USER_PROMPT,
@@ -50,7 +50,7 @@ logger = logging.getLogger(__name__)
 MODEL_ID = "gemini-3-flash-preview"
 
 # Timeouts and retries
-GENERATION_TIMEOUT = 60  # seconds
+GENERATION_TIMEOUT = 90  # seconds (higher thinking budget needs more time)
 MAX_RETRIES = 2
 
 
@@ -88,8 +88,8 @@ def _build_misl_rubric() -> str:
             lines.append(f"  Eligible animations: {', '.join(anims)}")
         lines.append("")
 
-    lines.append("# Quantity animations (apply to any element for count errors)")
-    lines.append(f"  {', '.join(QUANTITY_ANIMATIONS)}")
+    lines.append("# Count animations (apply to any element for count errors)")
+    lines.append(f"  {', '.join(COUNT_ANIMATIONS)}")
 
     _misl_rubric_cache = "\n".join(lines)
     return _misl_rubric_cache
@@ -226,9 +226,6 @@ def _validate_response(data: Dict[str, Any]) -> Tuple[SceneManifest, NEG]:
     return manifest, neg
 
 
-_CANVAS_H = 720
-_CANVAS_W = 1120
-
 # Expected y-ranges (normalized) per zone — generous tolerance
 _ZONE_Y_RANGES: Dict[str, Tuple[float, float]] = {
     "background": (0.15, 0.60),
@@ -257,38 +254,23 @@ def _validate_semantic(
     warnings: List[str] = []
 
     # ------------------------------------------------------------------
-    # 1. Zone/position consistency
+    # 1. Zone/position consistency (positions are already normalized 0-1)
     # ------------------------------------------------------------------
     for ent in manifest.entities:
         zone = ent.position.zone
         if zone and zone in _ZONE_Y_RANGES:
-            y_norm = ent.position.y / _CANVAS_H
+            y_norm = ent.position.y
             lo, hi = _ZONE_Y_RANGES[zone]
             if y_norm < lo - 0.05 or y_norm > hi + 0.05:
                 warnings.append(
-                    f"Entity {ent.id}: y={ent.position.y} (norm={y_norm:.2f}) "
+                    f"Entity {ent.id}: y={y_norm:.2f} "
                     f"inconsistent with zone '{zone}' "
                     f"(expected {lo:.2f}-{hi:.2f})"
                 )
 
     # ------------------------------------------------------------------
-    # 2. Scale consistency within same zone
+    # 2. (Removed — scale consistency is now enforced by _apply_zone_scale)
     # ------------------------------------------------------------------
-    zone_scales: Dict[str, List[Tuple[str, float]]] = {}
-    for ent in manifest.entities:
-        if ent.scale_factor is not None and ent.position.zone:
-            zone_scales.setdefault(ent.position.zone, []).append(
-                (ent.id, ent.scale_factor)
-            )
-    for zone, entries in zone_scales.items():
-        scales = [s for _, s in entries]
-        spread = max(scales) - min(scales)
-        if spread > 0.5:
-            names = ", ".join(f"{n}={s:.1f}" for n, s in entries)
-            warnings.append(
-                f"Zone '{zone}': scale spread {spread:.2f} "
-                f"exceeds 0.5 ({names})"
-            )
 
     # ------------------------------------------------------------------
     # 3. Minimum entity count (3-5 recommended)
@@ -343,21 +325,21 @@ def _validate_semantic(
             )
 
     # ------------------------------------------------------------------
-    # 7. Bounding box within canvas
+    # 7. Bounding box within canvas (normalized 0.0-1.0)
     # ------------------------------------------------------------------
     for ent in manifest.entities:
-        wh = ent.width_hint or 100
-        hh = ent.height_hint or 100
+        wh = ent.width_hint or 0.09
+        hh = ent.height_hint or 0.14
         x, y = ent.position.x, ent.position.y
-        if x - wh // 2 < 0 or x + wh // 2 > _CANVAS_W - 1:
+        if x - wh / 2 < -0.01 or x + wh / 2 > 1.01:
             warnings.append(
                 f"Entity {ent.id}: x-bounds overflow canvas "
-                f"(x={x}, w={wh})"
+                f"(x={x:.2f}, w={wh:.2f})"
             )
-        if y - hh // 2 < 0 or y + hh // 2 > _CANVAS_H - 1:
+        if y - hh / 2 < -0.01 or y + hh / 2 > 1.01:
             warnings.append(
                 f"Entity {ent.id}: y-bounds overflow canvas "
-                f"(y={y}, h={hh})"
+                f"(y={y:.2f}, h={hh:.2f})"
             )
 
     # ------------------------------------------------------------------
@@ -381,7 +363,106 @@ def _validate_semantic(
             f"Only {len(neg.targets)} NEG target(s) (3+ recommended)"
         )
 
+    # ------------------------------------------------------------------
+    # 10. Entity / structural element overlap
+    # ------------------------------------------------------------------
+    structural = (
+        data.get("manifest", {}).get("background", {}).get("structural_elements", [])
+    )
+    if structural and isinstance(structural, list):
+        structural_lower = {
+            s.lower().strip() for s in structural if isinstance(s, str)
+        }
+        for ent in manifest.entities:
+            ent_type = ent.type.lower().strip()
+            for se in structural_lower:
+                if ent_type in se or se in ent_type:
+                    warnings.append(
+                        f"Entity {ent.id} (type='{ent.type}') may overlap "
+                        f"with structural element '{se}' — risk of double "
+                        f"rendering"
+                    )
+
     return warnings
+
+
+# ---------------------------------------------------------------------------
+# Post-processing: auto scale + orientation resolution
+# ---------------------------------------------------------------------------
+
+_DEFAULT_ZONE_SCALES = {"sky": 0.5, "background": 0.7, "midground": 0.9, "foreground": 1.0}
+
+
+def _apply_zone_scale(manifest: SceneManifest) -> None:
+    """Apply zone-based scale to entity width/height hints.
+
+    The LLM provides BASE sizes (foreground scale). This function multiplies
+    them by the zone's scale_hint so background entities are automatically
+    smaller. Also sets scale_factor on each entity for downstream use.
+    """
+    # Build zone → scale_hint map from manifest background zones
+    zone_scales: Dict[str, float] = {}
+    if manifest.background and manifest.background.zones:
+        for z in manifest.background.zones:
+            zone_scales[z.id] = z.scale_hint
+
+    for ent in manifest.entities:
+        zone = ent.position.zone
+        if zone:
+            scale = zone_scales.get(zone, _DEFAULT_ZONE_SCALES.get(zone, 1.0))
+        else:
+            scale = 1.0
+        ent.scale_factor = scale
+        if ent.width_hint is not None:
+            ent.width_hint *= scale
+        if ent.height_hint is not None:
+            ent.height_hint *= scale
+
+
+def _sync_manifest_to_data(manifest: SceneManifest, data: Dict[str, Any]) -> None:
+    """Sync post-processed manifest values back to the raw data dict.
+
+    After _apply_zone_scale and _resolve_orientations modify the manifest model,
+    the raw data dict still has original LLM values. This syncs width_hint,
+    height_hint, scale_factor, and orientation back so downstream consumers
+    (scene_generator.py) read the correct values.
+    """
+    raw_entities = data.get("manifest", {}).get("entities", [])
+    model_by_id = {ent.id: ent for ent in manifest.entities}
+    for raw_ent in raw_entities:
+        eid = raw_ent.get("id", "")
+        model_ent = model_by_id.get(eid)
+        if model_ent is None:
+            continue
+        if model_ent.width_hint is not None:
+            raw_ent["width_hint"] = model_ent.width_hint
+        if model_ent.height_hint is not None:
+            raw_ent["height_hint"] = model_ent.height_hint
+        if model_ent.scale_factor is not None:
+            raw_ent["scale_factor"] = model_ent.scale_factor
+        if model_ent.orientation is not None:
+            raw_ent["orientation"] = model_ent.orientation
+
+
+def _resolve_orientations(manifest: SceneManifest) -> None:
+    """Resolve relational orientations (facing:<entity_id>) to absolute directions.
+
+    Compares x positions to determine facing_left vs facing_right.
+    """
+    positions = {ent.id: ent.position.x for ent in manifest.entities}
+    for ent in manifest.entities:
+        if not ent.orientation or not ent.orientation.startswith("facing:"):
+            continue
+        target_id = ent.orientation[len("facing:"):]
+        target_x = positions.get(target_id)
+        if target_x is None:
+            logger.warning(
+                "[orientation] %s: target '%s' not found, defaulting to facing_right",
+                ent.id, target_id,
+            )
+            ent.orientation = "facing_right"
+            continue
+        ent.orientation = "facing_left" if target_x < ent.position.x else "facing_right"
 
 
 # ---------------------------------------------------------------------------
@@ -440,7 +521,7 @@ async def generate_scene_and_neg(
                     contents=user_prompt,
                     config=types.GenerateContentConfig(
                         system_instruction=SCENE_NEG_SYSTEM_PROMPT,
-                        thinking_config=types.ThinkingConfig(thinking_budget=1024),
+                        thinking_config=types.ThinkingConfig(thinking_budget=8192),
                         temperature=1.0,
                         response_mime_type="application/json",
                     ),
@@ -454,6 +535,15 @@ async def generate_scene_and_neg(
             raw_text = get_response_text(response)
             data = extract_json(raw_text)
             manifest, neg = _validate_response(data)
+
+            # Post-processing: auto-scale and orientation resolution
+            _apply_zone_scale(manifest)
+            _resolve_orientations(manifest)
+
+            # Sync post-processed values back to raw data dict
+            # (scene_generator reads from data, not from manifest model)
+            _sync_manifest_to_data(manifest, data)
+
             parse_elapsed = time.time() - t1
             logger.info("[scene-neg] Parsing + validation took %.1fs", parse_elapsed)
 

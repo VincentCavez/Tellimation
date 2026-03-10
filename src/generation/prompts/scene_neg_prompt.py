@@ -51,7 +51,10 @@ Return ONLY valid JSON (no markdown fences, no commentary):
         {{"id": "midground", "y_start": 0.5, "y_end": 0.7, "scale_hint": 0.9}},
         {{"id": "foreground", "y_start": 0.7, "y_end": 1.0, "scale_hint": 1.0}}
       ],
-      "structural_elements": ["<fence>", "<stone path>", "..."]
+      "structural_elements": ["<EXHAUSTIVE list of every non-entity visible element \
+in the background: 'wooden counter', 'tiled floor', 'window with blue curtains', \
+'refrigerator', 'wall clock'. These are the objects that will appear in the \
+background image. Any entity that duplicates an item in this list is an ERROR.>"]
     }},
     "entities": [
       {{
@@ -68,8 +71,8 @@ Return ONLY valid JSON (no markdown fences, no commentary):
 to other entities or surfaces>"
         }},
         "position": {{
-          "x": "<int 0-1119>",
-          "y": "<int 0-719>",
+          "x": "<float 0.0-1.0 — normalized horizontal center (0=left, 1=right)>",
+          "y": "<float 0.0-1.0 — normalized vertical center (0=top, 1=bottom)>",
           "spatial_ref": "<on/under/beside entity_id or null>",
           "zone": "<foreground|midground|background>",
           "depth_order": "<int — 0=farthest back, higher=more in front>",
@@ -79,10 +82,9 @@ to other entities or surfaces>"
         "pose": "<SELF-CONTAINED body posture — describe ONLY the entity's own body, \
 NO references to other entities or surfaces>",
         "carried_over": "<true if entity existed in previous scene, false if new>",
-        "width_hint": "<int — estimated pixel width on the 1120x720 canvas>",
-        "height_hint": "<int — estimated pixel height>",
-        "orientation": "<facing_left|facing_right|facing_viewer>",
-        "scale_factor": "<float 0.5-1.5 — scale relative to zone default>",
+        "width_hint": "<float 0.0-1.0 — entity width as proportion of canvas width>",
+        "height_hint": "<float 0.0-1.0 — entity height as proportion of canvas height>",
+        "orientation": "<facing_left|facing_right|facing_viewer|facing:<entity_id>>",
         "sensory": {{
           "temperature": "<cold|cool|warm|hot — omit if irrelevant>",
           "sound": "<brief description — omit if silent>",
@@ -128,56 +130,125 @@ elaborated_noun_phrases, grammaticality, tense>",
   }},
   "scene_description": "<2-3 sentence rich visual description of the scene: \
 setting, lighting, mood, atmosphere, color palette, composition.>",
-  "background_description": "<2-4 sentence description of the environment/backdrop. \
-Start with environment type (outdoor, indoor, themed). Describe sky/ceiling, \
-ground/floor, lighting, atmosphere, structural elements. Do NOT mention entities.>",
+  "background_description": "<4-6 sentence DETAILED description of the complete \
+environment. This description is the SOLE input for background image generation, \
+so it must be rich and unambiguous. \
+Sentence 1: Environment type and setting (e.g., 'A warm, well-lit kitchen in a \
+cozy cottage'). \
+Sentence 2: Walls/boundaries and their appearance (color, material, decorations). \
+Sentence 3: Floor/ground surface (material, color, texture, any patterns). \
+Sentence 4: Lighting, atmosphere, and mood (time of day, light source, shadows). \
+Sentence 5-6: Structural elements and fixtures that define the space (counters, \
+shelves, windows with curtains, doorways, appliances — or for outdoor: paths, \
+fences, distant features). \
+Do NOT mention any entities (characters or objects). Those are rendered separately. \
+The description must produce a COHERENT, COMPLETE environment that makes visual \
+sense on its own — a viewer should understand exactly what room/place this is \
+without seeing any entities.>",
   "carried_over_entities": ["<entity_id>", ...],
   "background_changed": "<true|false>"
 }}
 ```
 
-# Canvas: 1120 x 720 pixels
+# Canvas: normalized coordinates (0.0 to 1.0)
+
+All positions and sizes use NORMALIZED coordinates from 0.0 to 1.0. \
+Think in PROPORTIONS, not pixels: x=0.5 means "center of the canvas", \
+width_hint=0.25 means "25% of the canvas width".
 
 Position `(x, y)` is the entity center. The bounding box spans from \
 `(x - width_hint/2, y - height_hint/2)` to `(x + width_hint/2, y + height_hint/2)`. \
-The entire bounding box MUST stay within the canvas (0,0)-(1119,719).
+The entire bounding box MUST stay within 0.0-1.0 on both axes.
+
+# Spatial relation positions (CRITICAL)
+
+When two entities have a spatial relation (in `relations[]` or via `spatial_ref`), \
+their (x, y) positions MUST reflect that relationship physically:
+
+- "on", "on_top_of": entity_a center directly above entity_b. \
+  Horizontal distance (|xa - xb|) < entity_b width_hint / 2. \
+  entity_a bottom edge ≈ entity_b top edge.
+- "beside", "next_to": horizontal distance (|xa - xb|) ≈ \
+  (wa + wb) / 2 + 0.02. Entities should almost touch.
+- "under", "beneath", "below": inverse of "on". entity_a below entity_b.
+- "behind", "in_front_of": similar x, differ in depth_order and \
+  slightly in y (behind = higher y, smaller scale).
+- "between": entity x midway between the two flanking entities.
+- "facing": entities within interaction distance (|xa - xb| < 0.27).
+
+If a character is performing an action ON or WITH an object (e.g., "rolling \
+a snowball", "holding a book"), the object MUST be within arm's reach: \
+|xa - xb| < character_width_hint. Position the object adjacent to or \
+overlapping the character's bounding box.
+
+SELF-CHECK: for every relation in `relations[]`, verify the (x, y) positions \
+are physically consistent. If not, adjust positions before outputting.
 
 # Scene zones and depth
 
-The scene has 4 logical zones (top to bottom on the 720px canvas):
+The scene has 4 logical zones (top to bottom):
 
-- **Sky zone** (y: 0-180): sky, clouds, sun/moon, flying objects only.
-- **Background zone** (y: 180-360): distant elements, smaller scale (0.6-0.8x). \
+- **Sky zone** (y: 0.0-0.25): sky, clouds, sun/moon, flying objects only.
+- **Background zone** (y: 0.25-0.50): distant elements, smaller scale (0.6-0.8x). \
 Trees far away, distant buildings, mountains.
-- **Midground zone** (y: 360-500): medium-distance elements, medium scale (0.8-1.0x). \
+- **Midground zone** (y: 0.50-0.69): medium-distance elements, medium scale (0.8-1.0x). \
 Bushes, fences, path elements.
-- **Foreground zone** (y: 500-720): main characters and close objects, full scale (1.0-1.2x). \
-The ground_line is at approximately y=500 (70% from top). Characters with \
+- **Foreground zone** (y: 0.69-1.0): main characters and close objects, full scale (1.0x). \
+The ground_line is at approximately y=0.7. Characters with \
 ground_contact=true should have their feet near this line.
 
 Rules:
 - Every entity MUST have a "zone" in its position.
-- Entity width_hint and height_hint should be SCALED by the zone's scale factor. \
-A tree that would be 300px tall in the foreground should be ~210px (0.7x) \
-in the background zone.
-- Background-zone entities should be SMALLER than foreground equivalents.
-- Entities in the same zone should have consistent scale.
-- Characters with ground_contact=true should have center y ≈ 500 - height/2 + height/2 \
-(feet at the ground_line).
+- Provide BASE sizes (foreground scale) for width_hint and height_hint. \
+The system will automatically apply the zone's scale_hint to compute the \
+final rendered size. Do NOT pre-scale sizes yourself.
+- Background-zone entities will be automatically scaled down (×0.7).
+- Midground-zone entities will be automatically scaled down (×0.9).
+- Characters with ground_contact=true should have their feet near y=0.7.
 
 The background model includes default zones. You MAY adjust zone y-ranges for \
 specific scenes (e.g., indoor scenes may have no sky zone) but the defaults \
 work for most outdoor scenes.
+
+# Perspective and proportions (CRITICAL)
+
+Entities are separate sprites composited ON TOP of the background image. \
+The background contains buildings, landscape, and architectural features. \
+If a foreground entity is placed near a background building, it will look \
+GIANT compared to the building — because the entity is at foreground scale \
+but the building is drawn at background scale in the background image.
+
+Rules for realistic proportions:
+- Characters belong in the FOREGROUND (y: 0.69-1.0). They should NOT be \
+positioned at the same y-level as background buildings or structures.
+- If the scene is "in front of a house", the house is in the BACKGROUND \
+IMAGE (drawn by background_description). The character stands in the \
+foreground. The house appears BEHIND and ABOVE the character, with the \
+roof extending above the frame or high in the background.
+- NEVER position a foreground-scale entity directly next to a \
+background-scale structure. The size mismatch breaks the illusion.
+- Objects that a character interacts with (snowball, book, cup) should be \
+in the SAME ZONE as the character (foreground), not in the midground.
+- Think of it as a CAMERA: foreground entities are CLOSE to the camera \
+(large), background elements are FAR from the camera (small). A child \
+standing 2 meters from the camera looks much taller than a house 50 \
+meters away.
 
 # Entity orientation
 
 Every character entity MUST have an "orientation" field:
 - "facing_left" or "facing_right": which direction the character faces.
 - "facing_viewer": character faces the viewer directly (rare, for direct address).
+- "facing:<entity_id>": the character faces toward the specified entity. \
+The system will automatically resolve this to "facing_left" or "facing_right" \
+based on the relative x positions.
 
-Two characters interacting should face each other. \
-The main character typically faces right (story progression direction). \
-Non-character entities (trees, rocks) do not need orientation.
+PREFER "facing:<entity_id>" when two entities interact (talking, looking at, \
+giving, receiving). This is more robust than manually computing the direction. \
+Examples: "facing:rabbit_01", "facing:ball_01".
+
+The main character typically faces right (story progression direction) when \
+not interacting. Non-character entities (trees, rocks) do not need orientation.
 
 # Sensory properties
 
@@ -263,20 +334,56 @@ Add `weight`, `state`, `pattern` as appropriate.
 - Every entity MUST have a `pose`.
 - Every character entity MUST have an `orientation`.
 
+# Entity vs. background separation (CRITICAL)
+
+Entities are composited ON TOP of the background image as separate sprites. \
+The background is generated independently from the background_description text. \
+If the same object appears in both, it will be drawn TWICE (once in the \
+background image, once as a sprite on top) — this looks broken.
+
+## What goes in the background (structural_elements + background_description):
+- Architectural structure: walls, floors, ceilings, windows, doors
+- Fixed furniture that defines the setting: counters, shelves, tables, bookcases
+- Paths, fences, gates, signs, bridges
+- Distant landscape: mountains, horizon, buildings far away
+- Room fixtures: lamps on walls, curtains, rugs, wallpaper
+
+## What goes as entities:
+- Characters (animals, people) — ALWAYS entities
+- Objects a character interacts with or that have narrative importance
+- Items with descriptive affordances (color, texture, state) worth narrating
+- Movable objects: food, toys, tools, books, bags, balls
+
+## Deconfliction rule:
+Before finalizing, check every entity against structural_elements and \
+background_description. If an entity duplicates something already in the \
+background (e.g., window_01 when the background already describes windows), \
+REMOVE the entity. Architectural features that are part of the room/setting \
+structure MUST be background-only.
+
+## Exception:
+An object may appear as BOTH a background element AND an entity ONLY if the \
+entity version is a DIFFERENT instance in a DIFFERENT location (e.g., background \
+has "distant houses" and an entity is "house_01" in the foreground with specific \
+properties). Even then, ensure they don't visually overlap.
+
 # Size hints
 
-Every entity MUST include `width_hint` and `height_hint` (pixels on 1120x720). \
-These should be SCALED according to the entity's zone:
+Every entity MUST include `width_hint` and `height_hint` as NORMALIZED values \
+(0.0 to 1.0, proportion of canvas width/height). These are BASE sizes \
+(foreground scale). The system will automatically scale them by the zone's \
+scale_hint — do NOT pre-scale yourself.
 
-Foreground (scale 1.0x):
-- Characters: width 160-240, height 200-280
-- Trees: width 240-360, height 280-400
-- Small objects: width 64-120, height 64-120
-- Medium objects: width 120-240, height 96-200
-- Large objects: width 240-400, height 200-360
+BASE sizes (foreground, scale 1.0x):
+- Characters: width 0.25-0.36, height 0.44-0.67
+- Trees: width 0.32-0.45, height 0.56-0.78
+- Small objects: width 0.11-0.18, height 0.17-0.28
+- Medium objects: width 0.18-0.32, height 0.22-0.44
+- Large objects: width 0.32-0.50, height 0.44-0.72
 
-Background (scale ~0.7x): multiply above by 0.7.
-Midground (scale ~0.9x): multiply above by 0.9.
+IMPORTANT: entities must be LARGE enough to be clearly visible and detailed \
+in the pixel art rendering. A character should fill roughly 1/3 to 1/2 of the \
+canvas height. Err on the side of BIGGER entities.
 
 # Pose and distinctive_features: SELF-CONTAINED
 
@@ -332,6 +439,11 @@ descriptive affordances for the child's MISL gaps.
 target_level = min(current_level + 1, expected_level + 1).
 - Create NEG targets that exploit spatial relations, sensory properties, \
 and visual contrasts.
+- Ensure NO entity duplicates a structural background element. Architectural \
+features (walls, windows, doors, counters, shelves) belong in the background \
+ONLY. Entities should be characters and interactive/narrative objects.
+- The background_description must be 4-6 sentences of rich, coherent detail. \
+A viewer should understand the setting from the background alone.
 - There is NO narrative_text. The manifest is purely factual — it describes \
 the scene for asset generation and module context.
 """
@@ -392,5 +504,10 @@ You may introduce 1-2 new entities. Aim for 3-5 total entities.
 target_level = min(current_level + 1, expected_level + 1).
 - Create NEG targets that exploit spatial relations, sensory properties, \
 and visual contrasts.
+- Ensure NO entity duplicates a structural background element. Architectural \
+features (walls, windows, doors, counters, shelves) belong in the background \
+ONLY. Entities should be characters and interactive/narrative objects.
+- The background_description must be 4-6 sentences of rich, coherent detail. \
+A viewer should understand the setting from the background alone.
 - There is NO narrative_text. The manifest is purely factual.
 """

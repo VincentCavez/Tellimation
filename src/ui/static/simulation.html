@@ -297,9 +297,9 @@
         <button class="anim-btn two-entity" onclick="playTemplate('causal_push')">causal_push</button>
       </div>
       <div class="family">
-        <span class="family-label">Q: Quantity</span>
-        <button class="anim-btn two-entity" onclick="playTemplate('bonk')">bonk</button>
+        <span class="family-label">C: Count</span>
         <button class="anim-btn" onclick="playTemplate('sequential_glow')">sequential_glow</button>
+        <button class="anim-btn" onclick="playTemplate('disintegration')">disintegration</button>
         <button class="anim-btn" onclick="playTemplate('ghost_outline')">ghost_outline</button>
       </div>
       <div class="family">
@@ -498,8 +498,8 @@
           btn.disabled = false;
         })
         .catch(function(err) {
-          log('Failed to load saved scene: ' + err, 'log-err');
-          setStatus('Error loading scene');
+          log('No cached scene — generate one first with your API key', 'log-warn');
+          setStatus('No cached scene yet');
           btn.disabled = false;
         });
     }
@@ -586,11 +586,11 @@
     // =====================================================================
     var SINGLE_ENTITY = [
       'spotlight', 'nametag', 'settle', 'color_pop', 'reveal',
-      'emanation', 'flashback', 'motion_lines', 'anticipation',
-      'ghost_outline', 'speech_bubble', 'thought_bubble', 'alert'
+      'emanation', 'motion_lines', 'anticipation',
+      'disintegration', 'ghost_outline', 'speech_bubble', 'thought_bubble', 'alert'
     ];
-    var TWO_ENTITY = ['magnetism', 'repel', 'causal_push', 'bonk'];
-    var SCENE_WIDE = ['timelapse'];
+    var TWO_ENTITY = ['magnetism', 'repel', 'causal_push'];
+    var SCENE_WIDE = ['timelapse', 'flashback'];
     var MULTI_ENTITY = ['sequential_glow'];
     var WORD_ONLY = ['interjection'];
 
@@ -613,7 +613,10 @@
         for (var i = 0; i < selectA.options.length; i++) prefixes.push(selectA.options[i].value);
         params.entityPrefixes = prefixes;
       }
-      if (SCENE_WIDE.indexOf(templateName) >= 0) params.cycles = 2;
+      if (SCENE_WIDE.indexOf(templateName) >= 0) {
+        var bg = currentScene && currentScene.manifest && currentScene.manifest.background;
+        params.isIndoor = !!(bg && bg.environment_type === 'indoor');
+      }
       if (WORD_ONLY.indexOf(templateName) >= 0) params.word = document.getElementById('paramWord').value || 'Wow!';
       if (templateName === 'emanation') params.particleType = document.getElementById('paramParticles').value;
       if (templateName === 'motion_lines') params.direction = document.getElementById('paramDirection').value;
@@ -648,7 +651,7 @@
       'color_pop', 'emanation', 'flashback', 'timelapse',
       'motion_lines', 'anticipation',
       'magnetism', 'repel', 'causal_push',
-      'bonk', 'sequential_glow', 'ghost_outline',
+      'sequential_glow', 'disintegration', 'ghost_outline',
       'speech_bubble', 'thought_bubble', 'alert', 'interjection'
     ];
 

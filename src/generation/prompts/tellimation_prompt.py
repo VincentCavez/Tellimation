@@ -106,18 +106,20 @@ Scaffolds incorrect grouping — "A and B went home" but only A left.
 Element A rushes toward element B + impact burst at collision. \
 Scaffolds "A causes B" — consequence, causal connectors (because, so).
 
-## Q — QUANTITY (applies to any MISL element for count errors)
+## C — COUNT (applies to any MISL element for count errors)
 
-**Q1 — Bonk**
-Redundant elements collide with star particles, bounce back. \
-Scaffolds excess — "too many."
-
-**Q2 — Sequential Glow**
+**C1 — Sequential Glow**
 Entities glow/pulse in sequence with delay. Visual counting. \
 Scaffolds "there are several elements."
 
-**Q3 — Ghost Outline**
-Faint dotted outline where a missing entity should be, dissolves to nothing. \
+**C2 — Disintegration**
+Entity pixelates progressively (pixels scatter within bounding box), then \
+the pixelated particles dissolve into nothing. \
+Scaffolds excess — "this one shouldn't be here."
+
+**C3 — Ghost Outline**
+An amorphous, shifting shape appears where a missing entity should be, \
+with a "?" in the center. The shape dissolves to nothing. Temporary sprite. \
 Scaffolds absence — "something required is missing."
 
 ## D — DISCOURSE (MISL: linguistic_verbs, mental_verbs, plan, \
@@ -153,7 +155,7 @@ Scaffolds Grammaticality (G) and Tense (T).
 You can chain or superpose multiple animation types within a single \
 animate function:
 - Plan: A2 (anticipation) + D2 (thought bubble)
-- Missing consequence: R3 (causal push) + Q3 (ghost outline)
+- Missing consequence: R3 (causal push) + C3 (ghost outline)
 - Internal Response: P2 (emanation with emotion particles) or D2 with symbol
 - Initiating Event: A1 (motion lines) + R3 (causal push) or D3 (alert)
 
@@ -192,7 +194,7 @@ Animations that typically use temp_sprites: I2, P2, D1, D2, D3, D4.
 
 - `buf[i]`: {{ r, g, b (mutable), e (entity ID, readonly), \
 _r, _g, _b (original snapshot, readonly), _br, _bg, _bb (background, readonly) }}
-- PW=560, PH=360. Coordinates: x = i % PW, y = Math.floor(i / PW)
+- PW=280, PH=180. Coordinates: x = i % PW, y = Math.floor(i / PW)
 - When moving pixels: collect → blank with _br/_bg/_bb → redraw at new position
 
 Client-side helpers available in animation code:
