@@ -1710,13 +1710,12 @@ AnimationTemplates.register('causal_push', function(params) {
       dxB = Math.round(jitter * cachedNdx);
       dyB = Math.round(jitter * cachedNdy);
     } else {
-      // Post-impact: A recoils back, B gets knocked away
+      // Post-impact: A slides back gently, B gets knocked away
       var postT = (t - 0.40) / 0.60;
-      // A recoils with damped oscillation
-      var decayA = (1 - postT);
-      var bounceA = Math.sin(postT * Math.PI * 2) * decayA;
-      dxA = Math.round(-cachedRushDist * 0.3 * bounceA * cachedNdx);
-      dyA = Math.round(-cachedRushDist * 0.3 * bounceA * cachedNdy);
+      // A slides back smoothly to origin
+      var slideBack = 1 - postT;
+      dxA = Math.round(cachedRushDist * slideBack * cachedNdx);
+      dyA = Math.round(cachedRushDist * slideBack * cachedNdy);
       // B knocked away in A→B direction with damped bounce
       var decayB = (1 - postT);
       var bounceB = Math.sin(postT * Math.PI * 3) * decayB;
