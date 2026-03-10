@@ -43,6 +43,18 @@
     }
     .top-bar .btn-generate:hover { background: #388e3c; }
     .top-bar .btn-generate:disabled { opacity: 0.4; cursor: not-allowed; }
+    .top-bar .btn-load-saved {
+      background: #1a3a5a;
+      color: #66aaff;
+      border: 1px solid #335588;
+      padding: 0.35rem 1.2rem;
+      border-radius: 4px;
+      font-size: 13px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .top-bar .btn-load-saved:hover { background: #2a4a6a; }
+    .top-bar .btn-load-saved:disabled { opacity: 0.4; cursor: not-allowed; }
     #status-text {
       font-size: 12px;
       color: #888;
@@ -60,8 +72,6 @@
       image-rendering: crisp-edges;
       border: 2px solid #333;
       background: #000;
-      /* No CSS size override — display at native 1120×720.
-         Each art pixel (K=4) = exactly 4×4 CSS pixels. */
       max-width: 100%;
       height: auto;
     }
@@ -205,11 +215,13 @@
 </head>
 <body>
 
-  <!-- Top bar: API key + Generate -->
+  <!-- Top bar -->
   <div class="top-bar">
-    <input type="password" id="apiKey" placeholder="Gemini API key">
-    <button class="btn-generate" id="btnGenerate" onclick="generateScene()">Generate Scene</button>
-    <span id="status-text">Enter API key to start</span>
+    <button class="btn-load-saved" id="btnLoadSaved" onclick="loadSavedScene()">Load Saved Scene</button>
+    <span style="color:#555;font-size:12px;">|</span>
+    <input type="password" id="apiKey" placeholder="Gemini API key (optional)">
+    <button class="btn-generate" id="btnGenerate" onclick="generateScene()">Generate New Scene</button>
+    <span id="status-text">Loading saved scene...</span>
   </div>
 
   <!-- Canvas at full native size -->
@@ -224,9 +236,9 @@
     <div class="section-title">Entity Selection &amp; Parameters</div>
     <div class="param-row">
       <label>Entity A</label>
-      <select id="entityA"><option value="">-- generate a scene --</option></select>
+      <select id="entityA"><option value="">-- loading --</option></select>
       <label>Entity B</label>
-      <select id="entityB"><option value="">-- generate a scene --</option></select>
+      <select id="entityB"><option value="">-- loading --</option></select>
       <label>Text</label>
       <input type="text" id="paramText" value="Hello!" placeholder="speech/thought">
       <label>Word</label>
@@ -285,9 +297,9 @@
         <button class="anim-btn two-entity" onclick="playTemplate('causal_push')">causal_push</button>
       </div>
       <div class="family">
-        <span class="family-label">Q: Quantity</span>
-        <button class="anim-btn two-entity" onclick="playTemplate('bonk')">bonk</button>
+        <span class="family-label">C: Count</span>
         <button class="anim-btn" onclick="playTemplate('sequential_glow')">sequential_glow</button>
+        <button class="anim-btn" onclick="playTemplate('disintegration')">disintegration</button>
         <button class="anim-btn" onclick="playTemplate('ghost_outline')">ghost_outline</button>
       </div>
       <div class="family">
@@ -429,7 +441,6 @@
             log('Failed to render entity: ' + entityEids[i] + ' — ' + e.message, 'log-warn');
           }
         }
-        // Pre-compute distance fields for animations (spotlight, nametag, etc.)
         buf.computeDistanceFields(20);
         renderer.render();
         log('Scene rendered: ' + entityEids.length + ' entities', 'log-ok');
@@ -467,7 +478,34 @@
     }
 
     // =====================================================================
-    // WebSocket + scene generation
+    // Load saved scene (no Gemini call)
+    // =====================================================================
+    function loadSavedScene() {
+      var btn = document.getElementById('btnLoadSaved');
+      btn.disabled = true;
+      setStatus('Loading saved scene...');
+      log('Fetching /api/simulation-scene...');
+
+      fetch('/api/simulation-scene')
+        .then(function(r) {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return r.json();
+        })
+        .then(function(scene) {
+          log('Saved scene loaded', 'log-ok');
+          setStatus('Saved scene (cached)');
+          renderScene(scene);
+          btn.disabled = false;
+        })
+        .catch(function(err) {
+          log('No cached scene — generate one first with your API key', 'log-warn');
+          setStatus('No cached scene yet');
+          btn.disabled = false;
+        });
+    }
+
+    // =====================================================================
+    // WebSocket + scene generation (Gemini)
     // =====================================================================
     function generateScene() {
       var apiKey = document.getElementById('apiKey').value.trim();
@@ -514,7 +552,7 @@
 
           case 'scene_ready':
             log('Scene ready! Rendering...', 'log-ok');
-            setStatus('Scene ready');
+            setStatus('Scene ready (generated)');
             renderScene(msg.scene);
             btnGen.disabled = false;
             btnGen.textContent = 'Generate New Scene';
@@ -548,11 +586,11 @@
     // =====================================================================
     var SINGLE_ENTITY = [
       'spotlight', 'nametag', 'settle', 'color_pop', 'reveal',
-      'emanation', 'flashback', 'motion_lines', 'anticipation',
-      'ghost_outline', 'speech_bubble', 'thought_bubble', 'alert'
+      'emanation', 'motion_lines', 'anticipation',
+      'disintegration', 'ghost_outline', 'speech_bubble', 'thought_bubble', 'alert'
     ];
-    var TWO_ENTITY = ['magnetism', 'repel', 'causal_push', 'bonk'];
-    var SCENE_WIDE = ['timelapse'];
+    var TWO_ENTITY = ['magnetism', 'repel', 'causal_push'];
+    var SCENE_WIDE = ['timelapse', 'flashback'];
     var MULTI_ENTITY = ['sequential_glow'];
     var WORD_ONLY = ['interjection'];
 
@@ -575,7 +613,10 @@
         for (var i = 0; i < selectA.options.length; i++) prefixes.push(selectA.options[i].value);
         params.entityPrefixes = prefixes;
       }
-      if (SCENE_WIDE.indexOf(templateName) >= 0) params.cycles = 2;
+      if (SCENE_WIDE.indexOf(templateName) >= 0) {
+        var bg = currentScene && currentScene.manifest && currentScene.manifest.background;
+        params.isIndoor = !!(bg && bg.environment_type === 'indoor');
+      }
       if (WORD_ONLY.indexOf(templateName) >= 0) params.word = document.getElementById('paramWord').value || 'Wow!';
       if (templateName === 'emanation') params.particleType = document.getElementById('paramParticles').value;
       if (templateName === 'motion_lines') params.direction = document.getElementById('paramDirection').value;
@@ -586,7 +627,7 @@
     }
 
     function playTemplate(templateName) {
-      if (!currentScene) { log('Generate a scene first', 'log-warn'); return; }
+      if (!currentScene) { log('Load a scene first', 'log-warn'); return; }
       var spec = buildSpec(templateName);
       log('Playing: ' + templateName + ' ' + JSON.stringify(spec.params));
       runner.play(spec).then(function() {
@@ -610,12 +651,12 @@
       'color_pop', 'emanation', 'flashback', 'timelapse',
       'motion_lines', 'anticipation',
       'magnetism', 'repel', 'causal_push',
-      'bonk', 'sequential_glow', 'ghost_outline',
+      'sequential_glow', 'disintegration', 'ghost_outline',
       'speech_bubble', 'thought_bubble', 'alert', 'interjection'
     ];
 
     async function playAll() {
-      if (!currentScene) { log('Generate a scene first', 'log-warn'); return; }
+      if (!currentScene) { log('Load a scene first', 'log-warn'); return; }
       stopPlayAll = false;
       log('--- Playing all 20 animations sequentially ---');
       for (var i = 0; i < ALL_TEMPLATES.length; i++) {
@@ -666,7 +707,7 @@
     }
 
     async function runSnapshotTest() {
-      if (!currentScene) { log('Generate a scene first', 'log-warn'); return; }
+      if (!currentScene) { log('Load a scene first', 'log-warn'); return; }
       log('--- Snapshot/Restore test: all 20 templates ---');
       var allPassed = true;
       for (var i = 0; i < ALL_TEMPLATES.length; i++) {
@@ -685,6 +726,13 @@
       log(allPassed ? '=== ALL 20/20 SNAPSHOT TESTS PASSED ===' : '=== SOME TESTS FAILED ===',
           allPassed ? 'log-ok' : 'log-warn');
     }
+
+    // =====================================================================
+    // Auto-load saved scene on page load
+    // =====================================================================
+    window.addEventListener('load', function() {
+      loadSavedScene();
+    });
 
   </script>
 </body>

@@ -645,100 +645,128 @@ AnimationTemplates.register('nametag', function(params) {
     var bounds = _computeEntityBounds(buf, PW, prefix);
     if (bounds.x2 < 0) return;
 
-    // Pivot angle: gentle oscillation
-    var pivotAngle = Math.sin(t * Math.PI * 3) * 0.08 * env;
-    var cosA = Math.cos(pivotAngle), sinA = Math.sin(pivotAngle);
+    // Decide side: offset tag left or right based on available space
+    var spaceLeft = bounds.x1;
+    var spaceRight = PW - 1 - bounds.x2;
+    var offsetRight = spaceRight >= spaceLeft;
+    var holeOnLeft = offsetRight; // hole on the side facing the entity
 
-    // Label position: centered above entity, 22px gap
-    var anchorX = bounds.cx;  // string attachment = center bottom of label
-    var anchorY = Math.max(labelH + 4, bounds.y1 - 22);
-    var alpha = env * 0.9;
+    // Tag position: static, offset to the side, vertically at entity center
+    var tagGap = 8;
+    var tagCenterY = Math.max(labelH / 2 + 2, Math.min(bounds.cy, PH - labelH / 2 - 2));
+    var tagX; // top-left corner X of the tag
+    if (offsetRight) {
+      tagX = bounds.x2 + tagGap;
+    } else {
+      tagX = bounds.x1 - tagGap - labelW;
+    }
+    var tagY = Math.round(tagCenterY - labelH / 2); // top-left corner Y
 
-    // String endpoint: top-center of entity
-    var stringEndX = bounds.cx;
-    var stringEndY = bounds.y1;
+    // Hole: circle INSIDE the tag, next to the border, at mid-height
+    var holeRadius = 1;
+    var holeCenterLy = Math.round(labelH / 2); // local Y in tag coords
+    var holeCenterLx = holeOnLeft ? (1 + holeRadius + 1) : (labelW - 2 - holeRadius); // 1px inside border
+    var holeScreenX = tagX + holeCenterLx;
+    var holeScreenY = tagY + holeCenterLy;
 
-    // Draw the undulating red string from anchor to entity top
-    var stringLen = stringEndY - anchorY;
-    if (stringLen > 2) {
-      for (var sy = 0; sy <= stringLen; sy++) {
-        var progress = sy / stringLen;
-        // Sine wave offset that animates over time
-        var waveAmp = 3 * Math.sin(progress * Math.PI) * env;
-        var waveX = waveAmp * Math.sin(progress * Math.PI * 2.5 + t * Math.PI * 4);
-        var px = Math.round(anchorX + waveX);
-        var py = anchorY + sy;
+    // String endpoint: closest point on entity edge
+    var stringEndX = offsetRight ? bounds.x2 : bounds.x1;
+    var stringEndY = bounds.cy;
+
+    // Draw the undulating red string from hole to entity edge (only string moves)
+    var stringDx = stringEndX - holeScreenX;
+    var stringDy = stringEndY - holeScreenY;
+    var stringLen = Math.max(1, Math.sqrt(stringDx * stringDx + stringDy * stringDy));
+    var steps = Math.round(stringLen);
+    if (steps > 1) {
+      var snx = -stringDy / stringLen, sny = stringDx / stringLen;
+      for (var si2 = 0; si2 <= steps; si2++) {
+        var progress = si2 / steps;
+        var waveAmp = 2 * Math.sin(progress * Math.PI) * env;
+        var waveOff = waveAmp * Math.sin(progress * Math.PI * 2.5 + t * Math.PI * 4);
+        var px = Math.round(holeScreenX + stringDx * progress + snx * waveOff);
+        var py = Math.round(holeScreenY + stringDy * progress + sny * waveOff);
         if (px >= 0 && px < PW && py >= 0 && py < PH) {
           var si = py * PW + px;
-          buf[si].r = Math.round(buf[si].r * (1 - alpha) + stringColor[0] * alpha);
-          buf[si].g = Math.round(buf[si].g * (1 - alpha) + stringColor[1] * alpha);
-          buf[si].b = Math.round(buf[si].b * (1 - alpha) + stringColor[2] * alpha);
+          buf[si].r = Math.round(buf[si].r * (1 - env) + stringColor[0] * env);
+          buf[si].g = Math.round(buf[si].g * (1 - env) + stringColor[1] * env);
+          buf[si].b = Math.round(buf[si].b * (1 - env) + stringColor[2] * env);
         }
       }
     }
 
-    // Draw label with pivot rotation around anchor point (center-bottom of label)
+    // Draw label (static, no rotation)
     for (var ly = 0; ly < labelH; ly++) {
       for (var lx = 0; lx < labelW; lx++) {
-        // Position relative to anchor (center-bottom of label)
-        var relX = lx - labelW / 2;
-        var relY = ly - labelH; // negative because label is above anchor
-        // Apply rotation
-        var rotX = relX * cosA - relY * sinA;
-        var rotY = relX * sinA + relY * cosA;
-        var drawX = Math.round(anchorX + rotX);
-        var drawY = Math.round(anchorY + rotY);
+        var drawX = tagX + lx;
+        var drawY = tagY + ly;
         if (drawX < 0 || drawX >= PW || drawY < 0 || drawY >= PH) continue;
+
+        // Round corners: skip outermost pixels at each corner
+        if ((ly === 0 || ly === labelH - 1) && (lx === 0 || lx === labelW - 1)) continue; // skip exact corners
 
         var di = drawY * PW + drawX;
         var isBorder = (ly === 0 || ly === labelH - 1 || lx === 0 || lx === labelW - 1);
-        // Small hole for string at top-center
-        var isHole = (ly === labelH - 1 && lx >= labelW / 2 - 1 && lx <= labelW / 2 + 1);
-        if (isHole) continue;
+
+        // Hole: round circle inside the tag (not touching border)
+        var hdx = lx - holeCenterLx, hdy = ly - holeCenterLy;
+        var holeDist = Math.sqrt(hdx * hdx + hdy * hdy);
+        var isHole = holeDist <= holeRadius;
+        if (isHole) continue; // leave hole transparent (shows background)
+
+        // Hole border: dark ring around the hole
+        var isHoleRing = holeDist <= holeRadius + 1 && holeDist > holeRadius;
+
+        // Red line: from hole edge to tag border, at mid-height (1px tall)
+        var isRedLine = false;
+        if (ly === holeCenterLy) {
+          if (holeOnLeft && lx >= 0 && lx < holeCenterLx - holeRadius) isRedLine = true;
+          if (!holeOnLeft && lx > holeCenterLx + holeRadius && lx <= labelW - 1) isRedLine = true;
+        }
 
         var cr, cg, cb;
-        if (isBorder) {
+        if (isRedLine) {
+          cr = stringColor[0]; cg = stringColor[1]; cb = stringColor[2];
+        } else if (isHoleRing) {
+          cr = borderColor[0]; cg = borderColor[1]; cb = borderColor[2];
+        } else if (isBorder) {
           cr = borderColor[0]; cg = borderColor[1]; cb = borderColor[2];
         } else {
           cr = bgColor[0]; cg = bgColor[1]; cb = bgColor[2];
         }
-        buf[di].r = Math.round(buf[di].r * (1 - alpha) + cr * alpha);
-        buf[di].g = Math.round(buf[di].g * (1 - alpha) + cg * alpha);
-        buf[di].b = Math.round(buf[di].b * (1 - alpha) + cb * alpha);
+        buf[di].r = Math.round(buf[di].r * (1 - env) + cr * env);
+        buf[di].g = Math.round(buf[di].g * (1 - env) + cg * env);
+        buf[di].b = Math.round(buf[di].b * (1 - env) + cb * env);
       }
     }
 
-    // Draw text inside the label (with same rotation)
-    var textStartX = -textW / 2;
-    var textStartY = -labelH + labelPadY;
+    // Draw text inside the label (static, no rotation)
+    var textStartX = tagX + Math.round((labelW - textW) / 2);
+    var textStartY = tagY + labelPadY;
     var upper = entityType;
-    var cx = textStartX;
+    var cx2 = textStartX;
     for (var ci = 0; ci < upper.length; ci++) {
       var ch = upper[ci];
       var glyph = _PIXEL_FONT[ch];
-      if (!glyph) { cx += charW; continue; }
+      if (!glyph) { cx2 += charW; continue; }
       for (var gy = 0; gy < _FONT_H; gy++) {
         for (var gx = 0; gx < _FONT_W; gx++) {
           if (!glyph[gy * _FONT_W + gx]) continue;
           for (var sy2 = 0; sy2 < textScale; sy2++) {
             for (var sx2 = 0; sx2 < textScale; sx2++) {
-              var relX2 = cx + gx * textScale + sx2;
-              var relY2 = textStartY + gy * textScale + sy2;
-              var rotX2 = relX2 * cosA - relY2 * sinA;
-              var rotY2 = relX2 * sinA + relY2 * cosA;
-              var drawX2 = Math.round(anchorX + rotX2);
-              var drawY2 = Math.round(anchorY + rotY2);
+              var drawX2 = cx2 + gx * textScale + sx2;
+              var drawY2 = textStartY + gy * textScale + sy2;
               if (drawX2 >= 0 && drawX2 < PW && drawY2 >= 0 && drawY2 < PH) {
                 var ti = drawY2 * PW + drawX2;
-                buf[ti].r = Math.round(buf[ti].r * (1 - alpha) + textColor[0] * alpha);
-                buf[ti].g = Math.round(buf[ti].g * (1 - alpha) + textColor[1] * alpha);
-                buf[ti].b = Math.round(buf[ti].b * (1 - alpha) + textColor[2] * alpha);
+                buf[ti].r = Math.round(buf[ti].r * (1 - env) + textColor[0] * env);
+                buf[ti].g = Math.round(buf[ti].g * (1 - env) + textColor[1] * env);
+                buf[ti].b = Math.round(buf[ti].b * (1 - env) + textColor[2] * env);
               }
             }
           }
         }
       }
-      cx += charW;
+      cx2 += charW;
     }
   };
 }, 3000);
@@ -1728,7 +1756,7 @@ AnimationTemplates.register('causal_push', function(params) {
     _redrawEntityPixels(buf, PW, PH, pixelsA, dxA, dyA);
     _redrawEntityPixels(buf, PW, PH, pixelsB, dxB, dyB);
 
-    // Star burst at impact (same as bonk)
+    // Star burst at impact
     if (t >= 0.30 && t < 0.55) {
       // Midpoint of displaced centers
       var ipx = Math.round((boundsA.cx + dxA + boundsB.cx + dxB) / 2);
@@ -1789,133 +1817,7 @@ AnimationTemplates.register('causal_push', function(params) {
   };
 }, 1500);
 
-// ── Q1: Bonk ──
-AnimationTemplates.register('bonk', function(params) {
-  var prefixA = params.entityPrefixA || params.entityPrefix || '';
-  var prefixB = params.entityPrefixB || '';
-
-  // Cached contour gap data (computed once)
-  var cachedMoveA = null, cachedMoveB = null;
-  var cachedNdx = 0, cachedNdy = 0;
-  var cachedImpactX = 0, cachedImpactY = 0;
-
-  return function animate(buf, PW, PH, t) {
-    var boundsA = _computeEntityBounds(buf, PW, prefixA);
-    var boundsB = prefixB ? _computeEntityBounds(buf, PW, prefixB) : null;
-
-    var pixelsA = _collectEntityPixels(buf, PW, prefixA);
-    var pixelsB = prefixB ? _collectEntityPixels(buf, PW, prefixB) : [];
-
-    // Compute true contour gap on first frame (cached)
-    if (cachedMoveA === null) {
-      if (boundsB && pixelsB.length > 0) {
-        var cg = _computeContourGap(pixelsA, pixelsB, boundsA, boundsB);
-        cachedNdx = cg.ndx;
-        cachedNdy = cg.ndy;
-        cachedMoveA = cg.gap / 2;
-        cachedMoveB = cg.gap / 2;
-        cachedImpactX = cg.impactX;
-        cachedImpactY = cg.impactY;
-      } else {
-        cachedMoveA = 6; cachedMoveB = 0;
-        cachedNdx = 1; cachedNdy = 0;
-        cachedImpactX = boundsA.cx; cachedImpactY = boundsA.cy;
-      }
-    }
-
-    var dxA = 0, dyA = 0, dxB = 0, dyB = 0;
-
-    if (t < 0.3) {
-      // Move toward each other (diagonal, contour-based)
-      var approach = t / 0.3;
-      dxA = Math.round(cachedMoveA * approach * cachedNdx);
-      dyA = Math.round(cachedMoveA * approach * cachedNdy);
-      dxB = Math.round(-cachedMoveB * approach * cachedNdx);
-      dyB = Math.round(-cachedMoveB * approach * cachedNdy);
-    } else if (t < 0.35) {
-      // Impact: hold at contact + jitter along axis
-      var jitter = Math.round((Math.random() - 0.5) * 3);
-      dxA = Math.round(cachedMoveA * cachedNdx + jitter * cachedNdx);
-      dyA = Math.round(cachedMoveA * cachedNdy + jitter * cachedNdy);
-      dxB = Math.round(-cachedMoveB * cachedNdx - jitter * cachedNdx);
-      dyB = Math.round(-cachedMoveB * cachedNdy - jitter * cachedNdy);
-    } else {
-      // Bounce back with damped oscillation (diagonal)
-      var bt = (t - 0.35) / 0.65;
-      var decay = (1 - bt);
-      var bounce = Math.sin(bt * Math.PI * 3) * decay;
-      dxA = Math.round(-cachedMoveA * 0.5 * bounce * cachedNdx);
-      dyA = Math.round(-cachedMoveA * 0.5 * bounce * cachedNdy);
-      dxB = Math.round(cachedMoveB * 0.5 * bounce * cachedNdx);
-      dyB = Math.round(cachedMoveB * 0.5 * bounce * cachedNdy);
-    }
-
-    _blankEntityPixels(buf, pixelsA);
-    if (pixelsB.length > 0) _blankEntityPixels(buf, pixelsB);
-
-    _redrawEntityPixels(buf, PW, PH, pixelsA, dxA, dyA);
-    if (pixelsB.length > 0) _redrawEntityPixels(buf, PW, PH, pixelsB, dxB, dyB);
-
-    // Large star burst at impact point during collision
-    if (t >= 0.25 && t < 0.50) {
-      // Impact point: midpoint of displaced centers (same as magnetism sparkles)
-      var ipx = Math.round((boundsA.cx + dxA + (boundsB ? boundsB.cx + dxB : boundsA.cx)) / 2);
-      var ipy = Math.round((boundsA.cy + dyA + (boundsB ? boundsB.cy + dyB : boundsA.cy)) / 2);
-      var starAlpha = t < 0.32
-        ? (t - 0.25) / 0.07       // fade in
-        : 1 - (t - 0.32) / 0.18;  // fade out
-      starAlpha = Math.max(0, Math.min(1, starAlpha));
-
-      // 4-pointed star: two crosses (cardinal + diagonal) with graduated size
-      // Inner core (3×3)
-      for (var dy = -1; dy <= 1; dy++) {
-        for (var dx = -1; dx <= 1; dx++) {
-          var sx = ipx + dx, sy = ipy + dy;
-          if (sx >= 0 && sx < PW && sy >= 0 && sy < PH) {
-            var si = sy * PW + sx;
-            buf[si].r = Math.min(255, Math.round(buf[si].r * (1 - starAlpha) + 255 * starAlpha));
-            buf[si].g = Math.min(255, Math.round(buf[si].g * (1 - starAlpha) + 255 * starAlpha));
-            buf[si].b = Math.min(255, Math.round(buf[si].b * (1 - starAlpha) + 180 * starAlpha));
-          }
-        }
-      }
-      // Cardinal spikes (length 6)
-      var spikeLen = 6;
-      var cardinals = [[1,0],[-1,0],[0,1],[0,-1]];
-      for (var c = 0; c < 4; c++) {
-        for (var d = 2; d <= spikeLen; d++) {
-          var fade = 1 - (d - 1) / spikeLen; // brighter near center
-          var sa = starAlpha * fade;
-          var sx = ipx + cardinals[c][0] * d, sy = ipy + cardinals[c][1] * d;
-          if (sx >= 0 && sx < PW && sy >= 0 && sy < PH) {
-            var si = sy * PW + sx;
-            buf[si].r = Math.min(255, Math.round(buf[si].r * (1 - sa) + 255 * sa));
-            buf[si].g = Math.min(255, Math.round(buf[si].g * (1 - sa) + 255 * sa));
-            buf[si].b = Math.min(255, Math.round(buf[si].b * (1 - sa) + 120 * sa));
-          }
-        }
-      }
-      // Diagonal spikes (length 4)
-      var diagLen = 4;
-      var diags = [[1,1],[-1,1],[1,-1],[-1,-1]];
-      for (var c = 0; c < 4; c++) {
-        for (var d = 2; d <= diagLen; d++) {
-          var fade = 1 - (d - 1) / diagLen;
-          var sa = starAlpha * fade;
-          var sx = ipx + diags[c][0] * d, sy = ipy + diags[c][1] * d;
-          if (sx >= 0 && sx < PW && sy >= 0 && sy < PH) {
-            var si = sy * PW + sx;
-            buf[si].r = Math.min(255, Math.round(buf[si].r * (1 - sa) + 255 * sa));
-            buf[si].g = Math.min(255, Math.round(buf[si].g * (1 - sa) + 230 * sa));
-            buf[si].b = Math.min(255, Math.round(buf[si].b * (1 - sa) + 80 * sa));
-          }
-        }
-      }
-    }
-  };
-}, 1200);
-
-// ── Q2: Sequential Glow ──
+// ── C1: Sequential Glow ──
 AnimationTemplates.register('sequential_glow', function(params) {
   var prefixes = params.entityPrefixes || [params.entityPrefix || ''];
   var n = prefixes.length;
@@ -1964,69 +1866,237 @@ AnimationTemplates.register('sequential_glow', function(params) {
   };
 }, 1600);
 
-// ── Q3: Ghost Outline ──
-AnimationTemplates.register('ghost_outline', function(params) {
+// ── C2: Disintegration ──
+// Entity pixels fall downward with slight horizontal drift, fading to opacity 0.
+AnimationTemplates.register('disintegration', function(params) {
   var prefix = params.entityPrefix || '';
-  var gc = params.ghostColor || [180, 180, 180];
+
+  var cachedPixels = null;
+  var cachedOffsets = null; // {dx, dy, delay} per pixel — dy always positive (downward)
+  var cachedBounds = null;
 
   return function animate(buf, PW, PH, t) {
-    var bounds = _computeEntityBounds(buf, PW, prefix);
+    if (!cachedPixels) {
+      cachedPixels = _collectEntityPixels(buf, PW, prefix);
+      cachedBounds = _computeEntityBounds(buf, PW, prefix);
+      cachedOffsets = [];
+      var bh = cachedBounds.y2 - cachedBounds.y1 + 1;
+      var bw = cachedBounds.x2 - cachedBounds.x1 + 1;
+      for (var j = 0; j < cachedPixels.length; j++) {
+        // Pixels from top of entity fall further, bottom pixels fall less
+        var relY = (cachedPixels[j].y - cachedBounds.y1) / Math.max(1, bh); // 0=top, 1=bottom
+        var fallDist = bh * (0.4 + 0.6 * (1 - relY)); // top pixels fall more
+        cachedOffsets.push({
+          dx: Math.round((Math.random() - 0.5) * bw * 0.3), // slight horizontal drift
+          dy: Math.round(fallDist * (0.7 + Math.random() * 0.6)), // downward
+          delay: Math.random() * 0.25 + relY * 0.15 // top pixels start detaching first
+        });
+      }
+    }
 
-    for (var i = 0; i < buf.length; i++) {
-      if (buf[i].e === prefix || buf[i].e.startsWith(prefix + '.')) {
-        var x = i % PW, y = Math.floor(i / PW);
+    // Phase 1 (t 0→0.5): Pixels detach and fall downward (staggered)
+    // Phase 2 (t 0.3→1.0): Pixels fade to opacity 0 (overlaps with falling)
 
-        if (t < 0.3) {
-          // Fade to dotted outline
-          var fadeProgress = t / 0.3;
-          var isCheckerboard = (x + y) % 2 === 0;
-          if (isCheckerboard) {
-            // These pixels become ghost color
-            buf[i].r = Math.round(buf[i]._r * (1 - fadeProgress) + gc[0] * fadeProgress);
-            buf[i].g = Math.round(buf[i]._g * (1 - fadeProgress) + gc[1] * fadeProgress);
-            buf[i].b = Math.round(buf[i]._b * (1 - fadeProgress) + gc[2] * fadeProgress);
-          } else {
-            // These pixels fade to background
-            buf[i].r = Math.round(buf[i]._r * (1 - fadeProgress) + buf[i]._br * fadeProgress);
-            buf[i].g = Math.round(buf[i]._g * (1 - fadeProgress) + buf[i]._bg * fadeProgress);
-            buf[i].b = Math.round(buf[i]._b * (1 - fadeProgress) + buf[i]._bb * fadeProgress);
-          }
-        } else if (t < 0.7) {
-          // Pulsing dotted outline
-          var pulsePhase = (t - 0.3) / 0.4;
-          var pulse = 0.6 + 0.4 * Math.sin(pulsePhase * Math.PI * 4);
-          var isCheckerboard = (x + y) % 2 === 0;
-          if (isCheckerboard) {
-            buf[i].r = Math.round(gc[0] * pulse);
-            buf[i].g = Math.round(gc[1] * pulse);
-            buf[i].b = Math.round(gc[2] * pulse);
-          } else {
-            buf[i].r = buf[i]._br;
-            buf[i].g = buf[i]._bg;
-            buf[i].b = buf[i]._bb;
-          }
-        } else {
-          // Dissolve bottom-up
-          var dissolveProgress = (t - 0.7) / 0.3;
-          var dissolveLine = bounds.y2 - dissolveProgress * (bounds.y2 - bounds.y1);
-          if (y > dissolveLine) {
-            // Already dissolved
-            buf[i].r = buf[i]._br;
-            buf[i].g = buf[i]._bg;
-            buf[i].b = buf[i]._bb;
-          } else {
-            var isCheckerboard = (x + y) % 2 === 0;
-            if (isCheckerboard) {
-              buf[i].r = gc[0]; buf[i].g = gc[1]; buf[i].b = gc[2];
-            } else {
-              buf[i].r = buf[i]._br; buf[i].g = buf[i]._bg; buf[i].b = buf[i]._bb;
+    _blankEntityPixels(buf, cachedPixels);
+
+    for (var j = 0; j < cachedPixels.length; j++) {
+      var p = cachedPixels[j];
+      var off = cachedOffsets[j];
+
+      // Fall progress
+      var fallStart = off.delay * 0.5;
+      var fall = 0;
+      if (t > fallStart) {
+        fall = Math.min(1, (t - fallStart) / 0.55);
+        fall = fall * fall; // accelerating (gravity-like)
+      }
+
+      var drawX = Math.round(p.x + off.dx * fall);
+      var drawY = Math.round(p.y + off.dy * fall);
+
+      // Fade to opacity 0 — starts shortly after detaching, staggered per pixel
+      var fadeStart = fallStart + 0.15;
+      var alpha = 1;
+      if (t > fadeStart) {
+        alpha = 1 - Math.min(1, (t - fadeStart) / 0.5);
+      }
+
+      if (alpha > 0.01 && drawX >= 0 && drawX < PW && drawY >= 0 && drawY < PH) {
+        var di = drawY * PW + drawX;
+        buf[di].r = Math.round(buf[di]._br * (1 - alpha) + p.r * alpha);
+        buf[di].g = Math.round(buf[di]._bg * (1 - alpha) + p.g * alpha);
+        buf[di].b = Math.round(buf[di]._bb * (1 - alpha) + p.b * alpha);
+      }
+    }
+  };
+}, 2000);
+
+// ── C3: Ghost Outline ──
+// Dark flat puddle at an empty spot + big "?" with black outline. Scaffolds absence.
+AnimationTemplates.register('ghost_outline', function(params) {
+  var prefix = params.entityPrefix || '';
+
+  var cachedPuddleCx = null, cachedPuddleY = null;
+  var cachedRx = 0, cachedRy = 0;
+  var cachedEdgeOffsets = null;
+
+  return function animate(buf, PW, PH, t) {
+    if (cachedPuddleCx === null) {
+      var bounds = _computeEntityBounds(buf, PW, prefix);
+      var ew = bounds.x2 - bounds.x1 + 1;
+      var eh = bounds.y2 - bounds.y1 + 1;
+      cachedRx = Math.max(8, Math.round(ew * 0.55));
+      cachedRy = Math.max(3, Math.round(eh * 0.08));
+
+      // Find an empty ground-level spot (not overlapping any entity)
+      var groundY = bounds.y2;
+      var testH = 10; // vertical strip to test for emptiness
+      var bestCx = null;
+      // Try offsets: ±1.0×ew, ±1.5×ew, ±2.0×ew
+      var offsets = [1.0, -1.0, 1.5, -1.5, 2.0, -2.0, 0.7, -0.7];
+      for (var oi = 0; oi < offsets.length; oi++) {
+        var testCx = Math.round(bounds.cx + offsets[oi] * ew);
+        if (testCx - cachedRx < 0 || testCx + cachedRx >= PW) continue;
+        // Check if this column is empty of entity pixels
+        var occupied = false;
+        for (var ty = Math.max(0, groundY - testH); ty <= Math.min(PH - 1, groundY + cachedRy); ty++) {
+          for (var tx = testCx - 5; tx <= testCx + 5; tx++) {
+            if (tx < 0 || tx >= PW) continue;
+            var ti = ty * PW + tx;
+            if (buf[ti].e && buf[ti].e !== '' && buf[ti].e !== 'background' && !buf[ti].e.startsWith('bg')) {
+              occupied = true; break;
             }
+          }
+          if (occupied) break;
+        }
+        if (!occupied) { bestCx = testCx; break; }
+      }
+      // Fallback: offset 1.5× entity width to the right (or left if off-screen)
+      if (bestCx === null) {
+        bestCx = bounds.cx + Math.round(ew * 1.5);
+        if (bestCx + cachedRx >= PW) bestCx = bounds.cx - Math.round(ew * 1.5);
+      }
+      cachedPuddleCx = _clamp(bestCx, cachedRx, PW - cachedRx - 1);
+      cachedPuddleY = groundY;
+
+      // Edge wobble offsets
+      cachedEdgeOffsets = [];
+      for (var row = 0; row < cachedRy * 2 + 1; row++) {
+        cachedEdgeOffsets.push(Math.random() * Math.PI * 2);
+      }
+    }
+
+    var cx = cachedPuddleCx;
+    var puddleY = cachedPuddleY;
+    var rx = cachedRx, ry = cachedRy;
+
+    // Phase 1 (t 0→0.15): fade in | Phase 2 (t 0.15→0.7): wobble | Phase 3 (t 0.7→1): dissolve
+    var shapeAlpha = 1;
+    if (t < 0.15) {
+      shapeAlpha = t / 0.15;
+    } else if (t > 0.7) {
+      shapeAlpha = 1 - (t - 0.7) / 0.3;
+    }
+    shapeAlpha = Math.max(0, Math.min(1, shapeAlpha));
+    if (shapeAlpha < 0.01) return;
+
+    var gc = [60, 65, 85]; // dark blue-grey
+
+    // Draw flat puddle: scan-line filled ellipse with wobbling edge
+    for (var dy = -ry; dy <= ry; dy++) {
+      var py = puddleY + dy;
+      if (py < 0 || py >= PH) continue;
+      var rowFrac = dy / ry;
+      var halfW = rx * Math.sqrt(Math.max(0, 1 - rowFrac * rowFrac));
+      var rowIdx = (dy + ry) % cachedEdgeOffsets.length;
+      var wobble = Math.sin(t * Math.PI * 5 + cachedEdgeOffsets[rowIdx]) * 2;
+      halfW += wobble;
+      if (halfW < 1) continue;
+
+      for (var dx = Math.round(-halfW); dx <= Math.round(halfW); dx++) {
+        var px = cx + dx;
+        if (px < 0 || px >= PW) continue;
+        var pi = py * PW + px;
+        var edgeFrac = Math.abs(dx) / halfW;
+        var isEdge = edgeFrac > 0.8;
+        if (isEdge && (px + py) % 2 !== 0) continue;
+        var sa = shapeAlpha * (0.6 - 0.2 * edgeFrac);
+        buf[pi].r = Math.round(buf[pi].r * (1 - sa) + gc[0] * sa);
+        buf[pi].g = Math.round(buf[pi].g * (1 - sa) + gc[1] * sa);
+        buf[pi].b = Math.round(buf[pi].b * (1 - sa) + gc[2] * sa);
+      }
+    }
+
+    // Draw big "?" with black outline (13×19 bitmap, thick strokes)
+    if (shapeAlpha > 0.15) {
+      var qAlpha = Math.min(1, (shapeAlpha - 0.15) / 0.25);
+      // "?" bitmap 13 wide × 19 tall
+      var qMark = [
+        0,0,0,1,1,1,1,1,1,1,0,0,0,
+        0,0,1,1,1,1,1,1,1,1,1,0,0,
+        0,1,1,1,0,0,0,0,0,1,1,1,0,
+        1,1,1,0,0,0,0,0,0,0,1,1,1,
+        1,1,1,0,0,0,0,0,0,0,1,1,1,
+        1,1,0,0,0,0,0,0,0,0,1,1,1,
+        0,0,0,0,0,0,0,0,0,1,1,1,0,
+        0,0,0,0,0,0,0,0,1,1,1,0,0,
+        0,0,0,0,0,0,0,1,1,1,0,0,0,
+        0,0,0,0,0,0,1,1,1,0,0,0,0,
+        0,0,0,0,0,1,1,1,0,0,0,0,0,
+        0,0,0,0,0,1,1,1,0,0,0,0,0,
+        0,0,0,0,0,1,1,1,0,0,0,0,0,
+        0,0,0,0,0,1,1,1,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,1,1,1,0,0,0,0,0,
+        0,0,0,0,0,1,1,1,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0,0
+      ];
+      var qW = 13, qH = 20;
+      // Gentle float: slow sinusoidal drift in all directions
+      var floatX = Math.round(Math.sin(t * Math.PI * 2.3) * 2 + Math.cos(t * Math.PI * 1.7) * 1);
+      var floatY = Math.round(Math.sin(t * Math.PI * 1.9 + 1.2) * 2 + Math.cos(t * Math.PI * 2.7) * 1);
+      var qx0 = cx - Math.floor(qW / 2) + floatX;
+      var qy0 = puddleY - ry - qH - 3 + floatY;
+      var qa = qAlpha * shapeAlpha;
+      // Pass 1: black outline (draw 8-neighbors of each "?" pixel)
+      // Note: neighbors outside the bitmap bounds are still drawn on screen
+      var dirs = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+      for (var qy = 0; qy < qH; qy++) {
+        for (var qx = 0; qx < qW; qx++) {
+          if (!qMark[qy * qW + qx]) continue;
+          for (var d = 0; d < 8; d++) {
+            var nx = qx + dirs[d][0], ny = qy + dirs[d][1];
+            // Skip only if the neighbor is itself a fill pixel (inside bitmap bounds)
+            var isInsideBitmap = nx >= 0 && nx < qW && ny >= 0 && ny < qH;
+            if (isInsideBitmap && qMark[ny * qW + nx]) continue;
+            var sx = qx0 + nx, sy = qy0 + ny;
+            if (sx >= 0 && sx < PW && sy >= 0 && sy < PH) {
+              var si = sy * PW + sx;
+              buf[si].r = Math.round(buf[si].r * (1 - qa) + 0);
+              buf[si].g = Math.round(buf[si].g * (1 - qa) + 0);
+              buf[si].b = Math.round(buf[si].b * (1 - qa) + 0);
+            }
+          }
+        }
+      }
+      // Pass 2: white fill
+      for (var qy = 0; qy < qH; qy++) {
+        for (var qx = 0; qx < qW; qx++) {
+          if (!qMark[qy * qW + qx]) continue;
+          var sx = qx0 + qx, sy = qy0 + qy;
+          if (sx >= 0 && sx < PW && sy >= 0 && sy < PH) {
+            var si = sy * PW + sx;
+            buf[si].r = Math.min(255, Math.round(buf[si].r * (1 - qa) + 255 * qa));
+            buf[si].g = Math.min(255, Math.round(buf[si].g * (1 - qa) + 255 * qa));
+            buf[si].b = Math.min(255, Math.round(buf[si].b * (1 - qa) + 220 * qa));
           }
         }
       }
     }
   };
-}, 1500);
+}, 2500);
 
 // ── R1: Magnetism ──
 AnimationTemplates.register('magnetism', function(params) {
