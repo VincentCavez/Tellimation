@@ -74,9 +74,10 @@ no internal deformation. Scaffolds missing or uncompleted action verbs.
 Occluding layer becomes semi-transparent to peek at what's behind/under. \
 Scaffolds hidden spatial relationships — "there's something you missed."
 
-**S2 — Settle**
-Entity sinks into its actual position with soft bounce + shadow grows. \
-Scaffolds spatial prepositions: "on", "under", "next to."
+**S2 — Stamp**
+The entity slowly lifts from its position (2s), revealing a solid black silhouette underneath. \
+It then snaps back elastically (0.5s), and cracks radiate from the impact point (0.5s). \
+Reinforces actual spatial location.
 
 ## T — TIME (MISL: tense)
 
