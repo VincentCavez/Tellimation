@@ -1749,7 +1749,11 @@ AnimationTemplates.register('causal_push', function(params) {
 AnimationTemplates.register('bonk', function(params) {
   var prefixA = params.entityPrefixA || params.entityPrefix || '';
   var prefixB = params.entityPrefixB || '';
-  var impactPx = _clamp(params.impactPixels || 6, 2, 15);
+
+  // Cached contour gap data (computed once)
+  var cachedMoveA = null, cachedMoveB = null;
+  var cachedNdx = 0, cachedNdy = 0;
+  var cachedImpactX = 0, cachedImpactY = 0;
 
   return function animate(buf, PW, PH, t) {
     var boundsA = _computeEntityBounds(buf, PW, prefixA);
@@ -1758,56 +1762,108 @@ AnimationTemplates.register('bonk', function(params) {
     var pixelsA = _collectEntityPixels(buf, PW, prefixA);
     var pixelsB = prefixB ? _collectEntityPixels(buf, PW, prefixB) : [];
 
-    var dxA = 0, dxB = 0;
+    // Compute true contour gap on first frame (cached)
+    if (cachedMoveA === null) {
+      if (boundsB && pixelsB.length > 0) {
+        var cg = _computeContourGap(pixelsA, pixelsB, boundsA, boundsB);
+        cachedNdx = cg.ndx;
+        cachedNdy = cg.ndy;
+        cachedMoveA = cg.gap / 2;
+        cachedMoveB = cg.gap / 2;
+        cachedImpactX = cg.impactX;
+        cachedImpactY = cg.impactY;
+      } else {
+        cachedMoveA = 6; cachedMoveB = 0;
+        cachedNdx = 1; cachedNdy = 0;
+        cachedImpactX = boundsA.cx; cachedImpactY = boundsA.cy;
+      }
+    }
+
+    var dxA = 0, dyA = 0, dxB = 0, dyB = 0;
 
     if (t < 0.3) {
-      // Move toward each other
+      // Move toward each other (diagonal, contour-based)
       var approach = t / 0.3;
-      if (boundsB) {
-        var dirAB = boundsB.cx > boundsA.cx ? 1 : -1;
-        dxA = Math.round(impactPx * approach * dirAB);
-        dxB = Math.round(-impactPx * approach * dirAB);
-      } else {
-        dxA = Math.round(impactPx * Math.sin(approach * Math.PI * 0.5));
-      }
+      dxA = Math.round(cachedMoveA * approach * cachedNdx);
+      dyA = Math.round(cachedMoveA * approach * cachedNdy);
+      dxB = Math.round(-cachedMoveB * approach * cachedNdx);
+      dyB = Math.round(-cachedMoveB * approach * cachedNdy);
     } else if (t < 0.35) {
-      // Impact jitter
+      // Impact: hold at contact + jitter along axis
       var jitter = Math.round((Math.random() - 0.5) * 3);
-      dxA = jitter; dxB = -jitter;
+      dxA = Math.round(cachedMoveA * cachedNdx + jitter * cachedNdx);
+      dyA = Math.round(cachedMoveA * cachedNdy + jitter * cachedNdy);
+      dxB = Math.round(-cachedMoveB * cachedNdx - jitter * cachedNdx);
+      dyB = Math.round(-cachedMoveB * cachedNdy - jitter * cachedNdy);
     } else {
-      // Bounce back with damped oscillation
+      // Bounce back with damped oscillation (diagonal)
       var bt = (t - 0.35) / 0.65;
       var decay = (1 - bt);
       var bounce = Math.sin(bt * Math.PI * 3) * decay;
-      if (boundsB) {
-        var dirAB = boundsB.cx > boundsA.cx ? 1 : -1;
-        dxA = Math.round(-impactPx * 0.5 * bounce * dirAB);
-        dxB = Math.round(impactPx * 0.5 * bounce * dirAB);
-      } else {
-        dxA = Math.round(-impactPx * 0.5 * bounce);
-      }
+      dxA = Math.round(-cachedMoveA * 0.5 * bounce * cachedNdx);
+      dyA = Math.round(-cachedMoveA * 0.5 * bounce * cachedNdy);
+      dxB = Math.round(cachedMoveB * 0.5 * bounce * cachedNdx);
+      dyB = Math.round(cachedMoveB * 0.5 * bounce * cachedNdy);
     }
 
     _blankEntityPixels(buf, pixelsA);
     if (pixelsB.length > 0) _blankEntityPixels(buf, pixelsB);
 
-    _redrawEntityPixels(buf, PW, PH, pixelsA, dxA, 0);
-    if (pixelsB.length > 0) _redrawEntityPixels(buf, PW, PH, pixelsB, dxB, 0);
+    _redrawEntityPixels(buf, PW, PH, pixelsA, dxA, dyA);
+    if (pixelsB.length > 0) _redrawEntityPixels(buf, PW, PH, pixelsB, dxB, dyB);
 
-    // Star particles at impact point during collision
-    if (t >= 0.28 && t < 0.4) {
-      var impactX = boundsB ? Math.round((boundsA.cx + boundsB.cx) / 2) : boundsA.cx;
-      var impactY = boundsB ? Math.round((boundsA.cy + boundsB.cy) / 2) : boundsA.cy;
-      var starAlpha = 1 - Math.abs(t - 0.34) / 0.06;
-      // Draw small star pattern
-      var starOffsets = [[-2,0],[2,0],[0,-2],[0,2],[-1,-1],[1,-1],[-1,1],[1,1]];
-      for (var s = 0; s < starOffsets.length; s++) {
-        var sx = impactX + starOffsets[s][0], sy = impactY + starOffsets[s][1];
-        if (sx >= 0 && sx < PW && sy >= 0 && sy < PH) {
-          var si = sy * PW + sx;
-          buf[si].r = Math.round(buf[si].r * (1 - starAlpha) + 255 * starAlpha);
-          buf[si].g = Math.round(buf[si].g * (1 - starAlpha) + 255 * starAlpha);
-          buf[si].b = Math.round(buf[si].b * (1 - starAlpha) + 100 * starAlpha);
+    // Large star burst at impact point during collision
+    if (t >= 0.25 && t < 0.50) {
+      // Impact point: use contour contact point (displaced by movement)
+      var ipx = cachedImpactX, ipy = cachedImpactY;
+      var starAlpha = t < 0.32
+        ? (t - 0.25) / 0.07       // fade in
+        : 1 - (t - 0.32) / 0.18;  // fade out
+      starAlpha = Math.max(0, Math.min(1, starAlpha));
+
+      // 4-pointed star: two crosses (cardinal + diagonal) with graduated size
+      // Inner core (3×3)
+      for (var dy = -1; dy <= 1; dy++) {
+        for (var dx = -1; dx <= 1; dx++) {
+          var sx = ipx + dx, sy = ipy + dy;
+          if (sx >= 0 && sx < PW && sy >= 0 && sy < PH) {
+            var si = sy * PW + sx;
+            buf[si].r = Math.min(255, Math.round(buf[si].r * (1 - starAlpha) + 255 * starAlpha));
+            buf[si].g = Math.min(255, Math.round(buf[si].g * (1 - starAlpha) + 255 * starAlpha));
+            buf[si].b = Math.min(255, Math.round(buf[si].b * (1 - starAlpha) + 180 * starAlpha));
+          }
+        }
+      }
+      // Cardinal spikes (length 6)
+      var spikeLen = 6;
+      var cardinals = [[1,0],[-1,0],[0,1],[0,-1]];
+      for (var c = 0; c < 4; c++) {
+        for (var d = 2; d <= spikeLen; d++) {
+          var fade = 1 - (d - 1) / spikeLen; // brighter near center
+          var sa = starAlpha * fade;
+          var sx = ipx + cardinals[c][0] * d, sy = ipy + cardinals[c][1] * d;
+          if (sx >= 0 && sx < PW && sy >= 0 && sy < PH) {
+            var si = sy * PW + sx;
+            buf[si].r = Math.min(255, Math.round(buf[si].r * (1 - sa) + 255 * sa));
+            buf[si].g = Math.min(255, Math.round(buf[si].g * (1 - sa) + 255 * sa));
+            buf[si].b = Math.min(255, Math.round(buf[si].b * (1 - sa) + 120 * sa));
+          }
+        }
+      }
+      // Diagonal spikes (length 4)
+      var diagLen = 4;
+      var diags = [[1,1],[-1,1],[1,-1],[-1,-1]];
+      for (var c = 0; c < 4; c++) {
+        for (var d = 2; d <= diagLen; d++) {
+          var fade = 1 - (d - 1) / diagLen;
+          var sa = starAlpha * fade;
+          var sx = ipx + diags[c][0] * d, sy = ipy + diags[c][1] * d;
+          if (sx >= 0 && sx < PW && sy >= 0 && sy < PH) {
+            var si = sy * PW + sx;
+            buf[si].r = Math.min(255, Math.round(buf[si].r * (1 - sa) + 255 * sa));
+            buf[si].g = Math.min(255, Math.round(buf[si].g * (1 - sa) + 230 * sa));
+            buf[si].b = Math.min(255, Math.round(buf[si].b * (1 - sa) + 80 * sa));
+          }
         }
       }
     }
