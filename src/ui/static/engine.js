@@ -2,14 +2,14 @@
 //
 // Three-resolution model with k-factor:
 //   SOURCE  (1120×720)  — manifest coordinates, Gemini image generation
-//   ART GRID (560×360)  — pixel buffer, animations (= source / K)
+//   ART GRID (280×180)  — pixel buffer, animations (= source / K)
 //   DISPLAY (1120×720)  — on-screen canvas (= art grid upscaled K×K)
 
 const SOURCE_W = 1120;
 const SOURCE_H = 720;
-const K = 2;                              // pixel-art aggregation factor (2×2 HD → 1 art pixel)
-const PW = Math.ceil(SOURCE_W / K);       // 560  — art grid width
-const PH = Math.ceil(SOURCE_H / K);       // 360  — art grid height
+const K = 4;                              // pixel-art aggregation factor (4×4 HD → 1 art pixel)
+const PW = Math.ceil(SOURCE_W / K);       // 280  — art grid width
+const PH = Math.ceil(SOURCE_H / K);       // 180  — art grid height
 
 // ---------------------------------------------------------------------------
 // PixelBuffer
@@ -259,6 +259,99 @@ class PixelBuffer {
         p.b = p._b;
       }
     }
+  }
+
+  /**
+   * Pre-compute BFS distance fields from each entity's contour.
+   * Call once after scene composition. Result is stored in this.distFields
+   * and attached to this.data._distFields for animation access.
+   *
+   * For each root entity prefix, produces a Uint8Array(PW*PH) where:
+   *   0   = pixel is inside the entity
+   *   1-N = pixel is N pixels away from the entity contour
+   *   255 = pixel is farther than maxDist
+   *
+   * @param {number} [maxDist=20] - maximum distance to compute
+   */
+  computeDistanceFields(maxDist) {
+    maxDist = maxDist || 20;
+    var PW = this.width, PH = this.height, buf = this.data;
+    var totalPixels = PW * PH;
+
+    // 1. Discover all unique root entity prefixes
+    var prefixes = {};
+    for (var i = 0; i < totalPixels; i++) {
+      var e = buf[i].e;
+      if (e && e !== '' && !e.startsWith('bg.')) {
+        var dot = e.indexOf('.');
+        var root = dot >= 0 ? e.substring(0, dot) : e;
+        prefixes[root] = true;
+      }
+    }
+
+    // 2. For each prefix, compute BFS distance field
+    this.distFields = {};
+    var prefixList = Object.keys(prefixes);
+
+    for (var p = 0; p < prefixList.length; p++) {
+      var prefix = prefixList[p];
+      var prefixDot = prefix + '.';
+      var field = new Uint8Array(totalPixels);
+      field.fill(255);
+
+      // Mark entity pixels as 0
+      for (var i = 0; i < totalPixels; i++) {
+        var pe = buf[i].e;
+        if (pe === prefix || (pe.length > prefix.length && pe.startsWith(prefixDot))) {
+          field[i] = 0;
+        }
+      }
+
+      // Find contour pixels (entity pixels with at least one non-entity 4-neighbor)
+      var edgeQueue = [];
+      for (var i = 0; i < totalPixels; i++) {
+        if (field[i] !== 0) continue;
+        var x = i % PW, y = (i - x) / PW;
+        if ((x > 0      && field[i - 1]  !== 0) ||
+            (x < PW - 1 && field[i + 1]  !== 0) ||
+            (y > 0       && field[i - PW] !== 0) ||
+            (y < PH - 1  && field[i + PW] !== 0)) {
+          edgeQueue.push(i);
+        }
+      }
+
+      // BFS layer 1: seed from edge pixel neighbors
+      var nextQueue = [];
+      for (var q = 0; q < edgeQueue.length; q++) {
+        var ci = edgeQueue[q];
+        var cx = ci % PW, cy = (ci - cx) / PW;
+        if (cx > 0      && field[ci - 1]  === 255) { field[ci - 1]  = 1; nextQueue.push(ci - 1);  }
+        if (cx < PW - 1 && field[ci + 1]  === 255) { field[ci + 1]  = 1; nextQueue.push(ci + 1);  }
+        if (cy > 0       && field[ci - PW] === 255) { field[ci - PW] = 1; nextQueue.push(ci - PW); }
+        if (cy < PH - 1  && field[ci + PW] === 255) { field[ci + PW] = 1; nextQueue.push(ci + PW); }
+      }
+
+      // BFS layers 2..maxDist
+      var dist = 1;
+      while (nextQueue.length > 0 && dist < maxDist) {
+        dist++;
+        var currentQueue = nextQueue;
+        nextQueue = [];
+        for (var q = 0; q < currentQueue.length; q++) {
+          var ci = currentQueue[q];
+          var cx = ci % PW, cy = (ci - cx) / PW;
+          if (cx > 0      && field[ci - 1]  === 255) { field[ci - 1]  = dist; nextQueue.push(ci - 1);  }
+          if (cx < PW - 1 && field[ci + 1]  === 255) { field[ci + 1]  = dist; nextQueue.push(ci + 1);  }
+          if (cy > 0       && field[ci - PW] === 255) { field[ci - PW] = dist; nextQueue.push(ci - PW); }
+          if (cy < PH - 1  && field[ci + PW] === 255) { field[ci + PW] = dist; nextQueue.push(ci + PW); }
+        }
+      }
+
+      this.distFields[prefix] = field;
+    }
+
+    // Attach to data array so animation code can access via buf._distFields
+    this.data._distFields = this.distFields;
   }
 }
 

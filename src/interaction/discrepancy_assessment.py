@@ -147,6 +147,7 @@ async def assess_and_respond(
                 target_id=data.get("target_id"),
                 misl_element=data.get("misl_element"),
                 guidance_text=data.get("guidance_text"),
+                problematic_segment=data.get("problematic_segment"),
                 reasoning=data.get("reasoning", ""),
             )
 
