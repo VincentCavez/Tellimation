@@ -82,6 +82,91 @@ function _setPixel(buf, PW, PH, x, y, r, g, b) {
   }
 }
 
+/**
+ * Compute the true contour gap between two entities along the axis connecting
+ * their centers. Returns { gap, ndx, ndy, impactX, impactY }.
+ *
+ * Works by projecting all pixels into a rotated coordinate frame aligned with
+ * the A→B axis, binning by perpendicular coordinate, and finding the minimum
+ * gap across bins where both entities have pixels (true silhouette collision).
+ *
+ * @param {Array} pixelsA  - pixels of entity A ({x, y, ...})
+ * @param {Array} pixelsB  - pixels of entity B
+ * @param {Object} boundsA - bounds of A (needs .cx, .cy)
+ * @param {Object} boundsB - bounds of B (needs .cx, .cy)
+ * @returns {Object} { gap, ndx, ndy, impactX, impactY }
+ */
+function _computeContourGap(pixelsA, pixelsB, boundsA, boundsB) {
+  var aCx = boundsA.cx, aCy = boundsA.cy;
+  var bCx = boundsB.cx, bCy = boundsB.cy;
+  var ddx = bCx - aCx, ddy = bCy - aCy;
+  var centerDist = Math.sqrt(ddx * ddx + ddy * ddy);
+  if (centerDist < 1) centerDist = 1;
+  var ndx = ddx / centerDist, ndy = ddy / centerDist;
+  // Perpendicular unit vector
+  var pnx = -ndy, pny = ndx;
+
+  // Project all pixels into rotated frame (origin = A center, along = A→B axis)
+  // For A: bin by perp coord, keep max along-axis value (furthest toward B)
+  var binsA = {};
+  for (var j = 0; j < pixelsA.length; j++) {
+    var rx = pixelsA[j].x - aCx, ry = pixelsA[j].y - aCy;
+    var along = rx * ndx + ry * ndy;
+    var perp = Math.round(rx * pnx + ry * pny);
+    if (binsA[perp] === undefined || along > binsA[perp]) binsA[perp] = along;
+  }
+  // For B: bin by perp coord (same frame), keep min along-axis value (closest to A)
+  var binsB = {}, binsB_px = {};
+  for (var j = 0; j < pixelsB.length; j++) {
+    var rx = pixelsB[j].x - aCx, ry = pixelsB[j].y - aCy;
+    var along = rx * ndx + ry * ndy;
+    var perp = Math.round(rx * pnx + ry * pny);
+    if (binsB[perp] === undefined || along < binsB[perp]) {
+      binsB[perp] = along;
+      binsB_px[perp] = { x: pixelsB[j].x, y: pixelsB[j].y };
+    }
+  }
+
+  // Find min gap across shared perpendicular bins
+  var minGap = Infinity;
+  var impactPerp = 0;
+  for (var perp in binsA) {
+    if (binsB[perp] !== undefined) {
+      var g = binsB[perp] - binsA[perp];
+      if (g < minGap) { minGap = g; impactPerp = perp; }
+    }
+  }
+
+  // Fallback if no shared perpendicular bins (entities don't overlap in perp)
+  if (minGap === Infinity) {
+    var maxA = 0, minB = Infinity;
+    for (var j = 0; j < pixelsA.length; j++) {
+      var p = (pixelsA[j].x - aCx) * ndx + (pixelsA[j].y - aCy) * ndy;
+      if (p > maxA) maxA = p;
+    }
+    for (var j = 0; j < pixelsB.length; j++) {
+      var p = (pixelsB[j].x - aCx) * ndx + (pixelsB[j].y - aCy) * ndy;
+      if (p < minB) minB = p;
+    }
+    minGap = minB - maxA;
+  }
+
+  var gap = Math.max(0, minGap);
+
+  // Impact point: B's contour pixel at the closest perpendicular bin
+  var impactX, impactY;
+  if (binsB_px[impactPerp]) {
+    impactX = binsB_px[impactPerp].x;
+    impactY = binsB_px[impactPerp].y;
+  } else {
+    // Fallback: midpoint
+    impactX = Math.round((aCx + bCx) / 2);
+    impactY = Math.round((aCy + bCy) / 2);
+  }
+
+  return { gap: gap, ndx: ndx, ndy: ndy, impactX: impactX, impactY: impactY };
+}
+
 // ═══════════════════════════════════════════════════════════════════
 // Section 1b: Bitmap Pixel Font & drawText
 // ═══════════════════════════════════════════════════════════════════
@@ -1603,36 +1688,15 @@ AnimationTemplates.register('causal_push', function(params) {
 
     var pixelsA = _collectEntityPixels(buf, PW, prefixA);
 
-    // Compute diagonal contour gap on first frame (cached)
+    // Compute true contour gap on first frame (cached)
     if (cachedRushDist === null) {
       var pixelsB_init = _collectEntityPixels(buf, PW, prefixB);
-      var aCx0 = boundsA.cx, aCy0 = boundsA.cy;
-      var bCx0 = boundsB.cx, bCy0 = boundsB.cy;
-      var ddx = bCx0 - aCx0, ddy = bCy0 - aCy0;
-      var centerDist = Math.sqrt(ddx * ddx + ddy * ddy);
-      if (centerDist < 1) centerDist = 1;
-      cachedNdx = ddx / centerDist;
-      cachedNdy = ddy / centerDist;
-
-      // Project A pixels onto A→B axis: max forward extent from A center
-      var maxProjA = 0;
-      for (var j = 0; j < pixelsA.length; j++) {
-        var proj = (pixelsA[j].x - aCx0) * cachedNdx + (pixelsA[j].y - aCy0) * cachedNdy;
-        if (proj > maxProjA) maxProjA = proj;
-      }
-      // Project B pixels onto B→A axis: max forward extent from B center
-      var maxProjB = 0;
-      for (var j = 0; j < pixelsB_init.length; j++) {
-        var proj = (pixelsB_init[j].x - bCx0) * (-cachedNdx) + (pixelsB_init[j].y - bCy0) * (-cachedNdy);
-        if (proj > maxProjB) maxProjB = proj;
-      }
-
-      var gap = centerDist - maxProjA - maxProjB;
-      cachedRushDist = Math.max(0, gap);
-
-      // Impact point: B's contour edge facing A (B center minus B's forward extent along A→B)
-      cachedImpactX = Math.round(bCx0 - maxProjB * cachedNdx);
-      cachedImpactY = Math.round(bCy0 - maxProjB * cachedNdy);
+      var cg = _computeContourGap(pixelsA, pixelsB_init, boundsA, boundsB);
+      cachedNdx = cg.ndx;
+      cachedNdy = cg.ndy;
+      cachedRushDist = cg.gap;
+      cachedImpactX = cg.impactX;
+      cachedImpactY = cg.impactY;
     }
 
     var dxA = 0, dyA = 0;
@@ -1888,34 +1952,13 @@ AnimationTemplates.register('magnetism', function(params) {
     var pixelsA = _collectEntityPixels(buf, PW, prefixA);
     var pixelsB = _collectEntityPixels(buf, PW, prefixB);
 
-    // Compute diagonal contour gap on first frame (cached for subsequent frames)
+    // Compute true contour gap on first frame (cached)
     if (cachedMoveA === null) {
-      var aCx0 = boundsA.cx, aCy0 = boundsA.cy;
-      var bCx0 = boundsB.cx, bCy0 = boundsB.cy;
-      var ddx = bCx0 - aCx0, ddy = bCy0 - aCy0;
-      var centerDist = Math.sqrt(ddx * ddx + ddy * ddy);
-      if (centerDist < 1) centerDist = 1;
-      cachedNdx = ddx / centerDist;
-      cachedNdy = ddy / centerDist;
-
-      // Project entity A pixels onto A→B axis, find max forward extent from A center
-      var maxProjA = 0;
-      for (var j = 0; j < pixelsA.length; j++) {
-        var proj = (pixelsA[j].x - aCx0) * cachedNdx + (pixelsA[j].y - aCy0) * cachedNdy;
-        if (proj > maxProjA) maxProjA = proj;
-      }
-      // Project entity B pixels onto B→A axis, find max forward extent from B center
-      var maxProjB = 0;
-      for (var j = 0; j < pixelsB.length; j++) {
-        var proj = (pixelsB[j].x - bCx0) * (-cachedNdx) + (pixelsB[j].y - bCy0) * (-cachedNdy);
-        if (proj > maxProjB) maxProjB = proj;
-      }
-
-      // Gap along axis = center distance - forward extents of both entities
-      var gap = centerDist - maxProjA - maxProjB;
-      var contactDist = Math.max(0, gap);
-      cachedMoveA = contactDist / 2;
-      cachedMoveB = contactDist / 2;
+      var cg = _computeContourGap(pixelsA, pixelsB, boundsA, boundsB);
+      cachedNdx = cg.ndx;
+      cachedNdy = cg.ndy;
+      cachedMoveA = cg.gap / 2;
+      cachedMoveB = cg.gap / 2;
     }
 
     var dxA = 0, dyA = 0, dxB = 0, dyB = 0;
