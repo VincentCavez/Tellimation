@@ -2974,7 +2974,7 @@ AnimationTemplates.register('interjection', function(params) {
 
     if (cachedBCX === null) {
       var displayText = word.toUpperCase();
-      var textW = displayText.length * 7;
+      var textW = displayText.length * (_FONT_W + _FONT_SPACING) - _FONT_SPACING;
       cachedRX = Math.max(22, Math.round((textW + 12) / 2));
       cachedRY = Math.round(cachedRX * 0.6);
       spikeH = Math.max(6, Math.round(cachedRX * 0.35));  // proportional to ellipse size
@@ -3044,9 +3044,9 @@ AnimationTemplates.register('interjection', function(params) {
 
     // Draw text centered, then re-blend with alpha so it fades identically to the bubble
     var displayText = word.toUpperCase();
-    var textW = displayText.length * 7;
+    var textW = displayText.length * (_FONT_W + _FONT_SPACING) - _FONT_SPACING;
     var ttx = Math.round(bcx - textW / 2);
-    var tty = Math.round(bcy - 3);
+    var tty = Math.round(bcy - _FONT_H / 2);
     drawText(buf, PW, PH, displayText, ttx, tty, 30, 20, 10, 'temp.interjection');
     for (var rty = Math.max(0, tty - 1); rty <= Math.min(PH - 1, tty + 7); rty++) {
       for (var rtx = Math.max(0, ttx - 1); rtx <= Math.min(PW - 1, ttx + textW + 1); rtx++) {
