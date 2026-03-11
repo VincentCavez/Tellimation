@@ -51,10 +51,14 @@ Return ONLY valid JSON (no markdown fences, no commentary):
         {{"id": "midground", "y_start": 0.5, "y_end": 0.7, "scale_hint": 0.9}},
         {{"id": "foreground", "y_start": 0.7, "y_end": 1.0, "scale_hint": 1.0}}
       ],
-      "structural_elements": ["<EXHAUSTIVE list of every non-entity visible element \
-in the background: 'wooden counter', 'tiled floor', 'window with blue curtains', \
-'refrigerator', 'wall clock'. These are the objects that will appear in the \
-background image. Any entity that duplicates an item in this list is an ERROR.>"]
+      "structural_elements": [
+        {{
+          "name": "<descriptive name: 'wooden counter', 'tiled floor', 'window with blue curtains'>",
+          "x": "<float 0.0-1.0 — normalized horizontal center position>",
+          "y": "<float 0.0-1.0 — normalized vertical center position>",
+          "zone": "<sky|background|midground|foreground>"
+        }}
+      ]
     }},
     "entities": [
       {{
@@ -327,7 +331,7 @@ set skill_coverage_check to "PARTIAL".
 - Unique id: `<type>_<NN>` (e.g. `rabbit_01`, `tree_02`).
 - At least 4 visual properties: `color`, `size`, `texture`, `distinctive_features`. \
 Add `weight`, `state`, `pattern` as appropriate.
-- 3-5 entities per scene (1 main character + 2-4 environment elements).
+- 4-5 entities per scene (1 main character + 3-4 environment elements).
 - At least 2 spatial relations between entities.
 - At least 1 action for the main character.
 - At least 2 distinct color families across entities.
@@ -347,6 +351,11 @@ background image, once as a sprite on top) — this looks broken.
 - Paths, fences, gates, signs, bridges
 - Distant landscape: mountains, horizon, buildings far away
 - Room fixtures: lamps on walls, curtains, rugs, wallpaper
+
+Every structural element MUST have a position (x, y) and zone. This ensures \
+the background image places elements consistently with entity spatial_refs. \
+For example, if an entity has spatial_ref "on counter_01", the counter's \
+position in structural_elements must match where the entity expects it.
 
 ## What goes as entities:
 - Characters (animals, people) — ALWAYS entities
@@ -421,8 +430,8 @@ belong in this environment.
 
 # Instructions
 
-- Create a fresh scene with 1 main character and 2-4 environment elements \
-(total 3-5 entities).
+- Create a fresh scene with 1 main character and 3-4 environment elements \
+(total 4-5 entities).
 - The character should have a clear personality and distinctive visual features.
 - Place entities in appropriate zones (foreground for main character, \
 midground/background for environment elements). Scale size hints accordingly.
@@ -487,7 +496,7 @@ Generate the next scene in an ongoing story.
 
 - Continue the narrative naturally from where it left off.
 - Keep existing characters (mark them carried_over: true). \
-You may introduce 1-2 new entities. Aim for 3-5 total entities.
+You may introduce 1-2 new entities. Aim for 4-5 total entities.
 - List all persisting entity IDs in carried_over_entities.
 - Set background_changed: false if same location/time, true otherwise.
 - Scene ID: "scene_{scene_number:02d}".

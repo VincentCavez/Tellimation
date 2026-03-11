@@ -41,7 +41,7 @@ IMAGE_MODEL_ID = "gemini-3.1-flash-image-preview"
 
 # Timeouts (seconds)
 IMAGE_TIMEOUT = 120
-IMAGE_MAX_RETRIES = 2
+IMAGE_MAX_RETRIES = 3
 
 # Resolution model (must match engine.js)
 SOURCE_W = 1120   # HD image resolution (not used for manifest coords — those are normalized)
@@ -138,10 +138,34 @@ def _build_scene_image_prompt(manifest_data: Dict[str, Any]) -> str:
                 "The ground or floor should be at approximately 70% from the top."
             )
 
+    # Build structural element placement hints from manifest positions
+    structural_hints = ""
+    bg_data_se = manifest_data.get("manifest", {}).get("background", {})
+    structural_elements = bg_data_se.get("structural_elements", []) if isinstance(bg_data_se, dict) else []
+    if structural_elements:
+        lines = ["\n## Structural element placement (CRITICAL)"]
+        lines.append(
+            "The following elements MUST be placed at their specified positions. "
+            "Positions are normalized: x=0.0 is far left, x=1.0 is far right, "
+            "y=0.0 is top, y=1.0 is bottom."
+        )
+        for se in structural_elements:
+            if isinstance(se, dict):
+                name = se.get("name", "unknown")
+                sx = se.get("x", 0.5)
+                sy = se.get("y", 0.5)
+                zone = se.get("zone", "")
+                h_pct = "left" if sx < 0.35 else "right" if sx > 0.65 else "center"
+                v_pct = "top" if sy < 0.35 else "bottom" if sy > 0.65 else "middle"
+                lines.append(f"- {name}: at {h_pct}-{v_pct} of image (x≈{sx:.1f}, y≈{sy:.1f})")
+            elif isinstance(se, str):
+                lines.append(f"- {se}")
+        structural_hints = "\n".join(lines)
+
     return BACKGROUND_IMAGE_PROMPT_TEMPLATE.format(
         scene_description=bg_desc,
         ground_level_hint=ground_level_hint,
-    )
+    ) + structural_hints
 
 
 # ---------------------------------------------------------------------------
@@ -201,6 +225,15 @@ def _build_entity_description(entity: Dict[str, Any]) -> str:
             desc += f", {sanitized_pose}"
     if distinctive:
         desc += f". {distinctive}"
+
+    # Orientation — tell the image model which direction the entity faces
+    orientation = entity.get("orientation", "")
+    if orientation == "facing_left":
+        desc += ". FACING LEFT — the character looks toward the LEFT side of the image."
+    elif orientation == "facing_right":
+        desc += ". FACING RIGHT — the character looks toward the RIGHT side of the image."
+    elif orientation == "facing_viewer":
+        desc += ". FACING THE VIEWER — the character looks directly at the camera."
 
     # Sensory properties (temperature, sound, smell) — enriches image prompt
     sensory = entity.get("sensory")
@@ -869,7 +902,14 @@ def _filter_overlapping_entities(
 
     bg_data = manifest_data.get("manifest", {}).get("background", {})
     structural = bg_data.get("structural_elements", []) if isinstance(bg_data, dict) else []
-    structural_text = " ".join(s.lower() for s in structural if isinstance(s, str))
+    # Support both old format (list of strings) and new format (list of dicts with "name")
+    structural_names = []
+    for s in structural:
+        if isinstance(s, dict):
+            structural_names.append(s.get("name", "").lower())
+        elif isinstance(s, str):
+            structural_names.append(s.lower())
+    structural_text = " ".join(structural_names)
 
     bg_desc = manifest_data.get("background_description", "").lower()
 
@@ -1046,8 +1086,34 @@ async def generate_scene_assets(
         else:
             logger.warning("[assets] %s: no image generated", eid)
 
-    logger.info("[assets] Generated %d/%d entity images",
+    logger.info("[assets] Generated %d/%d entity images (first pass)",
                 len(entity_images), len(entities_to_generate))
+
+    # --- Retry pass: re-attempt failed entities sequentially ---
+    failed_entities = [
+        ent for ent in entities_to_generate
+        if ent["id"] not in entity_images
+    ]
+    if failed_entities:
+        logger.warning(
+            "[assets] %d entities failed first pass, retrying: %s",
+            len(failed_entities),
+            [e["id"] for e in failed_entities],
+        )
+        for ent in failed_entities:
+            eid = ent["id"]
+            result = await _generate_entity(client, ent)
+            if isinstance(result, bytes):
+                entity_images[eid] = result
+                logger.info("[assets] %s: retry succeeded (%d bytes)", eid, len(result))
+            else:
+                logger.error(
+                    "[assets] %s: FAILED after retry — entity will be MISSING from scene",
+                    eid,
+                )
+        logger.info("[assets] After retry: %d/%d entity images",
+                    len(entity_images), len(entities_to_generate))
+
     await _notify("images")
 
     # --- Step 3+4: Magenta removal + Downscale ---

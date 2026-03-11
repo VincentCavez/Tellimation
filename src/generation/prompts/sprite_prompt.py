@@ -25,6 +25,10 @@ SOLID MAGENTA (#FF00FF) background. The magenta must be perfectly uniform \
 - **Detailed**: clearly distinct body parts (head, body, limbs, tail, ears, eyes). \
   Eyes should have at least 2 colors (pupil + shine).
 - **Side view** (like a 2D storybook): flat side profile, no 3D perspective.
+- **ORIENTATION IS CRITICAL**: If the description says "FACING LEFT", the character \
+  MUST look toward the LEFT side of the image (its nose/face points LEFT). \
+  If it says "FACING RIGHT", the character MUST look toward the RIGHT side \
+  (its nose/face points RIGHT). Getting this wrong breaks the scene composition.
 - **The subject should fill most of the image** — center it, leave only a small \
   margin of magenta around it.
 - **NO other elements**: no ground, no shadow, no text, no decorations. \
