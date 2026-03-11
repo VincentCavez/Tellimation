@@ -19,13 +19,22 @@ class BackgroundZone(BaseModel):
     scale_hint: float = 1.0  # default entity scale in this zone
 
 
+class StructuralElement(BaseModel):
+    """A non-entity background element with position data."""
+
+    name: str                          # e.g. "wooden counter", "tiled floor"
+    x: float = 0.5                     # normalized 0-1, horizontal center
+    y: float = 0.5                     # normalized 0-1, vertical center
+    zone: str = "background"           # "sky", "background", "midground", "foreground"
+
+
 class Background(BaseModel):
     """Scene background metadata — environment, zones, structural elements."""
 
     environment_type: str = "outdoor"  # "outdoor", "indoor", "themed_outdoor"
     ground_line: float = 0.7           # normalized 0-1 from top
     zones: List[BackgroundZone] = Field(default_factory=list)
-    structural_elements: List[str] = Field(default_factory=list)
+    structural_elements: List[StructuralElement] = Field(default_factory=list)
 
 
 # ---------------------------------------------------------------------------

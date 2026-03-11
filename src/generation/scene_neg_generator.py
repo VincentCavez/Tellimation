@@ -273,12 +273,12 @@ def _validate_semantic(
     # ------------------------------------------------------------------
 
     # ------------------------------------------------------------------
-    # 3. Minimum entity count (3-5 recommended)
+    # 3. Minimum entity count (4-5 recommended)
     # ------------------------------------------------------------------
     n_entities = len(manifest.entities)
-    if n_entities < 3:
+    if n_entities < 4:
         warnings.append(
-            f"Only {n_entities} entities (3-5 recommended)"
+            f"Only {n_entities} entities (4-5 recommended)"
         )
 
     # ------------------------------------------------------------------
@@ -370,9 +370,13 @@ def _validate_semantic(
         data.get("manifest", {}).get("background", {}).get("structural_elements", [])
     )
     if structural and isinstance(structural, list):
-        structural_lower = {
-            s.lower().strip() for s in structural if isinstance(s, str)
-        }
+        structural_lower: set[str] = set()
+        for s in structural:
+            if isinstance(s, dict):
+                structural_lower.add(s.get("name", "").lower().strip())
+            elif isinstance(s, str):
+                structural_lower.add(s.lower().strip())
+        structural_lower.discard("")
         for ent in manifest.entities:
             ent_type = ent.type.lower().strip()
             for se in structural_lower:
