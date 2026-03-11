@@ -809,14 +809,29 @@ AnimationTemplates.register('stamp', function(params) {
     var crackRange = 14;
 
     // ── Collect entity pixels and bounding box ──
+    // Use entity layer for complete bounds (includes pixels covered by higher-z entities).
+    // Only visible pixels (owned in flat buffer) go into indices for drawing.
     var minX = PW, maxX = 0, minY = PH, maxY = 0;
     var indices = [];
-    for (var i = 0; i < buf.length; i++) {
-      if (buf[i].e && buf[i].e.startsWith(prefix)) {
-        var x = i % PW, y = Math.floor(i / PW);
-        indices.push(i);
-        if (x < minX) minX = x; if (x > maxX) maxX = x;
-        if (y < minY) minY = y; if (y > maxY) maxY = y;
+    var layerData = buf._entityLayers && buf._entityLayers[prefix];
+    if (layerData && layerData.length > 0) {
+      for (var k = 0; k < layerData.length; k++) {
+        var li = layerData[k];
+        var lx = li.idx % PW, ly = Math.floor(li.idx / PW);
+        if (lx < minX) minX = lx; if (lx > maxX) maxX = lx;
+        if (ly < minY) minY = ly; if (ly > maxY) maxY = ly;
+        if (buf[li.idx].e && buf[li.idx].e.startsWith(prefix)) {
+          indices.push(li.idx);
+        }
+      }
+    } else {
+      for (var i = 0; i < buf.length; i++) {
+        if (buf[i].e && buf[i].e.startsWith(prefix)) {
+          var x = i % PW, y = Math.floor(i / PW);
+          indices.push(i);
+          if (x < minX) minX = x; if (x > maxX) maxX = x;
+          if (y < minY) minY = y; if (y > maxY) maxY = y;
+        }
       }
     }
     if (indices.length === 0) return;
@@ -837,41 +852,53 @@ AnimationTemplates.register('stamp', function(params) {
     var dispX = Math.round(liftDX * prog);
     var dispY = Math.round(liftDY * prog);
 
-    // ── Restore extended bounding box (cleans trail from previous frame) ──
-    var restMinY = Math.max(0, minY + Math.min(0, dispY) - 2);
-    var restMaxY = Math.min(PH - 1, maxY + crackRange + 2);
-    var restMinX = Math.max(0, minX + Math.min(0, dispX) - 2);
-    var restMaxX = Math.min(PW - 1, maxX + Math.max(0, dispX) + crackRange + 2);
-    for (var sy = restMinY; sy <= restMaxY; sy++) {
-      for (var sx = restMinX; sx <= restMaxX; sx++) {
-        var si = sy * PW + sx;
-        if (buf[si].e && buf[si].e.startsWith(prefix)) {
-          buf[si].r = buf[si]._r; buf[si].g = buf[si]._g; buf[si].b = buf[si]._b;
-        } else {
-          buf[si].r = buf[si]._br; buf[si].g = buf[si]._bg; buf[si].b = buf[si]._bb;
-        }
-      }
-    }
-
     // ── Draw entity at displaced position ──
     if (dispX !== 0 || dispY !== 0) {
-      // Black silhouette at original position
+      // Blank visible entity pixels to behind-colors (don't touch covered pixels)
+      for (var k = 0; k < indices.length; k++) {
+        var idx = indices[k];
+        buf[idx].r = buf[idx]._br;
+        buf[idx].g = buf[idx]._bg;
+        buf[idx].b = buf[idx]._bb;
+      }
+      // Black silhouette at visible original positions
       for (var k = 0; k < indices.length; k++) {
         var idx = indices[k];
         buf[idx].r = 0; buf[idx].g = 0; buf[idx].b = 0;
       }
-      // Entity drawn at displaced position
-      for (var k = 0; k < indices.length; k++) {
-        var idx = indices[k];
-        var py = Math.floor(idx / PW), px = idx % PW;
-        var nx = px + dispX, ny = py + dispY;
-        if (nx >= 0 && nx < PW && ny >= 0 && ny < PH) {
-          var nidx = ny * PW + nx;
-          buf[nidx].r = buf[idx]._r; buf[nidx].g = buf[idx]._g; buf[nidx].b = buf[idx]._b;
+      // Draw COMPLETE entity at displaced position using layer data
+      // (includes pixels that were covered by higher-z entities)
+      if (layerData) {
+        for (var k = 0; k < layerData.length; k++) {
+          var li = layerData[k];
+          var py = Math.floor(li.idx / PW), px = li.idx % PW;
+          var nx = px + dispX, ny = py + dispY;
+          if (nx >= 0 && nx < PW && ny >= 0 && ny < PH) {
+            var nidx = ny * PW + nx;
+            buf[nidx].r = li.r; buf[nidx].g = li.g; buf[nidx].b = li.b;
+          }
+        }
+      } else {
+        for (var k = 0; k < indices.length; k++) {
+          var idx = indices[k];
+          var py = Math.floor(idx / PW), px = idx % PW;
+          var nx = px + dispX, ny = py + dispY;
+          if (nx >= 0 && nx < PW && ny >= 0 && ny < PH) {
+            var nidx = ny * PW + nx;
+            buf[nidx].r = buf[idx]._r; buf[nidx].g = buf[idx]._g; buf[nidx].b = buf[idx]._b;
+          }
         }
       }
+    } else if (layerData) {
+      // prog===0: entity back at original position — restore ALL entity pixels from layer
+      // (ensures covered pixels are also restored to their correct entity colors)
+      for (var k = 0; k < layerData.length; k++) {
+        var li = layerData[k];
+        buf[li.idx].r = li.r; buf[li.idx].g = li.g; buf[li.idx].b = li.b;
+        buf[li.idx].e = li.e;
+      }
     }
-    // prog===0: entity at original position, already restored above
+    // Without layerData: prog===0 relies on buf.restore() which shows composite correctly
 
     // ── Phase 3: cracks radiating from all around the entity contour ──
     if (t > SNAP_END) {
@@ -1695,17 +1722,29 @@ AnimationTemplates.register('anticipation', function(params) {
   var prefix = params.entityPrefix || '';
 
   return function animate(buf, PW, PH, t) {
-    // Collect entity pixels and bounding box
+    // Collect entity pixels and bounding box.
+    // Use entity layer for complete bounds (includes covered pixels).
     var minX = PW, maxX = 0, minY = PH, maxY = 0;
     var indices = [];
-    for (var i = 0; i < buf.length; i++) {
-      if (buf[i].e && buf[i].e.startsWith(prefix)) {
-        var x = i % PW, y = Math.floor(i / PW);
-        indices.push(i);
-        if (x < minX) minX = x;
-        if (x > maxX) maxX = x;
-        if (y < minY) minY = y;
-        if (y > maxY) maxY = y;
+    var layerData = buf._entityLayers && buf._entityLayers[prefix];
+    if (layerData && layerData.length > 0) {
+      for (var k = 0; k < layerData.length; k++) {
+        var li = layerData[k];
+        var lx = li.idx % PW, ly = Math.floor(li.idx / PW);
+        if (lx < minX) minX = lx; if (lx > maxX) maxX = lx;
+        if (ly < minY) minY = ly; if (ly > maxY) maxY = ly;
+        if (buf[li.idx].e && buf[li.idx].e.startsWith(prefix)) {
+          indices.push(li.idx);
+        }
+      }
+    } else {
+      for (var i = 0; i < buf.length; i++) {
+        if (buf[i].e && buf[i].e.startsWith(prefix)) {
+          var x = i % PW, y = Math.floor(i / PW);
+          indices.push(i);
+          if (x < minX) minX = x; if (x > maxX) maxX = x;
+          if (y < minY) minY = y; if (y > maxY) maxY = y;
+        }
       }
     }
     if (indices.length === 0) return;
@@ -1714,24 +1753,7 @@ AnimationTemplates.register('anticipation', function(params) {
     var halfW = Math.max(cx - minX, maxX - cx);
     if (halfW === 0) return;
 
-    // Step 1: Restore entire bounding box to snapshot — cleans up trail from previous frame.
-    // Mirror positions always land within [minX, maxX], so the box covers all modified pixels.
-    for (var sy = minY; sy <= maxY; sy++) {
-      for (var sx = minX; sx <= maxX; sx++) {
-        var sidx = sy * PW + sx;
-        if (buf[sidx].e && buf[sidx].e.startsWith(prefix)) {
-          buf[sidx].r = buf[sidx]._r;
-          buf[sidx].g = buf[sidx]._g;
-          buf[sidx].b = buf[sidx]._b;
-        } else {
-          buf[sidx].r = buf[sidx]._br;
-          buf[sidx].g = buf[sidx]._bg;
-          buf[sidx].b = buf[sidx]._bb;
-        }
-      }
-    }
-
-    // Step 2: Blank entity pixels at their original positions (set to background).
+    // Blank visible entity pixels to behind-colors (don't touch covered pixels)
     for (var k = 0; k < indices.length; k++) {
       var idx = indices[k];
       buf[idx].r = buf[idx]._br;
@@ -1739,8 +1761,7 @@ AnimationTemplates.register('anticipation', function(params) {
       buf[idx].b = buf[idx]._bb;
     }
 
-    // Step 3: Draw each entity pixel at its interpolated x position.
-    //
+    // Draw COMPLETE entity at interpolated x positions using layer data.
     // dist = |px - cx| / halfW  (0 = on axis, 1 = at extremity)
     // mirrorX = 2*cx - px  (horizontal mirror)
     //
@@ -1751,9 +1772,20 @@ AnimationTemplates.register('anticipation', function(params) {
     // Return phase (t: 0.5→1.0): pixel slides back from mirrorX to px.
     //   Same stagger: extremity starts at t=0.5, axis at t=0.75.
     //   All pixels back at px at t=1.0.
-    for (var k = 0; k < indices.length; k++) {
-      var idx = indices[k];
-      var px = idx % PW, py = Math.floor(idx / PW);
+    var drawSource = layerData || [];
+    var useLayers = !!layerData;
+    if (!useLayers) drawSource = indices;
+
+    for (var k = 0; k < drawSource.length; k++) {
+      var srcIdx, srcR, srcG, srcB;
+      if (useLayers) {
+        var li = drawSource[k];
+        srcIdx = li.idx; srcR = li.r; srcG = li.g; srcB = li.b;
+      } else {
+        srcIdx = drawSource[k];
+        srcR = buf[srcIdx]._r; srcG = buf[srcIdx]._g; srcB = buf[srcIdx]._b;
+      }
+      var px = srcIdx % PW, py = Math.floor(srcIdx / PW);
       var dist = Math.abs(px - cx) / halfW;
       var mirrorX = 2 * cx - px;
       var newX;
@@ -1771,9 +1803,9 @@ AnimationTemplates.register('anticipation', function(params) {
       var nx = Math.round(newX);
       if (nx >= 0 && nx < PW) {
         var nidx = py * PW + nx;
-        buf[nidx].r = buf[idx]._r;
-        buf[nidx].g = buf[idx]._g;
-        buf[nidx].b = buf[idx]._b;
+        buf[nidx].r = srcR;
+        buf[nidx].g = srcG;
+        buf[nidx].b = srcB;
       }
     }
   };

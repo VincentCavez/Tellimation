@@ -432,14 +432,45 @@
         }
       }
 
+      // Sort by depth_order (ascending) so back entities draw first, front entities on top
+      var entities = (scene.manifest && scene.manifest.entities) || [];
+      var depthMap = {};
+      for (var di = 0; di < entities.length; di++) {
+        var de = entities[di];
+        depthMap[de.id] = (de.position && de.position.depth_order != null) ? de.position.depth_order : 0;
+      }
+      entityEids.sort(function(a, b) { return (depthMap[a] || 0) - (depthMap[b] || 0); });
+
       function renderEntitiesAndFlush() {
-        buf.snapshotBackground();
+        buf.snapshotBackground(); // _br = background for all pixels
+
+        // Draw entities in z-order (back to front). After each entity,
+        // save its complete layer data (pixels + behind colors).
+        var N = buf.data.length;
+        var preR = new Array(N);
+        var preG = new Array(N);
+        var preB = new Array(N);
+        var preE = new Array(N);
+
         for (var i = 0; i < entityEids.length; i++) {
-          try {
-            renderSpriteEntry(entityEids[i], spriteCode[entityEids[i]], buf);
-          } catch (e) {
-            log('Failed to render entity: ' + entityEids[i] + ' — ' + e.message, 'log-warn');
+          var prefix = entityEids[i];
+
+          // Save current buffer state (bg + entities drawn so far)
+          for (var j = 0; j < N; j++) {
+            preR[j] = buf.data[j].r;
+            preG[j] = buf.data[j].g;
+            preB[j] = buf.data[j].b;
+            preE[j] = buf.data[j].e;
           }
+
+          try {
+            renderSpriteEntry(prefix, spriteCode[prefix], buf);
+          } catch (e) {
+            log('Failed to render entity: ' + prefix + ' — ' + e.message, 'log-warn');
+          }
+
+          // Save entity layer (complete pixels + behind colors + update _br/_be)
+          buf.saveEntityLayer(prefix, preR, preG, preB, preE);
         }
         buf.computeDistanceFields(20);
         renderer.render();
