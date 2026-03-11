@@ -1,0 +1,272 @@
+{
+  "manifest": {
+    "scene_id": "scene_01",
+    "background": {
+      "environment_type": "indoor",
+      "ground_line": 0.7,
+      "zones": [
+        {
+          "id": "sky",
+          "y_start": 0.0,
+          "y_end": 0.25,
+          "scale_hint": 0.5
+        },
+        {
+          "id": "background",
+          "y_start": 0.25,
+          "y_end": 0.45,
+          "scale_hint": 0.7
+        },
+        {
+          "id": "midground",
+          "y_start": 0.45,
+          "y_end": 0.69,
+          "scale_hint": 0.9
+        },
+        {
+          "id": "foreground",
+          "y_start": 0.69,
+          "y_end": 1.0,
+          "scale_hint": 1.0
+        }
+      ],
+      "structural_elements": [
+        {
+          "name": "stone floor",
+          "x": 0.5,
+          "y": 0.85,
+          "zone": "foreground"
+        },
+        {
+          "name": "wooden counter",
+          "x": 0.75,
+          "y": 0.65,
+          "zone": "midground"
+        },
+        {
+          "name": "circular window",
+          "x": 0.2,
+          "y": 0.35,
+          "zone": "background"
+        },
+        {
+          "name": "wooden beams",
+          "x": 0.5,
+          "y": 0.2,
+          "zone": "sky"
+        }
+      ]
+    },
+    "entities": [
+      {
+        "id": "fox_01",
+        "type": "fox apprentice",
+        "properties": {
+          "color": "burnt orange",
+          "size": "medium",
+          "texture": "fluffy",
+          "pattern": "white-tipped ears and tail",
+          "weight": "light",
+          "state": "surprised",
+          "distinctive_features": "wearing a small green vest with tiny brass buttons"
+        },
+        "position": {
+          "x": 0.45,
+          "y": 0.72,
+          "spatial_ref": "on stone floor",
+          "zone": "foreground",
+          "depth_order": 2,
+          "ground_contact": true
+        },
+        "emotion": "amazed",
+        "pose": "standing on hind legs with front paws raised near the chest",
+        "carried_over": false,
+        "width_hint": 0.28,
+        "height_hint": 0.5,
+        "orientation": "facing_right",
+        "sensory": {
+          "sound": "soft breathing"
+        },
+        "scale_factor": 1.0
+      },
+      {
+        "id": "cauldron_01",
+        "type": "cauldron",
+        "properties": {
+          "color": "matte black",
+          "size": "medium",
+          "texture": "rough cast iron",
+          "pattern": "solid",
+          "weight": "heavy",
+          "state": "bubbling over",
+          "distinctive_features": "glowing neon-green liquid spilling down the sides"
+        },
+        "position": {
+          "x": 0.72,
+          "y": 0.78,
+          "spatial_ref": "on stone floor",
+          "zone": "foreground",
+          "depth_order": 1,
+          "ground_contact": true
+        },
+        "emotion": null,
+        "pose": "sitting upright and steady",
+        "carried_over": false,
+        "width_hint": 0.3,
+        "height_hint": 0.3,
+        "orientation": "facing_viewer",
+        "sensory": {
+          "temperature": "hot",
+          "sound": "loud glugging and popping",
+          "smell": "sweet peppermint"
+        },
+        "scale_factor": 1.0
+      },
+      {
+        "id": "book_01",
+        "type": "spellbook",
+        "properties": {
+          "color": "deep mahogany",
+          "size": "small",
+          "texture": "cracked leather",
+          "pattern": "silver embossed stars",
+          "weight": "medium",
+          "state": "open",
+          "distinctive_features": "a heavy golden latch and yellowed parchment pages"
+        },
+        "position": {
+          "x": 0.25,
+          "y": 0.85,
+          "spatial_ref": "beside fox_01",
+          "zone": "foreground",
+          "depth_order": 3,
+          "ground_contact": true
+        },
+        "emotion": null,
+        "pose": "lying flat with pages spread wide",
+        "carried_over": false,
+        "width_hint": 0.2,
+        "height_hint": 0.15,
+        "orientation": "facing_viewer",
+        "sensory": {
+          "smell": "old dusty paper"
+        },
+        "scale_factor": 1.0
+      },
+      {
+        "id": "crystal_01",
+        "type": "crystal",
+        "properties": {
+          "color": "luminescent amethyst",
+          "size": "small",
+          "texture": "glossy and smooth",
+          "pattern": "glowing internal veins",
+          "weight": "light",
+          "state": "floating",
+          "distinctive_features": "surrounded by a faint purple aura"
+        },
+        "position": {
+          "x": 0.75,
+          "y": 0.5,
+          "spatial_ref": "on wooden counter",
+          "zone": "midground",
+          "depth_order": 0,
+          "ground_contact": false
+        },
+        "emotion": null,
+        "pose": "hovering vertically in the air",
+        "carried_over": false,
+        "width_hint": 0.108,
+        "height_hint": 0.18000000000000002,
+        "orientation": "facing_viewer",
+        "sensory": {
+          "temperature": "cool",
+          "sound": "faint humming"
+        },
+        "scale_factor": 0.9
+      }
+    ],
+    "relations": [
+      {
+        "entity_a": "fox_01",
+        "entity_b": "cauldron_01",
+        "type": "spatial",
+        "preposition": "beside"
+      },
+      {
+        "entity_a": "book_01",
+        "entity_b": "fox_01",
+        "type": "spatial",
+        "preposition": "beside"
+      }
+    ],
+    "actions": [
+      {
+        "entity_id": "fox_01",
+        "verb": "watches",
+        "tense": "present",
+        "manner": "carefully"
+      }
+    ]
+  },
+  "neg": {
+    "targets": [
+      {
+        "id": "t1",
+        "entity_id": "fox_01",
+        "misl_element": "character",
+        "current_level": 0,
+        "target_level": 1,
+        "description": "The child should identify the character as Pip or the little fox.",
+        "priority": 1.0,
+        "tolerance": 0.3
+      },
+      {
+        "id": "t2",
+        "entity_id": "fox_01",
+        "misl_element": "setting",
+        "current_level": 0,
+        "target_level": 1,
+        "description": "The child should mention the setting is an attic or a workshop.",
+        "priority": 0.8,
+        "tolerance": 0.5
+      },
+      {
+        "id": "t3",
+        "entity_id": "cauldron_01",
+        "misl_element": "initiating_event",
+        "current_level": 0,
+        "target_level": 1,
+        "description": "The child should state that the green liquid is bubbling or spilling out.",
+        "priority": 0.9,
+        "tolerance": 0.4
+      },
+      {
+        "id": "t4",
+        "entity_id": "crystal_01",
+        "misl_element": "elaborated_noun_phrases",
+        "current_level": 0,
+        "target_level": 1,
+        "description": "The child should describe the 'glowing purple crystal' using at least one adjective.",
+        "priority": 0.7,
+        "tolerance": 0.6
+      },
+      {
+        "id": "t5",
+        "entity_id": "cauldron_01",
+        "misl_element": "adverbs",
+        "current_level": 0,
+        "target_level": 1,
+        "description": "The child should describe the bubbling 'loudly' or 'messily'.",
+        "priority": 0.6,
+        "tolerance": 0.6
+      }
+    ],
+    "min_coverage": 0.7,
+    "skill_coverage_check": "PASS"
+  },
+  "scene_description": "A whimsical alchemist's attic at night, where a small fox apprentice stands amazed. The room is filled with magical light from a glowing amethyst crystal and a bubbling cauldron of neon-green potion. The atmosphere is mysterious and cluttered, featuring a rich palette of deep mahogany, burnt orange, and luminescent purples.",
+  "background_description": "A cozy and cluttered alchemist's attic situated directly beneath a steeply pitched roof. The walls are made of aged, dark timber with heavy slanted wooden beams visible across the ceiling. The floor is composed of large, smooth grey stone tiles that catch the magical light. The room is dimly lit by a large circular window showing a starry indigo sky, creating a quiet and mystical atmosphere. A long wooden counter stands against the right wall, while built-in shelves are packed with jars and scrolls. No people or animals are present in the room itself.",
+  "carried_over_entities": [],
+  "background_changed": true
+}

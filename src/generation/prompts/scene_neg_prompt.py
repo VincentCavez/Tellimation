@@ -77,7 +77,8 @@ to other entities or surfaces>"
         "position": {{
           "x": "<float 0.0-1.0 — normalized horizontal center (0=left, 1=right)>",
           "y": "<float 0.0-1.0 — normalized vertical center (0=top, 1=bottom)>",
-          "spatial_ref": "<on/under/beside entity_id or null>",
+          "spatial_ref": "<'<preposition> <structural_element_name>' or '<preposition> <entity_id>' or null — \
+e.g. 'on wooden counter', 'beside bookshelf', 'under oak table', 'beside rabbit_01'>",
           "zone": "<foreground|midground|background>",
           "depth_order": "<int — 0=farthest back, higher=more in front>",
           "ground_contact": "<true if entity touches ground, false if floating/flying>"
@@ -333,6 +334,7 @@ set skill_coverage_check to "PARTIAL".
 Add `weight`, `state`, `pattern` as appropriate.
 - 4-5 entities per scene (1 main character + 3-4 environment elements).
 - At least 2 spatial relations between entities.
+- At least 2 entities with `spatial_ref` pointing to a structural element name.
 - At least 1 action for the main character.
 - At least 2 distinct color families across entities.
 - Every entity MUST have a `pose`.
@@ -354,8 +356,23 @@ background image, once as a sprite on top) — this looks broken.
 
 Every structural element MUST have a position (x, y) and zone. This ensures \
 the background image places elements consistently with entity spatial_refs. \
-For example, if an entity has spatial_ref "on counter_01", the counter's \
+For example, if an entity has spatial_ref "on wooden counter", the counter's \
 position in structural_elements must match where the entity expects it.
+
+## Linking entities to structural elements (CRITICAL)
+
+At least 2 entities MUST have a `spatial_ref` that references a structural \
+element by name (using a preposition). This is how the system knows where to \
+place entities relative to the background. Examples:
+- A cup "on wooden counter" → spatial_ref: "on wooden counter"
+- A cat "under oak table" → spatial_ref: "under oak table"
+- A lantern "beside bookshelf" → spatial_ref: "beside bookshelf"
+- A bird "on window ledge" → spatial_ref: "on window ledge"
+
+The structural element name in `spatial_ref` must match one of the names in \
+`structural_elements[]`. The entity's (x, y) should be roughly consistent \
+with the structural element's (x, y) and the spatial relation. The system \
+will fine-tune positions after background generation using visual detection.
 
 ## What goes as entities:
 - Characters (animals, people) — ALWAYS entities
