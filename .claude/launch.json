@@ -5,7 +5,8 @@
       "name": "tellimations",
       "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "uvicorn", "src.ui.app:app", "--reload", "--port", "8000"],
-      "port": 8000
+      "port": 8000,
+      "autoPort": false
     }
   ]
 }

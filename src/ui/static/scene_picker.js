@@ -88,6 +88,15 @@ var ScenePicker = (function() {
       }
     }
 
+    // Sort by depth_order (ascending) so back entities draw first, front entities on top
+    var entities = (scene.manifest && scene.manifest.entities) || [];
+    var depthMap = {};
+    for (var di = 0; di < entities.length; di++) {
+      var de = entities[di];
+      depthMap[de.id] = (de.position && de.position.depth_order != null) ? de.position.depth_order : 0;
+    }
+    entityEids.sort(function(a, b) { return (depthMap[a] || 0) - (depthMap[b] || 0); });
+
     function renderToCanvas(fullBuf) {
       fullBuf.snapshotBackground();
       // Render all entity sprites (sync)

@@ -20,13 +20,53 @@ class PixelBuffer {
     this.width = width;
     this.height = height;
     this.data = new Array(width * height);
+    this.entityLayers = {};
     this.clear();
   }
 
   clear() {
     for (let i = 0; i < this.data.length; i++) {
-      this.data[i] = { r: 0, g: 0, b: 0, e: '', _br: 0, _bg: 0, _bb: 0 };
+      this.data[i] = { r: 0, g: 0, b: 0, e: '', _br: 0, _bg: 0, _bb: 0, _be: '' };
     }
+    this.entityLayers = {};
+  }
+
+  /**
+   * Save entity layer data after rendering an entity.
+   * Captures the entity's complete pixel set (indices + colors) and the
+   * behind-entity colors (what was at each position before this entity drew).
+   * Also updates flat buffer _br/_bg/_bb/_be for backward compatibility.
+   *
+   * @param {string} prefix - Entity prefix (e.g. 'dog_01')
+   * @param {number[]} preR - Pre-draw red values for all pixels
+   * @param {number[]} preG - Pre-draw green values for all pixels
+   * @param {number[]} preB - Pre-draw blue values for all pixels
+   * @param {string[]} preE - Pre-draw entity IDs for all pixels
+   */
+  saveEntityLayer(prefix, preR, preG, preB, preE) {
+    var layer = [];
+    var prefixDot = prefix + '.';
+    for (var i = 0; i < this.data.length; i++) {
+      var e = this.data[i].e;
+      if (e === prefix || e.startsWith(prefixDot)) {
+        layer.push({
+          idx: i,
+          r: this.data[i].r,
+          g: this.data[i].g,
+          b: this.data[i].b,
+          e: e,
+          br: preR[i],
+          bg: preG[i],
+          bb: preB[i]
+        });
+        this.data[i]._br = preR[i];
+        this.data[i]._bg = preG[i];
+        this.data[i]._bb = preB[i];
+        this.data[i]._be = preE ? preE[i] : '';
+      }
+    }
+    this.entityLayers[prefix] = layer;
+    this.data._entityLayers = this.entityLayers;
   }
 
   // -- internal helpers -----------------------------------------------------
@@ -248,6 +288,7 @@ class PixelBuffer {
       p._g = p.g;
       p._b = p.b;
     }
+    this.data._entityLayers = this.entityLayers;
   }
 
   restore() {

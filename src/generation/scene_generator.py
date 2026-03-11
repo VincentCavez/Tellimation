@@ -1116,6 +1116,19 @@ async def generate_scene_assets(
 
     await _notify("images")
 
+    # --- Step 2b: Reanchor entity positions against actual background ---
+    # Detect where structural elements actually ended up in the generated
+    # background image, then adjust entity positions to match.
+    if bg_image_bytes:
+        from src.generation.pipeline_integration import reanchor_scene
+        try:
+            bg_pil = Image.open(io.BytesIO(bg_image_bytes)).convert("RGB")
+            manifest_data = await reanchor_scene(api_key, bg_pil, manifest_data)
+        except Exception as exc:
+            logger.warning("[assets] Reanchor failed (%s): %s — using original positions",
+                           type(exc).__name__, exc)
+    await _notify("reanchor")
+
     # --- Step 3+4: Magenta removal + Downscale ---
     bg_sprite: Optional[Dict[str, Any]] = None
     if reused_bg_sprite is not None:
