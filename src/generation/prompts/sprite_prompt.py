@@ -24,6 +24,13 @@ SOLID MAGENTA (#FF00FF) background. The magenta must be perfectly uniform \
   the middle, bright highlights. No flat/blocky fills.
 - **Detailed**: clearly distinct body parts (head, body, limbs, tail, ears, eyes). \
   Eyes should have at least 2 colors (pupil + shine).
+- **HUMANIZATION RULE — CRITICAL**: \
+  * If the subject is a CHARACTER or LIVING CREATURE (animal, person, creature), \
+    it MAY have eyes, mouth, expressions, and humanoid traits. \
+  * If the subject is an INANIMATE OBJECT (snowball, rock, tree, furniture, vehicle, \
+    food, tool, etc.), it MUST NOT have eyes, mouth, faces, or human expressions. \
+    Draw it realistically — a snowball is a plain white sphere, a rock is a plain stone, \
+    a tree has no face. NO ANTHROPOMORPHISM for non-living things.
 - **Side view** (like a 2D storybook): flat side profile, no 3D perspective.
 - **ORIENTATION IS CRITICAL**: If the description says "FACING LEFT", the character \
   MUST look toward the LEFT side of the image (its nose/face points LEFT). \
@@ -76,4 +83,7 @@ no characters, no objects, no entities. Just the environment.
 - **Atmospheric details**: clouds, stars, sun glow, distant mountains, etc.
 - **NO characters or objects**: this is purely the background environment.
 - **Color richness**: use many shades for the sky and ground to create depth.
+- **NO ANTHROPOMORPHISM**: Trees, rocks, terrain, weather, and all background \
+  elements must be drawn realistically without faces, eyes, or human expressions. \
+  They are environments, not characters.
 """
