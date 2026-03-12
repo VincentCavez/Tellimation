@@ -124,6 +124,9 @@ class StudentProfile(BaseModel):
     total_utterances: int = 0
     animation_history: List[Dict[str, Any]] = Field(default_factory=list)
 
+    # Child-given character names (entity_type → name), persists across sessions
+    character_names: Dict[str, str] = Field(default_factory=dict)
+
     # Per-utterance log with error context
     recent_utterances: List[Dict[str, Any]] = Field(default_factory=list)
     # Each entry: {text: str, timestamp: float, scene_id: str, errors: List[str]}
