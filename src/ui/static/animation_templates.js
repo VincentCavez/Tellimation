@@ -82,6 +82,31 @@ function _setPixel(buf, PW, PH, x, y, r, g, b) {
   }
 }
 
+function _hueChannel(p, q, t) {
+  if (t < 0) t += 1; if (t > 1) t -= 1;
+  if (t < 1/6) return p + (q - p) * 6 * t;
+  if (t < 1/2) return q;
+  if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+  return p;
+}
+function _hslToRgb(h, s, l) {
+  if (s === 0) { var v = Math.round(l * 255); return [v, v, v]; }
+  var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+  var pp = 2 * l - q;
+  return [Math.round(_hueChannel(pp, q, h + 1/3) * 255),
+          Math.round(_hueChannel(pp, q, h) * 255),
+          Math.round(_hueChannel(pp, q, h - 1/3) * 255)];
+}
+function _rgbToHue(r, g, b) {
+  var max = Math.max(r, g, b), min = Math.min(r, g, b);
+  if (max === min) return 0;
+  var d = max - min, h;
+  if (max === r) h = ((g - b) / d + 6) % 6;
+  else if (max === g) h = (b - r) / d + 2;
+  else h = (r - g) / d + 4;
+  return h / 6;
+}
+
 /**
  * Compute the true contour gap between two entities along the axis connecting
  * their centers. Returns { gap, ndx, ndy, impactX, impactY }.
@@ -950,27 +975,29 @@ AnimationTemplates.register('stamp', function(params) {
 }, 3000);
 
 // ── P1: Color Pop ──
-// Each pixel of the entity transitions to its RGB complement (color wheel
-// opposite): blue→yellow, white→black, green→magenta. Two full round-trips
-// in 3 seconds. Non-target entities are desaturated.
+// Rainbow canon: each pixel cycles through all rainbow colors, starting
+// from a hue offset based on its original color. Pixels of the same
+// original hue move in sync; different hues create a canon effect.
+// Non-target entities are desaturated.
 AnimationTemplates.register('color_pop', function(params) {
   var prefix = params.entityPrefix || '';
   var desatStr = params.desaturationStrength != null ? params.desaturationStrength : 0.8;
   var prefixDot = prefix + '.';
+  var cycleCount = 2;  // full rainbow cycles over 3s
 
   return function animate(buf, PW, PH, t) {
     var env = _easeEnvelope(t, 0.12, 0.12);
-    // Two round-trips: cos(t * PI * 4) does 2 full cycles in t=[0,1]
-    // phase goes 0→1→0→1→0 (original → complement → original → complement → original)
-    var phase = (0.5 - 0.5 * Math.cos(t * Math.PI * 4)) * env;
+    if (env < 0.01) return;
 
     for (var i = 0; i < buf.length; i++) {
       var p = buf[i];
       if (p.e === prefix || p.e.startsWith(prefixDot)) {
-        // Transition each channel toward its complement: complement = 255 - original
-        p.r = Math.round(p._r + (255 - 2 * p._r) * phase);
-        p.g = Math.round(p._g + (255 - 2 * p._g) * phase);
-        p.b = Math.round(p._b + (255 - 2 * p._b) * phase);
+        var origHue = _rgbToHue(p._r, p._g, p._b);
+        var hue = ((t * cycleCount + origHue) % 1 + 1) % 1;
+        var rgb = _hslToRgb(hue, 0.7, 0.5);
+        p.r = Math.round(p._r * (1 - env) + rgb[0] * env);
+        p.g = Math.round(p._g * (1 - env) + rgb[1] * env);
+        p.b = Math.round(p._b * (1 - env) + rgb[2] * env);
       } else if (p.e && p.e !== '' && !p.e.startsWith('bg.')) {
         var L = Math.round(p._r * 0.299 + p._g * 0.587 + p._b * 0.114);
         var mix = desatStr * env;
@@ -1893,6 +1920,7 @@ AnimationTemplates.register('causal_push', function(params) {
   // Cached contour gap data
   var cachedRushDist = null;
   var cachedNdx = 0, cachedNdy = 0;
+  var cachedImpactX = 0, cachedImpactY = 0;
 
   return function animate(buf, PW, PH, t) {
     var boundsA = _computeEntityBounds(buf, PW, prefixA);
@@ -1908,6 +1936,8 @@ AnimationTemplates.register('causal_push', function(params) {
       cachedNdx = cg.ndx;
       cachedNdy = cg.ndy;
       cachedRushDist = cg.gap;
+      cachedImpactX = cg.impactX;
+      cachedImpactY = cg.impactY;
     }
 
     var dxA = 0, dyA = 0, dxB = 0, dyB = 0;
@@ -1945,9 +1975,9 @@ AnimationTemplates.register('causal_push', function(params) {
 
     // Star burst at impact
     if (t >= 0.30 && t < 0.55) {
-      // Midpoint of displaced centers
-      var ipx = Math.round((boundsA.cx + dxA + boundsB.cx + dxB) / 2);
-      var ipy = Math.round((boundsA.cy + dyA + boundsB.cy + dyB) / 2);
+      // Impact point on B's contour (moves with B)
+      var ipx = cachedImpactX + dxB;
+      var ipy = cachedImpactY + dyB;
       var starAlpha;
       if (t < 0.37) {
         starAlpha = (t - 0.30) / 0.07;
@@ -2446,16 +2476,10 @@ AnimationTemplates.register('magnetism', function(params) {
 AnimationTemplates.register('repel', function(params) {
   var prefixA = params.entityPrefixA || params.entityPrefix || '';
   var prefixB = params.entityPrefixB || '';
-  var repelPx = _clamp(params.repelPixels || 12, 2, 25);
-
-  // Pre-generate zigzag bolt offsets (deterministic)
-  var _seed = 42;
-  function _srand() { _seed = (_seed * 16807) % 2147483647; return (_seed & 0xffff) / 0xffff; }
-  var boltSegments = 7; // number of zigzag points between endpoints
-  var boltOffsets = [];  // perpendicular offsets for each interior point
-  for (var i = 0; i < boltSegments; i++) {
-    boltOffsets.push((_srand() - 0.5) * 16); // ±8px perpendicular jitter
-  }
+  var repelPx = _clamp(params.repelPixels || 22, 2, 40);
+  // Cached contour gap data
+  var cachedGap = null, cachedNdx = 0, cachedNdy = 0;
+  var cachedImpactX = 0, cachedImpactY = 0;
 
   return function animate(buf, PW, PH, t) {
     var boundsA = _computeEntityBounds(buf, PW, prefixA);
@@ -2465,39 +2489,43 @@ AnimationTemplates.register('repel', function(params) {
     var pixelsA = _collectEntityPixels(buf, PW, prefixA);
     var pixelsB = _collectEntityPixels(buf, PW, prefixB);
 
-    // Direction unit vector from A toward B (diagonal axis)
-    var ddx = boundsB.cx - boundsA.cx, ddy = boundsB.cy - boundsA.cy;
-    var dist = Math.sqrt(ddx * ddx + ddy * ddy);
-    if (dist < 1) dist = 1;
-    var ndx = ddx / dist, ndy = ddy / dist;
-    // Perpendicular vector
-    var pnx = -ndy, pny = ndx;
+    // Compute true contour gap on first frame (cached)
+    if (cachedGap === null) {
+      var cg = _computeContourGap(pixelsA, pixelsB, boundsA, boundsB);
+      cachedNdx = cg.ndx; cachedNdy = cg.ndy;
+      cachedGap = cg.gap;
+      cachedImpactX = cg.impactX; cachedImpactY = cg.impactY;
+    }
 
+    var ndx = cachedNdx, ndy = cachedNdy;
     var dxA = 0, dyA = 0, dxB = 0, dyB = 0;
 
-    if (t < 0.1) {
-      // Brief attract (tension) — diagonal
-      var attract = t / 0.1;
-      dxA = Math.round(2 * attract * ndx);
-      dyA = Math.round(2 * attract * ndy);
-      dxB = Math.round(-2 * attract * ndx);
-      dyB = Math.round(-2 * attract * ndy);
-    } else if (t < 0.4) {
-      // Push apart — diagonal (away from each other)
-      var progress = (t - 0.1) / 0.3;
+    if (t < 0.20) {
+      // Attract — ease-in, close the contour gap over 300ms
+      var attract = t / 0.20;
+      attract = attract * attract; // ease-in (slow start, accelerate)
+      dxA = Math.round(cachedGap / 2 * attract * ndx);
+      dyA = Math.round(cachedGap / 2 * attract * ndy);
+      dxB = Math.round(-cachedGap / 2 * attract * ndx);
+      dyB = Math.round(-cachedGap / 2 * attract * ndy);
+    } else if (t < 0.50) {
+      // Push apart — ease-out, separate over 450ms
+      var progress = (t - 0.20) / 0.30;
+      progress = 1 - (1 - progress) * (1 - progress); // ease-out (fast start, decelerate)
       dxA = Math.round(-repelPx / 2 * progress * ndx);
       dyA = Math.round(-repelPx / 2 * progress * ndy);
       dxB = Math.round(repelPx / 2 * progress * ndx);
       dyB = Math.round(repelPx / 2 * progress * ndy);
-    } else if (t < 0.7) {
-      // Hold apart — diagonal
+    } else if (t < 0.70) {
+      // Hold apart
       dxA = Math.round(-repelPx / 2 * ndx);
       dyA = Math.round(-repelPx / 2 * ndy);
       dxB = Math.round(repelPx / 2 * ndx);
       dyB = Math.round(repelPx / 2 * ndy);
     } else {
-      // Drift back — diagonal
-      var release = (t - 0.7) / 0.3;
+      // Drift back — ease-in-out
+      var release = (t - 0.70) / 0.30;
+      release = release * release * (3 - 2 * release); // smoothstep
       dxA = Math.round(-repelPx / 2 * (1 - release) * ndx);
       dyA = Math.round(-repelPx / 2 * (1 - release) * ndy);
       dxB = Math.round(repelPx / 2 * (1 - release) * ndx);
@@ -2509,77 +2537,80 @@ AnimationTemplates.register('repel', function(params) {
     _redrawEntityPixels(buf, PW, PH, pixelsA, dxA, dyA);
     _redrawEntityPixels(buf, PW, PH, pixelsB, dxB, dyB);
 
-    // ── Lightning bolt between entities ──
-    // Visible from t=0.08 (just before repel) to t=0.30, peak brightness at t=0.12
-    var boltStart = 0.08, boltPeak = 0.12, boltEnd = 0.30;
-    if (t >= boltStart && t <= boltEnd) {
-      var boltAlpha;
-      if (t < boltPeak) {
-        boltAlpha = (t - boltStart) / (boltPeak - boltStart); // fade in
+    // ── Bonk effect at contour collision point ──
+    var bonkStart = 0.16, bonkPeak = 0.22, bonkEnd = 0.42;
+    if (t >= bonkStart && t <= bonkEnd) {
+      var bonkAlpha;
+      if (t < bonkPeak) {
+        bonkAlpha = (t - bonkStart) / (bonkPeak - bonkStart);
       } else {
-        boltAlpha = 1 - (t - boltPeak) / (boltEnd - boltPeak); // fade out
+        bonkAlpha = 1 - (t - bonkPeak) / (bonkEnd - bonkPeak);
       }
-      boltAlpha = Math.max(0, Math.min(1, boltAlpha));
+      bonkAlpha = _clamp(bonkAlpha, 0, 1);
 
-      // Endpoints: entity centers (with current displacement)
-      var ax = boundsA.cx + dxA, ay = boundsA.cy + dyA;
-      var bx = boundsB.cx + dxB, by = boundsB.cy + dyB;
+      // Impact point from contour gap (moves with B during push)
+      var ipx = cachedImpactX + dxB;
+      var ipy = cachedImpactY + dyB;
 
-      // Build zigzag path from A to B
-      var pts = [{x: ax, y: ay}];
-      for (var s = 0; s < boltSegments; s++) {
-        var frac = (s + 1) / (boltSegments + 1);
-        var mx = ax + (bx - ax) * frac;
-        var my = ay + (by - ay) * frac;
-        // Perpendicular offset for zigzag
-        mx += pnx * boltOffsets[s];
-        my += pny * boltOffsets[s];
-        pts.push({x: Math.round(mx), y: Math.round(my)});
+      // 1) Core flash (3x3 bright white-yellow)
+      for (var dy = -1; dy <= 1; dy++) {
+        for (var dx = -1; dx <= 1; dx++) {
+          var sx = ipx + dx, sy = ipy + dy;
+          if (sx >= 0 && sx < PW && sy >= 0 && sy < PH) {
+            var si = sy * PW + sx;
+            buf[si].r = Math.min(255, Math.round(buf[si].r * (1 - bonkAlpha) + 255 * bonkAlpha));
+            buf[si].g = Math.min(255, Math.round(buf[si].g * (1 - bonkAlpha) + 255 * bonkAlpha));
+            buf[si].b = Math.min(255, Math.round(buf[si].b * (1 - bonkAlpha) + 180 * bonkAlpha));
+          }
+        }
       }
-      pts.push({x: bx, y: by});
 
-      // Draw each segment as a thick bright line (core + glow)
-      for (var seg = 0; seg < pts.length - 1; seg++) {
-        var x0 = pts[seg].x, y0 = pts[seg].y;
-        var x1 = pts[seg + 1].x, y1 = pts[seg + 1].y;
-        var sdx = x1 - x0, sdy = y1 - y0;
-        var slen = Math.max(1, Math.sqrt(sdx * sdx + sdy * sdy));
-        var steps = Math.ceil(slen);
-
-        for (var st = 0; st <= steps; st++) {
-          var f = st / steps;
-          var px = Math.round(x0 + sdx * f);
-          var py = Math.round(y0 + sdy * f);
-
-          // Glow (2px radius, blue-white tint)
-          for (var gy = -2; gy <= 2; gy++) {
-            for (var gx = -2; gx <= 2; gx++) {
-              if (gx * gx + gy * gy > 5) continue; // rough circle
-              var fx = px + gx, fy = py + gy;
-              if (fx < 0 || fx >= PW || fy < 0 || fy >= PH) continue;
-              var gi = fy * PW + fx;
-              var gAlpha = boltAlpha * 0.3;
-              buf[gi].r = Math.min(255, Math.round(buf[gi].r * (1 - gAlpha) + 180 * gAlpha));
-              buf[gi].g = Math.min(255, Math.round(buf[gi].g * (1 - gAlpha) + 200 * gAlpha));
-              buf[gi].b = Math.min(255, Math.round(buf[gi].b * (1 - gAlpha) + 255 * gAlpha));
-            }
+      // 2) Cardinal star spikes (length 4)
+      var cardinals = [[1,0],[-1,0],[0,1],[0,-1]];
+      for (var c = 0; c < 4; c++) {
+        for (var d = 2; d <= 4; d++) {
+          var fade = 1 - (d - 1) / 5;
+          var sa = bonkAlpha * fade;
+          var sx = ipx + cardinals[c][0] * d, sy = ipy + cardinals[c][1] * d;
+          if (sx >= 0 && sx < PW && sy >= 0 && sy < PH) {
+            var si = sy * PW + sx;
+            buf[si].r = Math.min(255, Math.round(buf[si].r * (1 - sa) + 255 * sa));
+            buf[si].g = Math.min(255, Math.round(buf[si].g * (1 - sa) + 255 * sa));
+            buf[si].b = Math.min(255, Math.round(buf[si].b * (1 - sa) + 120 * sa));
           }
+        }
+      }
 
-          // Core (1px, bright white-yellow)
-          if (px >= 0 && px < PW && py >= 0 && py < PH) {
-            var ci = py * PW + px;
-            buf[ci].r = Math.min(255, Math.round(buf[ci].r * (1 - boltAlpha) + 255 * boltAlpha));
-            buf[ci].g = Math.min(255, Math.round(buf[ci].g * (1 - boltAlpha) + 255 * boltAlpha));
-            buf[ci].b = Math.min(255, Math.round(buf[ci].b * (1 - boltAlpha) + 220 * boltAlpha));
+      // 3) Diagonal star spikes (length 3)
+      var diags = [[1,1],[-1,1],[1,-1],[-1,-1]];
+      for (var c = 0; c < 4; c++) {
+        for (var d = 2; d <= 3; d++) {
+          var fade = 1 - (d - 1) / 4;
+          var sa = bonkAlpha * fade;
+          var sx = ipx + diags[c][0] * d, sy = ipy + diags[c][1] * d;
+          if (sx >= 0 && sx < PW && sy >= 0 && sy < PH) {
+            var si = sy * PW + sx;
+            buf[si].r = Math.min(255, Math.round(buf[si].r * (1 - sa) + 255 * sa));
+            buf[si].g = Math.min(255, Math.round(buf[si].g * (1 - sa) + 230 * sa));
+            buf[si].b = Math.min(255, Math.round(buf[si].b * (1 - sa) + 80 * sa));
           }
-          // Second core pixel perpendicular for thickness
-          var px2 = px + Math.round(pnx * 0.5), py2 = py + Math.round(pny * 0.5);
-          if (px2 >= 0 && px2 < PW && py2 >= 0 && py2 < PH) {
-            var ci2 = py2 * PW + px2;
-            buf[ci2].r = Math.min(255, Math.round(buf[ci2].r * (1 - boltAlpha) + 255 * boltAlpha));
-            buf[ci2].g = Math.min(255, Math.round(buf[ci2].g * (1 - boltAlpha) + 255 * boltAlpha));
-            buf[ci2].b = Math.min(255, Math.round(buf[ci2].b * (1 - boltAlpha) + 220 * boltAlpha));
-          }
+        }
+      }
+
+      // 4) Expanding impact ring
+      var ringProgress = _clamp((t - bonkStart) / (bonkEnd - bonkStart), 0, 1);
+      var ringRadius = 2 + ringProgress * 6;  // expands 2px -> 8px
+      var ringAlpha = bonkAlpha * 0.7;
+      var ringSteps = Math.max(16, Math.ceil(ringRadius * 6));
+      for (var s = 0; s < ringSteps; s++) {
+        var angle = (s / ringSteps) * Math.PI * 2;
+        var rx = Math.round(ipx + Math.cos(angle) * ringRadius);
+        var ry = Math.round(ipy + Math.sin(angle) * ringRadius);
+        if (rx >= 0 && rx < PW && ry >= 0 && ry < PH) {
+          var ri = ry * PW + rx;
+          buf[ri].r = Math.min(255, Math.round(buf[ri].r * (1 - ringAlpha) + 255 * ringAlpha));
+          buf[ri].g = Math.min(255, Math.round(buf[ri].g * (1 - ringAlpha) + 220 * ringAlpha));
+          buf[ri].b = Math.min(255, Math.round(buf[ri].b * (1 - ringAlpha) + 80 * ringAlpha));
         }
       }
     }
