@@ -166,11 +166,12 @@ def _build_continuation_prompt(
     # Previous manifest
     prev_manifest_str = json.dumps(previous_manifest, indent=2) if previous_manifest else "{}"
 
-    # Active entities summary
+    # Active entities summary (include child-given names if any)
     entity_lines = []
     for eid, ent in story_state.active_entities.items():
+        name_part = f", name=\"{ent.name}\"" if ent.name else ""
         entity_lines.append(
-            f"- {eid} (type={ent.type}, appeared={ent.first_appeared}, "
+            f"- {eid} (type={ent.type}{name_part}, appeared={ent.first_appeared}, "
             f"pos={ent.last_position})"
         )
     active_entities = "\n".join(entity_lines) if entity_lines else "(none)"

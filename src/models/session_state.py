@@ -56,6 +56,11 @@ class SessionState:
         # Key: "target_id::misl_element"
         self.voice_escalated_errors: Dict[str, str] = {}
 
+        # Character naming phase — True until child names the main character
+        self.naming_phase: bool = True
+        # Child-given character names (entity_id → name), persists across scenes
+        self.character_names: Dict[str, str] = {}
+
         # Initial scenes generated for the selection page
         self.initial_scenes: List[Dict[str, Any]] = []
 

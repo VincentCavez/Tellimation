@@ -54,6 +54,7 @@ class Position(BaseModel):
 class Entity(BaseModel):
     id: str
     type: str
+    name: Optional[str] = None  # Child-given name (not used for sprite generation)
     properties: Dict[str, str] = Field(default_factory=dict)
     position: Position
     emotion: Optional[str] = None
@@ -100,3 +101,9 @@ class SceneManifest(BaseModel):
 
     def entity_ids(self) -> List[str]:
         return [e.id for e in self.entities]
+
+    def get_main_character(self) -> Optional[Entity]:
+        """Return the main character (first entity — scene gen puts it first)."""
+        if self.entities:
+            return self.entities[0]
+        return None
