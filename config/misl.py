@@ -162,9 +162,6 @@ MICROSTRUCTURE = {
 # ============================================================================
 
 AGE_EXPECTATIONS: Dict[int, Dict[str, int]] = {
-    4:  {"character": 1, "setting": 0, "initiating_event": 0, "internal_response": 0, "plan": 0, "action": 0, "consequence": 0},
-    5:  {"character": 1, "setting": 1, "initiating_event": 2, "internal_response": 0, "plan": 0, "action": 0, "consequence": 0},
-    6:  {"character": 1, "setting": 1, "initiating_event": 1, "internal_response": 0, "plan": 0, "action": 1, "consequence": 0},
     7:  {"character": 1, "setting": 1, "initiating_event": 2, "internal_response": 0, "plan": 0, "action": 2, "consequence": 0},
     8:  {"character": 1, "setting": 1, "initiating_event": 2, "internal_response": 0, "plan": 0, "action": 2, "consequence": 0},
     9:  {"character": 1, "setting": 1, "initiating_event": 2, "internal_response": 0, "plan": 0, "action": 2, "consequence": 2},
