@@ -152,15 +152,18 @@ def _build_continuation_prompt(
     story_state: StoryState,
     student_profile: Optional[StudentProfile],
     previous_manifest: Optional[Dict[str, Any]],
+    accepted_utterances: Optional[List[str]] = None,
 ) -> str:
     """Build user prompt for a continuation scene."""
-    # Story context: narrative summaries of each scene
+    # Story context: narrative summaries of each scene WITH child's utterances
     story_lines = []
     for s in story_state.scenes:
-        story_lines.append(
-            f"- {s.get('scene_id', '?')}: "
-            f"entities={[e['id'] for e in s.get('manifest', {}).get('entities', [])]}"
-        )
+        ents = [e["id"] for e in s.get("manifest", {}).get("entities", [])]
+        line = f"- {s.get('scene_id', '?')}: entities={ents}"
+        utts = s.get("accepted_utterances", [])
+        if utts:
+            line += "\n  Child said: " + "; ".join(f'"{u}"' for u in utts)
+        story_lines.append(line)
     story_context = "\n".join(story_lines) if story_lines else "(first scene)"
 
     # Previous manifest
@@ -176,6 +179,25 @@ def _build_continuation_prompt(
         )
     active_entities = "\n".join(entity_lines) if entity_lines else "(none)"
 
+    # Inactive entities (available for recall from sprite archive)
+    inactive = story_state.get_inactive_entities()
+    if inactive:
+        inactive_lines = []
+        for eid, info in inactive.items():
+            inactive_lines.append(
+                f"- {eid} (type={info['type']}, last_seen={info['last_appeared']}, "
+                f"has_sprite=true)"
+            )
+        inactive_entities = "\n".join(inactive_lines)
+    else:
+        inactive_entities = "(none)"
+
+    # Child's narration from the scene that just ended
+    if accepted_utterances:
+        child_narration = "\n".join(f'- "{utt}"' for utt in accepted_utterances)
+    else:
+        child_narration = "(no narration recorded)"
+
     # Student profile + age
     age = student_profile.age if student_profile else 8
     profile_ctx = ""
@@ -190,7 +212,9 @@ def _build_continuation_prompt(
         story_context=story_context,
         previous_manifest=prev_manifest_str,
         active_entities=active_entities,
-        student_profile=profile_ctx,
+        inactive_entities=inactive_entities,
+        child_narration=child_narration,
+        student_profile_context=profile_ctx,
         scene_number=scene_number,
     )
 
@@ -456,6 +480,7 @@ async def generate_scene_manifest(
     student_profile: Optional[StudentProfile] = None,
     theme: str = "",
     previous_manifest: Optional[Dict[str, Any]] = None,
+    accepted_utterances: Optional[List[str]] = None,
 ) -> Tuple[SceneManifest, Dict[str, Any]]:
     """Generate a scene manifest in a single LLM call.
 
@@ -465,6 +490,7 @@ async def generate_scene_manifest(
         student_profile: Child's error profile.
         theme: Story theme for initial scenes. Ignored for continuations.
         previous_manifest: Manifest dict of the previous scene (for continuity).
+        accepted_utterances: Accepted utterances from the scene that just ended.
 
     Returns:
         Tuple of (SceneManifest, raw_response_dict).
@@ -478,6 +504,7 @@ async def generate_scene_manifest(
     else:
         user_prompt = _build_continuation_prompt(
             story_state, student_profile, previous_manifest,
+            accepted_utterances=accepted_utterances,
         )
 
     client = genai.Client(api_key=api_key)

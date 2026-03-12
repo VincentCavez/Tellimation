@@ -531,6 +531,11 @@ async def _handle_generate_scene(
         theme = ""
         previous_manifest = None
 
+        # Capture accepted utterances from the current scene BEFORE reset
+        current_accepted: List[str] = []
+        if is_continuation and session.current_scene_log:
+            current_accepted = get_accepted_utterances(session.current_scene_log)
+
         if not is_continuation:
             theme = random.choice(STORY_THEMES)
         else:
@@ -550,6 +555,7 @@ async def _handle_generate_scene(
             student_profile=session.student_profile,
             theme=theme,
             previous_manifest=previous_manifest,
+            accepted_utterances=current_accepted if is_continuation else None,
         )
 
         # Step 2: Generate images + sprites
@@ -576,6 +582,10 @@ async def _handle_generate_scene(
             story_idx, _ = create_story(session.participant_id)
             session.current_story_index = story_idx
         save_scene(session.participant_id, session.current_story_index, scene)
+
+        # Save previous scene's accepted utterances before reset wipes scene_log
+        if is_continuation and current_accepted and session.story_state.scenes:
+            session.story_state.scenes[-1]["accepted_utterances"] = current_accepted
 
         # Hydrate session state
         _apply_scene_to_session(session, scene)

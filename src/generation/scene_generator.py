@@ -21,7 +21,7 @@ from typing import Any, Callable, Dict, List, Optional
 
 from google import genai
 
-from src.models.story_state import StoryState
+from src.models.story_state import ActiveEntity, StoryState
 from src.generation.image_processing import (
     ART_W,
     ART_H,
@@ -423,13 +423,25 @@ async def generate_scene_assets(
                      len(skip_ids), skip_ids)
 
     # --- Collect entities to generate (skip carried_over + overlapping) ---
+    # Carried-over entities with pose_changed=true need regeneration
+    pose_changed_ids = set()
     entities_to_generate = []
     for ent in manifest_data.get("manifest", {}).get("entities", []):
-        if ent.get("id") in carried_over or ent.get("carried_over"):
-            continue
-        if ent.get("id") in skip_ids:
+        eid = ent.get("id")
+        if eid in skip_ids:
             continue  # Would duplicate background
-        entities_to_generate.append(ent)
+        is_carried = eid in carried_over or ent.get("carried_over")
+        if is_carried and ent.get("pose_changed"):
+            # Pose changed — regenerate sprite even though carried over
+            entities_to_generate.append(ent)
+            pose_changed_ids.add(eid)
+            if eid in carried_over:
+                carried_over.remove(eid)
+            logger.info("[assets] %s: pose_changed=true, will regenerate sprite", eid)
+        elif is_carried:
+            continue  # Normal carried-over: reuse existing sprite
+        else:
+            entities_to_generate.append(ent)
 
     # --- Step 1+2: Background + Entity images (PARALLEL) ---
     logger.info("[assets] Generating %s + %d entity images...",
@@ -543,12 +555,25 @@ async def generate_scene_assets(
     entity_positions = _compute_entity_positions(manifest_data, entity_sprites)
     sprite_code = _compose_scene(bg_sprite, entity_sprites, entity_positions)
 
-    # Backfill carried-over entities from story_state
+    # Backfill carried-over entities from story_state (or sprite archive)
     if story_state and carried_over:
         for eid in carried_over:
             if eid in sprite_code:
                 continue
+            # Try active entities first, then sprite archive for recalled entities
             old_sprite = story_state.get_entity_sprite(eid)
+            if old_sprite is None:
+                old_sprite = story_state.get_archived_sprite(eid)
+                if old_sprite:
+                    logger.info("[assets] Recalled archived sprite for %s", eid)
+                    # Re-activate the entity in active_entities
+                    hist = story_state.entity_history.get(eid, {})
+                    story_state.active_entities[eid] = ActiveEntity(
+                        type=hist.get("type", ""),
+                        sprite_code=old_sprite,
+                        first_appeared=hist.get("first_appeared", ""),
+                        last_position=hist.get("last_position", {}),
+                    )
             if old_sprite and isinstance(old_sprite, dict):
                 reused = dict(old_sprite)
                 pos = entity_positions.get(eid)
@@ -559,7 +584,8 @@ async def generate_scene_assets(
                 logger.info("[assets] Reused carried-over sprite for %s at (%s,%s)",
                             eid, reused.get("x"), reused.get("y"))
             else:
-                logger.warning("[assets] Carried-over entity %s has no stored sprite", eid)
+                logger.warning("[assets] Carried-over entity %s has no stored sprite "
+                              "(not in active or archive)", eid)
 
     logger.info("[assets] Done. %d sprite entries: %s",
                 len(sprite_code), list(sprite_code.keys()))
