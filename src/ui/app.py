@@ -274,7 +274,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
     # Set child's age on the student profile
     try:
-        session.student_profile.age = max(4, min(15, int(child_age_str)))
+        session.student_profile.age = max(7, min(15, int(child_age_str)))
     except (ValueError, TypeError):
         session.student_profile.age = 8
     ws = _WebSocketAdapter(websocket)

@@ -179,7 +179,7 @@ class StudentProfile(BaseModel):
             age_row = AGE_EXPECTATIONS.get(self.age)
             if age_row is None:
                 # Clamp to nearest defined age
-                clamped = max(4, min(15, self.age))
+                clamped = max(7, min(15, self.age))
                 age_row = AGE_EXPECTATIONS.get(clamped, {})
             return age_row.get(misl_element, 0)
         # Microstructure — no empirical trajectory
