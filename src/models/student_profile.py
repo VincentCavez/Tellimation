@@ -21,6 +21,98 @@ class Discrepancy(BaseModel):
     severity: float = 0.5
 
 
+class AnimationDecision(BaseModel):
+    """Logged for every animation decision. Tracks mode, params, and outcome."""
+    timestamp: float = 0.0
+    scene_id: str = ""
+    target_id: str = ""
+    misl_element: str = ""
+    mode: str = ""           # use_default | adjust_params | sequence | custom_code
+    animation_id: str = ""
+    template: str = ""
+    params: Dict[str, Any] = Field(default_factory=dict)
+    steps: List[Dict] = Field(default_factory=list)
+    code: str = ""
+    duration_ms: int = 0
+    outcome: str = "pending"  # pending | success | failure
+    escalated_to_voice: bool = False
+
+
+# ---------------------------------------------------------------------------
+# MISL Difficulty Profile (persistent across sessions)
+# ---------------------------------------------------------------------------
+
+class MISLDimensionStats(BaseModel):
+    """Tracks suggestion/resolution counts for a single MISL dimension."""
+    times_suggested: int = 0
+    times_resolved: int = 0
+
+
+class MISLDifficultyProfile(BaseModel):
+    """Per-student MISL difficulty tracking, persistent across sessions.
+
+    Structure: {dimension_key: MISLDimensionStats}
+    Example: {"character": {times_suggested: 4, times_resolved: 2}}
+    """
+    dimensions: Dict[str, MISLDimensionStats] = Field(default_factory=dict)
+
+    def get_difficulty_ratio(self, dimension: str) -> float:
+        """Return difficulty ratio for a dimension (0.0 = easy, 1.0 = hard).
+
+        Computed as 1 - (resolved / suggested). Higher means the child
+        struggles more with this dimension.
+        """
+        stats = self.dimensions.get(dimension)
+        if stats is None or stats.times_suggested == 0:
+            return 0.0
+        return 1.0 - (stats.times_resolved / stats.times_suggested)
+
+    def record_suggestion(self, dimension: str) -> None:
+        """Record that a MISL dimension was suggested to the child."""
+        if dimension not in self.dimensions:
+            self.dimensions[dimension] = MISLDimensionStats()
+        self.dimensions[dimension].times_suggested += 1
+
+    def record_resolution(self, dimension: str) -> None:
+        """Record that a previously suggested dimension was resolved."""
+        if dimension not in self.dimensions:
+            self.dimensions[dimension] = MISLDimensionStats()
+        self.dimensions[dimension].times_resolved += 1
+
+    def get_problematic_dimensions(self, min_suggestions: int = 2) -> Dict[str, float]:
+        """Return dimensions with high difficulty ratio.
+
+        Only includes dimensions suggested at least min_suggestions times.
+        Returns {dimension: difficulty_ratio}, sorted by ratio descending.
+        """
+        result: Dict[str, float] = {}
+        for dim, stats in self.dimensions.items():
+            if stats.times_suggested >= min_suggestions:
+                ratio = self.get_difficulty_ratio(dim)
+                if ratio > 0.3:
+                    result[dim] = ratio
+        return dict(sorted(result.items(), key=lambda x: x[1], reverse=True))
+
+    def to_prompt_context(self) -> str:
+        """Format the difficulty profile for LLM prompt injection."""
+        if not self.dimensions:
+            return "(No difficulty data yet — first session.)"
+        lines = []
+        for dim, stats in sorted(
+            self.dimensions.items(),
+            key=lambda x: self.get_difficulty_ratio(x[0]),
+            reverse=True,
+        ):
+            ratio = self.get_difficulty_ratio(dim)
+            label = "easy" if ratio < 0.3 else "moderate" if ratio < 0.6 else "hard"
+            lines.append(
+                f"- {dim}: suggested {stats.times_suggested}x, "
+                f"resolved {stats.times_resolved}x "
+                f"(difficulty: {ratio:.0%} — {label})"
+            )
+        return "\n".join(lines)
+
+
 class StudentProfile(BaseModel):
     age: int = 8
     error_counts: Dict[str, int] = Field(default_factory=dict)
@@ -41,8 +133,16 @@ class StudentProfile(BaseModel):
     # Ex: {"character": [1, 1, 2], "action": [0, 1],
     #       "subordinating_conjunctions": [0, 0]}
 
-    # Animation efficacy log — tracks whether animations led to correction
+    # MISL difficulty profile — persistent across sessions
+    misl_difficulty_profile: MISLDifficultyProfile = Field(
+        default_factory=MISLDifficultyProfile
+    )
+
+    # Animation efficacy log — tracks whether animations led to correction (legacy)
     animation_efficacy: List[Dict[str, Any]] = Field(default_factory=list)
+
+    # Animation decisions — 4-mode decision log with outcome tracking
+    animation_decisions: List[AnimationDecision] = Field(default_factory=list)
     # Each entry: {
     #   target_id: str,           # sub-entity/feature targeted
     #   animation_type: str,      # type of animation (e.g. I1_spotlight)

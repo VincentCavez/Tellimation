@@ -250,3 +250,142 @@ COUNT_ANIMATIONS: List[str] = ["C1_sequential_glow", "C2_disintegration", "C3_gh
 MACRO_KEYS: List[str] = list(MACROSTRUCTURE.keys())
 MICRO_KEYS: List[str] = list(MICROSTRUCTURE.keys())
 ALL_KEYS: List[str] = MACRO_KEYS + MICRO_KEYS
+
+# ============================================================================
+# Animation ID → template name mapping
+# ============================================================================
+
+ANIMATION_ID_TO_TEMPLATE: Dict[str, str] = {
+    "I1_spotlight": "spotlight",
+    "I2_nametag": "nametag",
+    "P1_color_pop": "color_pop",
+    "P2_emanation": "emanation",
+    "A1_motion_line": "motion_lines",
+    "A2_anticipation": "anticipation",
+    "S1_reveal": "reveal",
+    "S2_stamp": "stamp",
+    "T1_flashback": "flashback",
+    "T2_timelapse": "timelapse",
+    "R1_magnetism": "magnetism",
+    "R2_repel": "repel",
+    "R3_causal_push": "causal_push",
+    "C1_sequential_glow": "sequential_glow",
+    "C2_disintegration": "disintegration",
+    "C3_ghost_outline": "ghost_outline",
+    "D1_speech_bubble": "speech_bubble",
+    "D2_thought_bubble": "thought_bubble",
+    "D3_alert": "alert",
+    "D4_interjection": "interjection",
+}
+
+# ============================================================================
+# Animation parameter schemas (per template)
+# ============================================================================
+
+ANIMATION_PARAMS: Dict[str, Dict] = {
+    "spotlight": {
+        "dimStrength":  {"type": "float", "min": 0, "max": 1, "default": 0.7, "desc": "How much non-target pixels are dimmed"},
+        "glowStrength": {"type": "float", "min": 0, "max": 1, "default": 0.35, "desc": "Glow intensity on target entity"},
+        "haloColor":    {"type": "rgb", "default": [255, 240, 180], "desc": "Color of the halo around entity"},
+        "maxHaloSize":  {"type": "int", "min": 5, "max": 20, "default": 14, "desc": "Maximum halo radius in pixels"},
+    },
+    "nametag": {
+        "bgColor":     {"type": "rgb", "default": [40, 40, 55], "desc": "Label background color"},
+        "textColor":   {"type": "rgb", "default": [255, 255, 200], "desc": "Label text color"},
+        "stringColor": {"type": "rgb", "default": [180, 180, 180], "desc": "Connecting string color"},
+    },
+    "color_pop": {
+        "desaturationStrength": {"type": "float", "min": 0, "max": 1, "default": 0.8, "desc": "How much non-target pixels are desaturated"},
+        "cycleCount":           {"type": "int", "min": 1, "max": 4, "default": 2, "desc": "Number of full hue-rotation cycles"},
+    },
+    "emanation": {
+        "particleType":  {"type": "enum", "values": ["steam", "frost", "sparkle", "dust", "hearts", "anger", "fear"], "default": "steam", "desc": "Type of emanation particle"},
+        "particleCount": {"type": "int", "min": 8, "max": 30, "default": 15, "desc": "Number of particles emitted"},
+    },
+    "motion_lines": {
+        "direction": {"type": "enum", "values": ["left", "right", "any"], "default": "any", "desc": "Direction of motion lines"},
+        "lineLength": {"type": "int", "min": 10, "max": 30, "default": 20, "desc": "Length of each motion line in pixels"},
+        "amplitude":  {"type": "int", "min": 5, "max": 15, "default": 10, "desc": "Vertical wave amplitude"},
+    },
+    "anticipation": {
+        "speed": {"type": "float", "min": 0.5, "max": 2.0, "default": 1.0, "desc": "Speed multiplier for the flip animation"},
+    },
+    "reveal": {
+        "revealAlpha": {"type": "float", "min": 0.3, "max": 0.9, "default": 0.6, "desc": "Transparency level of occluding layer"},
+    },
+    "stamp": {
+        "liftPixels": {"type": "int", "min": 10, "max": 30, "default": 22, "desc": "How many pixels the entity lifts up"},
+        "crackCount":  {"type": "int", "min": 6, "max": 18, "default": 12, "desc": "Number of crack lines on impact"},
+    },
+    "flashback": {
+        "flickerIntensity": {"type": "float", "min": 0, "max": 1, "default": 0.08, "desc": "Brightness flicker amplitude (projector effect)"},
+        "scratchCount":     {"type": "int", "min": 0, "max": 5, "default": 3, "desc": "Max number of vertical scratch lines per frame"},
+    },
+    "timelapse": {
+        "isIndoor": {"type": "bool", "default": False, "desc": "Indoor scenes use warm lighting shift instead of sky gradient"},
+    },
+    "magnetism": {
+        "entityPrefixB": {"type": "string", "default": "", "desc": "Entity ID of the second element (attracted toward)"},
+    },
+    "repel": {
+        "entityPrefixB": {"type": "string", "default": "", "desc": "Entity ID of the second element (repelled from)"},
+        "repelPixels":   {"type": "int", "min": 5, "max": 40, "default": 20, "desc": "Maximum repulsion distance in pixels"},
+    },
+    "causal_push": {
+        "entityPrefixB": {"type": "string", "default": "", "desc": "Entity ID of the target receiving the push"},
+        "knockPixels":   {"type": "int", "min": 5, "max": 30, "default": 12, "desc": "Knockback distance on impact"},
+    },
+    "sequential_glow": {
+        "entityPrefixes": {"type": "string_array", "default": [], "desc": "Ordered list of entity IDs to glow in sequence"},
+    },
+    "disintegration": {
+        "driftAmount": {"type": "float", "min": 0, "max": 1, "default": 0.3, "desc": "Horizontal scatter range (fraction of entity width)"},
+        "fallSpeed":   {"type": "float", "min": 0.5, "max": 2.0, "default": 1.0, "desc": "Vertical fall speed multiplier"},
+    },
+    "ghost_outline": {
+        "puddleColor": {"type": "rgb", "default": [60, 65, 85], "desc": "Color of the dark puddle shape"},
+    },
+    "speech_bubble": {
+        "bubbleText": {"type": "string", "default": "...", "desc": "Text to display inside the speech bubble"},
+    },
+    "thought_bubble": {
+        "bubbleText": {"type": "string", "default": "...", "desc": "Text to display inside the thought bubble"},
+    },
+    "alert": {
+        "markCount": {"type": "int", "min": 1, "max": 3, "default": 3, "desc": "Number of exclamation marks"},
+        "color":     {"type": "rgb", "default": [255, 220, 30], "desc": "Fill color of the exclamation marks"},
+    },
+    "interjection": {
+        "word": {"type": "string", "default": "?", "desc": "Word or symbol displayed in the starburst"},
+    },
+}
+
+
+def build_params_prompt() -> str:
+    """Format ANIMATION_PARAMS as a prompt reference for the LLM."""
+    lines = ["## Animation Template Parameters\n"]
+    for template, params in ANIMATION_PARAMS.items():
+        # Find the animation ID for this template
+        aid = next((k for k, v in ANIMATION_ID_TO_TEMPLATE.items() if v == template), template)
+        lines.append(f"### `{template}` ({aid})")
+        lines.append(f"  Default duration: see template registration.")
+        for pname, pspec in params.items():
+            if pname == "entityPrefix":
+                continue  # always injected server-side
+            ptype = pspec["type"]
+            default = pspec["default"]
+            desc = pspec.get("desc", "")
+            if ptype == "float":
+                lines.append(f"  - `{pname}` ({ptype}, {pspec['min']}-{pspec['max']}, default={default}): {desc}")
+            elif ptype == "int":
+                lines.append(f"  - `{pname}` ({ptype}, {pspec['min']}-{pspec['max']}, default={default}): {desc}")
+            elif ptype == "enum":
+                lines.append(f"  - `{pname}` (one of {pspec['values']}, default=\"{default}\"): {desc}")
+            elif ptype == "rgb":
+                lines.append(f"  - `{pname}` ([r,g,b], default={default}): {desc}")
+            elif ptype == "bool":
+                lines.append(f"  - `{pname}` (bool, default={default}): {desc}")
+            else:
+                lines.append(f"  - `{pname}` ({ptype}, default={repr(default)}): {desc}")
+        lines.append("")
+    return "\n".join(lines)

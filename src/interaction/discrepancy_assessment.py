@@ -1,17 +1,10 @@
-"""Discrepancy assessment module — the conversational brain of Tellimations.
+"""Discrepancy assessment module.
 
-Handles ALL oral interaction with the child: when to speak, what to say,
-and how to react. Each call to assess_and_respond() makes a single LLM
-decision about the next action.
+Single Gemini call per utterance: compares the child's speech against the
+scene manifest + MISL taxonomy to detect factual errors and identify MISL
+scaffolding opportunities.
 
 Model: Gemini 3 Flash (gemini-3-flash-preview)
-
-Escalation protocol (encoded in the prompt, not hardcoded):
-  Level 0: Open-ended invitation ("What do you see?")
-  Level 1: Animate the highest-priority unsatisfied target
-  Level 2: Guided question ("What does the fox look like?")
-  Level 3: Explicit model ("Look, it's an orange fox!")
-  Level 4: Move on to next target
 """
 
 from __future__ import annotations
@@ -19,19 +12,19 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-from typing import Any, Dict, List, Optional
+from typing import List, Optional
 
 from google import genai
 from google.genai import types
 
-from src.models.assessment import AssessmentDecision
-from src.models.neg import NEG
-from src.models.student_profile import StudentProfile
+from config.misl import MACROSTRUCTURE, MICROSTRUCTURE
+from src.models.assessment import AssessmentResponse, FactualError, MISLOpportunity
+from src.models.scene import SceneManifest
+from src.models.student_profile import MISLDifficultyProfile
 from src.generation.prompts.assessment_prompt import (
     ASSESSMENT_SYSTEM_PROMPT,
     ASSESSMENT_USER_PROMPT_TEMPLATE,
 )
-from src.generation.scene_neg_generator import _build_misl_rubric
 from src.generation.utils import (
     extract_json as _extract_json,
     get_response_text as _get_response_text,
@@ -40,85 +33,80 @@ from src.generation.utils import (
 logger = logging.getLogger(__name__)
 
 MODEL_ID = "gemini-3-flash-preview"
-ASSESSMENT_TIMEOUT = 30   # latency-critical, must respond fast
+ASSESSMENT_TIMEOUT = 30
 MAX_RETRIES = 2
 
 
-def _format_conversation_history(history: List[Dict[str, Any]]) -> str:
-    """Format conversation history for the prompt.
+def _build_misl_taxonomy() -> str:
+    """Build a human-readable MISL taxonomy text for the prompt."""
+    lines = ["## Macrostructure (7 elements, scores 0-3)\n"]
+    for key, info in MACROSTRUCTURE.items():
+        lines.append(f"**{info['label']}** (`{key}`)")
+        for score, desc in info["scores"].items():
+            lines.append(f"  {score}: {desc}")
+        lines.append("")
 
-    Each entry is a dict with:
-      - role: "child" or "system"
-      - text: transcription or guidance text
-      - action: (optional) what action was taken after this entry
-    """
-    if not history:
-        return "(No conversation yet — this is the start of the scene.)"
-
-    lines = []
-    for i, entry in enumerate(history, 1):
-        role = entry.get("role", "unknown")
-        text = entry.get("text", "")
-        action = entry.get("action", "")
-
-        if role == "child":
-            lines.append(f"[{i}] CHILD: \"{text}\"")
-        elif role == "system":
-            lines.append(f"[{i}] SYSTEM ({action}): \"{text}\"")
-        else:
-            lines.append(f"[{i}] {role}: \"{text}\"")
+    lines.append("## Microstructure (8 elements, scores 0-3)\n")
+    for key, info in MICROSTRUCTURE.items():
+        lines.append(f"**{info['label']}** (`{key}`)")
+        for score, desc in info["scores"].items():
+            lines.append(f"  {score}: {desc}")
+        lines.append("")
 
     return "\n".join(lines)
 
 
-def _format_animations_played(animations: List[str]) -> str:
-    """Format list of animated target IDs for the prompt."""
-    if not animations:
-        return "(No animations played yet in this scene.)"
-    return "\n".join(f"- {tid}" for tid in animations)
-
-
-async def assess_and_respond(
+async def assess_utterance(
     api_key: str,
-    student_profile: StudentProfile,
-    neg: NEG,
-    conversation_history: List[Dict[str, Any]],
-    animations_played: List[str],
-) -> AssessmentDecision:
-    """Assess the current interaction state and decide the next action.
+    manifest: SceneManifest,
+    utterance_text: str,
+    story_so_far: List[str],
+    misl_already_suggested: List[str],
+    misl_difficulty_profile: MISLDifficultyProfile,
+) -> AssessmentResponse:
+    """Assess a child's utterance against the scene manifest and MISL taxonomy.
 
-    This is the per-utterance decision function. It examines the full
-    conversation history, the NEG targets, and the student profile to
-    decide whether to animate, speak, advance, or wait.
-
-    After the decision, it also updates the student_profile with
-    animation efficacy data (if the LLM reports corrections).
+    Single Gemini call that checks for factual errors and identifies MISL
+    opportunities for scaffolding.
 
     Args:
         api_key: Gemini API key.
-        student_profile: Child's cumulative error profile.
-        neg: Narrative Expectation Graph for the current scene.
-        conversation_history: List of conversation entries in this scene.
-            Each entry: {"role": "child"|"system", "text": str, "action": str}
-        animations_played: List of target_ids already animated in this scene.
+        manifest: The current scene's manifest.
+        utterance_text: The transcribed child utterance.
+        story_so_far: List of accepted utterance texts in this scene.
+        misl_already_suggested: MISL dimensions already prompted this scene.
+        misl_difficulty_profile: Persistent MISL difficulty data.
 
     Returns:
-        AssessmentDecision with the chosen action.
+        AssessmentResponse with factual errors and/or MISL opportunities.
     """
     client = genai.Client(api_key=api_key)
 
     # Build user prompt
-    neg_json = json.dumps(neg.model_dump(), indent=2)
-    history_text = _format_conversation_history(conversation_history)
-    animations_text = _format_animations_played(animations_played)
-    profile_text = student_profile.to_prompt_context()
+    manifest_json = json.dumps(manifest.model_dump(), indent=2)
+    misl_taxonomy = _build_misl_taxonomy()
+
+    if story_so_far:
+        story_text = "\n".join(
+            f'{i+1}. "{utt}"' for i, utt in enumerate(story_so_far)
+        )
+    else:
+        story_text = "(No accepted utterances yet — this is the first.)"
+
+    if misl_already_suggested:
+        suggested_text = ", ".join(misl_already_suggested)
+    else:
+        suggested_text = "(None yet.)"
+
+    difficulty_text = misl_difficulty_profile.to_prompt_context()
 
     user_prompt = ASSESSMENT_USER_PROMPT_TEMPLATE.format(
-        misl_rubric=_build_misl_rubric(),
-        neg_json=neg_json,
-        conversation_history=history_text,
-        animations_played=animations_text,
-        student_profile=profile_text,
+        manifest_json=manifest_json,
+        misl_taxonomy=misl_taxonomy,
+        utterance_text=utterance_text,
+        story_so_far=story_text,
+        misl_already_suggested=suggested_text,
+        misl_difficulty_profile=difficulty_text,
     )
 
     last_exc: Optional[Exception] = None
@@ -141,96 +129,67 @@ async def assess_and_respond(
 
             data = _extract_json(_get_response_text(response))
 
-            # Extract the decision
-            decision = AssessmentDecision(
-                action=data.get("action", "wait"),
-                target_id=data.get("target_id"),
-                misl_element=data.get("misl_element"),
-                guidance_text=data.get("guidance_text"),
-                problematic_segment=data.get("problematic_segment"),
-                reasoning=data.get("reasoning", ""),
+            # Parse factual errors
+            raw_errors = data.get("factual_errors", [])
+            factual_errors = []
+            if isinstance(raw_errors, list):
+                for item in raw_errors:
+                    if isinstance(item, dict):
+                        factual_errors.append(FactualError(
+                            utterance_fragment=item.get("utterance_fragment", ""),
+                            manifest_ref=item.get("manifest_ref", ""),
+                            explanation=item.get("explanation", ""),
+                        ))
+
+            # Parse MISL opportunities
+            raw_opps = data.get("misl_opportunities", [])
+            misl_opportunities = []
+            if isinstance(raw_opps, list):
+                for item in raw_opps:
+                    if isinstance(item, dict):
+                        misl_opportunities.append(MISLOpportunity(
+                            dimension=item.get("dimension", ""),
+                            manifest_elements=item.get("manifest_elements", []),
+                            suggestion=item.get("suggestion", ""),
+                        ))
+
+            acceptable = data.get("utterance_is_acceptable", True)
+            if not isinstance(acceptable, bool):
+                acceptable = True
+
+            result = AssessmentResponse(
+                factual_errors=factual_errors,
+                misl_opportunities=misl_opportunities,
+                utterance_is_acceptable=acceptable,
             )
-
-            # Record MISL scores from LLM evaluation
-            misl_scores = data.get("misl_scores", {})
-            _update_misl_scores(student_profile, misl_scores)
-
-            # Log animation efficacy from LLM response
-            efficacy_list = data.get("animation_efficacy", [])
-            _update_animation_efficacy(student_profile, efficacy_list)
 
             logger.info(
-                "[assessment] action=%s target=%s misl=%s reasoning=%s",
-                decision.action,
-                decision.target_id,
-                decision.misl_element,
-                decision.reasoning[:80] if decision.reasoning else "",
+                "[assessment] errors=%d opportunities=%d acceptable=%s",
+                len(factual_errors),
+                len(misl_opportunities),
+                acceptable,
             )
 
-            return decision
+            return result
 
         except asyncio.TimeoutError:
-            logger.warning("[assessment] Attempt %d/%d timed out after %ds",
-                           attempt, MAX_RETRIES, ASSESSMENT_TIMEOUT)
+            logger.warning(
+                "[assessment] Attempt %d/%d timed out after %ds",
+                attempt, MAX_RETRIES, ASSESSMENT_TIMEOUT,
+            )
             last_exc = asyncio.TimeoutError(
-                f"Assessment timed out after {ASSESSMENT_TIMEOUT}s")
+                f"Assessment timed out after {ASSESSMENT_TIMEOUT}s"
+            )
         except Exception as exc:
-            logger.warning("[assessment] Attempt %d/%d failed (%s): %s",
-                           attempt, MAX_RETRIES,
-                           type(exc).__name__, exc or "no details")
+            logger.warning(
+                "[assessment] Attempt %d/%d failed (%s): %s",
+                attempt, MAX_RETRIES, type(exc).__name__, exc or "no details",
+            )
             last_exc = exc
 
-    # All retries exhausted — return a safe fallback
-    logger.error("[assessment] All %d attempts failed, returning wait",
-                 MAX_RETRIES)
-    return AssessmentDecision(
-        action="wait",
-        reasoning=f"LLM call failed after {MAX_RETRIES} attempts: {last_exc}",
+    # All retries exhausted — return a safe fallback (accept the utterance)
+    logger.error(
+        "[assessment] All %d attempts failed, accepting utterance by default",
+        MAX_RETRIES,
     )
-
-
-def _update_misl_scores(
-    profile: StudentProfile,
-    scores: Dict[str, Any],
-) -> None:
-    """Append MISL scores from LLM evaluation to the student profile."""
-    for element, score in scores.items():
-        if not isinstance(score, int) or score < 0 or score > 3:
-            continue
-        if element not in profile.misl_scores:
-            profile.misl_scores[element] = []
-        profile.misl_scores[element].append(score)
-    if scores:
-        logger.info("[assessment] MISL scores recorded: %s", scores)
-
-
-def _update_animation_efficacy(
-    profile: StudentProfile,
-    efficacy_list: List[Dict[str, Any]],
-) -> None:
-    """Update student profile with animation efficacy data from LLM response.
-
-    Finds pending entries in profile.animation_efficacy (led_to_correction=False)
-    and updates them based on the LLM's assessment of whether the child corrected.
-    """
-    for entry in efficacy_list:
-        target_id = entry.get("target_id", "")
-        led_to_correction = entry.get("led_to_correction", False)
-
-        if not target_id:
-            continue
-
-        if led_to_correction:
-            # Find the most recent pending efficacy entry for this target
-            for eff in reversed(profile.animation_efficacy):
-                if (
-                    eff.get("target_id") == target_id
-                    and not eff.get("led_to_correction", False)
-                ):
-                    eff["led_to_correction"] = True
-                    break
-            profile.corrections_after_animation += 1
-            logger.info("[assessment] Animation on %s led to correction", target_id)
-        else:
-            logger.info("[assessment] Animation on %s did NOT lead to correction",
-                        target_id)
+    return AssessmentResponse(utterance_is_acceptable=True)

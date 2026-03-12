@@ -25,14 +25,12 @@ class StoryState(BaseModel):
         scene_id: str,
         narrative_text: str,
         manifest: Dict,
-        neg: Dict,
         sprite_code: Optional[Dict[str, Any]] = None,
     ) -> None:
         self.scenes.append({
             "scene_id": scene_id,
             "narrative_text": narrative_text,
             "manifest": manifest,
-            "neg": neg,
         })
         if sprite_code:
             for entity_id, code in sprite_code.items():

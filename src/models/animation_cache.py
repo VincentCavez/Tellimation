@@ -6,27 +6,15 @@ from pydantic import BaseModel, Field
 
 
 class CachedAnimation(BaseModel):
-    code: Optional[str] = None
-    template: Optional[str] = None
+    mode: str = "use_default"    # use_default | adjust_params | sequence | custom_code
+    template: str = ""
     params: Dict[str, Any] = Field(default_factory=dict)
+    code: str = ""               # only for custom_code mode
+    steps: List[Dict[str, Any]] = Field(default_factory=list)  # for sequence mode
     particles: List[Dict[str, Any]] = Field(default_factory=list)
     text_overlays: List[Dict[str, Any]] = Field(default_factory=list)
     duration_ms: int = 1200
     generated_for: str = ""
-
-    def to_ws_dict(self) -> Dict[str, Any]:
-        """Return the dict to send over WebSocket."""
-        d: Dict[str, Any] = {"duration_ms": self.duration_ms}
-        if self.template:
-            d["template"] = self.template
-            d["params"] = self.params
-            if self.particles:
-                d["particles"] = self.particles
-            if self.text_overlays:
-                d["text_overlays"] = self.text_overlays
-        elif self.code:
-            d["code"] = self.code
-        return d
 
 
 class AnimationCache(BaseModel):

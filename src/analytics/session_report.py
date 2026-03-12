@@ -1,4 +1,4 @@
-"""Post-session analytics: SLP report generation via Gemini 3.1 Pro."""
+"""Post-session analytics: SLP report generation via Gemini 3 Pro."""
 
 from __future__ import annotations
 
@@ -28,38 +28,46 @@ with the following sections:
 
 # Session Report
 
-## 1. Recurring Error Patterns
-Identify the most frequent error types and describe how they \
-manifested across scenes. Note any clusters (e.g. the child \
-consistently omits color descriptors but handles spatial \
-prepositions well). Reference specific scenes and entities.
+## 1. Factual Error Patterns
+Identify recurring factual errors the child made (utterances that \
+contradicted the scene manifest). Note patterns across scenes — \
+e.g., the child consistently misidentifies entity properties or \
+spatial relationships. Reference specific scenes and entities.
 
-## 2. Animation Effectiveness
+## 2. MISL Scaffolding Opportunities
+Analyse the MISL dimensions that were suggested as opportunities \
+during the session. For each dimension:
+- How many times it was suggested
+- Whether the child improved on that dimension in later utterances
+- Which MISL developmental tier the suggestions fell into
+Group by macrostructure vs microstructure.
+
+## 3. Animation Effectiveness
 For each animation type that fired during the session, report:
 - How many times it fired
 - How many times the child **corrected** after seeing it
 - The **correction rate** (corrections / firings)
 - Whether the animation appears effective, partially effective, \
   or ineffective for this child
-Group by error type (PROPERTY_COLOR, SPATIAL, OMISSION, etc.).
 
-## 3. SKILL Progress (Scene by Scene)
+## 4. Scene-by-Scene Progress
 For each scene, summarize:
 - Scene description (brief)
-- Error types encountered
-- Scene progress achieved
-- Satisfied narrative targets
+- Number of accepted vs rejected utterances
+- MISL opportunities given (out of max 3 per scene)
+- Factual errors encountered
 Show the trajectory — is the child improving, stable, or regressing?
 
-## 4. Student-Profile Adaptation Impact
-Analyse how the child's error profile influenced the generated \
-scenes. Were later scenes richer in the child's weak areas? Did \
-the adaptation help? Provide concrete examples.
+## 5. MISL Difficulty Profile Analysis
+Analyse the child's persistent MISL difficulty profile:
+- Which dimensions have high suggestion-to-resolution ratios (struggling)
+- Which dimensions are strengths
+- How the profile evolved during the session
 
-## 5. Recommendations for Next Session
+## 6. Recommendations for Next Session
 Based on the data, recommend:
-- Which SKILL objectives to prioritise
-- Which error types need more scaffolding
+- Which MISL dimensions to prioritise
+- Which factual error patterns need attention
 - Suggested scene complexity adjustments
 - Any animation types that should be changed or emphasised
 
