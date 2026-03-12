@@ -12,7 +12,7 @@
   --blue: #519DD9;
   --teal: #53BAC1;
   --light: #EDEDED;
-  --dark: #0e0e14;
+  --dark: #0d0d24;
   --dark2: #16161f;
   --dark3: #1e1e2a;
   --dark4: #2a2a38;
@@ -258,11 +258,8 @@ a { color: var(--teal); text-decoration: none; }
 .thumbnail-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  border-color: var(--teal);
 }
-.thumbnail-card:nth-child(1):hover { border-color: var(--red); }
-.thumbnail-card:nth-child(2):hover { border-color: var(--yellow); }
-.thumbnail-card:nth-child(3):hover { border-color: var(--blue); }
-.thumbnail-card:nth-child(4):hover { border-color: var(--teal); }
 
 .thumbnail-card canvas {
   width: 100%;
