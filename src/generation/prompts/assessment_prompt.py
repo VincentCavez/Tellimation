@@ -35,6 +35,18 @@ actually in the scene. Examples:
 Be generous with vocabulary: "bunny" = "rabbit", "big" = "large", etc. \
 Only flag genuine contradictions, not imprecise but acceptable descriptions.
 
+IMPORTANT — Adjective tolerance:
+Only flag an adjective as a factual error if the child's description is \
+GROSSLY wrong — the opposite or a completely unrelated quality. Examples \
+of real errors: "yellow" when the entity is blue, "tiny" when it is huge. \
+Near-misses or creative interpretations are NOT errors — route them to \
+MISL opportunities instead (elaborated_noun_phrases or adverbs). \
+For instance "bright teal" for something blue, or "dark" for something \
+gray, is acceptable. \
+Similarly, if the child uses a different but thematically fitting \
+adjective or adverb (e.g. "happily" instead of "excitedly"), accept it \
+— it still demonstrates the target MISL dimension.
+
 When the child refers to an entity by a name listed in the character names \
 section, treat it as a valid reference to that entity. For example, if \
 "Charlie" is the name for rabbit_01, then "Charlie hopped" is equivalent \
