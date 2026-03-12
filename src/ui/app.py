@@ -77,6 +77,22 @@ def _save_simulation_cache(scene: dict) -> None:
     cache_path.write_text(json.dumps(scene))
     logger.info("Simulation scene cache saved to %s", cache_path)
 
+    # Also save manifest + NEG in a new numbered folder
+    sim_dir = data_dir / "simulation_scenes"
+    sim_dir.mkdir(exist_ok=True)
+    existing = sorted(sim_dir.glob("scene_*"))
+    next_num = 1
+    if existing:
+        try:
+            next_num = int(existing[-1].name.split("_")[1]) + 1
+        except (ValueError, IndexError):
+            next_num = len(existing) + 1
+    folder = sim_dir / f"scene_{next_num:03d}"
+    folder.mkdir(exist_ok=True)
+    (folder / "manifest.json").write_text(json.dumps(scene.get("manifest", {}), indent=2))
+    (folder / "neg.json").write_text(json.dumps(scene.get("neg", {}), indent=2))
+    logger.info("Simulation scene manifest+NEG saved to %s", folder)
+
 app = FastAPI(title="Tellimations")
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
@@ -324,10 +340,12 @@ async def _handle_generate_initial_scenes(
 ) -> None:
     """Generate INITIAL_SCENE_COUNT scenes in parallel for the selection page."""
     n = INITIAL_SCENE_COUNT
+    # Pick n DISTINCT themes so the 3 initial scenes are always diverse
+    themes = random.sample(STORY_THEMES, min(n, len(STORY_THEMES)))
 
     async def _gen_one(index: int) -> None:
         try:
-            theme = random.choice(STORY_THEMES)
+            theme = themes[index]
             t_scene = time.time()
 
             await ws.send_json({

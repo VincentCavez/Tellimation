@@ -154,6 +154,25 @@
     .anim-btn:disabled { opacity: 0.3; cursor: not-allowed; }
     .anim-btn.two-entity { border-color: #665533; }
 
+    .anim-pair {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+    }
+    .dl-btn {
+      background: #1a2a3a;
+      color: #88aacc;
+      border: 1px solid #335566;
+      padding: 0.2rem 0.35rem;
+      border-radius: 3px;
+      font-size: 10px;
+      cursor: pointer;
+      transition: background 0.1s;
+      line-height: 1;
+    }
+    .dl-btn:hover { background: #2a3a5a; color: #aaccee; }
+    .dl-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
     /* -- Utility buttons -------------------------------------------------- */
     .util-row {
       display: flex;
@@ -267,47 +286,47 @@
     <div class="families">
       <div class="family">
         <span class="family-label">I: Identity</span>
-        <button class="anim-btn" onclick="playTemplate('spotlight')">spotlight</button>
-        <button class="anim-btn" onclick="playTemplate('nametag')">nametag</button>
+        <span class="anim-pair"><button class="anim-btn" onclick="playTemplate('spotlight')">spotlight</button><button class="dl-btn" onclick="downloadAnimation('spotlight')" title="Download video">&#x2193;</button></span>
+        <span class="anim-pair"><button class="anim-btn" onclick="playTemplate('nametag')">nametag</button><button class="dl-btn" onclick="downloadAnimation('nametag')" title="Download video">&#x2193;</button></span>
       </div>
       <div class="family">
         <span class="family-label">S: Space</span>
-        <button class="anim-btn" onclick="playTemplate('reveal')">reveal</button>
-        <button class="anim-btn" onclick="playTemplate('stamp')">stamp</button>
+        <span class="anim-pair"><button class="anim-btn" onclick="playTemplate('reveal')">reveal</button><button class="dl-btn" onclick="downloadAnimation('reveal')" title="Download video">&#x2193;</button></span>
+        <span class="anim-pair"><button class="anim-btn" onclick="playTemplate('stamp')">stamp</button><button class="dl-btn" onclick="downloadAnimation('stamp')" title="Download video">&#x2193;</button></span>
       </div>
       <div class="family">
         <span class="family-label">P: Property</span>
-        <button class="anim-btn" onclick="playTemplate('color_pop')">color_pop</button>
-        <button class="anim-btn" onclick="playTemplate('emanation')">emanation</button>
+        <span class="anim-pair"><button class="anim-btn" onclick="playTemplate('color_pop')">color_pop</button><button class="dl-btn" onclick="downloadAnimation('color_pop')" title="Download video">&#x2193;</button></span>
+        <span class="anim-pair"><button class="anim-btn" onclick="playTemplate('emanation')">emanation</button><button class="dl-btn" onclick="downloadAnimation('emanation')" title="Download video">&#x2193;</button></span>
       </div>
       <div class="family">
         <span class="family-label">T: Time</span>
-        <button class="anim-btn" onclick="playTemplate('flashback')">flashback</button>
-        <button class="anim-btn" onclick="playTemplate('timelapse')">timelapse</button>
+        <span class="anim-pair"><button class="anim-btn" onclick="playTemplate('flashback')">flashback</button><button class="dl-btn" onclick="downloadAnimation('flashback')" title="Download video">&#x2193;</button></span>
+        <span class="anim-pair"><button class="anim-btn" onclick="playTemplate('timelapse')">timelapse</button><button class="dl-btn" onclick="downloadAnimation('timelapse')" title="Download video">&#x2193;</button></span>
       </div>
       <div class="family">
         <span class="family-label">A: Action</span>
-        <button class="anim-btn" onclick="playTemplate('motion_lines')">motion_lines</button>
-        <button class="anim-btn" onclick="playTemplate('anticipation')">anticipation</button>
+        <span class="anim-pair"><button class="anim-btn" onclick="playTemplate('motion_lines')">motion_lines</button><button class="dl-btn" onclick="downloadAnimation('motion_lines')" title="Download video">&#x2193;</button></span>
+        <span class="anim-pair"><button class="anim-btn" onclick="playTemplate('anticipation')">anticipation</button><button class="dl-btn" onclick="downloadAnimation('anticipation')" title="Download video">&#x2193;</button></span>
       </div>
       <div class="family">
         <span class="family-label">R: Relation</span>
-        <button class="anim-btn two-entity" onclick="playTemplate('magnetism')">magnetism</button>
-        <button class="anim-btn two-entity" onclick="playTemplate('repel')">repel</button>
-        <button class="anim-btn two-entity" onclick="playTemplate('causal_push')">causal_push</button>
+        <span class="anim-pair"><button class="anim-btn two-entity" onclick="playTemplate('magnetism')">magnetism</button><button class="dl-btn" onclick="downloadAnimation('magnetism')" title="Download video">&#x2193;</button></span>
+        <span class="anim-pair"><button class="anim-btn two-entity" onclick="playTemplate('repel')">repel</button><button class="dl-btn" onclick="downloadAnimation('repel')" title="Download video">&#x2193;</button></span>
+        <span class="anim-pair"><button class="anim-btn two-entity" onclick="playTemplate('causal_push')">causal_push</button><button class="dl-btn" onclick="downloadAnimation('causal_push')" title="Download video">&#x2193;</button></span>
       </div>
       <div class="family">
         <span class="family-label">C: Count</span>
-        <button class="anim-btn" onclick="playTemplate('sequential_glow')">sequential_glow</button>
-        <button class="anim-btn" onclick="playTemplate('disintegration')">disintegration</button>
-        <button class="anim-btn" onclick="playTemplate('ghost_outline')">ghost_outline</button>
+        <span class="anim-pair"><button class="anim-btn" onclick="playTemplate('sequential_glow')">sequential_glow</button><button class="dl-btn" onclick="downloadAnimation('sequential_glow')" title="Download video">&#x2193;</button></span>
+        <span class="anim-pair"><button class="anim-btn" onclick="playTemplate('disintegration')">disintegration</button><button class="dl-btn" onclick="downloadAnimation('disintegration')" title="Download video">&#x2193;</button></span>
+        <span class="anim-pair"><button class="anim-btn" onclick="playTemplate('ghost_outline')">ghost_outline</button><button class="dl-btn" onclick="downloadAnimation('ghost_outline')" title="Download video">&#x2193;</button></span>
       </div>
       <div class="family">
         <span class="family-label">D: Discourse</span>
-        <button class="anim-btn" onclick="playTemplate('speech_bubble')">speech_bubble</button>
-        <button class="anim-btn" onclick="playTemplate('thought_bubble')">thought_bubble</button>
-        <button class="anim-btn" onclick="playTemplate('alert')">alert</button>
-        <button class="anim-btn" onclick="playTemplate('interjection')">interjection</button>
+        <span class="anim-pair"><button class="anim-btn" onclick="playTemplate('speech_bubble')">speech_bubble</button><button class="dl-btn" onclick="downloadAnimation('speech_bubble')" title="Download video">&#x2193;</button></span>
+        <span class="anim-pair"><button class="anim-btn" onclick="playTemplate('thought_bubble')">thought_bubble</button><button class="dl-btn" onclick="downloadAnimation('thought_bubble')" title="Download video">&#x2193;</button></span>
+        <span class="anim-pair"><button class="anim-btn" onclick="playTemplate('alert')">alert</button><button class="dl-btn" onclick="downloadAnimation('alert')" title="Download video">&#x2193;</button></span>
+        <span class="anim-pair"><button class="anim-btn" onclick="playTemplate('interjection')">interjection</button><button class="dl-btn" onclick="downloadAnimation('interjection')" title="Download video">&#x2193;</button></span>
       </div>
     </div>
 
@@ -758,6 +777,110 @@
       }
       log(allPassed ? '=== ALL 20/20 SNAPSHOT TESTS PASSED ===' : '=== SOME TESTS FAILED ===',
           allPassed ? 'log-ok' : 'log-warn');
+    }
+
+    // =====================================================================
+    // Video download (canvas recording → MP4/WebM)
+    // =====================================================================
+    var isRecording = false;
+
+    function setButtonsDisabled(disabled) {
+      var btns = document.querySelectorAll('.anim-btn, .dl-btn, .btn-generate, .btn-load-saved');
+      for (var i = 0; i < btns.length; i++) btns[i].disabled = disabled;
+    }
+
+    // Re-render canvas in a loop to ensure captureStream produces frames
+    function waitWithRender(ms) {
+      return new Promise(function(resolve) {
+        var start = performance.now();
+        function tick() {
+          renderer.render();
+          if (performance.now() - start < ms) {
+            requestAnimationFrame(tick);
+          } else {
+            resolve();
+          }
+        }
+        requestAnimationFrame(tick);
+      });
+    }
+
+    async function downloadAnimation(templateName) {
+      if (!currentScene) { log('Load a scene first', 'log-warn'); return; }
+      if (isRecording) { log('Recording already in progress', 'log-warn'); return; }
+
+      isRecording = true;
+      setButtonsDisabled(true);
+      log('Recording ' + templateName + '...', 'log-info');
+      setStatus('Recording: ' + templateName);
+
+      // Ensure clean state
+      redrawScene();
+      await new Promise(function(r) { setTimeout(r, 500); }); // wait for async bg
+
+      // Pick best available format (prefer MP4)
+      var mimeType;
+      if (MediaRecorder.isTypeSupported('video/mp4; codecs="avc1.42E01E"')) {
+        mimeType = 'video/mp4; codecs="avc1.42E01E"';
+      } else if (MediaRecorder.isTypeSupported('video/mp4; codecs=avc1')) {
+        mimeType = 'video/mp4; codecs=avc1';
+      } else if (MediaRecorder.isTypeSupported('video/mp4')) {
+        mimeType = 'video/mp4';
+      } else if (MediaRecorder.isTypeSupported('video/webm; codecs=vp9')) {
+        mimeType = 'video/webm; codecs=vp9';
+      } else {
+        mimeType = 'video/webm';
+      }
+
+      var stream = canvas.captureStream(30);
+      var recorder = new MediaRecorder(stream, {
+        mimeType: mimeType,
+        videoBitsPerSecond: 5000000
+      });
+      var chunks = [];
+
+      recorder.ondataavailable = function(e) {
+        if (e.data.size > 0) chunks.push(e.data);
+      };
+
+      var recordingDone = new Promise(function(resolve) {
+        recorder.onstop = function() { resolve(); };
+      });
+
+      recorder.start();
+
+      // 1s static scene (continuously re-render so stream captures frames)
+      log('Recording: 1s static (start)');
+      await waitWithRender(1000);
+
+      // Play animation
+      log('Recording: animation...');
+      var spec = buildSpec(templateName);
+      await runner.play(spec);
+
+      // 1s static scene after animation restores
+      log('Recording: 1s static (end)');
+      await waitWithRender(1000);
+
+      // Stop and download
+      recorder.stop();
+      await recordingDone;
+
+      var ext = mimeType.indexOf('mp4') >= 0 ? 'mp4' : 'webm';
+      var blob = new Blob(chunks, { type: mimeType });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = templateName + '.' + ext;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function() { URL.revokeObjectURL(url); }, 2000);
+
+      log('Downloaded: ' + templateName + '.' + ext, 'log-ok');
+      setStatus('Ready');
+      isRecording = false;
+      setButtonsDisabled(false);
     }
 
     // =====================================================================
