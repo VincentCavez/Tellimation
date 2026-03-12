@@ -17,12 +17,8 @@
       <div class="login-sub">AI-powered storytelling for speech therapy</div>
 
       <div class="field">
-        <label for="api-key">Gemini API Key</label>
-        <input type="password" id="api-key" placeholder="AIza..." autocomplete="off">
-      </div>
-      <div class="field">
-        <label for="participant">Participant Number</label>
-        <input type="text" id="participant" placeholder="e.g. P012">
+        <label for="participant-code">Participant Code</label>
+        <input type="text" id="participant-code" placeholder="4-digit code" maxlength="4" autocomplete="off">
       </div>
       <div class="field">
         <label for="child-age">Child's Age</label>
@@ -48,27 +44,36 @@
   </div>
   <script>
     const btnOk = document.getElementById('btn-ok');
-    const apiKeyInput = document.getElementById('api-key');
-    const participantInput = document.getElementById('participant');
+    const codeInput = document.getElementById('participant-code');
     const ageSelect = document.getElementById('child-age');
 
-    function proceed() {
-      const apiKey = apiKeyInput.value.trim();
-      const participant = participantInput.value.trim();
-      if (!apiKey) { apiKeyInput.focus(); return; }
-      if (!participant) { participantInput.focus(); return; }
-      sessionStorage.setItem('api_key', apiKey);
-      sessionStorage.setItem('participant_id', participant);
-      sessionStorage.setItem('child_age', ageSelect.value);
-      window.location.href = '/selection';
+    async function proceed() {
+      const code = codeInput.value.trim();
+      if (!code) { codeInput.focus(); return; }
+
+      btnOk.disabled = true;
+      try {
+        const resp = await fetch('/api/validate-code', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({code})
+        });
+        if (!resp.ok) {
+          alert('Incorrect code, please try again');
+          codeInput.select();
+          return;
+        }
+        sessionStorage.setItem('participant_id', code);
+        sessionStorage.setItem('child_age', ageSelect.value);
+        window.location.href = '/selection';
+      } finally {
+        btnOk.disabled = false;
+      }
     }
 
     btnOk.addEventListener('click', proceed);
-    participantInput.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') ageSelect.focus();
-    });
-    apiKeyInput.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') participantInput.focus();
+    codeInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') proceed();
     });
   </script>
 </body>

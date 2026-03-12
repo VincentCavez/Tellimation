@@ -1,8 +1,7 @@
     (function() {
-      const apiKey = sessionStorage.getItem('api_key');
       const participantId = sessionStorage.getItem('participant_id');
       const childAge = sessionStorage.getItem('child_age') || '8';
-      if (!apiKey || !participantId) {
+      if (!participantId) {
         window.location.href = '/';
         return;
       }
@@ -100,8 +99,7 @@
       const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
       const ws = new WebSocket(
         protocol + '//' + location.host + '/ws'
-        + '?api_key=' + encodeURIComponent(apiKey)
-        + '&participant_id=' + encodeURIComponent(participantId)
+        + '?participant_id=' + encodeURIComponent(participantId)
         + '&child_age=' + encodeURIComponent(childAge)
       );
 
@@ -217,15 +215,18 @@
       // -- Animation playback --
       function handleAnimation(msg) {
         if (msg.template) {
-          animRunner.play({
+          animRunner.playLoop({
             template: msg.template,
             params: msg.params || {},
             particles: msg.particles || [],
             text_overlays: msg.text_overlays || [],
             duration_ms: msg.duration_ms || 1200,
           });
+        } else if (msg.steps) {
+          // Mode C: sequence — play steps in order, then loop
+          animRunner.playLoopSequence(msg.steps);
         } else {
-          // Draw text overlays into the buffer before animation snapshot
+          // Mode D: custom code
           var overlays = msg.text_overlays || [];
           if (overlays.length > 0 && typeof drawText === 'function') {
             for (var i = 0; i < overlays.length; i++) {
@@ -236,9 +237,28 @@
             }
             renderer.render();
           }
-          animRunner.play(msg.code, msg.duration_ms || 1200);
+          // Register custom animation for reuse if template_name provided
+          if (msg.template_name && typeof AnimationTemplates !== 'undefined') {
+            try {
+              var dur = msg.duration_ms || 1200;
+              var codeSrc = msg.code;
+              AnimationTemplates.register(msg.template_name, function(params) {
+                var wrapped = codeSrc + '\nreturn animate;';
+                var animFn = new Function('buf', 'PW', 'PH', 'tempSprites', wrapped)(
+                  buf.data, buf.width, buf.height,
+                  typeof tempSprites !== 'undefined' ? tempSprites : {}
+                );
+                return { animate: animFn, duration_ms: dur };
+              }, dur);
+            } catch (regErr) {
+              console.warn('[story] Failed to register custom animation:', regErr);
+            }
+          }
+          animRunner.playLoop(msg.code, msg.duration_ms || 1200);
         }
       }
+      // Expose animRunner for narration.js to stop loops on recording
+      window.animRunner = animRunner;
 
       // -- Scene complete → show branch picker --
       var branchPicker = document.getElementById('branch-picker');

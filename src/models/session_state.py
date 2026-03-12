@@ -6,7 +6,7 @@ import asyncio
 from typing import Any, Dict, List, Optional
 
 from src.models.animation_cache import AnimationCache
-from src.models.neg import NEG
+from src.models.assessment import SceneLog
 from src.models.scene import SceneManifest
 from src.models.story_state import StoryState
 from src.models.student_profile import StudentProfile
@@ -32,7 +32,9 @@ class SessionState:
         # Current scene data
         self.current_scene: Optional[Dict[str, Any]] = None
         self.current_manifest: Optional[SceneManifest] = None
-        self.current_neg: Optional[NEG] = None
+
+        # Per-scene assessment log (replaces NEG-based tracking)
+        self.current_scene_log: Optional[SceneLog] = None
 
         # Story tracking
         self.current_story_index: int = 0
@@ -42,11 +44,17 @@ class SessionState:
         self.conversation_history: List[Dict[str, Any]] = []
         self.animations_played_this_scene: List[str] = []
         self.narration_history: List[str] = []
-        self.satisfied_targets: List[str] = []
-        self.scene_progress: float = 0.0
 
         # Last animation played (for efficacy tracking)
         self.last_animation: Optional[Dict[str, Any]] = None
+
+        # Pending animation: set after animation plays, cleared when outcome is determined.
+        # Contains: target_id, misl_element, voice_text, decision_idx
+        self.pending_animation: Optional[Dict[str, Any]] = None
+
+        # Errors already escalated to voice — skip animation on repeat
+        # Key: "target_id::misl_element"
+        self.voice_escalated_errors: Dict[str, str] = {}
 
         # Initial scenes generated for the selection page
         self.initial_scenes: List[Dict[str, Any]] = []
@@ -59,5 +67,6 @@ class SessionState:
         self.conversation_history = []
         self.animations_played_this_scene = []
         self.narration_history = []
-        self.satisfied_targets = []
-        self.scene_progress = 0.0
+        self.current_scene_log = None
+        self.pending_animation = None
+        self.voice_escalated_errors = {}

@@ -1,11 +1,9 @@
-"""Prompts for co-generation of Scene Manifest + NEG.
+"""Prompts for scene manifest generation.
 
-A single LLM call produces both the detailed scene manifest and the
-Narrative Expectation Graph.  The manifest describes WHAT is in the scene
-(entities, positions, relations, properties, features) and serves as the
-brief for Nano Banana 2 image generation AND as context for the Tellimation
-module.  The NEG defines what the child should narrate and which error types
-to watch for.
+A single LLM call produces the detailed scene manifest.  The manifest
+describes WHAT is in the scene (entities, positions, relations, properties,
+features) and serves as the brief for image generation AND as context for
+the assessment and Tellimation modules.
 
 Model: Gemini 3 Flash (gemini-3-flash-preview)
 """
@@ -15,24 +13,22 @@ Model: Gemini 3 Flash (gemini-3-flash-preview)
 # ---------------------------------------------------------------------------
 
 SCENE_NEG_SYSTEM_PROMPT = """\
-You are the scene architect and assessment designer for Tellimations, a \
-children's storytelling system (ages 7-11). You design scenes that are both \
-visually engaging and pedagogically targeted.
+You are the scene architect for Tellimations, a children's storytelling \
+system (ages 7-11). You design scenes that are both visually engaging and \
+pedagogically targeted.
 
 # Task
 
-Generate a scene MANIFEST and its NEG (Narrative Expectation Graph) together \
-in a single JSON response.
+Generate a scene MANIFEST in a single JSON response.
 
-The manifest and NEG are CO-DESIGNED: you invent the scene KNOWING which \
-learning objectives you must create descriptive affordances for. A \
-"descriptive affordance" is a visual property of the scene that invites and \
-supports the production of a specific verbal description.
+You invent the scene KNOWING which learning objectives you must create \
+descriptive affordances for. A "descriptive affordance" is a visual \
+property of the scene that invites and supports the production of a \
+specific verbal description.
 
 For example, if the child struggles with spatial prepositions, you create a \
 scene with interesting spatial configurations (a cat ON a shelf, a ball UNDER \
-a table, a bird BETWEEN two trees) AND you put corresponding spatial targets \
-in the NEG.
+a table, a bird BETWEEN two trees).
 
 # Output JSON schema
 
@@ -113,25 +109,6 @@ NO references to other entities or surfaces>",
         "manner": "<adverb or null>"
       }}
     ]
-  }},
-  "neg": {{
-    "targets": [
-      {{
-        "id": "t<N>",
-        "entity_id": "<entity_id from manifest>",
-        "misl_element": "<MISL key from rubric: character, setting, initiating_event, \
-internal_response, plan, action, consequence, coordinating_conjunctions, \
-subordinating_conjunctions, mental_verbs, linguistic_verbs, adverbs, \
-elaborated_noun_phrases, grammaticality, tense>",
-        "current_level": "<int 0-3 — child's estimated current level for this element>",
-        "target_level": "<int 0-3 — level to aim for (current_level + 1, capped by age)>",
-        "description": "<what the child should say concretely to reach target_level>",
-        "priority": "<0.0-1.0>",
-        "tolerance": "<0.0-1.0>"
-      }}
-    ],
-    "min_coverage": 0.7,
-    "skill_coverage_check": "PASS"
   }},
   "scene_description": "<2-3 sentence rich visual description of the scene: \
 setting, lighting, mood, atmosphere, color palette, composition.>",
@@ -278,7 +255,7 @@ For EVERY pair of entities, ensure at least one clear visual contrast:
 These contrasts ARE the descriptive affordances — they practically beg \
 the child to describe differences using adjectives and comparisons.
 
-# Co-design principles
+# Scene design principles
 
 ## Descriptive affordances
 Every entity property in the manifest should be a potential narration target. \
@@ -288,6 +265,18 @@ weakness in color descriptors, create entities with distinctive, contrasting \
 colors — not just "brown rabbit" but "bright orange rabbit next to a dark \
 blue pond". The color contrast IS the affordance: it practically begs to be \
 described.
+
+## MISL-informed scene design
+Design scenes that create natural descriptive affordances for the child's \
+MISL gaps. Use the MISL rubric to understand what each element entails:
+- Spatial relations → affordances for "setting" and "subordinating_conjunctions" \
+(e.g., a cat ON a shelf BESIDE a jar).
+- Sensory properties → affordances for "elaborated_noun_phrases" and "adverbs" \
+(e.g., a HOT steaming cocoa, a bird chirping LOUDLY).
+- Visual contrasts → affordances for "coordinating_conjunctions" \
+(e.g., a big tree AND a small mushroom).
+- Orientation/facing → affordances for "action" and "initiating_event" \
+(e.g., the rabbit LOOKS AT the owl).
 
 ## Animation-informed scene design
 The student_profile includes `animation_history` with which animation types \
@@ -299,33 +288,6 @@ favor scenes where adjectives are carried by color (good for color_pop) or \
 spatial relations (good for settle, reveal) rather than texture.
 - This is subtle — don't force unnatural scenes, but when you have choices, \
 prefer configurations that play to effective animation types.
-
-## NEG targets from spatial and sensory properties
-The NEG should exploit the richer manifest:
-- Spatial relations → NEG targets for "setting" and "subordinating_conjunctions" \
-(e.g., "The bird is ON the branch BESIDE the nest").
-- Sensory properties → NEG targets for "elaborated_noun_phrases" and "adverbs" \
-(e.g., "the HOT steaming cocoa" or "the bird chirps LOUDLY").
-- Visual contrasts → NEG targets for "coordinating_conjunctions" \
-(e.g., "The big tree AND the small mushroom").
-- Orientation/facing → NEG targets for "action" and "initiating_event" \
-(e.g., "The rabbit LOOKS AT the owl").
-
-## Target design
-Each target is a MISL element tied to a specific entity. The `description` field \
-states concretely what the child should say.
-- At least 3 targets per scene, covering both macro and microstructure.
-- Main characters: priority 0.8-1.0. Background elements: 0.3-0.6.
-- `current_level`: use the student profile's MISL levels if available, else 0.
-- `target_level`: current_level + 1, capped at the expected level for the child's age.
-- Lower tolerance (0.2-0.4) for MISL gaps (current < expected).
-- Higher tolerance (0.5-0.7) for elements at or above expected level.
-
-## MISL coverage
-Verify that targets cover the MISL rubric elements relevant to the child's \
-profile. Use the macro/microstructure definitions to understand what each \
-element entails. If a targeted element cannot be covered by the manifest, \
-set skill_coverage_check to "PARTIAL".
 
 # Entity rules
 
@@ -459,12 +421,8 @@ sound for animals/instruments, smell for flowers/food).
 - All entities are new (carried_over: false, carried_over_entities: []).
 - background_changed: true.
 - Scene ID: "scene_01".
-- Co-design the manifest and NEG: choose entity properties that maximize \
-descriptive affordances for the child's MISL gaps.
-- NEG targets must use current_level from the student profile and \
-target_level = min(current_level + 1, expected_level + 1).
-- Create NEG targets that exploit spatial relations, sensory properties, \
-and visual contrasts.
+- Choose entity properties that maximize descriptive affordances for the \
+child's MISL gaps.
 - Ensure NO entity duplicates a structural background element. Architectural \
 features (walls, windows, doors, counters, shelves) belong in the background \
 ONLY. Entities should be characters and interactive/narrative objects.
@@ -497,10 +455,6 @@ Generate the next scene in an ongoing story.
 
 {previous_manifest}
 
-# Previous scene NEG
-
-{previous_neg}
-
 # Active entities (with existing sprite data)
 
 {active_entities}
@@ -518,7 +472,7 @@ You may introduce 1-2 new entities. Aim for 4-5 total entities.
 - Set background_changed: false if same location/time, true otherwise.
 - Scene ID: "scene_{scene_number:02d}".
 - Advance the plot — something new should happen.
-- Co-design the manifest and NEG based on the student profile:
+- Design the manifest based on the student profile:
   - MISL gaps → create more descriptive affordances for those elements.
   - Elements at/above expected level → maintain but don't over-emphasize.
   - Failed animation types → prefer scene configurations that suit effective animations.
@@ -526,10 +480,6 @@ You may introduce 1-2 new entities. Aim for 4-5 total entities.
 - Include at least 2 spatial relations between entities.
 - Ensure visual contrast between entities (different colors, sizes, textures).
 - Add sensory properties where natural.
-- NEG targets must use current_level from the student profile and \
-target_level = min(current_level + 1, expected_level + 1).
-- Create NEG targets that exploit spatial relations, sensory properties, \
-and visual contrasts.
 - Ensure NO entity duplicates a structural background element. Architectural \
 features (walls, windows, doors, counters, shelves) belong in the background \
 ONLY. Entities should be characters and interactive/narrative objects.

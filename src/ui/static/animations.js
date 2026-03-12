@@ -12,6 +12,8 @@ class AnimationRunner {
     this.isPlaying = false;
     this._rafId = null;
     this._resolve = null;
+    this._looping = false;
+    this._loopTimeout = null;
   }
 
   /**
@@ -120,6 +122,83 @@ class AnimationRunner {
     });
   }
 
+  /**
+   * Play an animation in a loop: play → wait 2× duration → play → ...
+   * Loops until stopLoop() is called.
+   */
+  playLoop(codeOrSpec, durationMs) {
+    this.stopLoop();
+    this._looping = true;
+
+    var self = this;
+    var dur = (typeof codeOrSpec === 'object' && codeOrSpec !== null && codeOrSpec.duration_ms)
+      ? codeOrSpec.duration_ms
+      : (durationMs || 1200);
+
+    var runOnce = function() {
+      if (!self._looping) return;
+      self.play(codeOrSpec, dur).then(function() {
+        if (!self._looping) return;
+        self._loopTimeout = setTimeout(runOnce, dur * 2);
+      });
+    };
+
+    runOnce();
+  }
+
+  /**
+   * Play a sequence of animation steps in a loop.
+   * Each step plays in order, then 2× total duration gap, then repeat.
+   */
+  playLoopSequence(steps) {
+    this.stopLoop();
+    this._looping = true;
+
+    var self = this;
+    var totalDur = 0;
+    for (var i = 0; i < steps.length; i++) {
+      totalDur += (steps[i].duration_ms || 1200);
+    }
+
+    var runSequence = function() {
+      if (!self._looping) return;
+
+      var idx = 0;
+      var runStep = function() {
+        if (!self._looping || idx >= steps.length) {
+          // All steps done — wait 2× total duration, then restart
+          if (self._looping) {
+            self._loopTimeout = setTimeout(runSequence, totalDur * 2);
+          }
+          return;
+        }
+        var step = steps[idx];
+        idx++;
+        self.play({
+          template: step.template,
+          params: step.params || {},
+          duration_ms: step.duration_ms || 1200,
+        }).then(runStep);
+      };
+
+      runStep();
+    };
+
+    runSequence();
+  }
+
+  /**
+   * Stop the loop (and any currently playing animation).
+   */
+  stopLoop() {
+    this._looping = false;
+    if (this._loopTimeout) {
+      clearTimeout(this._loopTimeout);
+      this._loopTimeout = null;
+    }
+    this.stop();
+  }
+
   stop() {
     if (this.isPlaying) {
       this._finish();
@@ -154,192 +233,10 @@ class AnimationRunner {
 // Each function returns a code string compatible with AnimationRunner.play().
 // The generated code defines: function animate(buf, PW, PH, t) { ... }
 
-const FallbackAnimations = {
-
-  /**
-   * colorPop — desaturates everything except the target entity, which gets
-   * a glowing brightness boost. Maps to PROPERTY_COLOR errors.
-   */
-  colorPop(entityPrefix) {
-    return `
-function animate(buf, PW, PH, t) {
-  // Ease in then ease out
-  var strength = t < 0.15 ? t / 0.15 : t > 0.85 ? (1 - t) / 0.15 : 1;
-  for (var i = 0; i < buf.length; i++) {
-    var p = buf[i];
-    var isTarget = p.e === '${entityPrefix}' || p.e.indexOf('${entityPrefix}.') === 0;
-    if (isTarget) {
-      // Brighten with a gentle pulse
-      var glow = 1 + 0.3 * strength * (0.7 + 0.3 * Math.sin(t * Math.PI * 6));
-      p.r = Math.min(255, Math.round(p._r * glow));
-      p.g = Math.min(255, Math.round(p._g * glow));
-      p.b = Math.min(255, Math.round(p._b * glow));
-    } else if (p.e !== 'sky' && p.e !== 'ground' && p.e !== '') {
-      // Desaturate non-target entities
-      var L = Math.round(p._r * 0.299 + p._g * 0.587 + p._b * 0.114);
-      var mix = strength * 0.8;
-      p.r = Math.round(p._r * (1 - mix) + L * mix);
-      p.g = Math.round(p._g * (1 - mix) + L * mix);
-      p.b = Math.round(p._b * (1 - mix) + L * mix);
-    }
-  }
-}`;
-  },
-
-  /**
-   * shake — rapid horizontal jitter of the target entity pixels.
-   * Maps to IDENTITY errors (vibrating pulse / jelloing).
-   */
-  shake(entityPrefix) {
-    return `
-function animate(buf, PW, PH, t) {
-  // Ease: ramp up then down
-  var env = t < 0.1 ? t / 0.1 : t > 0.8 ? (1 - t) / 0.2 : 1;
-  var offset = Math.round(Math.sin(t * Math.PI * 20) * 3 * env);
-  if (offset === 0) return;
-
-  // Collect target pixel positions
-  var pixels = [];
-  for (var i = 0; i < buf.length; i++) {
-    var e = buf[i].e;
-    if (e === '${entityPrefix}' || e.indexOf('${entityPrefix}.') === 0) {
-      pixels.push(i);
-    }
-  }
-
-  // Blank original positions — restore background color underneath
-  for (var j = 0; j < pixels.length; j++) {
-    var idx = pixels[j];
-    buf[idx].r = buf[idx]._br || 0;
-    buf[idx].g = buf[idx]._bg || 0;
-    buf[idx].b = buf[idx]._bb || 0;
-  }
-
-  // Redraw shifted
-  for (var j = 0; j < pixels.length; j++) {
-    var idx = pixels[j];
-    var x = idx % PW;
-    var y = (idx - x) / PW;
-    var nx = x + offset;
-    if (nx >= 0 && nx < PW) {
-      var ni = y * PW + nx;
-      buf[ni].r = buf[idx]._r;
-      buf[ni].g = buf[idx]._g;
-      buf[ni].b = buf[idx]._b;
-      buf[ni].e = buf[idx].e;
-    }
-  }
-}`;
-  },
-
-  /**
-   * pulse — rhythmic scale-like brightness pulsing of the target entity.
-   * Maps to QUANTITY errors (sequential pulse).
-   */
-  pulse(entityPrefix) {
-    return `
-function animate(buf, PW, PH, t) {
-  // Three distinct pulses over the duration
-  var pulseCount = 3;
-  var phase = (t * pulseCount) % 1;
-  var brightness = 0.5 + 0.5 * Math.sin(phase * Math.PI);
-  // Overall envelope
-  var env = t < 0.1 ? t / 0.1 : t > 0.9 ? (1 - t) / 0.1 : 1;
-  brightness = 1 + (brightness - 0.5) * env * 0.8;
-
-  for (var i = 0; i < buf.length; i++) {
-    var e = buf[i].e;
-    if (e === '${entityPrefix}' || e.indexOf('${entityPrefix}.') === 0) {
-      buf[i].r = Math.min(255, Math.round(buf[i]._r * brightness));
-      buf[i].g = Math.min(255, Math.round(buf[i]._g * brightness));
-      buf[i].b = Math.min(255, Math.round(buf[i]._b * brightness));
-    }
-  }
-}`;
-  },
-
-  /**
-   * isolate — dims everything except the target, which stays fully bright.
-   * Maps to QUANTITY/ISOLATION errors.
-   */
-  isolate(entityPrefix) {
-    return `
-function animate(buf, PW, PH, t) {
-  // Smooth ease in/out for the dimming
-  var dim;
-  if (t < 0.2) dim = t / 0.2;
-  else if (t > 0.8) dim = (1 - t) / 0.2;
-  else dim = 1;
-  dim *= 0.7; // max dimming amount
-
-  for (var i = 0; i < buf.length; i++) {
-    var e = buf[i].e;
-    var isTarget = e === '${entityPrefix}' || e.indexOf('${entityPrefix}.') === 0;
-    if (!isTarget) {
-      var factor = 1 - dim;
-      buf[i].r = Math.round(buf[i]._r * factor);
-      buf[i].g = Math.round(buf[i]._g * factor);
-      buf[i].b = Math.round(buf[i]._b * factor);
-    }
-  }
-}`;
-  },
-
-  /**
-   * bounce — vertical bounce of the target entity pixels.
-   * Maps to SPATIAL errors (settle animation).
-   */
-  bounce(entityPrefix) {
-    return `
-function animate(buf, PW, PH, t) {
-  // Damped bounce: 3 bounces decaying
-  var bounceT = t * 3; // 3 bounces over duration
-  var decay = 1 - t;   // amplitude decays over time
-  var offset = Math.round(Math.abs(Math.sin(bounceT * Math.PI)) * -8 * decay);
-  if (offset === 0 && t > 0.05) return;
-
-  // Collect target pixels (sorted by y descending so we can shift without overlap issues)
-  var pixels = [];
-  for (var i = 0; i < buf.length; i++) {
-    var e = buf[i].e;
-    if (e === '${entityPrefix}' || e.indexOf('${entityPrefix}.') === 0) {
-      pixels.push(i);
-    }
-  }
-
-  // Sort by y ascending (for upward shift, process top-to-bottom)
-  pixels.sort(function(a, b) { return a - b; });
-
-  // Blank original positions — restore background color underneath
-  for (var j = 0; j < pixels.length; j++) {
-    var idx = pixels[j];
-    buf[idx].r = buf[idx]._br || 0;
-    buf[idx].g = buf[idx]._bg || 0;
-    buf[idx].b = buf[idx]._bb || 0;
-  }
-
-  // Redraw shifted vertically
-  for (var j = 0; j < pixels.length; j++) {
-    var idx = pixels[j];
-    var x = idx % PW;
-    var y = (idx - x) / PW;
-    var ny = y + offset;
-    if (ny >= 0 && ny < PH) {
-      var ni = ny * PW + x;
-      buf[ni].r = buf[idx]._r;
-      buf[ni].g = buf[idx]._g;
-      buf[ni].b = buf[idx]._b;
-      buf[ni].e = buf[idx].e;
-    }
-  }
-}`;
-  },
-};
-
 // ---------------------------------------------------------------------------
 // Exports
 // ---------------------------------------------------------------------------
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { AnimationRunner, FallbackAnimations };
+  module.exports = { AnimationRunner };
 }

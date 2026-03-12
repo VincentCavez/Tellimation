@@ -233,6 +233,7 @@ AnimationTemplates.register('nametag', function(params) {
 AnimationTemplates.register('stamp', function(params) {
   var prefix = params.entityPrefix || '';
   var maxLift = params.liftPixels || 22;
+  var crackCount = params.crackCount != null ? params.crackCount : 12;
   // Diagonal direction: up-right (negative dy, positive dx)
   var liftDY = -maxLift;
   var liftDX = Math.round(maxLift * 0.7);
@@ -240,7 +241,7 @@ AnimationTemplates.register('stamp', function(params) {
   return function animate(buf, PW, PH, t) {
     var LIFT_END = 0.667;
     var SNAP_END = 0.833;
-    var crackRange = 14;
+    var crackRange = Math.max(6, Math.min(24, Math.round(crackCount * 14 / 12)));
 
     // ── Collect entity pixels and bounding box ──
     // Use entity layer for complete bounds (includes pixels covered by higher-z entities).
@@ -341,9 +342,9 @@ AnimationTemplates.register('stamp', function(params) {
       var crackFade = crackT < 0.6 ? 1.0 : 1.0 - (crackT - 0.6) / 0.4;
       var maxCrackLen = 10;
 
-      // 12 cracks evenly spaced around the entity contour.
+      // Cracks evenly spaced around the entity contour.
       // Ray-cast from center outward to find the actual entity edge per direction.
-      var N = 12;
+      var N = crackCount;
       var maxSearch = Math.ceil(Math.max(halfW, halfH)) + 2;
       for (var ci = 0; ci < N; ci++) {
         var ang = (ci / N) * 2 * Math.PI;
@@ -391,7 +392,7 @@ AnimationTemplates.register('stamp', function(params) {
 AnimationTemplates.register('color_pop', function(params) {
   var prefix = params.entityPrefix || '';
   var desatStr = params.desaturationStrength != null ? params.desaturationStrength : 0.8;
-  var cycleCount = 2;  // full rainbow cycles over 3s
+  var cycleCount = params.cycleCount != null ? params.cycleCount : 2;
 
   return function animate(buf, PW, PH, t) {
     var env = _easeEnvelope(t, 0.12, 0.12);
@@ -784,6 +785,8 @@ AnimationTemplates.register('emanation', function(params) {
 // vertical scratch lines, and dust specks — like a silent-era film reel.
 // Scaffolds past tense — "this already happened."
 AnimationTemplates.register('flashback', function(params) {
+  var flickerIntensity = params.flickerIntensity != null ? params.flickerIntensity : 0.08;
+  var scratchCount = params.scratchCount != null ? params.scratchCount : 3;
 
   return function animate(buf, PW, PH, t) {
     // Envelope: fade to B&W (0→0.08), hold (0.08→0.92), fade back (0.92→1)
@@ -795,7 +798,7 @@ AnimationTemplates.register('flashback', function(params) {
     // Projector brightness flicker (pseudo-random per frame)
     var frame = Math.floor(t * 180); // ~60fps × 3s
     var flickSeed = (frame * 16807 + 12345) % 2147483647;
-    var flick = 1.0 + ((flickSeed % 1000) / 1000 - 0.5) * 0.08 * desat; // ±4%
+    var flick = 1.0 + ((flickSeed % 1000) / 1000 - 0.5) * flickerIntensity * desat;
 
     // Desaturate ALL pixels + apply flicker
     for (var i = 0; i < buf.length; i++) {
@@ -817,7 +820,7 @@ AnimationTemplates.register('flashback', function(params) {
     var seed = (scratchGroup * 7919 + 31337) % 2147483647;
     function rng() { seed = (seed * 16807 + 31) % 2147483647; return (seed & 0x7fffffff) / 0x7fffffff; }
 
-    var numScratches = 1 + Math.floor(rng() * 3); // 1-3 scratches
+    var numScratches = Math.max(1, Math.min(5, scratchCount === 0 ? 0 : 1 + Math.floor(rng() * scratchCount)));
     for (var s = 0; s < numScratches; s++) {
       var sx = Math.floor(rng() * PW);
       var scratchW = rng() < 0.7 ? 1 : 2; // mostly 1px wide
@@ -1143,8 +1146,11 @@ AnimationTemplates.register('motion_lines', function(params) {
 // Like a momentum that was interrupted. Scaffolds missing/uncompleted action verbs.
 AnimationTemplates.register('anticipation', function(params) {
   var prefix = params.entityPrefix || '';
+  var speed = params.speed != null ? params.speed : 1.0;
 
   return function animate(buf, PW, PH, t) {
+    // Apply speed scaling: remap t so the flip happens faster/slower
+    t = Math.min(1, t * speed);
     // Collect entity pixels and bounding box.
     // Use entity layer for complete bounds (includes covered pixels).
     var minX = PW, maxX = 0, minY = PH, maxY = 0;
@@ -1440,6 +1446,8 @@ AnimationTemplates.register('sequential_glow', function(params) {
 // Entity pixels fall downward with slight horizontal drift, fading to opacity 0.
 AnimationTemplates.register('disintegration', function(params) {
   var prefix = params.entityPrefix || '';
+  var driftAmount = params.driftAmount != null ? params.driftAmount : 0.3;
+  var fallSpeed = params.fallSpeed != null ? params.fallSpeed : 1.0;
 
   var cachedPixels = null;
   var cachedOffsets = null; // {dx, dy, delay} per pixel — dy always positive (downward)
@@ -1455,9 +1463,9 @@ AnimationTemplates.register('disintegration', function(params) {
       for (var j = 0; j < cachedPixels.length; j++) {
         // Pixels from top of entity fall further, bottom pixels fall less
         var relY = (cachedPixels[j].y - cachedBounds.y1) / Math.max(1, bh); // 0=top, 1=bottom
-        var fallDist = bh * (0.4 + 0.6 * (1 - relY)); // top pixels fall more
+        var fallDist = bh * (0.4 + 0.6 * (1 - relY)) * fallSpeed; // top pixels fall more
         cachedOffsets.push({
-          dx: Math.round((Math.random() - 0.5) * bw * 0.3), // slight horizontal drift
+          dx: Math.round((Math.random() - 0.5) * bw * driftAmount), // horizontal drift
           dy: Math.round(fallDist * (0.7 + Math.random() * 0.6)), // downward
           delay: Math.random() * 0.25 + relY * 0.15 // top pixels start detaching first
         });
@@ -1570,7 +1578,7 @@ AnimationTemplates.register('ghost_outline', function(params) {
     shapeAlpha = Math.max(0, Math.min(1, shapeAlpha));
     if (shapeAlpha < 0.01) return;
 
-    var gc = [60, 65, 85]; // dark blue-grey
+    var gc = params.puddleColor || [60, 65, 85]; // dark blue-grey
 
     // Draw flat puddle: scan-line filled ellipse with wobbling edge
     for (var dy = -ry; dy <= ry; dy++) {
@@ -1925,6 +1933,7 @@ AnimationTemplates.register('repel', function(params) {
 // entity's head, and "..." (three bold dots) centered inside.
 AnimationTemplates.register('speech_bubble', function(params) {
   var prefix = params.entityPrefix || '';
+  var bubbleText = params.bubbleText || '...';
 
   return function animate(buf, PW, PH, t) {
     var env = _easeEnvelope(t, 0.2, 0.2);
@@ -2024,13 +2033,17 @@ AnimationTemplates.register('speech_bubble', function(params) {
       }
     }
 
-    // 4. Draw "..." — three 3×3 black squares, centered in ellipse
+    // 4. Draw text — render each character as 3×3 black squares, centered in ellipse
+    var charCount = bubbleText.length;
+    var charSpacing = 5;
+    var totalTextW = charCount * charSpacing - (charSpacing - 3);
+    var textStartX = bubbleCX - Math.floor(totalTextW / 2);
     var dotTopY = bubbleCY - 1;
-    var dotCXs = [bubbleCX - 5, bubbleCX, bubbleCX + 5];
-    for (var di = 0; di < 3; di++) {
+    for (var di = 0; di < charCount; di++) {
+      var dcx = textStartX + di * charSpacing;
       for (var ddy = 0; ddy < 3; ddy++) {
         for (var ddx = 0; ddx < 3; ddx++) {
-          var dpx = dotCXs[di] - 1 + ddx, dpy = dotTopY + ddy;
+          var dpx = dcx + ddx, dpy = dotTopY + ddy;
           if (dpx >= 0 && dpx < PW && dpy >= 0 && dpy < PH) {
             var dpi = dpy * PW + dpx;
             _blendPixel(buf, dpi, 0, 0, 0, alpha);
@@ -2046,6 +2059,7 @@ AnimationTemplates.register('speech_bubble', function(params) {
 // Scaffolds Internal Response and Plan (mental_verbs).
 AnimationTemplates.register('thought_bubble', function(params) {
   var prefix = params.entityPrefix || '';
+  var bubbleText = params.bubbleText || '...';
   // Cloud shape = union of overlapping circles
   var CC = [
     { dx:  0,  dy:  2, r: 10 },  // main body
@@ -2148,13 +2162,17 @@ AnimationTemplates.register('thought_bubble', function(params) {
       }
     }
 
-    // 4. "..." three 3×3 black squares inside cloud
+    // 4. Draw text — render each character as 3×3 black squares inside cloud
+    var charCount = bubbleText.length;
+    var charSpacing = 5;
+    var totalTextW = charCount * charSpacing - (charSpacing - 3);
+    var textStartX = bcx - Math.floor(totalTextW / 2);
     var dotTopY = bcy - 1;
-    var dotCXs = [bcx - 5, bcx, bcx + 5];
-    for (var di = 0; di < 3; di++) {
+    for (var di = 0; di < charCount; di++) {
+      var dcx = textStartX + di * charSpacing;
       for (var ddy = 0; ddy < 3; ddy++) {
         for (var ddx = 0; ddx < 3; ddx++) {
-          var dpx = dotCXs[di] - 1 + ddx, dpy = dotTopY + ddy;
+          var dpx = dcx + ddx, dpy = dotTopY + ddy;
           if (dpx >= 0 && dpx < PW && dpy >= 0 && dpy < PH) {
             var dpi = dpy * PW + dpx;
             _blendPixel(buf, dpi, 0, 0, 0, alpha);
@@ -2171,6 +2189,8 @@ AnimationTemplates.register('thought_bubble', function(params) {
 // Scaffolds Initiating Event (IE) and Internal Response (IR).
 AnimationTemplates.register('alert', function(params) {
   var prefix = params.entityPrefix || '';
+  var markCount = params.markCount != null ? Math.max(1, Math.min(3, params.markCount)) : 3;
+  var color = params.color || [255, 220, 30];
 
   // "!" bitmap: 5 wide × 20 tall — same height structure as ghost_outline "?"
   // Body: rows 0-13 (3px wide bar), gap: rows 14-16, dot: rows 17-18, pad: row 19
@@ -2207,12 +2227,12 @@ AnimationTemplates.register('alert', function(params) {
     var bounds = _computeEntityBounds(buf, PW, prefix);
     if (bounds.x2 < 0) return;
 
-    // 3 marks centered above entity
-    var totalW = eW * 3 + spacing * 2;
+    // marks centered above entity
+    var totalW = eW * markCount + spacing * (markCount - 1);
     var x0 = Math.round(bounds.cx - totalW / 2);
     var y0 = Math.max(2, bounds.y1 - eH - 4);
 
-    for (var mi = 0; mi < 3; mi++) {
+    for (var mi = 0; mi < markCount; mi++) {
       var mx0 = x0 + mi * (eW + spacing);
 
       // Pass 1: 2px black outer outline
@@ -2252,7 +2272,7 @@ AnimationTemplates.register('alert', function(params) {
           var px = mx0 + rx, py = y0 + ry;
           if (px < 0 || px >= PW || py < 0 || py >= PH) continue;
           var pi = py * PW + px;
-          _blendPixel(buf, pi, 255, 220, 30, alpha);
+          _blendPixel(buf, pi, color[0], color[1], color[2], alpha);
         }
       }
     }

@@ -1,8 +1,7 @@
 (function() {
-      const apiKey = sessionStorage.getItem('api_key');
       const participantId = sessionStorage.getItem('participant_id');
       const childAge = sessionStorage.getItem('child_age') || '8';
-      if (!apiKey || !participantId) {
+      if (!participantId) {
         window.location.href = '/';
         return;
       }
@@ -60,8 +59,7 @@
       const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
       const ws = new WebSocket(
         protocol + '//' + location.host + '/ws'
-        + '?api_key=' + encodeURIComponent(apiKey)
-        + '&participant_id=' + encodeURIComponent(participantId)
+        + '?participant_id=' + encodeURIComponent(participantId)
         + '&child_age=' + encodeURIComponent(childAge)
       );
 
