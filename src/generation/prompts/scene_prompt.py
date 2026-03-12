@@ -404,6 +404,10 @@ Generate the next scene in an ongoing story.
 # Active entities (with existing sprite code)
 {active_entities}
 
+Note: Character names (e.g. name="Charlie") are given by the child for \
+narrative context. Use them in narrative_text but do NOT embed character \
+names as text in sprite_code or pixel art.
+
 {student_profile_context}
 
 # CORE PRINCIPLE: Maintain narrative coherence and character focus

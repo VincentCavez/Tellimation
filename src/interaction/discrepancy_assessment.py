@@ -12,7 +12,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from google import genai
 from google.genai import types
@@ -63,6 +63,7 @@ async def assess_utterance(
     story_so_far: List[str],
     misl_already_suggested: List[str],
     misl_difficulty_profile: MISLDifficultyProfile,
+    character_names: Optional[Dict[str, str]] = None,
 ) -> AssessmentResponse:
     """Assess a child's utterance against the scene manifest and MISL taxonomy.
 
@@ -100,6 +101,16 @@ async def assess_utterance(
 
     difficulty_text = misl_difficulty_profile.to_prompt_context()
 
+    if character_names:
+        names_lines = []
+        for eid, name in character_names.items():
+            ent = manifest.get_entity(eid)
+            etype = ent.type if ent else eid
+            names_lines.append(f"- {eid} is named \"{name}\" (type: {etype})")
+        names_text = "\n".join(names_lines)
+    else:
+        names_text = "(No character names given yet.)"
+
     user_prompt = ASSESSMENT_USER_PROMPT_TEMPLATE.format(
         manifest_json=manifest_json,
         misl_taxonomy=misl_taxonomy,
@@ -107,6 +118,7 @@ async def assess_utterance(
         story_so_far=story_text,
         misl_already_suggested=suggested_text,
         misl_difficulty_profile=difficulty_text,
+        character_names=names_text,
     )
 
     last_exc: Optional[Exception] = None

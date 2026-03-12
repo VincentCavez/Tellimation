@@ -35,6 +35,11 @@ actually in the scene. Examples:
 Be generous with vocabulary: "bunny" = "rabbit", "big" = "large", etc. \
 Only flag genuine contradictions, not imprecise but acceptable descriptions.
 
+When the child refers to an entity by a name listed in the character names \
+section, treat it as a valid reference to that entity. For example, if \
+"Charlie" is the name for rabbit_01, then "Charlie hopped" is equivalent \
+to "the rabbit hopped."
+
 If there are NO factual errors, leave the list empty.
 
 ## 2. MISL opportunities
@@ -128,6 +133,10 @@ Assess the child's utterance against the scene manifest and MISL taxonomy.
 # Child's MISL difficulty profile
 
 {misl_difficulty_profile}
+
+# Character names (given by the child)
+
+{character_names}
 
 # Instructions
 

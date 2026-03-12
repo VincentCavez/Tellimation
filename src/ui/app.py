@@ -46,6 +46,9 @@ from src.persistence import (
     save_student_profile,
     create_story,
 )
+from google import genai
+from google.genai import types
+
 from src.ui.animation_handler import execute_animation, send_voice
 
 logging.basicConfig(
@@ -60,6 +63,9 @@ STATIC_DIR = BASE_DIR / "static"
 
 MAX_SCENES = 5
 INITIAL_SCENE_COUNT = 1  # number of scenes offered on the selection page
+
+_SHORT_LLM_MODEL = "gemini-3-flash-preview"
+_SHORT_LLM_TIMEOUT = 10
 
 # Valid participant codes: admin + 20 participants
 VALID_CODES = {
@@ -597,15 +603,157 @@ async def _hydrate_scene(
 
 
 # ---------------------------------------------------------------------------
-# Initial guidance (Level 0 — open invitation)
+# Initial guidance (Level 0 — open invitation / story intro)
 # ---------------------------------------------------------------------------
+
+async def _generate_story_intro(
+    session: SessionState,
+    manifest: SceneManifest,
+) -> str:
+    """Generate a warm story intro that asks the child to name the main character."""
+    main_char = manifest.get_main_character()
+    char_type = main_char.type if main_char else "character"
+
+    prompt = (
+        f"You are introducing a storytelling activity to a child (age {session.student_profile.age}). "
+        f"The scene shows a {char_type} and other elements. "
+        f"Generate a warm, brief spoken introduction (max 40 words) that: "
+        f"1) Says we're going to tell a story together about what's in this picture "
+        f"2) Says the story doesn't exist yet — what they say will create it "
+        f"3) Asks the child to give the {char_type} a name "
+        f"Just the spoken text, nothing else."
+    )
+
+    try:
+        client = genai.Client(api_key=session.api_key)
+        response = await asyncio.wait_for(
+            client.aio.models.generate_content(
+                model=_SHORT_LLM_MODEL,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    thinking_config=types.ThinkingConfig(thinking_budget=256),
+                    temperature=0.7,
+                ),
+            ),
+            timeout=_SHORT_LLM_TIMEOUT,
+        )
+        text = response.text.strip().strip('"')
+        logger.info("[intro] Generated story intro: %s", text)
+        return text
+    except Exception:
+        logger.warning("[intro] Failed to generate intro, using fallback")
+        return (
+            f"We're going to tell a story together! "
+            f"What you say will shape what happens next. "
+            f"First, what name would you like to give the {char_type}?"
+        )
+
+
+async def _extract_character_name(
+    api_key: str,
+    transcription: str,
+    entity_type: str,
+) -> str:
+    """Extract a character name from the child's response."""
+    prompt = (
+        f"A child was asked to name a {entity_type} character in a story. "
+        f"They said: \"{transcription}\". "
+        f"Extract ONLY the name they gave (a single word or short name). "
+        f"If they clearly said a name, return just the name (capitalize first letter). "
+        f"If no clear name was given, return an empty string. "
+        f"Just the name, nothing else."
+    )
+
+    try:
+        client = genai.Client(api_key=api_key)
+        response = await asyncio.wait_for(
+            client.aio.models.generate_content(
+                model=_SHORT_LLM_MODEL,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    thinking_config=types.ThinkingConfig(thinking_budget=256),
+                    temperature=0.0,
+                ),
+            ),
+            timeout=_SHORT_LLM_TIMEOUT,
+        )
+        name = response.text.strip().strip('"').strip()
+        logger.info("[naming] Extracted name: '%s' from '%s'", name, transcription)
+        return name
+    except Exception:
+        logger.warning("[naming] Name extraction failed")
+        return ""
+
+
+async def _handle_naming(
+    session: SessionState,
+    ws: _WebSocketAdapter,
+    transcription: str,
+) -> None:
+    """Handle the naming phase: extract name from child's utterance and store it."""
+    main_char = session.current_manifest.get_main_character()
+    if not main_char:
+        session.naming_phase = False
+        return
+
+    name = await _extract_character_name(
+        session.api_key, transcription, main_char.type,
+    )
+
+    if name:
+        # Store the name everywhere
+        session.character_names[main_char.id] = name
+        # Update the manifest entity (in-memory)
+        main_char.name = name
+        # Update story state for persistence across scenes
+        if main_char.id in session.story_state.active_entities:
+            session.story_state.active_entities[main_char.id].name = name
+
+        # Persist in student profile (keyed by entity type for cross-session use)
+        session.student_profile.character_names[main_char.type] = name
+
+        session.naming_phase = False
+
+        confirm = (
+            f"{name} the {main_char.type}! I love that name! "
+            f"Now, tell me what you see in the picture."
+        )
+
+        session.conversation_history.append({
+            "role": "system",
+            "text": confirm,
+            "action": "naming_confirmation",
+        })
+        await ws.send_json({
+            "type": "assessment_result",
+            "action": "oral_guidance",
+            "guidance_text": confirm,
+        })
+        asyncio.ensure_future(send_voice(session, ws, confirm))
+        logger.info("[naming] Character %s named '%s'", main_char.id, name)
+    else:
+        # Couldn't extract a name — ask again gently
+        retry = f"What name would you like to give the {main_char.type}?"
+        await ws.send_json({
+            "type": "assessment_result",
+            "action": "oral_guidance",
+            "guidance_text": retry,
+        })
+        asyncio.ensure_future(send_voice(session, ws, retry))
+
 
 async def _send_initial_guidance(
     session: SessionState,
     ws: _WebSocketAdapter,
 ) -> None:
-    """Send the Level 0 open invitation: 'What do you see?'"""
-    guidance_text = "What do you see?"
+    """Send initial voice guidance when a scene starts."""
+    if session.naming_phase:
+        # First scene — generate intro asking for character name
+        guidance_text = await _generate_story_intro(
+            session, session.current_manifest,
+        )
+    else:
+        guidance_text = "What do you see?"
 
     session.conversation_history.append({
         "role": "system",
@@ -671,6 +819,11 @@ async def _handle_audio(
         if not transcription:
             return
 
+        # ── Naming phase: first utterance is the character's name ──
+        if session.naming_phase:
+            await _handle_naming(session, ws, transcription)
+            return
+
         # Add child utterance to conversation + narration history
         session.narration_history.append(transcription)
         session.conversation_history.append({
@@ -694,6 +847,7 @@ async def _handle_audio(
             story_so_far=story_so_far,
             misl_already_suggested=misl_already,
             misl_difficulty_profile=session.student_profile.misl_difficulty_profile,
+            character_names=session.character_names,
         )
 
         # 3. Deterministic decision
@@ -884,6 +1038,7 @@ async def _resolve_pending_animation(
             story_so_far=story_so_far,
             misl_already_suggested=misl_already,
             misl_difficulty_profile=session.student_profile.misl_difficulty_profile,
+            character_names=session.character_names,
         )
 
         corrected = quick_assessment.utterance_is_acceptable

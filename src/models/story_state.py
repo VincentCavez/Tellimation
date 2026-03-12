@@ -9,6 +9,7 @@ from src.models.scene import SceneManifest
 
 class ActiveEntity(BaseModel):
     type: str
+    name: str = ""  # Child-given name (persists across scenes)
     sprite_code: Union[str, Dict[str, Any]] = ""
     first_appeared: str = ""
     last_position: Dict = Field(default_factory=dict)
