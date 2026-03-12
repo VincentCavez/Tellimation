@@ -291,7 +291,9 @@ prefer configurations that play to effective animation types.
 
 # Entity rules
 
-- Unique id: `<type>_<NN>` (e.g. `rabbit_01`, `tree_02`).
+- Unique id: `<type>_<NN>` where type is a GENERIC noun (e.g. `rabbit_01`, `boy_01`, `tree_02`). \
+NEVER use character names or proper nouns as the type — the child names characters later. \
+Use `boy_01` not `leo_01`, `girl_01` not `emma_01`.
 - At least 4 visual properties: `color`, `size`, `texture`, `distinctive_features`. \
 Add `weight`, `state`, `pattern` as appropriate.
 - 4-5 entities per scene (1 main character + 3-4 environment elements).

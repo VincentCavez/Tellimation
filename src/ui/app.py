@@ -15,6 +15,7 @@ import logging
 import os
 import re
 import time
+import copy
 import random
 
 from dotenv import load_dotenv
@@ -173,9 +174,56 @@ async def story_page():
     return (TEMPLATES_DIR / "story.html").read_text()
 
 
+@app.get("/admin", response_class=HTMLResponse)
+async def admin_page():
+    return (TEMPLATES_DIR / "admin.html").read_text()
+
+
 # ---------------------------------------------------------------------------
 # REST API endpoints
 # ---------------------------------------------------------------------------
+
+@app.get("/api/default-scenes")
+async def api_default_scenes():
+    """Serve pre-generated default scenes from data/default_scenes/ folder."""
+    data_dir = _find_data_dir()
+    if data_dir is None:
+        return JSONResponse(status_code=404, content={"error": "data/ directory not found"})
+    scenes_dir = data_dir / "default_scenes"
+    if not scenes_dir.is_dir():
+        return JSONResponse(status_code=404, content={"error": "No default scenes"})
+    scenes = []
+    for path in sorted(scenes_dir.glob("scene_*.json")):
+        try:
+            scenes.append(json.loads(path.read_text()))
+        except (json.JSONDecodeError, OSError) as exc:
+            logger.warning("Skipping bad default scene %s: %s", path.name, exc)
+    if not scenes:
+        return JSONResponse(status_code=404, content={"error": "No default scenes"})
+    return JSONResponse(content=scenes)
+
+
+@app.post("/api/save-default-scenes")
+async def api_save_default_scenes(request: Request):
+    """Save default scenes as individual files in data/default_scenes/."""
+    data_dir = _find_data_dir()
+    if data_dir is None:
+        return JSONResponse(status_code=500, content={"ok": False, "error": "data/ directory not found"})
+    body = await request.json()
+    scenes = body.get("scenes", [])
+    if not scenes:
+        return JSONResponse(status_code=400, content={"ok": False, "error": "No scenes provided"})
+    scenes_dir = data_dir / "default_scenes"
+    scenes_dir.mkdir(exist_ok=True)
+    # Clear existing files first
+    for old in scenes_dir.glob("scene_*.json"):
+        old.unlink()
+    for i, scene in enumerate(scenes):
+        path = scenes_dir / f"scene_{i + 1}.json"
+        path.write_text(json.dumps(scene))
+    logger.info("Saved %d default scenes to %s", len(scenes), scenes_dir)
+    return JSONResponse(content={"ok": True, "count": len(scenes)})
+
 
 @app.post("/api/validate-code")
 async def validate_code(request: Request):
@@ -297,7 +345,8 @@ async def websocket_endpoint(websocket: WebSocket):
             msg_type = data.get("type", "")
 
             if msg_type == "generate_initial_scenes":
-                await _handle_generate_initial_scenes(session, ws)
+                count = data.get("count", INITIAL_SCENE_COUNT)
+                await _handle_generate_initial_scenes(session, ws, count=count)
 
             elif msg_type == "init_scene":
                 # Client navigated to /story with a scene — re-hydrate
@@ -315,10 +364,14 @@ async def websocket_endpoint(websocket: WebSocket):
 
             elif msg_type == "select_scene":
                 index = data.get("index", 0)
-                await _handle_select_scene(session, ws, index)
+                inline_scene = data.get("scene")
+                await _handle_select_scene(session, ws, index, inline_scene=inline_scene)
 
             elif msg_type == "generate_one_more":
                 await _handle_generate_one_more(session, ws)
+
+            elif msg_type == "entity_moved":
+                await _handle_entity_moved(session, data)
 
             elif msg_type == "audio":
                 # Audio metadata header — next binary message is audio data
@@ -344,15 +397,66 @@ async def websocket_endpoint(websocket: WebSocket):
 
 
 # ---------------------------------------------------------------------------
+# Entity drag-and-drop
+# ---------------------------------------------------------------------------
+
+async def _handle_entity_moved(session: SessionState, data: Dict[str, Any]) -> None:
+    """Update entity position after client drag-and-drop."""
+    entity_id = data.get("entity_id", "")
+    position = data.get("position")  # {x, y} normalized 0-1
+    art_position = data.get("art_position")  # {x, y} art-grid top-left
+
+    if not entity_id or not position:
+        return
+
+    norm_x = float(position.get("x", 0.5))
+    norm_y = float(position.get("y", 0.5))
+
+    # Update manifest
+    if session.current_manifest:
+        entity = session.current_manifest.get_entity(entity_id)
+        if entity:
+            entity.position.x = norm_x
+            entity.position.y = norm_y
+
+    # Update story_state
+    pos_dict = {"x": norm_x, "y": norm_y}
+    if entity_id in session.story_state.active_entities:
+        session.story_state.active_entities[entity_id].last_position = pos_dict
+    if entity_id in session.story_state.entity_history:
+        session.story_state.entity_history[entity_id]["last_position"] = pos_dict
+
+    # Update raw_sprite x/y in current_scene and sprite_archive
+    if art_position:
+        art_x = int(art_position.get("x", 0))
+        art_y = int(art_position.get("y", 0))
+
+        if session.current_scene:
+            sc = session.current_scene.get("sprite_code", {})
+            if (entity_id in sc
+                    and isinstance(sc[entity_id], dict)
+                    and sc[entity_id].get("format") == "raw_sprite"):
+                sc[entity_id]["x"] = art_x
+                sc[entity_id]["y"] = art_y
+
+        if entity_id in session.story_state.sprite_archive:
+            session.story_state.sprite_archive[entity_id]["x"] = art_x
+            session.story_state.sprite_archive[entity_id]["y"] = art_y
+
+    logger.debug("[drag] Entity %s moved to (%.2f, %.2f)", entity_id, norm_x, norm_y)
+
+
+# ---------------------------------------------------------------------------
 # Initial scene generation (selection page)
 # ---------------------------------------------------------------------------
 
 async def _handle_generate_initial_scenes(
     session: SessionState,
     ws: _WebSocketAdapter,
+    count: int = INITIAL_SCENE_COUNT,
 ) -> None:
-    """Generate INITIAL_SCENE_COUNT scenes in parallel for the selection page."""
-    n = INITIAL_SCENE_COUNT
+    """Generate scenes in parallel for the selection page."""
+    n = max(1, min(count, 12))
     # Pick n DISTINCT themes so the 3 initial scenes are always diverse
     themes = random.sample(STORY_THEMES, min(n, len(STORY_THEMES)))
 
@@ -445,18 +549,23 @@ async def _handle_select_scene(
     session: SessionState,
     ws: _WebSocketAdapter,
     index: int,
+    inline_scene: Optional[Dict[str, Any]] = None,
 ) -> None:
     """Handle scene selection from the selection page."""
-    # Find the scene by index
-    scene = None
-    for entry in session.initial_scenes:
-        if entry["index"] == index:
-            scene = entry["scene"]
-            break
+    # Find the scene by index, or use inline scene (default-scenes case)
+    scene = inline_scene
+    if scene is None:
+        for entry in session.initial_scenes:
+            if entry["index"] == index:
+                scene = entry["scene"]
+                break
 
     if scene is None:
         await ws.send_json({"type": "error", "message": f"Scene {index} not found"})
         return
+
+    # Deep-copy so mutations (drag & drop) never affect the originals
+    scene = copy.deepcopy(scene)
 
     # Create a new story and persist
     story_idx, _ = create_story(session.participant_id)
@@ -630,7 +739,7 @@ async def _generate_story_intro(
         f"The scene shows a {char_type} and other elements. "
         f"Generate a warm, brief spoken introduction (max 40 words) that: "
         f"1) Says we're going to tell a story together about what's in this picture "
-        f"2) Says the story doesn't exist yet — what they say will create it "
+        f"2) Says it's up to THEM to imagine this story and the next scenes "
         f"3) Asks the child to give the {char_type} a name "
         f"Just the spoken text, nothing else."
     )
@@ -655,7 +764,7 @@ async def _generate_story_intro(
         logger.warning("[intro] Failed to generate intro, using fallback")
         return (
             f"We're going to tell a story together! "
-            f"What you say will shape what happens next. "
+            f"It's up to you to imagine this story and the next scenes. "
             f"First, what name would you like to give the {char_type}?"
         )
 
@@ -877,7 +986,12 @@ async def _handle_audio(
 
         # ── Step 0: Resolve pending animation outcome ──
         if session.pending_animation is not None:
-            await _resolve_pending_animation(session, ws, transcription)
+            voice_fired = await _resolve_pending_animation(session, ws, transcription)
+            if voice_fired:
+                # Voice escalation sent — don't assess this utterance for new
+                # errors (would trigger a simultaneous animation).
+                save_student_profile(session.participant_id, session.student_profile)
+                return
 
         # 2. Assess utterance against manifest + MISL
         story_so_far = get_accepted_utterances(session.current_scene_log)
@@ -937,23 +1051,9 @@ async def _handle_audio(
                     problematic_segment=first_error.get("utterance_fragment"),
                 )
 
-                # Schedule correction text to display AFTER animation completes
+                # Animation-first: NO text during animation.
+                # Voice + text only fires if child doesn't self-correct (see _resolve_pending_animation).
                 if decision and explanation:
-                    # Get animation duration from decision metadata
-                    animation_duration = decision.get("duration_ms", 1200) if isinstance(decision, dict) else 1200
-                    delay_ms = animation_duration + 300  # 300ms buffer for animation to settle
-
-                    async def send_correction_text_after_delay():
-                        await asyncio.sleep(delay_ms / 1000.0)
-                        await ws.send_json({
-                            "type": "correction_text",
-                            "guidance_text": explanation,
-                            "target_id": target_id,
-                        })
-
-                    asyncio.create_task(send_correction_text_after_delay())
-
-                    # Still defer voice for potential self-correction on next utterance
                     _set_pending_animation(
                         session, target_id, misl_el, explanation, decision,
                     )
@@ -1019,24 +1119,9 @@ async def _handle_audio(
                     misl_element=misl_dim,
                 )
 
-                # Schedule guidance text to display AFTER animation completes
+                # Animation-first: NO text during animation.
+                # Voice + text only fires if child doesn't self-correct (see _resolve_pending_animation).
                 if decision and suggestion:
-                    # Get animation duration from decision metadata
-                    animation_duration = decision.get("duration_ms", 1200) if isinstance(decision, dict) else 1200
-                    delay_ms = animation_duration + 300  # 300ms buffer for animation to settle
-
-                    async def send_guidance_text_after_delay():
-                        await asyncio.sleep(delay_ms / 1000.0)
-                        await ws.send_json({
-                            "type": "guidance_text",
-                            "guidance_text": suggestion,
-                            "target_id": target_id,
-                            "dimension": misl_dim,
-                        })
-
-                    asyncio.create_task(send_guidance_text_after_delay())
-
-                    # Still defer voice for potential self-correction on next utterance
                     _set_pending_animation(
                         session, target_id, misl_dim, suggestion, decision,
                     )
@@ -1111,17 +1196,19 @@ async def _resolve_pending_animation(
     session: SessionState,
     ws: _WebSocketAdapter,
     transcription: str,
-) -> None:
+) -> bool:
     """Check if the child self-corrected after the previous animation.
 
     Success = the new utterance is acceptable (child corrected without voice).
     Failure = still has issues → fire deferred voice as escalation.
+
+    Returns True if voice escalation was fired (caller should skip new assessment).
     """
     pending = session.pending_animation
     session.pending_animation = None
 
     if pending is None:
-        return
+        return False
 
     # Quick re-assess to check if the child's new utterance is now acceptable
     try:
@@ -1161,6 +1248,7 @@ async def _resolve_pending_animation(
                 if entry.get("target_id") == pending["target_id"]:
                     entry["led_to_correction"] = True
                     break
+        return False
     else:
         logger.info("[pending_anim] Child did NOT self-correct → failure, firing voice")
         voice_text = pending.get("voice_text", "")
@@ -1174,5 +1262,7 @@ async def _resolve_pending_animation(
             # Record escalation — skip animation on repeat of same error
             esc_key = f"{pending['target_id']}::{pending['misl_element']}"
             session.voice_escalated_errors[esc_key] = voice_text
+            return True
+        return False
 
 

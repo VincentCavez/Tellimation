@@ -335,6 +335,7 @@ var NarrationClient = (function() {
     destroy: destroy,
     handleVoiceHeader: handleVoiceHeader,
     handleVoiceBinary: handleVoiceBinary,
+    isRecording: function() { return isRecording; },
   };
 })();
 
