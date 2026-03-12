@@ -102,7 +102,11 @@ Return ONLY valid JSON (no markdown fences, no commentary):
 # Language
 
 All explanations and suggestions must be in English, using warm, \
-encouraging, age-appropriate language. Never be corrective or negative.
+encouraging, age-appropriate language. Never be corrective or negative. \
+NEVER mention "manifest", "scene data", "the data says", or any technical \
+term. The child must not feel there is a ground truth they are being \
+tested against. Frame corrections as observations: "Look, the cat is \
+actually orange!" not "The manifest shows the cat is orange."
 """
 
 ASSESSMENT_USER_PROMPT_TEMPLATE = """\
