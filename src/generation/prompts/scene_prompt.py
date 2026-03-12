@@ -78,9 +78,9 @@ other entities or surfaces. Use 2-3 COMMON descriptors.>",
         },
         "position": {"x": <float 0.0-1.0>, "y": <float 0.0-1.0>, "spatial_ref": "<on/under/beside entity_id or null>"},
         "emotion": "<emotion or null>",
-        "pose": "<SELF-CONTAINED body posture — describe ONLY the entity's own body, \
-NO references to other entities or surfaces. \
-BAD: 'leaning against the tree'. GOOD: 'standing on hind legs, front paws raised, head tilted up'>",
+        "pose": "<SIMPLE body posture — ONE or TWO words only. \
+Examples: standing, sitting, running, jumping, lying down, flying, crouching, walking. \
+Do NOT add details about head, tail, limbs, or body parts — those go in properties and emotion.>",
         "carried_over": <true if entity existed in previous scene, false if new>,
         "pose_changed": <true if carried_over entity has a NEW pose/action that differs from \
 the previous scene. When true, a new sprite image will be generated. When false (default), \
@@ -189,6 +189,12 @@ For EVERY entity, you MUST provide:
 - Describe what makes this entity unique using ONLY intrinsic visual properties.
 - Spatial relationships go in `relations[]`, NOT here.
 - Use 2-3 COMMON descriptors that a child age 7-11 would say.
+- NEVER re-describe the entity type, color, or size in distinctive_features. \
+Those are already in other property fields. Distinctive features are ONLY for \
+unique visual details not captured elsewhere (accessories, markings, scars, etc.).
+- BAD: "a small Golden Retriever named Leo wearing a shiny blue collar" \
+(re-describes the entity type and size — causes the image model to draw duplicates)
+- GOOD: "wearing a shiny blue collar with a small golden tag"
 - BAD: "stuck to the tree by a silver pin" (references "the tree")
 - GOOD: "held by a shiny silver pin at the top, with a soft blue glow along its edges"
 - BAD: "three bright red berries growing near the base of the oak"
@@ -206,16 +212,19 @@ shiny, dull
 AVOID: chartreuse, azure, cerulean, mahogany, obsidian, gossamer, iridescent, \
 luminescent, diminutive, colossal, resplendent, vermillion
 
-## Pose and body language (SELF-CONTAINED — NO references to other entities!)
-- Each entity's pose is used to generate an ISOLATED sprite image on a blank background.
-- The pose MUST describe ONLY the entity's own body position.
-- Spatial relationships (on, under, beside) belong in `relations[]`, NOT in `pose`.
-- BAD: "standing on hind legs with front paws resting against the tree trunk"
-- GOOD: "standing on hind legs, front paws raised and pressed forward, head tilted upward"
-- BAD: "pinned flat against the rough bark"
-- GOOD: "flat and slightly curled at the edges, with a silver pin at the top"
-- BAD: "sprouting upward from the gnarled roots of the oak"
-- GOOD: "a cluster of three mushrooms growing upward, with tangled roots at the base"
+## Pose (SIMPLE — one or two words ONLY)
+- The pose field is used to generate an ISOLATED sprite image.
+- It MUST be a SIMPLE body posture: standing, sitting, running, jumping, lying down, \
+flying, crouching, walking, swimming, climbing, sleeping, dancing.
+- Do NOT describe head position, tail position, limb details, or facial expression. \
+Those details go in `properties` and `emotion`.
+- BAD: "standing with head lowered and tail wagging slightly to the left"
+- BAD: "standing on hind legs, front paws raised and pressed forward, head tilted upward"
+- BAD: "flat and slightly curled at the edges, with a silver pin at the top"
+- GOOD: "standing"
+- GOOD: "sitting"
+- GOOD: "running"
+- GOOD: "lying down"
 
 # Canvas: normalized coordinates (0.0 to 1.0)
 
@@ -373,6 +382,18 @@ Generate an opening scene for a new story. This is for the story selection page 
 where the child picks from 3 options.
 
 Story theme: {theme}
+
+# MISL Context (Macrostructure & Microstructure targets)
+
+{misl_rubric}
+
+# Developmental Expectations (child's age and expected narrative level)
+
+{developmental_expectations}
+
+# Student Profile (baseline error history, if any)
+
+{student_profile_context}
 
 # MANDATORY CHARACTER AND NARRATIVE STRUCTURE
 

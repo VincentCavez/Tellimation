@@ -13,6 +13,7 @@ import asyncio
 import json
 import logging
 import os
+import re
 import time
 import random
 
@@ -687,11 +688,43 @@ async def _extract_character_name(
             ),
             timeout=_SHORT_LLM_TIMEOUT,
         )
-        name = response.text.strip().strip('"').strip()
-        logger.info("[naming] Extracted name: '%s' from '%s'", name, transcription)
+
+        name = response.text.strip()
+        logger.debug("[naming] Raw response: '%s'", name)
+
+        # Remove markdown code fences and language tags (be flexible with placement)
+        name = re.sub(r'(json|text|code)?\s*```\s*', '', name, flags=re.IGNORECASE)
+        name = re.sub(r'~~~\s*', '', name)
+        logger.debug("[naming] After removing code fences: '%s'", name)
+
+        # Remove all special JSON/formatting characters: {, }, ", ', :, =, etc.
+        # This handles artifacts like {name: "Charlie"} or "Charlie"
+        name = re.sub(r'[{}\[\]"\'`:=,;]', ' ', name)
+        logger.debug("[naming] After removing special chars: '%s'", name)
+
+        # Reserved words that are likely not real names
+        reserved_words = {'json', 'text', 'code', 'name', 'value', 'true', 'false', 'null', 'the', 'a', 'an'}
+
+        # Extract words (sequences of letters, hyphens, apostrophes)
+        words = re.findall(r"[A-Za-z][A-Za-z\-']*", name)
+        logger.debug("[naming] Extracted words: %s", words)
+
+        # Filter: not reserved, valid length (1-20 characters)
+        valid_names = [w for w in words if 1 <= len(w) <= 20 and w.lower() not in reserved_words]
+        logger.debug("[naming] Valid names after filtering: %s", valid_names)
+
+        name = valid_names[0] if valid_names else ""
+
+        if not name:
+            logger.warning("[naming] No valid name extracted from: '%s'", response.text.strip())
+            return ""
+
+        # Capitalize first letter
+        name = name.capitalize()
+        logger.info("[naming] Final extracted name: '%s' from transcription '%s'", name, transcription)
         return name
-    except Exception:
-        logger.warning("[naming] Name extraction failed")
+    except Exception as e:
+        logger.warning("[naming] Name extraction failed: %s", e)
         return ""
 
 
@@ -876,11 +909,11 @@ async def _handle_audio(
             target_id = first_error.get("manifest_ref", "").split(".")[0]
             explanation = first_error.get("explanation", "")
 
+            # Send assessment_result WITHOUT guidance_text (text will come later after animation)
             await ws.send_json({
                 "type": "assessment_result",
                 "action": "correct",
                 "target_id": target_id,
-                "guidance_text": explanation,
                 "errors": errors,
             })
 
@@ -904,13 +937,33 @@ async def _handle_audio(
                     problematic_segment=first_error.get("utterance_fragment"),
                 )
 
-                # Defer voice — set pending_animation for next utterance
+                # Schedule correction text to display AFTER animation completes
                 if decision and explanation:
+                    # Get animation duration from decision metadata
+                    animation_duration = decision.get("duration_ms", 1200) if isinstance(decision, dict) else 1200
+                    delay_ms = animation_duration + 300  # 300ms buffer for animation to settle
+
+                    async def send_correction_text_after_delay():
+                        await asyncio.sleep(delay_ms / 1000.0)
+                        await ws.send_json({
+                            "type": "correction_text",
+                            "guidance_text": explanation,
+                            "target_id": target_id,
+                        })
+
+                    asyncio.create_task(send_correction_text_after_delay())
+
+                    # Still defer voice for potential self-correction on next utterance
                     _set_pending_animation(
                         session, target_id, misl_el, explanation, decision,
                     )
                 elif explanation:
-                    # Animation failed entirely, voice fires now
+                    # Animation failed entirely, send correction text now
+                    await ws.send_json({
+                        "type": "correction_text",
+                        "guidance_text": explanation,
+                        "target_id": target_id,
+                    })
                     session.conversation_history.append({
                         "role": "system",
                         "text": explanation,
@@ -918,7 +971,12 @@ async def _handle_audio(
                     })
 
             elif explanation:
-                # No target to animate — fire voice immediately
+                # No target to animate — send correction text immediately
+                await ws.send_json({
+                    "type": "correction_text",
+                    "guidance_text": explanation,
+                    "target_id": "",
+                })
                 session.conversation_history.append({
                     "role": "system",
                     "text": explanation,
@@ -927,7 +985,7 @@ async def _handle_audio(
                 asyncio.ensure_future(send_voice(session, ws, explanation))
 
         elif action == "accept_and_guide":
-            # MISL guidance — animate, defer voice
+            # MISL guidance — animate, defer text display
             opps = action_data["misl_opportunities"]
             first_opp = opps[0]
             suggestion = first_opp.get("suggestion", "")
@@ -935,11 +993,11 @@ async def _handle_audio(
             target_id = elements[0] if elements else ""
             misl_dim = first_opp.get("dimension", "character")
 
+            # Send assessment_result WITHOUT guidance_text (text will come later after animation)
             await ws.send_json({
                 "type": "assessment_result",
                 "action": "guide",
                 "target_id": target_id,
-                "guidance_text": suggestion,
                 "dimension": misl_dim,
             })
 
@@ -961,12 +1019,35 @@ async def _handle_audio(
                     misl_element=misl_dim,
                 )
 
-                # Defer voice — set pending_animation for next utterance
+                # Schedule guidance text to display AFTER animation completes
                 if decision and suggestion:
+                    # Get animation duration from decision metadata
+                    animation_duration = decision.get("duration_ms", 1200) if isinstance(decision, dict) else 1200
+                    delay_ms = animation_duration + 300  # 300ms buffer for animation to settle
+
+                    async def send_guidance_text_after_delay():
+                        await asyncio.sleep(delay_ms / 1000.0)
+                        await ws.send_json({
+                            "type": "guidance_text",
+                            "guidance_text": suggestion,
+                            "target_id": target_id,
+                            "dimension": misl_dim,
+                        })
+
+                    asyncio.create_task(send_guidance_text_after_delay())
+
+                    # Still defer voice for potential self-correction on next utterance
                     _set_pending_animation(
                         session, target_id, misl_dim, suggestion, decision,
                     )
                 elif suggestion:
+                    # Animation failed entirely, send guidance text now
+                    await ws.send_json({
+                        "type": "guidance_text",
+                        "guidance_text": suggestion,
+                        "target_id": target_id,
+                        "dimension": misl_dim,
+                    })
                     session.conversation_history.append({
                         "role": "system",
                         "text": suggestion,
@@ -974,7 +1055,13 @@ async def _handle_audio(
                     })
 
             elif suggestion:
-                # No target to animate — fire voice immediately
+                # No target to animate — send guidance text immediately
+                await ws.send_json({
+                    "type": "guidance_text",
+                    "guidance_text": suggestion,
+                    "target_id": "",
+                    "dimension": misl_dim,
+                })
                 session.conversation_history.append({
                     "role": "system",
                     "text": suggestion,

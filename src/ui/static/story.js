@@ -167,9 +167,22 @@
             break;
 
           case 'assessment_result':
-            // Display guidance text if present
+            // No longer display text immediately — will come via correction_text or guidance_text
+            break;
+
+          case 'correction_text':
+            // Display factual error correction text (after animation completes)
             if (msg.guidance_text) {
               feedbackEl.textContent = msg.guidance_text;
+              feedbackEl.style.opacity = 1;
+            }
+            break;
+
+          case 'guidance_text':
+            // Display MISL guidance text (after animation completes)
+            if (msg.guidance_text) {
+              feedbackEl.textContent = msg.guidance_text;
+              feedbackEl.style.opacity = 1;
             }
             break;
 
