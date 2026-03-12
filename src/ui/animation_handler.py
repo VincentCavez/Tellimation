@@ -1,7 +1,10 @@
 """Animation execution and voice/TTS handling.
 
 Extracted from app.py to isolate the animation pipeline (generation,
-temp sprites, efficacy tracking) and voice (TTS) concerns.
+efficacy tracking) and voice (TTS) concerns.
+
+The tellimation module now returns a 4-mode decision dict. This handler
+translates the decision into WebSocket messages for the client.
 """
 
 from __future__ import annotations
@@ -16,7 +19,7 @@ from google.genai import types
 
 from src.interaction.tellimation import generate_tellimation
 from src.models.scene import SceneManifest
-from src.models.student_profile import StudentProfile
+from src.models.student_profile import AnimationDecision, StudentProfile
 from src.narration.voice_guidance import text_to_speech
 
 logger = logging.getLogger(__name__)
@@ -45,9 +48,10 @@ async def generate_oral_guidance(
     manifest: SceneManifest,
     student_profile: StudentProfile,
 ) -> str:
-    """Generate a spoken English guidance question via LLM.
+    """Generate a brief, kind oral explanation of an error with correction.
 
-    Used as the last-resort fallback when animation generation fails entirely.
+    Used as escalation when animation alone didn't lead to self-correction,
+    or as fallback when animation generation fails entirely.
     """
     root_id = target_id.split(".")[0] if "." in target_id else target_id
     entity = manifest.get_entity(root_id)
@@ -58,10 +62,13 @@ async def generate_oral_guidance(
         entity_desc = root_id
 
     prompt = (
-        f"Generate a single short spoken English question (max 15 words) "
-        f"to guide a child (age {student_profile.age}) to describe a "
-        f"{entity_desc} focusing on: {misl_element}. "
-        f"Just the question, nothing else."
+        f"A child (age {student_profile.age}) made an error describing a "
+        f"{entity_desc}. The issue is about: {misl_element}. "
+        f"Generate a single brief, kind spoken explanation (max 20 words) "
+        f"that gently tells the child what was wrong and gives the correction. "
+        f"Be warm and encouraging. "
+        f"Example: 'Look, the rabbit is actually brown, not white! Can you try again?' "
+        f"Just the spoken text, nothing else."
     )
 
     client = genai.Client(api_key=api_key)
@@ -82,6 +89,62 @@ async def generate_oral_guidance(
 
 
 # ---------------------------------------------------------------------------
+# Send animation to client based on mode
+# ---------------------------------------------------------------------------
+
+async def _send_animation_message(
+    ws: WSProtocol,
+    decision: Dict[str, Any],
+    target_id: str,
+    misl_element: str,
+) -> None:
+    """Send animation message(s) to client based on the decision mode."""
+    mode = decision["mode"]
+
+    if mode in ("use_default", "adjust_params"):
+        msg: Dict[str, Any] = {
+            "type": "animation",
+            "animation_id": decision["animation_id"],
+            "target_id": target_id,
+            "misl_element": misl_element,
+            "template": decision["template"],
+            "params": decision.get("params", {}),
+            "duration_ms": decision["duration_ms"],
+        }
+        if decision.get("text_overlays"):
+            msg["text_overlays"] = decision["text_overlays"]
+        await ws.send_json(msg)
+
+    elif mode == "sequence":
+        # Send all steps in a single message — client handles sequencing + looping
+        steps = decision.get("steps", [])
+        msg = {
+            "type": "animation",
+            "animation_id": decision["animation_id"],
+            "target_id": target_id,
+            "misl_element": misl_element,
+            "steps": steps,
+            "duration_ms": decision["duration_ms"],
+        }
+        await ws.send_json(msg)
+
+    elif mode == "custom_code":
+        msg = {
+            "type": "animation",
+            "animation_id": decision["animation_id"],
+            "target_id": target_id,
+            "misl_element": misl_element,
+            "code": decision["code"],
+            "duration_ms": decision["duration_ms"],
+        }
+        if decision.get("template_name"):
+            msg["template_name"] = decision["template_name"]
+        if decision.get("text_overlays"):
+            msg["text_overlays"] = decision["text_overlays"]
+        await ws.send_json(msg)
+
+
+# ---------------------------------------------------------------------------
 # Animation execution
 # ---------------------------------------------------------------------------
 
@@ -91,73 +154,49 @@ async def execute_animation(
     target_id: str,
     misl_element: str = "character",
     problematic_segment: Optional[str] = None,
-) -> None:
-    """Generate and send a tellimation animation for a target entity."""
+) -> Optional[Dict[str, Any]]:
+    """Generate and send a tellimation animation for a target entity.
+
+    Returns the decision dict on success (for deferred voice tracking),
+    or None on failure.
+    """
     try:
-        code, duration_ms, temp_sprites, animation_id, text_overlays = (
-            await generate_tellimation(
-                api_key=session.api_key,
-                sprite_code=(
-                    session.current_scene.get("sprite_code", {})
-                    if session.current_scene else {}
-                ),
-                manifest=session.current_manifest,
-                student_profile=session.student_profile,
-                target_id=target_id,
-                misl_element=misl_element,
-                neg=session.current_neg,
-                problematic_segment=problematic_segment,
-            )
+        decision = await generate_tellimation(
+            api_key=session.api_key,
+            sprite_code=(
+                session.current_scene.get("sprite_code", {})
+                if session.current_scene else {}
+            ),
+            manifest=session.current_manifest,
+            student_profile=session.student_profile,
+            target_id=target_id,
+            misl_element=misl_element,
+            problematic_segment=problematic_segment,
         )
 
-        # Send temp sprites BEFORE animation
-        if temp_sprites:
-            for sprite_id, sprite_data in temp_sprites.items():
-                await ws.send_json({
-                    "type": "add_temp_sprite",
-                    "id": sprite_id,
-                    "sprite": sprite_data,
-                })
+        # Inject entityPrefix into params for all template-based modes
+        if decision["mode"] in ("use_default", "adjust_params"):
+            decision["params"]["entityPrefix"] = target_id
 
-        # Send animation with full context
-        msg: Dict[str, Any] = {
-            "type": "animation",
-            "animation_id": animation_id,
-            "target_id": target_id,
-            "misl_element": misl_element,
-            "code": code,
-            "duration_ms": duration_ms,
-        }
-        if text_overlays:
-            msg["text_overlays"] = text_overlays
-        await ws.send_json(msg)
+        if decision["mode"] == "sequence":
+            for step in decision.get("steps", []):
+                step["params"]["entityPrefix"] = target_id
 
-        # Schedule temp sprite removal after animation ends
-        if temp_sprites:
-            sprite_ids = list(temp_sprites.keys())
-
-            async def _remove_temp_sprites_after_delay() -> None:
-                await asyncio.sleep(duration_ms / 1000.0)
-                for sid in sprite_ids:
-                    await ws.send_json({
-                        "type": "remove_temp_sprite",
-                        "id": sid,
-                    })
-
-            asyncio.ensure_future(_remove_temp_sprites_after_delay())
+        # Send animation to client
+        await _send_animation_message(ws, decision, target_id, misl_element)
 
         # Log last animation for efficacy tracking
         session.last_animation = {
             "target_id": target_id,
-            "animation_type": animation_id,
+            "animation_type": decision["animation_id"],
             "misl_element": misl_element,
             "timestamp": time.time(),
         }
 
-        # Append pending efficacy entry (discrepancy module updates led_to_correction)
+        # Append pending efficacy entry (legacy)
         session.student_profile.animation_efficacy.append({
             "target_id": target_id,
-            "animation_type": animation_id,
+            "animation_type": decision["animation_id"],
             "misl_element": misl_element,
             "led_to_correction": False,
             "escalation_level": 0,
@@ -168,12 +207,34 @@ async def execute_animation(
             ),
         })
 
+        # Log AnimationDecision for 4-mode tracking
+        session.student_profile.animation_decisions.append(AnimationDecision(
+            timestamp=time.time(),
+            scene_id=(
+                session.current_scene.get("scene_id", "")
+                if session.current_scene else ""
+            ),
+            target_id=target_id,
+            misl_element=misl_element,
+            mode=decision["mode"],
+            animation_id=decision["animation_id"],
+            template=decision.get("template", ""),
+            params=decision.get("params", {}),
+            steps=decision.get("steps", []),
+            code=decision.get("code", ""),
+            duration_ms=decision["duration_ms"],
+            outcome="pending",
+        ))
+
         session.animations_played_this_scene.append(target_id)
         session.conversation_history.append({
             "role": "system",
-            "text": f"Animation '{animation_id}' on {target_id} ({misl_element})",
+            "text": f"Animation '{decision['animation_id']}' (mode={decision['mode']}) "
+                    f"on {target_id} ({misl_element})",
             "action": "animate",
         })
+
+        return decision
 
     except Exception:
         logger.warning("[animation] Animation failed for %s, falling back to oral guidance",
@@ -197,6 +258,7 @@ async def execute_animation(
         except Exception:
             logger.exception("[animation] Oral guidance fallback also failed for %s",
                              target_id)
+        return None
 
 
 # ---------------------------------------------------------------------------

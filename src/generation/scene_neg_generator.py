@@ -1,15 +1,12 @@
-"""Scene Manifest + NEG co-generation module.
+"""Scene manifest generation module.
 
-Replaces the old separate manifest generation (scene_generator.py Step 1)
-and NEG generation (neg_generator.py) with a single LLM call that produces
-both structures together.
-
-Model: Gemini 3 Flash (gemini-3-flash-preview)
-
-The co-generation ensures that the scene is designed WITH its learning
+Single LLM call that produces the scene manifest — entities, positions,
+relations, properties, and features — designed WITH MISL learning
 objectives in mind.  Entity properties serve as "descriptive affordances"
 — visual features that invite and support specific verbal descriptions
 from the child.
+
+Model: Gemini 3 Flash (gemini-3-flash-preview)
 """
 
 from __future__ import annotations
@@ -40,7 +37,6 @@ from src.generation.prompts.scene_neg_prompt import (
     SCENE_NEG_SYSTEM_PROMPT,
 )
 from src.generation.utils import extract_json, get_response_text
-from src.models.neg import NEG
 from src.models.scene import SceneManifest
 from src.models.story_state import StoryState
 from src.models.student_profile import StudentProfile
@@ -156,7 +152,6 @@ def _build_continuation_prompt(
     story_state: StoryState,
     student_profile: Optional[StudentProfile],
     previous_manifest: Optional[Dict[str, Any]],
-    previous_neg: Optional[Dict[str, Any]],
 ) -> str:
     """Build user prompt for a continuation scene."""
     # Story context: narrative summaries of each scene
@@ -170,9 +165,6 @@ def _build_continuation_prompt(
 
     # Previous manifest
     prev_manifest_str = json.dumps(previous_manifest, indent=2) if previous_manifest else "{}"
-
-    # Previous NEG
-    prev_neg_str = json.dumps(previous_neg, indent=2) if previous_neg else "{}"
 
     # Active entities summary
     entity_lines = []
@@ -196,7 +188,6 @@ def _build_continuation_prompt(
         developmental_expectations=_build_developmental_expectations(age),
         story_context=story_context,
         previous_manifest=prev_manifest_str,
-        previous_neg=prev_neg_str,
         active_entities=active_entities,
         student_profile=profile_ctx,
         scene_number=scene_number,
@@ -208,22 +199,15 @@ def _build_continuation_prompt(
 # ---------------------------------------------------------------------------
 
 
-def _validate_response(data: Dict[str, Any]) -> Tuple[SceneManifest, NEG]:
-    """Validate the LLM response and return parsed models.
+def _validate_response(data: Dict[str, Any]) -> SceneManifest:
+    """Validate the LLM response and return parsed manifest.
 
     Raises ValueError if required fields are missing or invalid.
     """
     manifest_data = data.get("manifest")
     if not manifest_data:
         raise ValueError("Response missing 'manifest' field")
-    manifest = SceneManifest.model_validate(manifest_data)
-
-    neg_data = data.get("neg")
-    if not neg_data:
-        raise ValueError("Response missing 'neg' field")
-    neg = NEG.model_validate(neg_data)
-
-    return manifest, neg
+    return SceneManifest.model_validate(manifest_data)
 
 
 # Expected y-ranges (normalized) per zone — generous tolerance
@@ -242,10 +226,9 @@ _AIRBORNE_TYPES = frozenset({
 
 def _validate_semantic(
     manifest: "SceneManifest",
-    neg: "NEG",
     data: Dict[str, Any],
 ) -> List[str]:
-    """Semantic validation of the manifest + NEG.
+    """Semantic validation of the manifest.
 
     Returns a list of warning strings.  These are non-fatal — the scene is
     still usable, but the warnings highlight quality issues that the LLM
@@ -356,15 +339,7 @@ def _validate_semantic(
             )
 
     # ------------------------------------------------------------------
-    # 9. NEG target count (at least 3)
-    # ------------------------------------------------------------------
-    if len(neg.targets) < 3:
-        warnings.append(
-            f"Only {len(neg.targets)} NEG target(s) (3+ recommended)"
-        )
-
-    # ------------------------------------------------------------------
-    # 10. Entity / structural element overlap
+    # 9. Entity / structural element overlap
     # ------------------------------------------------------------------
     structural = (
         data.get("manifest", {}).get("background", {}).get("structural_elements", [])
@@ -474,15 +449,14 @@ def _resolve_orientations(manifest: SceneManifest) -> None:
 # ---------------------------------------------------------------------------
 
 
-async def generate_scene_and_neg(
+async def generate_scene_manifest(
     api_key: str,
     story_state: Optional[StoryState] = None,
     student_profile: Optional[StudentProfile] = None,
     theme: str = "",
     previous_manifest: Optional[Dict[str, Any]] = None,
-    previous_neg: Optional[Dict[str, Any]] = None,
-) -> Tuple[SceneManifest, NEG, Dict[str, Any]]:
-    """Co-generate a scene manifest and NEG in a single LLM call.
+) -> Tuple[SceneManifest, Dict[str, Any]]:
+    """Generate a scene manifest in a single LLM call.
 
     Args:
         api_key: Gemini API key.
@@ -490,10 +464,9 @@ async def generate_scene_and_neg(
         student_profile: Child's error profile.
         theme: Story theme for initial scenes. Ignored for continuations.
         previous_manifest: Manifest dict of the previous scene (for continuity).
-        previous_neg: NEG dict of the previous scene (for continuity).
 
     Returns:
-        Tuple of (SceneManifest, NEG, raw_response_dict).
+        Tuple of (SceneManifest, raw_response_dict).
         The raw dict contains additional fields like scene_description,
         background_description, carried_over_entities, background_changed.
     """
@@ -503,7 +476,7 @@ async def generate_scene_and_neg(
         user_prompt = _build_initial_prompt(student_profile, theme)
     else:
         user_prompt = _build_continuation_prompt(
-            story_state, student_profile, previous_manifest, previous_neg
+            story_state, student_profile, previous_manifest,
         )
 
     client = genai.Client(api_key=api_key)
@@ -512,7 +485,7 @@ async def generate_scene_and_neg(
     for attempt in range(1, MAX_RETRIES + 1):
         try:
             logger.info(
-                "[scene-neg] Attempt %d/%d — %s scene (model=%s)",
+                "[scene] Attempt %d/%d — %s scene (model=%s)",
                 attempt, MAX_RETRIES,
                 "initial" if is_initial else "continuation",
                 MODEL_ID,
@@ -533,12 +506,12 @@ async def generate_scene_and_neg(
                 timeout=GENERATION_TIMEOUT,
             )
             api_elapsed = time.time() - t0
-            logger.info("[scene-neg] API call took %.1fs", api_elapsed)
+            logger.info("[scene] API call took %.1fs", api_elapsed)
 
             t1 = time.time()
             raw_text = get_response_text(response)
             data = extract_json(raw_text)
-            manifest, neg = _validate_response(data)
+            manifest = _validate_response(data)
 
             # Post-processing: auto-scale and orientation resolution
             _apply_zone_scale(manifest)
@@ -549,43 +522,41 @@ async def generate_scene_and_neg(
             _sync_manifest_to_data(manifest, data)
 
             parse_elapsed = time.time() - t1
-            logger.info("[scene-neg] Parsing + validation took %.1fs", parse_elapsed)
+            logger.info("[scene] Parsing + validation took %.1fs", parse_elapsed)
 
             # Semantic validation (non-fatal warnings)
-            sem_warnings = _validate_semantic(manifest, neg, data)
+            sem_warnings = _validate_semantic(manifest, data)
             for w in sem_warnings:
-                logger.warning("[scene-neg] Semantic: %s", w)
+                logger.warning("[scene] Semantic: %s", w)
             if sem_warnings:
                 logger.info(
-                    "[scene-neg] %d semantic warning(s) for scene '%s'",
+                    "[scene] %d semantic warning(s) for scene '%s'",
                     len(sem_warnings), manifest.scene_id,
                 )
 
             logger.info(
-                "[scene-neg] Generated scene '%s': %d entities, %d relations, "
-                "%d actions, %d NEG targets (coverage_check=%s) — total %.1fs",
+                "[scene] Generated scene '%s': %d entities, %d relations, "
+                "%d actions — total %.1fs",
                 manifest.scene_id,
                 len(manifest.entities),
                 len(manifest.relations),
                 len(manifest.actions),
-                len(neg.targets),
-                neg.skill_coverage_check,
                 time.time() - t0,
             )
 
-            return manifest, neg, data
+            return manifest, data
 
         except asyncio.TimeoutError:
             logger.warning(
-                "[scene-neg] Attempt %d/%d timed out after %ds",
+                "[scene] Attempt %d/%d timed out after %ds",
                 attempt, MAX_RETRIES, GENERATION_TIMEOUT,
             )
             last_exc = asyncio.TimeoutError(
-                f"Scene+NEG generation timed out after {GENERATION_TIMEOUT}s"
+                f"Scene generation timed out after {GENERATION_TIMEOUT}s"
             )
         except Exception as exc:
             logger.warning(
-                "[scene-neg] Attempt %d/%d failed (%s): %s",
+                "[scene] Attempt %d/%d failed (%s): %s",
                 attempt, MAX_RETRIES, type(exc).__name__, exc,
             )
             last_exc = exc

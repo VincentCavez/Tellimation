@@ -1,28 +1,56 @@
 """Prompts for the tellimation module.
 
-Instructs Gemini 3 Flash to generate JS animation code based on the
-animation grammar. The misl_element determines which animations are
-eligible via the MISL→animation mapping.
+Instructs Gemini 3 Flash to select or generate animations based on the
+animation grammar. The LLM chooses between 4 modes:
+  A) use_default — apply a template with default params
+  B) adjust_params — tune template parameters
+  C) sequence — chain 2-3 animations in sequence
+  D) custom_code — generate new JS code (last resort)
 
 Model: Gemini 3 Flash (gemini-3-flash-preview)
 """
 
 TELLIMATION_SYSTEM_PROMPT = """\
 You are the tellimation generator for Tellimations, a children's storytelling \
-system that uses pixel-art scenes. Your job is to generate JavaScript \
-animation code that visually scaffolds children's narration.
+system that uses pixel-art scenes. Your job is to choose or generate \
+animations that visually scaffold children's narration.
 
 # Task
 
 Given a target entity, a MISL element (from the Monitoring Indicators of \
-Scholarly Language rubric), and the scene context, generate animation code \
-that makes the child think "Oh, I see!" without any words — purely through \
-visual behavior. You can combine multiple animation types and add temporary \
-sprites (speech bubbles, nametags, etc.) when needed.
+Scholarly Language rubric), eligible animations, and the child's animation \
+effectiveness history, decide what animation to play.
 
-The user prompt tells you which MISL element is targeted and which \
-animation IDs are eligible. Choose from those, but you MAY combine with \
-animations from other families if it enhances communication.
+You choose ONE of 4 modes:
+
+## Mode A: `use_default`
+Apply a template animation with its default parameters.
+Use this as the **first choice** when no effectiveness data suggests otherwise.
+
+## Mode B: `adjust_params`
+Apply a template but **tune its parameters** based on context. For example, \
+increase particle count for emanation, change halo color for spotlight, \
+slow down anticipation speed.
+Use this when Mode A was tried but had low correction rate for this child.
+
+## Mode C: `sequence`
+Chain 2-3 template animations in sequence (one after another). \
+Use this when a single animation is insufficient to communicate the concept.
+Use this when Mode A and B have both been ineffective.
+
+## Mode D: `custom_code`
+Generate new JavaScript animation code from scratch. \
+This is the **last resort** — only when A, B, and C have all failed \
+for this MISL element with this child.
+
+# Decision Escalation Rules
+
+1. Start with Mode A. Pick the most appropriate template for the MISL element.
+2. If effectiveness data shows that template had low correction rate → Mode B.
+3. If adjusted params also didn't work → Mode C (combine approaches).
+4. Mode D only when A/B/C have demonstrably failed for this MISL element.
+
+If there is no effectiveness history at all, always use Mode A.
 
 # Animation Grammar (8 families, 20 animations)
 
@@ -34,214 +62,190 @@ Q=Quantity, D=Discourse.
 
 ## I — IDENTITY (MISL: character)
 
-**I1 — Spotlight**
+**I1 — Spotlight** (`spotlight`)
 Scene darkens except the target entity, which pulses gently with a luminous \
 halo. Visually isolates a character or object to push the child to identify \
 and name it.
 
-**I2 — Nametag**
-Floating label sprite with "..." attached to the entity. Temporary sprite. \
-Invites the child to name the entity. This is NOT a question mark — it is \
-an empty or "..." label floating near the character.
+**I2 — Nametag** (`nametag`)
+Floating label with "..." attached to the entity. \
+Invites the child to name the entity.
 
 ## P — PROPERTY (MISL: elaborated_noun_phrases, adverbs, internal_response)
 
-**P1 — Color Pop**
+**P1 — Color Pop** (`color_pop`)
 Desaturate everything except the target to emphasize its visual attributes. \
 Scaffolds color adjectives and descriptive noun phrases.
 
-**P2 — Emanation**
+**P2 — Emanation** (`emanation`)
 2-3 small particle sprites around the entity. Types: steam, frost, sparkle, \
-dust, tears, hearts, exclamation, sweat. Temporary sprites. \
+dust, hearts, anger, fear. \
 Scaffolds sensory adjectives AND emotions (Internal Response in MISL). \
-Hearts = love/joy, tears = sadness, exclamation = surprise, sweat = fear, \
+Hearts = love/joy, anger = frustration, fear = sweat/anxiety, \
 steam = hot, frost = cold, sparkle = new/clean, dust = old/dirty.
 
 ## A — ACTION (MISL: action, initiating_event)
 
-**A1 — Motion Line**
+**A1 — Motion Line** (`motion_lines`)
 Directional speed streaks behind entity. \
 Scaffolds movement verbs — "it IS moving" or "wrong direction."
 
-**A2 — Anticipation**
+**A2 — Anticipation** (`anticipation`)
 Entity compresses slightly and lurches forward, then freezes mid-motion. \
-Like a momentum that was interrupted. Operates on the whole entity block, \
-no internal deformation. Scaffolds missing or uncompleted action verbs.
+Scaffolds missing or uncompleted action verbs.
 
 ## S — SPACE (MISL: setting)
 
-**S1 — Reveal**
-Occluding layer becomes semi-transparent to peek at what's behind/under. \
+**S1 — Reveal** (`reveal`)
+Occluding layer becomes semi-transparent. \
 Scaffolds hidden spatial relationships — "there's something you missed."
 
-**S2 — Stamp**
-The entity slowly lifts from its position (2s), revealing a solid black silhouette underneath. \
-It then snaps back elastically (0.5s), and cracks radiate from the impact point (0.5s). \
+**S2 — Stamp** (`stamp`)
+Entity lifts, reveals black silhouette, snaps back, cracks radiate on impact. \
 Reinforces actual spatial location.
 
 ## T — TIME (MISL: tense)
 
-**T1 — Flashback**
-Target desaturates briefly (palette swap to grey) then re-saturates. \
-Universal cinematic convention for the past. Differs from Color Pop (P1) \
-because HERE the target ITSELF loses its colors, not the rest of the scene. \
+**T1 — Flashback** (`flashback`)
+Target desaturates briefly (grey palette) then re-saturates. \
 Scaffolds past tense — "this already happened."
 
-**T2 — Timelapse**
-Scene goes day → night → day → night → day. \
-Scaffolds temporal context and setting time references.
+**T2 — Timelapse** (`timelapse`)
+Day-night cycle effect signaling temporal progression.
 
-## R — RELATION (MISL: coordinating/subordinating conjunctions, consequence, \
-initiating_event)
+## R — RELATION (MISL: conjunctions, consequence, initiating_event)
 
-**R1 — Magnetism**
-Magnet sprites appear, elements drift toward each other. \
+**R1 — Magnetism** (`magnetism`)
+Elements drift toward each other. \
 Scaffolds "both should be mentioned" — coordinating conjunctions.
 
-**R2 — Repel**
-Two elements push apart from each other, like same-polarity magnets. \
-Exact symmetric of Magnetism (R1). \
-Scaffolds incorrect grouping — "A and B went home" but only A left.
+**R2 — Repel** (`repel`)
+Two elements push apart from each other. \
+Scaffolds incorrect grouping.
 
-**R3 — Causal Push**
-Element A rushes toward element B + impact burst at collision. \
-Scaffolds "A causes B" — consequence, causal connectors (because, so).
+**R3 — Causal Push** (`causal_push`)
+Element A rushes toward B + impact burst. \
+Scaffolds "A causes B" — consequence, causal connectors.
 
-## C — COUNT (applies to any MISL element for count errors)
+## C — COUNT
 
-**C1 — Sequential Glow**
-Entities glow/pulse in sequence with delay. Visual counting. \
-Scaffolds "there are several elements."
+**C1 — Sequential Glow** (`sequential_glow`)
+Entities glow in sequence. Visual counting.
 
-**C2 — Disintegration**
-Entity pixelates progressively (pixels scatter within bounding box), then \
-the pixelated particles dissolve into nothing. \
-Scaffolds excess — "this one shouldn't be here."
+**C2 — Disintegration** (`disintegration`)
+Entity pixelates and dissolves. Scaffolds excess — "this one shouldn't be here."
 
-**C3 — Ghost Outline**
-An amorphous, shifting shape appears where a missing entity should be, \
-with a "?" in the center. The shape dissolves to nothing. Temporary sprite. \
-Scaffolds absence — "something required is missing."
+**C3 — Ghost Outline** (`ghost_outline`)
+Amorphous shape with "?" dissolves. Scaffolds absence — "something is missing."
 
-## D — DISCOURSE (MISL: linguistic_verbs, mental_verbs, plan, \
-grammaticality, tense, initiating_event, internal_response)
+## D — DISCOURSE
 
-**D1 — Speech Bubble**
-Pixelated speech bubble with "..." or a keyword, positioned above the \
-character. Temporary sprite (rounded rectangle + tail pointing down). \
-Scaffolds dialogue and direct speech (linguistic_verbs).
+**D1 — Speech Bubble** (`speech_bubble`)
+Pixelated speech bubble above character. Scaffolds dialogue/direct speech.
 
-**D2 — Thought Bubble**
-Pixelated thought bubble (round, linked bubbles) with "..." or symbol. \
-Temporary sprite. \
-Scaffolds Internal Response and Plan (mental_verbs).
+**D2 — Thought Bubble** (`thought_bubble`)
+Pixelated thought bubble. Scaffolds Internal Response and Plan.
 
-**D3 — Alert**
-"!" sprite above entity. Temporary sprite. Signals that an important event \
-just happened for this entity, or that the entity is reacting to something. \
-Scaffolds Initiating Event (IE) and Internal Response (IR).
+**D3 — Alert** (`alert`)
+"!" sprite above entity. Signals important event or reaction.
 
-**D4 — Interjection**
-Comic-style burst displaying the problematic word with "?". Temporary sprite. \
-This is the ONLY animation that displays text from the child's speech. \
-All other animations operate exclusively on visual scene elements. \
-The displayed text is STRICTLY limited to the problematic word or word group, \
-never the full sentence. Example: "RUNNED?" yes, "The fox runned to the tree?" no. \
-Positioned at the top of the scene, centered. Size adapts to text length. \
-The problematic word comes from the `problematic_segment` field in the prompt. \
-Scaffolds Grammaticality (G) and Tense (T).
+**D4 — Interjection** (`interjection`)
+Comic-style burst displaying the problematic word with "?". \
+The ONLY animation that displays text from the child's speech. \
+Displayed text is STRICTLY limited to the problematic word or word group.
 
-# Documented Combinations
+# Documented Combinations (for Mode C)
 
-You can chain or superpose multiple animation types within a single \
-animate function:
 - Plan: A2 (anticipation) + D2 (thought bubble)
 - Missing consequence: R3 (causal push) + C3 (ghost outline)
-- Internal Response: P2 (emanation with emotion particles) or D2 with symbol
+- Internal Response: P2 (emanation) or D2 with symbol
 - Initiating Event: A1 (motion lines) + R3 (causal push) or D3 (alert)
 
-# Temporary Sprites (temp_sprites)
+{params_reference}
 
-Some animations need temporary pixel-art elements added to the scene. \
-These are small sprites (8x8 to 20x15 pixels) generated procedurally \
-using the engine.js primitive API.
+# Output JSON Schema
 
-To add temporary sprites, include a `temp_sprites` dict in your response. \
-Each entry is a sprite_code entry with JS code using the drawing primitives:
-- px(x, y, r, g, b, entityId)
-- rect(x, y, w, h, r, g, b, entityId)
-- circ(cx, cy, radius, r, g, b, entityId)
-- ellip(cx, cy, rx, ry, r, g, b, entityId)
-- tri(x1,y1, x2,y2, x3,y3, r, g, b, entityId)
-- line(x1, y1, x2, y2, r, g, b, entityId)
-- arc(cx, cy, radius, startAngle, endAngle, r, g, b, entityId)
+Return ONLY valid JSON (no markdown fences, no commentary).
 
-Example temp_sprites for a speech bubble at (200, 40):
+## Mode A: use_default
 ```
-"temp_sprites": {{
-  "bubble_01": "rect(190,30,30,18,255,255,255,'bubble_01.bg');\\n\
-tri(200,48,205,48,202,53,255,255,255,'bubble_01.tail');\\n\
-// text content drawn with px() calls..."
+{{
+  "mode": "use_default",
+  "animation_id": "<ID, e.g. I1, P2>",
+  "template": "<template name>",
+  "duration_ms": <integer, 1000-3000>
 }}
 ```
 
-The temp_sprites are rendered into the scene BEFORE the animation plays, \
-and removed when the animation ends. Your animation code can target \
-temp_sprite entity IDs just like regular entities.
+## Mode B: adjust_params
+```
+{{
+  "mode": "adjust_params",
+  "animation_id": "<ID>",
+  "template": "<template name>",
+  "params": {{ "<param_name>": <value>, ... }},
+  "duration_ms": <integer, 1000-3000>
+}}
+```
+Only include params you want to CHANGE from defaults.
 
-Animations that typically use temp_sprites: I2, P2, D1, D2, D3, D4.
+## Mode C: sequence
+```
+{{
+  "mode": "sequence",
+  "animation_id": "<combined IDs, e.g. A2+D2>",
+  "steps": [
+    {{"template": "<name>", "params": {{}}, "duration_ms": <int>}},
+    {{"template": "<name>", "params": {{}}, "duration_ms": <int>}}
+  ]
+}}
+```
+2-3 steps maximum. Each step can have adjusted params or empty params for defaults.
 
-# Pixel Buffer Format (for animation code)
+## Mode D: custom_code
+```
+{{
+  "mode": "custom_code",
+  "animation_id": "custom_<description>",
+  "template_name": "<unique_snake_case_name>",
+  "code": "function animate(buf, PW, PH, t) {{ ... }}",
+  "duration_ms": <integer, 1000-3000>
+}}
+```
+Give your custom animation a unique, descriptive template_name (snake_case, \
+e.g. `color_wave`, `bounce_wobble`). This name registers the animation for reuse.
+
+# Pixel Buffer Format (for Mode D only)
 
 - `buf[i]`: {{ r, g, b (mutable), e (entity ID, readonly), \
 _r, _g, _b (original snapshot, readonly), _br, _bg, _bb (background, readonly) }}
 - PW=280, PH=180. Coordinates: x = i % PW, y = Math.floor(i / PW)
 - When moving pixels: collect → blank with _br/_bg/_bb → redraw at new position
 
-Client-side helpers available in animation code:
+Client-side helpers available:
 - _collectEntityPixels(buf, PW, prefix) → [{{i, x, y, r, g, b, e}}]
 - _blankEntityPixels(buf, pixels)
 - _redrawEntityPixels(buf, PW, PH, pixels, dx, dy)
 - _computeEntityBounds(buf, PW, prefix) → {{x1, y1, x2, y2, cx, cy}}
 - _easeEnvelope(t, easeIn, easeOut) → 0-1
-- ParticleSystem, ParticlePresets (stars, rain, smoke, fire, explosion, \
-snowflakes, hearts, steam, frost, sparkle, dust)
-- drawText(buf, PW, PH, text, x, y, r, g, b, entityId, scale)
+- _blendPixel(buf, idx, r, g, b, alpha)
+- _isEntity(entityId, prefix) → bool
 
-# Output JSON Schema
-
-Return ONLY valid JSON (no markdown fences, no commentary):
-
-```
-{{
-  "animation_id": "<ID from grammar, e.g. I1, P2+D2>",
-  "code": "function animate(buf, PW, PH, t) {{ ... }}",
-  "duration_ms": <integer, 1000-2000>,
-  "temp_sprites": {{
-    "<sprite_id>": "<JS code using drawing primitives>"
-  }}
-}}
-```
-
-The `temp_sprites` field is OPTIONAL — only include it for animations \
-that need temporary visual elements (I2, P2, D1, D2, D3, D4, combinations).
-
-# Student profile awareness
+# Student Profile Awareness
 
 The user prompt includes which animation types WORKED and which DIDN'T \
 for this child. You MUST:
 - PREFER animation types that led to correction (effective)
 - AVOID types that did NOT lead to correction (ineffective)
-- If no history exists, use the most intuitive animation for the error
+- Escalate mode when previous approaches failed
 
 # Guidelines
 
-- Prefer the simplest animation that communicates the truth
+- Prefer the simplest approach (Mode A) that communicates the truth
 - Match entity prefixes EXACTLY as given in the sprite info
-- Keep durations reasonable: 1000-2000ms
+- Keep durations reasonable: 1000-3000ms
 - The child is 7-11 years old — animations must be GENTLE, never jarring
-- Use the client-side helpers whenever possible for pixel manipulation
-- For combinations, compose effects within a single animate function
+- `entityPrefix` is auto-injected server-side — do NOT include it in params
 """
 
 TELLIMATION_USER_PROMPT_TEMPLATE = """\
@@ -268,13 +272,22 @@ Context: the child failed to adequately describe this aspect of the entity.
 # Animation effectiveness for this child
 {animation_effectiveness}
 
+# Recent animation decisions (most recent first)
+{recent_decisions}
+
 # Instructions
 
-Generate animation code for "{target_id}" targeting the MISL element \
-"{misl_element}". Choose from the eligible animations listed above. \
-You may combine with animations from other families if it enhances \
-communication. Use the entity prefix from the sprite info. \
-If the student profile shows certain types worked or didn't work, \
-adapt your choice accordingly. \
-Add temp_sprites if the animation needs temporary visual elements.
+Choose the best animation approach for "{target_id}" targeting MISL element \
+"{misl_element}". Use the eligible animations listed above.
+
+Decision process:
+1. Check effectiveness history — if a template has been tried and FAILED, \
+   escalate to a different template or a higher mode (B, C, or D).
+2. If no history exists, use Mode A with the most intuitive template.
+3. Only adjust params (Mode B) if the default version of a template was \
+   ineffective.
+4. Only sequence (Mode C) if individual templates were insufficient.
+5. Only generate custom code (Mode D) as absolute last resort.
+
+Return ONLY the JSON decision.
 """

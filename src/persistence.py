@@ -5,7 +5,7 @@ Directory layout under DATA_ROOT/users/:
     <participant_id>/
         profile.json              # StudentProfile (cumulative across sessions)
         story_001/
-            scene_01.json         # Full scene data (manifest, NEG, sprite_code, etc.)
+            scene_01.json         # Full scene data (manifest, sprite_code, etc.)
             scene_01_ref.png      # Reference image (if generated)
             scene_02.json
             scene_02_ref.png
@@ -143,11 +143,10 @@ def save_scene(
     reference_image: Optional[bytes] = None,
     entity_images: Optional[Dict[str, bytes]] = None,
 ) -> None:
-    """Save a scene (manifest + NEG + sprites + metadata) to a story folder.
+    """Save a scene (manifest + sprites + metadata) to a story folder.
 
     The scene_data dict is expected to have:
         - manifest (with scene_id)
-        - neg
         - sprite_code
         - narrative_text
         - branch_summary

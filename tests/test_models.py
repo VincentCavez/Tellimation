@@ -3,12 +3,16 @@ import json
 import pytest
 
 from src.models.scene import Action, Entity, Position, Relation, SceneManifest
-from src.models.neg import (
-    NEG,
-    NarrativeTarget,
+from src.models.assessment import (
+    AssessmentResponse,
+    FactualError,
+    MISLOpportunity,
+    SceneAssessmentEntry,
+    SceneLog,
+    SceneStoryEntry,
 )
 from src.models.story_state import ActiveEntity, StoryState
-from src.models.student_profile import Discrepancy, StudentProfile
+from src.models.student_profile import AnimationDecision, Discrepancy, StudentProfile
 from src.models.animation_cache import AnimationCache, CachedAnimation
 
 
@@ -90,57 +94,62 @@ class TestScene:
 
 
 # ---------------------------------------------------------------------------
-# neg.py
+# assessment.py
 # ---------------------------------------------------------------------------
 
-class TestNEG:
-    def test_neg_json_roundtrip(self):
-        neg = NEG(
-            targets=[
-                NarrativeTarget(
-                    id="t1",
-                    entity_id="cat_01",
-                    misl_element="character",
-                    current_level=1,
-                    target_level=2,
-                    description="Name the cat: Whiskers",
-                    priority=0.9,
-                    tolerance=0.3,
-                ),
-            ],
-            min_coverage=0.7,
-            skill_coverage_check="PASS",
-        )
-        data = json.loads(neg.model_dump_json())
-        restored = NEG.model_validate(data)
-        assert len(restored.targets) == 1
-        assert restored.targets[0].misl_element == "character"
-        assert restored.targets[0].target_level == 2
-        assert restored.skill_coverage_check == "PASS"
+class TestAssessment:
+    def test_assessment_response_defaults(self):
+        resp = AssessmentResponse()
+        assert resp.factual_errors == []
+        assert resp.misl_opportunities == []
+        assert resp.utterance_is_acceptable is True
 
-    def test_get_targets_for_entity(self):
-        neg = NEG(
-            targets=[
-                NarrativeTarget(
-                    id="t1", entity_id="cat_01",
-                    misl_element="character",
-                    description="Name the cat",
+    def test_assessment_response_with_errors(self):
+        resp = AssessmentResponse(
+            factual_errors=[
+                FactualError(
+                    utterance_fragment="the blue cat",
+                    manifest_ref="cat_01",
+                    explanation="The cat is orange, not blue",
                 ),
-                NarrativeTarget(
-                    id="t2", entity_id="dog_01",
-                    misl_element="character",
-                    description="Name the dog",
-                ),
-                NarrativeTarget(
-                    id="t3", entity_id="cat_01",
-                    misl_element="setting",
-                    description="Describe where the cat is",
+            ],
+            utterance_is_acceptable=False,
+        )
+        assert len(resp.factual_errors) == 1
+        assert resp.factual_errors[0].manifest_ref == "cat_01"
+        assert resp.utterance_is_acceptable is False
+
+    def test_assessment_response_with_opportunities(self):
+        resp = AssessmentResponse(
+            misl_opportunities=[
+                MISLOpportunity(
+                    dimension="elaborated_noun_phrases",
+                    manifest_elements=["cat_01"],
+                    suggestion="Can you describe what the cat looks like?",
                 ),
             ],
         )
-        cat_targets = neg.get_targets_for_entity("cat_01")
-        assert len(cat_targets) == 2
-        assert all(t.entity_id == "cat_01" for t in cat_targets)
+        assert len(resp.misl_opportunities) == 1
+        assert resp.misl_opportunities[0].dimension == "elaborated_noun_phrases"
+
+    def test_scene_log_tracks_assessments(self):
+        log = SceneLog(scene_id="scene_01", scene_manifest={"entities": []})
+        log.story.append(SceneStoryEntry(utterance_text="a cat"))
+        log.assessments.append(SceneAssessmentEntry(
+            utterance_text="a cat",
+            accepted=True,
+        ))
+        assert len(log.story) == 1
+        assert len(log.assessments) == 1
+        assert log.misl_opportunities_given == 0
+
+    def test_scene_log_json_roundtrip(self):
+        log = SceneLog(scene_id="s1", scene_manifest={})
+        log.story.append(SceneStoryEntry(utterance_text="hello"))
+        data = json.loads(log.model_dump_json())
+        restored = SceneLog.model_validate(data)
+        assert restored.scene_id == "s1"
+        assert len(restored.story) == 1
 
 
 # ---------------------------------------------------------------------------
@@ -154,7 +163,7 @@ class TestStoryState:
             scene_id="scene_01",
             narrative_text="A rabbit appears.",
             manifest={"entities": []},
-            neg={"targets": []},
+
             sprite_code={"rabbit_01": "circ(50,50,10,255,255,255,'rabbit_01');"},
         )
         assert len(state.scenes) == 1
@@ -173,7 +182,6 @@ class TestStoryState:
             scene_id="scene_02",
             narrative_text="Rabbit moves.",
             manifest={},
-            neg={},
             sprite_code={"rabbit_01": "new_code"},
         )
         assert state.active_entities["rabbit_01"].sprite_code == "new_code"
@@ -235,7 +243,6 @@ class TestStoryState:
             scene_id="scene_01",
             narrative_text="Hello",
             manifest={},
-            neg={},
             sprite_code={"cat_01": "rect(0,0,10,10,0,0,0,'cat_01');"},
         )
         data = json.loads(state.model_dump_json())
@@ -369,16 +376,17 @@ class TestAnimationCache:
     def test_store_and_exact_lookup(self):
         cache = AnimationCache()
         anim = CachedAnimation(
-            code="function animate(buf,PW,PH,t){}", duration_ms=1000, generated_for="cat_01.body"
+            mode="use_default", template="spotlight",
+            duration_ms=1000, generated_for="cat_01.body"
         )
         cache.store("cat_01.body", "PROPERTY_COLOR", anim)
         result = cache.lookup("cat_01.body", "PROPERTY_COLOR")
         assert result is not None
-        assert result.code == anim.code
+        assert result.template == "spotlight"
 
     def test_has(self):
         cache = AnimationCache()
-        cache.store("a", "X", CachedAnimation(code="c"))
+        cache.store("a", "X", CachedAnimation(template="spotlight"))
         assert cache.has("a", "X") is True
         assert cache.has("a", "Y") is False
         assert cache.has("b", "X") is False
@@ -390,43 +398,174 @@ class TestAnimationCache:
     def test_prefix_match_parent_to_child(self):
         """lookup("rabbit_01", ...) should match cache["rabbit_01.body"]."""
         cache = AnimationCache()
-        anim = CachedAnimation(code="body_anim", generated_for="rabbit_01.body")
+        anim = CachedAnimation(
+            mode="adjust_params", template="emanation",
+            params={"particleType": "hearts"}, generated_for="rabbit_01.body"
+        )
         cache.store("rabbit_01.body", "PROPERTY_COLOR", anim)
         result = cache.lookup("rabbit_01", "PROPERTY_COLOR")
         assert result is not None
-        assert result.code == "body_anim"
+        assert result.template == "emanation"
+        assert result.params["particleType"] == "hearts"
 
     def test_prefix_match_child_to_parent(self):
         """lookup("rabbit_01.body.fur", ...) should match cache["rabbit_01.body"]."""
         cache = AnimationCache()
-        anim = CachedAnimation(code="body_anim", generated_for="rabbit_01.body")
+        anim = CachedAnimation(
+            mode="use_default", template="stamp", generated_for="rabbit_01.body"
+        )
         cache.store("rabbit_01.body", "SPATIAL", anim)
         result = cache.lookup("rabbit_01.body.fur", "SPATIAL")
         assert result is not None
-        assert result.code == "body_anim"
+        assert result.template == "stamp"
 
     def test_prefix_no_false_positive(self):
         """'rabbit_01' should NOT match 'rabbit_012' (not a dot boundary)."""
         cache = AnimationCache()
-        cache.store("rabbit_012", "SPATIAL", CachedAnimation(code="wrong"))
+        cache.store("rabbit_012", "SPATIAL", CachedAnimation(template="reveal"))
         assert cache.lookup("rabbit_01", "SPATIAL") is None
 
     def test_exact_match_takes_priority(self):
         cache = AnimationCache()
-        cache.store("cat_01.body", "PROPERTY_COLOR", CachedAnimation(code="child"))
-        cache.store("cat_01", "PROPERTY_COLOR", CachedAnimation(code="exact"))
+        cache.store("cat_01.body", "PROPERTY_COLOR", CachedAnimation(template="color_pop"))
+        cache.store("cat_01", "PROPERTY_COLOR", CachedAnimation(template="spotlight"))
         result = cache.lookup("cat_01", "PROPERTY_COLOR")
         assert result is not None
-        assert result.code == "exact"
+        assert result.template == "spotlight"
+
+    def test_custom_code_mode(self):
+        cache = AnimationCache()
+        anim = CachedAnimation(
+            mode="custom_code",
+            code="function animate(buf,PW,PH,t){}",
+            duration_ms=1500,
+            generated_for="cat_01",
+        )
+        cache.store("cat_01", "IDENTITY", anim)
+        result = cache.lookup("cat_01", "IDENTITY")
+        assert result is not None
+        assert result.mode == "custom_code"
+        assert "animate" in result.code
+
+    def test_sequence_mode(self):
+        cache = AnimationCache()
+        anim = CachedAnimation(
+            mode="sequence",
+            steps=[
+                {"template": "anticipation", "params": {}, "duration_ms": 1500},
+                {"template": "thought_bubble", "params": {}, "duration_ms": 1200},
+            ],
+            duration_ms=2700,
+            generated_for="fox_01",
+        )
+        cache.store("fox_01", "plan", anim)
+        result = cache.lookup("fox_01", "plan")
+        assert result is not None
+        assert result.mode == "sequence"
+        assert len(result.steps) == 2
 
     def test_json_roundtrip(self):
         cache = AnimationCache()
         cache.store(
             "owl_01.body",
             "IDENTITY",
-            CachedAnimation(code="fn(buf,PW,PH,t){}", duration_ms=800, generated_for="owl_01.body"),
+            CachedAnimation(
+                mode="adjust_params", template="spotlight",
+                params={"dimStrength": 0.9}, duration_ms=800,
+                generated_for="owl_01.body",
+            ),
         )
         data = json.loads(cache.model_dump_json())
         restored = AnimationCache.model_validate(data)
         assert restored.has("owl_01.body", "IDENTITY")
-        assert restored.lookup("owl_01", "IDENTITY") is not None
+        result = restored.lookup("owl_01", "IDENTITY")
+        assert result is not None
+        assert result.params["dimStrength"] == 0.9
+
+
+# ---------------------------------------------------------------------------
+# AnimationDecision
+# ---------------------------------------------------------------------------
+
+class TestAnimationDecision:
+    def test_defaults(self):
+        d = AnimationDecision()
+        assert d.mode == ""
+        assert d.outcome == "pending"
+        assert d.escalated_to_voice is False
+        assert d.params == {}
+        assert d.steps == []
+
+    def test_use_default_decision(self):
+        d = AnimationDecision(
+            mode="use_default",
+            animation_id="I1_spotlight",
+            template="spotlight",
+            target_id="cat_01",
+            misl_element="character",
+            duration_ms=3000,
+        )
+        assert d.mode == "use_default"
+        assert d.template == "spotlight"
+
+    def test_adjust_params_decision(self):
+        d = AnimationDecision(
+            mode="adjust_params",
+            animation_id="P2_emanation",
+            template="emanation",
+            params={"particleType": "hearts", "particleCount": 25},
+            duration_ms=2500,
+        )
+        assert d.params["particleType"] == "hearts"
+        assert d.params["particleCount"] == 25
+
+    def test_sequence_decision(self):
+        d = AnimationDecision(
+            mode="sequence",
+            animation_id="A2+D2",
+            steps=[
+                {"template": "anticipation", "params": {}, "duration_ms": 2000},
+                {"template": "thought_bubble", "params": {}, "duration_ms": 1500},
+            ],
+            duration_ms=3500,
+        )
+        assert len(d.steps) == 2
+        assert d.steps[0]["template"] == "anticipation"
+
+    def test_outcome_tracking(self):
+        d = AnimationDecision(mode="use_default", outcome="pending")
+        d.outcome = "success"
+        assert d.outcome == "success"
+        d.outcome = "failure"
+        d.escalated_to_voice = True
+        assert d.outcome == "failure"
+        assert d.escalated_to_voice is True
+
+    def test_json_roundtrip(self):
+        d = AnimationDecision(
+            mode="adjust_params",
+            animation_id="P1_color_pop",
+            template="color_pop",
+            params={"cycleCount": 3},
+            target_id="owl_01",
+            misl_element="adverbs",
+            duration_ms=3000,
+            outcome="success",
+        )
+        data = json.loads(d.model_dump_json())
+        restored = AnimationDecision.model_validate(data)
+        assert restored.mode == "adjust_params"
+        assert restored.params["cycleCount"] == 3
+        assert restored.outcome == "success"
+
+    def test_student_profile_has_decisions_list(self):
+        p = StudentProfile()
+        assert p.animation_decisions == []
+        p.animation_decisions.append(AnimationDecision(
+            mode="use_default",
+            animation_id="I1_spotlight",
+            template="spotlight",
+            outcome="success",
+        ))
+        assert len(p.animation_decisions) == 1
+        assert p.animation_decisions[0].outcome == "success"

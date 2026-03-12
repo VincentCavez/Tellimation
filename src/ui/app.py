@@ -1,9 +1,9 @@
 """Tellimations FastAPI web server with WebSocket handler.
 
-Orchestrates the v3 pipeline:
-  1. scene_neg_generator → manifest + NEG (Gemini 3.1 Pro)
-  2. scene_generator → sprite_code (Nano Banana 2 images)
-  3. discrepancy_assessment → per-utterance decision (Gemini 3 Flash)
+Orchestrates the pipeline:
+  1. scene_neg_generator → manifest (Gemini 3 Flash)
+  2. scene_generator → sprite_code
+  3. transcription → assessment → decision logic (Gemini 3 Flash)
   4. tellimation → animation code (Gemini 3 Flash)
 """
 
@@ -12,8 +12,13 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import os
 import time
 import random
+
+from dotenv import load_dotenv
+
+load_dotenv()
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -24,13 +29,18 @@ from starlette.websockets import WebSocketState
 
 from src.analytics.session_report import generate_report
 from src.generation.scene_generator import STORY_THEMES, generate_scene_assets
-from src.generation.scene_neg_generator import generate_scene_and_neg
-from src.interaction.discrepancy_assessment import assess_and_respond
-from src.models.neg import NEG
+from src.generation.scene_neg_generator import generate_scene_manifest
+from src.interaction.decision_logic import (
+    get_accepted_utterances,
+    get_misl_dimensions_suggested,
+    process_assessment,
+)
+from src.interaction.discrepancy_assessment import assess_utterance
+from src.models.assessment import SceneLog
 from src.models.scene import SceneManifest
 from src.models.session_state import SessionState
 from src.models.student_profile import StudentProfile
-from src.narration.transcription import transcribe_and_detect
+from src.narration.transcription import transcribe_audio
 from src.persistence import (
     save_scene,
     save_student_profile,
@@ -51,11 +61,19 @@ STATIC_DIR = BASE_DIR / "static"
 MAX_SCENES = 5
 INITIAL_SCENE_COUNT = 1  # number of scenes offered on the selection page
 
+# Valid participant codes: admin + 20 participants
+VALID_CODES = {
+    "0027",  # admin
+    "4831", "7249", "1563", "9087", "3412",
+    "6758", "2094", "8376", "5620", "1947",
+    "7503", "4186", "9641", "2835", "6072",
+    "3498", "8215", "5769", "1324", "7950",
+}
+
 
 def _assemble_scene_dict(
     raw_data: Dict[str, Any],
     manifest: SceneManifest,
-    neg: NEG,
     assets: Dict[str, Any],
 ) -> Dict[str, Any]:
     """Build the canonical scene dict from generation outputs."""
@@ -63,7 +81,6 @@ def _assemble_scene_dict(
         "narrative_text": raw_data.get("narrative_text", ""),
         "scene_description": raw_data.get("scene_description", ""),
         "manifest": manifest.model_dump(),
-        "neg": neg.model_dump(),
         "sprite_code": assets["sprite_code"],
         "carried_over_entities": assets.get("carried_over_entities", []),
     }
@@ -76,14 +93,18 @@ def _apply_scene_to_session(
     """Hydrate session state from a scene dict (no WS interaction)."""
     session.current_scene = scene
     session.current_manifest = SceneManifest.model_validate(scene["manifest"])
-    session.current_neg = NEG.model_validate(scene.get("neg", {"targets": []}))
     session.reset_scene_state()
+
+    # Initialize per-scene assessment log
+    session.current_scene_log = SceneLog(
+        scene_id=scene["manifest"].get("scene_id", ""),
+        scene_manifest=scene["manifest"],
+    )
 
     session.story_state.add_scene(
         scene_id=scene["manifest"]["scene_id"],
         narrative_text=scene.get("narrative_text", ""),
         manifest=scene["manifest"],
-        neg=scene.get("neg", {}),
         sprite_code=scene.get("sprite_code"),
     )
 
@@ -149,6 +170,16 @@ async def story_page():
 # REST API endpoints
 # ---------------------------------------------------------------------------
 
+@app.post("/api/validate-code")
+async def validate_code(request: Request):
+    """Check if a participant code is valid."""
+    body = await request.json()
+    code = body.get("code", "").strip()
+    if code in VALID_CODES:
+        return JSONResponse(content={"valid": True})
+    return JSONResponse(status_code=401, content={"valid": False})
+
+
 @app.get("/api/simulation-scene")
 async def api_simulation_scene():
     """Return the last scene generated with participant_id=simulation."""
@@ -165,7 +196,7 @@ async def api_simulation_scene():
 async def api_report(request: Request):
     """Generate a post-session SLP report."""
     body = await request.json()
-    api_key = body.get("api_key", "")
+    api_key = os.environ.get("GEMINI_API_KEY", "")
     if not api_key:
         return JSONResponse(
             status_code=400,
@@ -224,7 +255,7 @@ class _WebSocketAdapter:
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
 
-    api_key = websocket.query_params.get("api_key", "")
+    api_key = os.environ.get("GEMINI_API_KEY", "")
     participant_id = websocket.query_params.get("participant_id", "")
     child_age_str = websocket.query_params.get("child_age", "8")
 
@@ -331,16 +362,15 @@ async def _handle_generate_initial_scenes(
             })
 
             t0 = time.time()
-            manifest, neg, raw_data = await generate_scene_and_neg(
+            manifest, raw_data = await generate_scene_manifest(
                 api_key=session.api_key,
                 story_state=None,
                 student_profile=session.student_profile,
                 theme=theme,
                 previous_manifest=None,
-                previous_neg=None,
             )
             logger.info(
-                "[pipeline] Scene %d: manifest+NEG took %.1fs",
+                "[pipeline] Scene %d: manifest took %.1fs",
                 index, time.time() - t0,
             )
 
@@ -371,7 +401,7 @@ async def _handle_generate_initial_scenes(
                 index, time.time() - t1,
             )
 
-            scene = _assemble_scene_dict(raw_data, manifest, neg, assets)
+            scene = _assemble_scene_dict(raw_data, manifest, assets)
 
             # Store in session for later selection
             session.initial_scenes.append({"index": index, "scene": scene})
@@ -441,13 +471,12 @@ async def _handle_generate_one_more(
     try:
         theme = random.choice(STORY_THEMES)
 
-        manifest, neg, raw_data = await generate_scene_and_neg(
+        manifest, raw_data = await generate_scene_manifest(
             api_key=session.api_key,
             story_state=None,
             student_profile=session.student_profile,
             theme=theme,
             previous_manifest=None,
-            previous_neg=None,
         )
 
         assets = await generate_scene_assets(
@@ -456,7 +485,7 @@ async def _handle_generate_one_more(
             story_state=None,
         )
 
-        scene = _assemble_scene_dict(raw_data, manifest, neg, assets)
+        scene = _assemble_scene_dict(raw_data, manifest, assets)
 
         session.initial_scenes.append({"index": index, "scene": scene})
 
@@ -482,10 +511,9 @@ async def _handle_generate_scene(
 ) -> None:
     """Generate a new scene using the 2-step pipeline.
 
-    1. scene_neg_generator → manifest + NEG  (Gemini 3.1 Pro)
-    2. scene_generator → sprite_code         (Nano Banana 2)
+    1. scene_neg_generator → manifest  (Gemini 3 Flash)
+    2. scene_generator → sprite_code
     3. Send scene_ready to client
-    4. Send initial oral guidance ("What do you see?")
     """
     try:
         await ws.send_json({
@@ -496,7 +524,6 @@ async def _handle_generate_scene(
         # Context for initial vs. continuation
         theme = ""
         previous_manifest = None
-        previous_neg = None
 
         if not is_continuation:
             theme = random.choice(STORY_THEMES)
@@ -504,21 +531,19 @@ async def _handle_generate_scene(
             if session.story_state.scenes:
                 last = session.story_state.scenes[-1]
                 previous_manifest = last.get("manifest")
-                previous_neg = last.get("neg")
 
-        # Step 1: Co-generate manifest + NEG
+        # Step 1: Generate manifest
         await ws.send_json({
             "type": "generation_step",
-            "step": "manifest_neg",
+            "step": "manifest",
         })
 
-        manifest, neg, raw_data = await generate_scene_and_neg(
+        manifest, raw_data = await generate_scene_manifest(
             api_key=session.api_key,
             story_state=session.story_state if is_continuation else None,
             student_profile=session.student_profile,
             theme=theme,
             previous_manifest=previous_manifest,
-            previous_neg=previous_neg,
         )
 
         # Step 2: Generate images + sprites
@@ -538,7 +563,7 @@ async def _handle_generate_scene(
         )
 
         # Assemble scene data
-        scene = _assemble_scene_dict(raw_data, manifest, neg, assets)
+        scene = _assemble_scene_dict(raw_data, manifest, assets)
 
         # Persist
         if not is_continuation:
@@ -607,26 +632,30 @@ async def _handle_audio(
     audio_bytes: bytes,
     ws: _WebSocketAdapter,
 ) -> None:
-    """Handle an audio utterance: transcribe → assess → execute.
+    """Handle an audio utterance: transcribe → assess → decide → execute.
 
-    Full interactive loop per utterance:
-      1. Transcribe audio + detect discrepancies
-      2. Update student profile + conversation history
-      3. Discrepancy assessment → decision
-      4. Execute decision (animate / oral_guidance / next_scene / wait)
+    Animation-first flow:
+      - Animation fires immediately. Voice is DEFERRED.
+      - On the NEXT utterance, we check if the child self-corrected.
+      - If corrected → success (no voice). If not → failure (fire voice as escalation).
+
+    Pipeline:
+      0. Check pending animation outcome from previous utterance
+      1. transcribe_audio → text
+      2. assess_utterance → factual_errors / misl_opportunities
+      3. process_assessment → deterministic action
+      4. Execute action (correct / accept_and_guide / accept_and_advance)
     """
-    if session.current_neg is None or session.current_manifest is None:
+    if session.current_manifest is None or session.current_scene_log is None:
         await ws.send_json({"type": "error", "message": "No active scene"})
         return
 
     try:
-        # 1. Transcribe + detect discrepancies
-        result = await transcribe_and_detect(
+        # 1. Transcribe audio
+        transcription = await transcribe_audio(
             api_key=session.api_key,
             audio_bytes=audio_bytes,
-            neg=session.current_neg,
             narration_history=session.narration_history,
-            student_profile=session.student_profile,
             narrative_text=(
                 session.current_scene.get("narrative_text", "")
                 if session.current_scene else ""
@@ -636,78 +665,171 @@ async def _handle_audio(
         # Send transcription to client
         await ws.send_json({
             "type": "transcription",
-            "text": result.transcription,
-            "scene_progress": result.scene_progress,
+            "text": transcription,
         })
 
-        # 2. Update state
-        if result.updated_history:
-            session.narration_history = result.updated_history
-        if result.transcription:
-            session.narration_history.append(result.transcription)
+        if not transcription:
+            return
 
-        session.satisfied_targets = list(set(
-            session.satisfied_targets + result.satisfied_targets
-        ))
-        session.scene_progress = result.scene_progress
-
-        # Update student profile error counts
-        if result.profile_updates:
-            for error_type, count in result.profile_updates.errors_this_scene.items():
-                current = session.student_profile.error_counts.get(error_type, 0)
-                session.student_profile.error_counts[error_type] = current + count
-        session.student_profile.total_utterances += 1
-
-        # Add child utterance to conversation history
+        # Add child utterance to conversation + narration history
+        session.narration_history.append(transcription)
         session.conversation_history.append({
             "role": "child",
-            "text": result.transcription,
+            "text": transcription,
         })
+        session.student_profile.total_utterances += 1
 
-        # 3. Discrepancy assessment
-        decision = await assess_and_respond(
+        # ── Step 0: Resolve pending animation outcome ──
+        if session.pending_animation is not None:
+            await _resolve_pending_animation(session, ws, transcription)
+
+        # 2. Assess utterance against manifest + MISL
+        story_so_far = get_accepted_utterances(session.current_scene_log)
+        misl_already = get_misl_dimensions_suggested(session.current_scene_log)
+
+        assessment = await assess_utterance(
             api_key=session.api_key,
-            student_profile=session.student_profile,
-            neg=session.current_neg,
-            conversation_history=session.conversation_history,
-            animations_played=session.animations_played_this_scene,
+            manifest=session.current_manifest,
+            utterance_text=transcription,
+            story_so_far=story_so_far,
+            misl_already_suggested=misl_already,
+            misl_difficulty_profile=session.student_profile.misl_difficulty_profile,
         )
 
-        # Send assessment result to client
-        await ws.send_json({
-            "type": "assessment_result",
-            "action": decision.action,
-            "target_id": decision.target_id,
-            "guidance_text": decision.guidance_text,
-            "reasoning": decision.reasoning,
-        })
+        # 3. Deterministic decision
+        action, action_data = process_assessment(
+            utterance_text=transcription,
+            response=assessment,
+            scene_log=session.current_scene_log,
+            misl_difficulty_profile=session.student_profile.misl_difficulty_profile,
+        )
 
-        # 4. Execute decision
-        if decision.action == "animate" and decision.target_id:
-            await execute_animation(
-                session, ws, decision.target_id,
-                misl_element=decision.misl_element or "character",
-                problematic_segment=decision.problematic_segment,
-            )
+        # 4. Execute action
+        if action == "correct":
+            # Factual errors — animate errored entity, defer voice
+            errors = action_data["factual_errors"]
+            first_error = errors[0]
+            target_id = first_error.get("manifest_ref", "").split(".")[0]
+            explanation = first_error.get("explanation", "")
 
-        elif decision.action == "oral_guidance" and decision.guidance_text:
-            session.conversation_history.append({
-                "role": "system",
-                "text": decision.guidance_text,
-                "action": "oral_guidance",
+            await ws.send_json({
+                "type": "assessment_result",
+                "action": "correct",
+                "target_id": target_id,
+                "guidance_text": explanation,
+                "errors": errors,
             })
-            asyncio.ensure_future(
-                send_voice(session, ws, decision.guidance_text)
-            )
 
-        elif decision.action == "next_scene":
+            misl_el = "character"
+            esc_key = f"{target_id}::{misl_el}"
+
+            if esc_key in session.voice_escalated_errors:
+                # Same error after voice → skip animation, voice only
+                if explanation:
+                    session.conversation_history.append({
+                        "role": "system",
+                        "text": explanation,
+                        "action": "repeat_voice_guidance",
+                    })
+                    asyncio.ensure_future(send_voice(session, ws, explanation))
+
+            elif target_id:
+                decision = await execute_animation(
+                    session, ws, target_id,
+                    misl_element=misl_el,
+                    problematic_segment=first_error.get("utterance_fragment"),
+                )
+
+                # Defer voice — set pending_animation for next utterance
+                if decision and explanation:
+                    _set_pending_animation(
+                        session, target_id, misl_el, explanation, decision,
+                    )
+                elif explanation:
+                    # Animation failed entirely, voice fires now
+                    session.conversation_history.append({
+                        "role": "system",
+                        "text": explanation,
+                        "action": "correction",
+                    })
+
+            elif explanation:
+                # No target to animate — fire voice immediately
+                session.conversation_history.append({
+                    "role": "system",
+                    "text": explanation,
+                    "action": "correction",
+                })
+                asyncio.ensure_future(send_voice(session, ws, explanation))
+
+        elif action == "accept_and_guide":
+            # MISL guidance — animate, defer voice
+            opps = action_data["misl_opportunities"]
+            first_opp = opps[0]
+            suggestion = first_opp.get("suggestion", "")
+            elements = first_opp.get("manifest_elements", [])
+            target_id = elements[0] if elements else ""
+            misl_dim = first_opp.get("dimension", "character")
+
+            await ws.send_json({
+                "type": "assessment_result",
+                "action": "guide",
+                "target_id": target_id,
+                "guidance_text": suggestion,
+                "dimension": misl_dim,
+            })
+
+            esc_key = f"{target_id}::{misl_dim}"
+
+            if esc_key in session.voice_escalated_errors:
+                # Same suggestion after voice → skip animation, voice only
+                if suggestion:
+                    session.conversation_history.append({
+                        "role": "system",
+                        "text": suggestion,
+                        "action": "repeat_voice_guidance",
+                    })
+                    asyncio.ensure_future(send_voice(session, ws, suggestion))
+
+            elif target_id:
+                decision = await execute_animation(
+                    session, ws, target_id,
+                    misl_element=misl_dim,
+                )
+
+                # Defer voice — set pending_animation for next utterance
+                if decision and suggestion:
+                    _set_pending_animation(
+                        session, target_id, misl_dim, suggestion, decision,
+                    )
+                elif suggestion:
+                    session.conversation_history.append({
+                        "role": "system",
+                        "text": suggestion,
+                        "action": "misl_guidance",
+                    })
+
+            elif suggestion:
+                # No target to animate — fire voice immediately
+                session.conversation_history.append({
+                    "role": "system",
+                    "text": suggestion,
+                    "action": "misl_guidance",
+                })
+                asyncio.ensure_future(send_voice(session, ws, suggestion))
+
+        elif action == "accept_and_advance":
+            # Scene complete — advance to next scene
+            await ws.send_json({
+                "type": "assessment_result",
+                "action": "accept",
+            })
+
             if len(session.completed_scene_ids) < MAX_SCENES:
                 session.student_profile.scenes_completed += 1
                 await _handle_generate_scene(session, ws, is_continuation=True)
             else:
                 await ws.send_json({"type": "story_complete"})
-
-        # "wait" → no action
 
         # Persist profile after every utterance
         save_student_profile(session.participant_id, session.student_profile)
@@ -715,5 +837,90 @@ async def _handle_audio(
     except Exception as e:
         logger.exception("Audio processing error")
         await ws.send_json({"type": "error", "message": str(e)})
+
+
+def _set_pending_animation(
+    session: SessionState,
+    target_id: str,
+    misl_element: str,
+    voice_text: str,
+    decision: Dict[str, Any],
+) -> None:
+    """Set a pending animation so voice is deferred until next utterance."""
+    decisions = getattr(session.student_profile, "animation_decisions", [])
+    session.pending_animation = {
+        "target_id": target_id,
+        "misl_element": misl_element,
+        "voice_text": voice_text,
+        "decision_idx": len(decisions) - 1 if decisions else -1,
+    }
+
+
+async def _resolve_pending_animation(
+    session: SessionState,
+    ws: _WebSocketAdapter,
+    transcription: str,
+) -> None:
+    """Check if the child self-corrected after the previous animation.
+
+    Success = the new utterance is acceptable (child corrected without voice).
+    Failure = still has issues → fire deferred voice as escalation.
+    """
+    pending = session.pending_animation
+    session.pending_animation = None
+
+    if pending is None:
+        return
+
+    # Quick re-assess to check if the child's new utterance is now acceptable
+    try:
+        story_so_far = get_accepted_utterances(session.current_scene_log)
+        misl_already = get_misl_dimensions_suggested(session.current_scene_log)
+
+        quick_assessment = await assess_utterance(
+            api_key=session.api_key,
+            manifest=session.current_manifest,
+            utterance_text=transcription,
+            story_so_far=story_so_far,
+            misl_already_suggested=misl_already,
+            misl_difficulty_profile=session.student_profile.misl_difficulty_profile,
+        )
+
+        corrected = quick_assessment.utterance_is_acceptable
+    except Exception:
+        logger.warning("[pending_anim] Quick assessment failed, treating as not corrected")
+        corrected = False
+
+    # Mark the decision outcome
+    decisions = getattr(session.student_profile, "animation_decisions", [])
+    decision_idx = pending.get("decision_idx", -1)
+    if 0 <= decision_idx < len(decisions):
+        d = decisions[decision_idx]
+        if hasattr(d, "outcome"):
+            d.outcome = "success" if corrected else "failure"
+            d.escalated_to_voice = not corrected
+
+    if corrected:
+        logger.info("[pending_anim] Child self-corrected after animation → success")
+        session.student_profile.corrections_after_animation += 1
+        # Also mark in legacy animation_efficacy
+        if session.last_animation:
+            for entry in reversed(session.student_profile.animation_efficacy):
+                if entry.get("target_id") == pending["target_id"]:
+                    entry["led_to_correction"] = True
+                    break
+    else:
+        logger.info("[pending_anim] Child did NOT self-correct → failure, firing voice")
+        voice_text = pending.get("voice_text", "")
+        if voice_text:
+            session.conversation_history.append({
+                "role": "system",
+                "text": voice_text,
+                "action": "escalated_voice_guidance",
+            })
+            asyncio.ensure_future(send_voice(session, ws, voice_text))
+            # Record escalation — skip animation on repeat of same error
+            esc_key = f"{pending['target_id']}::{pending['misl_element']}"
+            session.voice_escalated_errors[esc_key] = voice_text
 
 

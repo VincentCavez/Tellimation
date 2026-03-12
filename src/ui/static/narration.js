@@ -94,6 +94,11 @@ var NarrationClient = (function() {
     // Stop any ongoing word-by-word TTS text display
     _cancelWordReveal();
 
+    // Stop looping animation when child starts recording
+    if (window.animRunner && window.animRunner.stopLoop) {
+      window.animRunner.stopLoop();
+    }
+
     // Update UI
     transcriptionBox.classList.add('recording');
     feedbackEl.textContent = '\uD83D\uDD34 Recording...';
