@@ -1,0 +1,3224 @@
+{
+  "stimuli": {
+    "A_A2": {
+      "video": "A_A2.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "A_C3": {
+      "video": "A_C3.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "A_D1": {
+      "video": "A_D1.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "A_I1": {
+      "video": "A_I1.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "A_T2": {
+      "video": "A_T2.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "B_D2": {
+      "video": "B_D2.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "B_I2": {
+      "video": "B_I2.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "B_P1": {
+      "video": "B_P1.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "B_R1": {
+      "video": "B_R1.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "B_S1": {
+      "video": "B_S1.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "C_C1": {
+      "video": "C_C1.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "C_D3": {
+      "video": "C_D3.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "C_P2": {
+      "video": "C_P2.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "C_R2": {
+      "video": "C_R2.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "C_S2": {
+      "video": "C_S2.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "D_A1": {
+      "video": "D_A1.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "D_C2": {
+      "video": "D_C2.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "D_D4": {
+      "video": "D_D4.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "D_R3": {
+      "video": "D_R3.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "D_T1": {
+      "video": "D_T1.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "E_A2": {
+      "video": "E_A2.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "E_C3": {
+      "video": "E_C3.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "E_D1": {
+      "video": "E_D1.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "E_I1": {
+      "video": "E_I1.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "E_T2": {
+      "video": "E_T2.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "F_D2": {
+      "video": "F_D2.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "F_I2": {
+      "video": "F_I2.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "F_P1": {
+      "video": "F_P1.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "F_R1": {
+      "video": "F_R1.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "F_S1": {
+      "video": "F_S1.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "G_C1": {
+      "video": "G_C1.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "G_D3": {
+      "video": "G_D3.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "G_P2": {
+      "video": "G_P2.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "G_R2": {
+      "video": "G_R2.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "G_S2": {
+      "video": "G_S2.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "H_A1": {
+      "video": "H_A1.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "H_C2": {
+      "video": "H_C2.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "H_D4": {
+      "video": "H_D4.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "H_R3": {
+      "video": "H_R3.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "H_T1": {
+      "video": "H_T1.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "I_A2": {
+      "video": "I_A2.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "I_C3": {
+      "video": "I_C3.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "I_D1": {
+      "video": "I_D1.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "I_I1": {
+      "video": "I_I1.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "I_T2": {
+      "video": "I_T2.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "J_D2": {
+      "video": "J_D2.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "J_I2": {
+      "video": "J_I2.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "J_P1": {
+      "video": "J_P1.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "J_R1": {
+      "video": "J_R1.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "J_S1": {
+      "video": "J_S1.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "K_C1": {
+      "video": "K_C1.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "K_D3": {
+      "video": "K_D3.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "K_P2": {
+      "video": "K_P2.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "K_R2": {
+      "video": "K_R2.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "K_S2": {
+      "video": "K_S2.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "L_A1": {
+      "video": "L_A1.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "L_C2": {
+      "video": "L_C2.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "L_D4": {
+      "video": "L_D4.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "L_R3": {
+      "video": "L_R3.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "L_T1": {
+      "video": "L_T1.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "M_A2": {
+      "video": "M_A2.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "M_C3": {
+      "video": "M_C3.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "M_D1": {
+      "video": "M_D1.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "M_I1": {
+      "video": "M_I1.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "M_T2": {
+      "video": "M_T2.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "N_D2": {
+      "video": "N_D2.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "N_I2": {
+      "video": "N_I2.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "N_P1": {
+      "video": "N_P1.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "N_R1": {
+      "video": "N_R1.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "N_S1": {
+      "video": "N_S1.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "O_C1": {
+      "video": "O_C1.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "O_D3": {
+      "video": "O_D3.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "O_P2": {
+      "video": "O_P2.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "O_R2": {
+      "video": "O_R2.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "O_S2": {
+      "video": "O_S2.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "P_A1": {
+      "video": "P_A1.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "P_C2": {
+      "video": "P_C2.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "P_D4": {
+      "video": "P_D4.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "P_R3": {
+      "video": "P_R3.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "P_T1": {
+      "video": "P_T1.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "Q_A2": {
+      "video": "Q_A2.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "Q_C3": {
+      "video": "Q_C3.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "Q_D1": {
+      "video": "Q_D1.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "Q_I1": {
+      "video": "Q_I1.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "Q_T2": {
+      "video": "Q_T2.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "R_D2": {
+      "video": "R_D2.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "R_I2": {
+      "video": "R_I2.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "R_P1": {
+      "video": "R_P1.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "R_R1": {
+      "video": "R_R1.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "R_S1": {
+      "video": "R_S1.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "S_C1": {
+      "video": "S_C1.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "S_D3": {
+      "video": "S_D3.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "S_P2": {
+      "video": "S_P2.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "S_R2": {
+      "video": "S_R2.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "S_S2": {
+      "video": "S_S2.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "T_A1": {
+      "video": "T_A1.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "T_C2": {
+      "video": "T_C2.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "T_D4": {
+      "video": "T_D4.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "T_R3": {
+      "video": "T_R3.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "T_T1": {
+      "video": "T_T1.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    }
+  },
+  "sets": {
+    "set1": [
+      "A_I1",
+      "B_I2",
+      "C_C1",
+      "D_C2",
+      "E_C3",
+      "F_P1",
+      "G_P2",
+      "H_A1",
+      "I_A2",
+      "J_S1",
+      "K_S2",
+      "L_T1",
+      "M_T2",
+      "N_R1",
+      "O_R2",
+      "P_R3",
+      "Q_D1",
+      "R_D2",
+      "S_D3",
+      "T_D4"
+    ],
+    "set2": [
+      "A_C3",
+      "B_P1",
+      "C_P2",
+      "D_A1",
+      "E_A2",
+      "F_S1",
+      "G_S2",
+      "H_T1",
+      "I_T2",
+      "J_R1",
+      "K_R2",
+      "L_R3",
+      "M_D1",
+      "N_D2",
+      "O_D3",
+      "P_D4",
+      "Q_I1",
+      "R_I2",
+      "S_C1",
+      "T_C2"
+    ],
+    "set3": [
+      "A_A2",
+      "B_S1",
+      "C_S2",
+      "D_T1",
+      "E_T2",
+      "F_R1",
+      "G_R2",
+      "H_R3",
+      "I_D1",
+      "J_D2",
+      "K_D3",
+      "L_D4",
+      "M_I1",
+      "N_I2",
+      "O_C1",
+      "P_C2",
+      "Q_C3",
+      "R_P1",
+      "S_P2",
+      "T_A1"
+    ],
+    "set4": [
+      "A_T2",
+      "B_R1",
+      "C_R2",
+      "D_R3",
+      "E_D1",
+      "F_D2",
+      "G_D3",
+      "H_D4",
+      "I_I1",
+      "J_I2",
+      "K_C1",
+      "L_C2",
+      "M_C3",
+      "N_P1",
+      "O_P2",
+      "P_A1",
+      "Q_A2",
+      "R_S1",
+      "S_S2",
+      "T_T1"
+    ],
+    "set5": [
+      "A_D1",
+      "B_D2",
+      "C_D3",
+      "D_D4",
+      "E_I1",
+      "F_I2",
+      "G_C1",
+      "H_C2",
+      "I_C3",
+      "J_P1",
+      "K_P2",
+      "L_A1",
+      "M_A2",
+      "N_S1",
+      "O_S2",
+      "P_T1",
+      "Q_T2",
+      "R_R1",
+      "S_R2",
+      "T_R3"
+    ]
+  },
+  "training": {
+    "arrow": {
+      "video": "training_arrow.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    },
+    "cross": {
+      "video": "training_cross.mp4",
+      "utterance": "TO_BE_FILLED",
+      "answers": [
+        {
+          "text": "TO_BE_FILLED",
+          "correct": true
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "TO_BE_FILLED",
+          "correct": false
+        },
+        {
+          "text": "It draws attention to something, but I'm not sure what specifically.",
+          "correct": false
+        },
+        {
+          "text": "I don't understand what this animation is trying to communicate.",
+          "correct": false
+        }
+      ]
+    }
+  },
+  "latin_square": [
+    [
+      0,
+      1,
+      19,
+      2,
+      18,
+      3,
+      17,
+      4,
+      16,
+      5,
+      15,
+      6,
+      14,
+      7,
+      13,
+      8,
+      12,
+      9,
+      11,
+      10
+    ],
+    [
+      1,
+      2,
+      0,
+      3,
+      19,
+      4,
+      18,
+      5,
+      17,
+      6,
+      16,
+      7,
+      15,
+      8,
+      14,
+      9,
+      13,
+      10,
+      12,
+      11
+    ],
+    [
+      2,
+      3,
+      1,
+      4,
+      0,
+      5,
+      19,
+      6,
+      18,
+      7,
+      17,
+      8,
+      16,
+      9,
+      15,
+      10,
+      14,
+      11,
+      13,
+      12
+    ],
+    [
+      3,
+      4,
+      2,
+      5,
+      1,
+      6,
+      0,
+      7,
+      19,
+      8,
+      18,
+      9,
+      17,
+      10,
+      16,
+      11,
+      15,
+      12,
+      14,
+      13
+    ],
+    [
+      4,
+      5,
+      3,
+      6,
+      2,
+      7,
+      1,
+      8,
+      0,
+      9,
+      19,
+      10,
+      18,
+      11,
+      17,
+      12,
+      16,
+      13,
+      15,
+      14
+    ],
+    [
+      5,
+      6,
+      4,
+      7,
+      3,
+      8,
+      2,
+      9,
+      1,
+      10,
+      0,
+      11,
+      19,
+      12,
+      18,
+      13,
+      17,
+      14,
+      16,
+      15
+    ],
+    [
+      6,
+      7,
+      5,
+      8,
+      4,
+      9,
+      3,
+      10,
+      2,
+      11,
+      1,
+      12,
+      0,
+      13,
+      19,
+      14,
+      18,
+      15,
+      17,
+      16
+    ],
+    [
+      7,
+      8,
+      6,
+      9,
+      5,
+      10,
+      4,
+      11,
+      3,
+      12,
+      2,
+      13,
+      1,
+      14,
+      0,
+      15,
+      19,
+      16,
+      18,
+      17
+    ],
+    [
+      8,
+      9,
+      7,
+      10,
+      6,
+      11,
+      5,
+      12,
+      4,
+      13,
+      3,
+      14,
+      2,
+      15,
+      1,
+      16,
+      0,
+      17,
+      19,
+      18
+    ],
+    [
+      9,
+      10,
+      8,
+      11,
+      7,
+      12,
+      6,
+      13,
+      5,
+      14,
+      4,
+      15,
+      3,
+      16,
+      2,
+      17,
+      1,
+      18,
+      0,
+      19
+    ],
+    [
+      10,
+      11,
+      9,
+      12,
+      8,
+      13,
+      7,
+      14,
+      6,
+      15,
+      5,
+      16,
+      4,
+      17,
+      3,
+      18,
+      2,
+      19,
+      1,
+      0
+    ],
+    [
+      11,
+      12,
+      10,
+      13,
+      9,
+      14,
+      8,
+      15,
+      7,
+      16,
+      6,
+      17,
+      5,
+      18,
+      4,
+      19,
+      3,
+      0,
+      2,
+      1
+    ],
+    [
+      12,
+      13,
+      11,
+      14,
+      10,
+      15,
+      9,
+      16,
+      8,
+      17,
+      7,
+      18,
+      6,
+      19,
+      5,
+      0,
+      4,
+      1,
+      3,
+      2
+    ],
+    [
+      13,
+      14,
+      12,
+      15,
+      11,
+      16,
+      10,
+      17,
+      9,
+      18,
+      8,
+      19,
+      7,
+      0,
+      6,
+      1,
+      5,
+      2,
+      4,
+      3
+    ],
+    [
+      14,
+      15,
+      13,
+      16,
+      12,
+      17,
+      11,
+      18,
+      10,
+      19,
+      9,
+      0,
+      8,
+      1,
+      7,
+      2,
+      6,
+      3,
+      5,
+      4
+    ],
+    [
+      15,
+      16,
+      14,
+      17,
+      13,
+      18,
+      12,
+      19,
+      11,
+      0,
+      10,
+      1,
+      9,
+      2,
+      8,
+      3,
+      7,
+      4,
+      6,
+      5
+    ],
+    [
+      16,
+      17,
+      15,
+      18,
+      14,
+      19,
+      13,
+      0,
+      12,
+      1,
+      11,
+      2,
+      10,
+      3,
+      9,
+      4,
+      8,
+      5,
+      7,
+      6
+    ],
+    [
+      17,
+      18,
+      16,
+      19,
+      15,
+      0,
+      14,
+      1,
+      13,
+      2,
+      12,
+      3,
+      11,
+      4,
+      10,
+      5,
+      9,
+      6,
+      8,
+      7
+    ],
+    [
+      18,
+      19,
+      17,
+      0,
+      16,
+      1,
+      15,
+      2,
+      14,
+      3,
+      13,
+      4,
+      12,
+      5,
+      11,
+      6,
+      10,
+      7,
+      9,
+      8
+    ],
+    [
+      19,
+      0,
+      18,
+      1,
+      17,
+      2,
+      16,
+      3,
+      15,
+      4,
+      14,
+      5,
+      13,
+      6,
+      12,
+      7,
+      11,
+      8,
+      10,
+      9
+    ]
+  ],
+  "latin_square_selected_rows": [
+    0,
+    2,
+    4,
+    6,
+    8,
+    10,
+    12,
+    14,
+    16,
+    18
+  ]
+}

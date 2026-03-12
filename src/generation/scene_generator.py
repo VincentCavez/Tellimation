@@ -139,25 +139,27 @@ def _build_scene_image_prompt(manifest_data: Dict[str, Any]) -> str:
             )
 
     # Build structural element placement hints from manifest positions
+    # NOTE: Only use natural language placement (left/right/center) — NEVER
+    # include numeric coordinates.  The image model renders them as literal
+    # text artefacts on the illustration.
     structural_hints = ""
     bg_data_se = manifest_data.get("manifest", {}).get("background", {})
     structural_elements = bg_data_se.get("structural_elements", []) if isinstance(bg_data_se, dict) else []
     if structural_elements:
         lines = ["\n## Structural element placement (CRITICAL)"]
         lines.append(
-            "The following elements MUST be placed at their specified positions. "
-            "Positions are normalized: x=0.0 is far left, x=1.0 is far right, "
-            "y=0.0 is top, y=1.0 is bottom."
+            "The following elements MUST appear in the background at the "
+            "described positions. Do NOT draw any text, labels, numbers, or "
+            "coordinates on the image."
         )
         for se in structural_elements:
             if isinstance(se, dict):
                 name = se.get("name", "unknown")
                 sx = se.get("x", 0.5)
                 sy = se.get("y", 0.5)
-                zone = se.get("zone", "")
-                h_pct = "left" if sx < 0.35 else "right" if sx > 0.65 else "center"
-                v_pct = "top" if sy < 0.35 else "bottom" if sy > 0.65 else "middle"
-                lines.append(f"- {name}: at {h_pct}-{v_pct} of image (x≈{sx:.1f}, y≈{sy:.1f})")
+                h_pct = "on the left side" if sx < 0.35 else "on the right side" if sx > 0.65 else "in the center"
+                v_pct = "near the top" if sy < 0.35 else "near the bottom" if sy > 0.65 else "in the middle"
+                lines.append(f"- {name}: {h_pct}, {v_pct} of the image")
             elif isinstance(se, str):
                 lines.append(f"- {se}")
         structural_hints = "\n".join(lines)
@@ -1115,19 +1117,6 @@ async def generate_scene_assets(
                     len(entity_images), len(entities_to_generate))
 
     await _notify("images")
-
-    # --- Step 2b: Reanchor entity positions against actual background ---
-    # Detect where structural elements actually ended up in the generated
-    # background image, then adjust entity positions to match.
-    if bg_image_bytes:
-        from src.generation.pipeline_integration import reanchor_scene
-        try:
-            bg_pil = Image.open(io.BytesIO(bg_image_bytes)).convert("RGB")
-            manifest_data = await reanchor_scene(api_key, bg_pil, manifest_data)
-        except Exception as exc:
-            logger.warning("[assets] Reanchor failed (%s): %s — using original positions",
-                           type(exc).__name__, exc)
-    await _notify("reanchor")
 
     # --- Step 3+4: Magenta removal + Downscale ---
     bg_sprite: Optional[Dict[str, Any]] = None

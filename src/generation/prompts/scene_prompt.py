@@ -99,10 +99,16 @@ false if same setting. For initial scenes always true.>
 - Every entity MUST have a unique id formatted as `<type>_<NN>` (e.g. `rabbit_01`, `tree_02`).
 - Each entity MUST have at least 4 properties: `color` (mandatory for non-background), \
 `size`, `texture`, and `distinctive_features`. Add more as appropriate.
-- Create at least 2 entities per scene (1 character + 1 environment element). Prefer 3-5 entities.
-- At least 1 spatial relation between entities.
-- At least 1 action for the main character.
-- Every entity MUST have a `pose` describing its physical stance or orientation.
+- **Minimum entities: 3 (1 main character + 2 supporting interactive elements)**
+- **Maximum entities: 5** (avoid cluttered scenes)
+- Every scene MUST have exactly 1 main character (a child or relatable animal) — \
+  this is the anchor for the entire story.
+- Supporting elements MUST be interactive and have narrative potential \
+  (see catalyzing event examples in the user prompt).
+- Avoid abstract, decorative, or non-interactive objects (drops, clouds, beams of light, etc.)
+- At least 1 spatial relation between entities
+- At least 1 action for the main character
+- Every entity MUST have a `pose` describing its physical stance or orientation
 
 # Entity vs. background separation (CRITICAL)
 
@@ -136,11 +142,11 @@ background-only.
 Every entity MUST include `width_hint` and `height_hint` as NORMALIZED values \
 (0.0 to 1.0, proportion of canvas width/height). Use these guidelines:
 
-- **Characters** (animals, people): width 0.25-0.36, height 0.44-0.67
+- **Characters** (children, animals, people): width 0.25-0.36, height 0.44-0.67
 - **Trees**: width 0.32-0.45, height 0.56-0.78
-- **Small objects** (flowers, mushrooms, items): width 0.11-0.18, height 0.17-0.28
-- **Medium objects** (rocks, stumps, bushes): width 0.18-0.32, height 0.22-0.44
-- **Large objects** (houses, vehicles): width 0.32-0.50, height 0.44-0.72
+- **Small objects** (books, toys, balls, phones, keys, food): width 0.11-0.18, height 0.17-0.28
+- **Medium objects** (bicycles, chairs, backpacks, buckets, cakes): width 0.18-0.32, height 0.22-0.44
+- **Large objects** (doors, ladders, treasure chests, vehicles): width 0.32-0.50, height 0.44-0.72
 
 IMPORTANT: entities must be LARGE enough to be clearly visible and detailed \
 in the pixel art rendering. A character should fill roughly 1/3 to 1/2 of the \
@@ -244,11 +250,60 @@ atmosphere as the previous scene (e.g., still in the same forest clearing, same 
 
 When in doubt, prefer `true` (it is safer to regenerate than to show a wrong background).
 
+# Emotional stakes (CRITICAL for storytelling)
+
+Every scene MUST set up a SITUATION that a child can narrate. This requires:
+
+1. **The main character WANTS something or FACES something**: \
+   hungry and sees food, lost and looking for home, curious about a mysterious object, \
+   excited to open a gift, scared of a noise, trying to reach something high up.
+2. **There is TENSION or ANTICIPATION**: something is about to happen, something just \
+   happened, or the character must make a choice. A static "here are some things in a \
+   place" is NOT a scene — it's a still life. Scenes need MOMENTUM.
+3. **The supporting elements CREATE the situation**: a ringing telephone creates urgency, \
+   a locked door creates mystery, a ball rolling away creates a chase. Every object should \
+   PARTICIPATE in the emotional dynamic, not just exist.
+
+# narrative_text guidelines
+
+The `narrative_text` field is what the child will try to narrate. It MUST:
+- Name the main character and at least one distinctive trait (color, size, emotion)
+- Describe what the character IS DOING (an observable action)
+- Mention 1-2 supporting elements and their relationship to the character
+- Be written in present tense, simple language, suitable for age 7-11
+- Create a scene the child can LOOK AT and DESCRIBE — every element mentioned in the \
+  text must be visually present in the scene
+
+BAD: "A peaceful meadow with various creatures."
+GOOD: "A small orange cat is reaching up toward a red kite stuck in a tall tree, \
+while a blue bird watches from a wooden fence."
+
+# Action quality
+
+The `actions[]` field must contain OBSERVABLE, PHYSICAL actions — things a child can \
+SEE and DESCRIBE by looking at the scene:
+- GOOD actions: running, jumping, climbing, eating, reaching, pulling, pushing, hiding, \
+  looking, carrying, opening, sitting, sleeping, flying, swimming, digging
+- BAD actions: thinking, feeling, wanting, knowing, remembering, wondering, hoping \
+  (these are invisible — a child cannot narrate what they can't see)
+
+Every main character MUST have at least one physical action.
+
+# Age-appropriate settings
+
+Scenes should take place in environments FAMILIAR and RELATABLE to children age 7-11:
+- Home: bedroom, kitchen, living room, garden, backyard
+- School: classroom, playground, cafeteria, gym
+- Outdoors: park, beach, forest trail, pond, farm, zoo, market
+- Adventure: treehouse, cave entrance, small boat on a lake, campsite
+
+AVOID: abstract environments, industrial settings, offices, bars, highways, \
+volcanic landscapes, deep space, or any setting a 7-11 year old wouldn't relate to.
+
 # Important reminders
 
 - Do NOT include any sprite code or drawing code. That is handled in a later step.
 - Focus entirely on WHAT the scene contains and HOW to describe it richly.
-- The `narrative_text` should be engaging for a 7-11 year old narrator.
 """
 
 # ---------------------------------------------------------------------------
@@ -279,6 +334,8 @@ Just the environment and atmosphere. Clean children's illustration style.
   Indoor scenes: show walls, ceiling, and floor.
 - **Rich details**: atmospheric gradients, clouds, distant elements, textures.
 - **NO characters or objects** — purely the background environment.
+- **NO text, labels, numbers, coordinates, or writing of any kind** in the image. \
+  The illustration must be purely visual with zero text elements.
 - **Warm, friendly, child-appropriate** feel.
 """
 
@@ -292,16 +349,47 @@ where the child picks from 3 options.
 
 Story theme: {theme}
 
-Use this theme as the setting for the scene. Create characters and elements \
-that naturally belong in this environment.
+# MANDATORY CHARACTER AND NARRATIVE STRUCTURE
+
+**There MUST be exactly ONE main character.** This character MUST be ONE of:
+1. A child (boy or girl, age 6-12)
+2. A domestic animal (dog, cat, rabbit, hamster, bird, horse, etc.)
+3. A fantasy creature or animal that is child-like and relatable
+
+This character is the HEART of the story — the narrator will describe this character \
+and what happens to them.
+
+**Supporting elements (2-3 additional entities) MUST:**
+- Have a DIRECT RELATIONSHIP to the main character (their toy, their pet, their room, \
+  their school, their house, etc.)
+- Be able to CATALYZE A NARRATIVE EVENT. Each element should answer "What story can \
+  happen with this?" Examples:
+  * A TELEPHONE → someone can call, bringing news or a surprise
+  * A BICYCLE → the character can ride, race, or have an accident
+  * A BOOK → the character can read and discover something
+  * A TREE → the character can climb, hide, or find something in it
+  * A DOOR → someone can knock, or the character can open it to discover something new
+  * A BALL → the character can play, chase it, or lose it
+  * A MIRROR → the character can see something surprising
+  * A CAKE → the character can eat, bake, or the cake can disappear
+  * A FRIEND (another child/animal) → they can play together, disagree, help each other
+
+**WHAT NOT TO INCLUDE:**
+- Abstract, random, or non-interactive objects (a drop of water, a cloud, a shadow, \
+  a beam of light, floating abstract shapes)
+- Objects with no relationship to the character or setting
+- Multiple instances of the same object type
+- Objects that cannot be narrated or animated (pure background elements belong in \
+  background_description only)
 
 Requirements:
-- Create a fresh, imaginative scene with 1 main character and 2-3 environment elements.
-- The character should have a clear personality and distinctive visual features.
-- Include a narrative hook that makes the child want to tell this story.
-- All entities are new (carried_over: false, carried_over_entities: []).
-- background_changed: true (initial scene, always needs a new background).
-- Scene ID: "scene_01".
+- 1 main character (child or relatable animal) + 2-3 interactive, relatable elements
+- Each supporting element must have clear narrative potential
+- The character should have a clear personality and distinctive visual features
+- Include a narrative hook that makes the child want to tell this story
+- All entities are new (carried_over: false, carried_over_entities: [])
+- background_changed: true (initial scene, always needs a new background)
+- Scene ID: "scene_01"
 """
 
 CONTINUATION_SCENE_USER_PROMPT = """\
@@ -318,16 +406,54 @@ Generate the next scene in an ongoing story.
 
 {student_profile_context}
 
-# Instructions
-- Continue the narrative naturally from where it left off.
-- Keep existing characters (mark them carried_over: true). You may introduce 1-2 new entities.
-- Generate sprite_code ONLY for new entities (carried_over: false).
-- List all persisting entity IDs in carried_over_entities.
-- Set background_changed: false if the scene stays in the same location/setting/time of \
-day as the previous scene. Set true if the scene moves to a new place or time changes.
-- Adapt the scene complexity based on the student profile:
-  - If the child struggles with a skill area, create more opportunities for that area.
-  - If the child is strong in an area, maintain but don't over-emphasize it.
-- Advance the plot — something new should happen.
-- Scene ID: "scene_{scene_number:02d}".
+# CORE PRINCIPLE: Maintain narrative coherence and character focus
+
+The main character(s) from the previous scene(s) SHOULD persist and continue the story. \
+If the main character is gone, the story loses its anchor. Only introduce new main \
+characters in exceptional cases (e.g., meeting a new character becomes the turning point).
+
+# Instructions for scene elements
+
+**Carry over the main character(s)** (mark as carried_over: true). They remain the heart \
+of the story.
+
+**Add 1-2 NEW supporting elements** that:
+- Have a DIRECT RELATIONSHIP to the main character or the unfolding plot
+- Are INTERACTIVE and can CATALYZE NEW NARRATIVE EVENTS. Examples:
+  * A STORM → danger, shelter-seeking, rescue
+  * A RIVAL or FRIEND → conflict, teamwork, or secrets
+  * A GIFT or TREASURE → discovery, joy, puzzle-solving
+  * A ROPE → climbing, escaping, pulling something
+  * A LADDER → reaching something, escaping, helping
+  * A BUCKET → fetching water, digging, collecting something
+  * A DARK CAVE or ROOM → exploration, mystery, fear
+  * A WALL or BARRIER → something to overcome or hide behind
+  * A FIRE or LIGHT → warmth, danger, or revealing hidden things
+  * A BRIDGE → crossing, meeting someone, or taking a risk
+  * A KEY or LOCK → unlocking a secret, opening a path
+
+**WHAT NOT TO ADD:**
+- Abstract or random objects with no narrative connection (floating shapes, random droplets, \
+  clouds with no purpose)
+- Duplicate object types from the previous scene unless the plot demands it
+- Narrative-inert background elements (those should be in background_description only)
+- Objects that don't advance the plot or provide emotional/interactive value
+
+**DO NOT:**
+- Remove all supporting elements — keep 2-4 interactive entities (including the main character)
+- Introduce 4+ brand new characters (too many to narrate)
+- Replace the main character without strong narrative justification
+
+# Guidelines
+- Continue the narrative naturally from where it left off
+- Keep existing main character(s) (mark carried_over: true)
+- New supporting elements must have narrative potential
+- Generate sprite_code ONLY for new entities (carried_over: false)
+- List all persisting entity IDs in carried_over_entities
+- Set background_changed: false if same location/time. Set true if scene moves or time shifts
+- Adapt complexity based on the student profile:
+  - If the child struggles with a skill area, create more opportunities
+  - If strong, maintain but don't over-emphasize
+- Advance the plot — each scene must move the story forward
+- Scene ID: "scene_{scene_number:02d}"
 """
