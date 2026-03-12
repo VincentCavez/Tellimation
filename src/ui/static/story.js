@@ -14,6 +14,9 @@
       const renderer = new Renderer(canvas, buf);
       const animRunner = new AnimationRunner(buf, renderer);
 
+      // -- Track current scene for drag-and-drop --
+      var currentSceneRef = null;
+
       // -- Load initial scene from sessionStorage --
       const chosenScene = JSON.parse(sessionStorage.getItem('chosen_scene') || 'null');
       if (chosenScene) {
@@ -21,6 +24,7 @@
       }
 
       function renderScene(scene) {
+        currentSceneRef = scene;
         buf.clear();
 
         var spriteCode = scene.sprite_code || {};
@@ -95,6 +99,145 @@
         }
       }
 
+      // -- Entity Drag-and-Drop --
+      var drag = { active: false, entityId: null, offsetX: 0, offsetY: 0 };
+
+      function canvasToArt(e) {
+        var rect = canvas.getBoundingClientRect();
+        return {
+          x: Math.floor((e.clientX - rect.left) / rect.width * PW),
+          y: Math.floor((e.clientY - rect.top) / rect.height * PH),
+        };
+      }
+
+      function hitTestEntity(artX, artY) {
+        if (artX < 0 || artX >= PW || artY < 0 || artY >= PH) return null;
+        var e = buf.data[artY * PW + artX].e;
+        if (!e || e.startsWith('bg')) return null;
+        var dot = e.indexOf('.');
+        return dot >= 0 ? e.substring(0, dot) : e;
+      }
+
+      function moveEntityPixels(entityId, dx, dy) {
+        var layer = buf.entityLayers[entityId];
+        if (!layer || layer.length === 0) return;
+        dx = Math.round(dx);
+        dy = Math.round(dy);
+        if (dx === 0 && dy === 0) return;
+
+        // 1. Erase old pixels (restore behind-colors)
+        for (var i = 0; i < layer.length; i++) {
+          var idx = layer[i].idx;
+          buf.data[idx].r = layer[i].br;
+          buf.data[idx].g = layer[i].bg;
+          buf.data[idx].b = layer[i].bb;
+          buf.data[idx].e = '';
+        }
+
+        // 2. Compute shifted layer
+        var newLayer = [];
+        for (var i = 0; i < layer.length; i++) {
+          var oldIdx = layer[i].idx;
+          var ox = oldIdx % PW;
+          var oy = Math.floor(oldIdx / PW);
+          var nx = ox + dx;
+          var ny = oy + dy;
+          if (nx >= 0 && nx < PW && ny >= 0 && ny < PH) {
+            var newIdx = ny * PW + nx;
+            newLayer.push({
+              idx: newIdx,
+              r: layer[i].r,
+              g: layer[i].g,
+              b: layer[i].b,
+              e: layer[i].e,
+              br: buf.data[newIdx].r,
+              bg: buf.data[newIdx].g,
+              bb: buf.data[newIdx].b,
+            });
+          }
+        }
+
+        // 3. Write shifted pixels
+        for (var i = 0; i < newLayer.length; i++) {
+          var idx = newLayer[i].idx;
+          buf.data[idx].r = newLayer[i].r;
+          buf.data[idx].g = newLayer[i].g;
+          buf.data[idx].b = newLayer[i].b;
+          buf.data[idx].e = newLayer[i].e;
+        }
+
+        buf.entityLayers[entityId] = newLayer;
+        renderer.render();
+      }
+
+      canvas.addEventListener('mousedown', function(e) {
+        if (NarrationClient.isRecording && NarrationClient.isRecording()) return;
+        var art = canvasToArt(e);
+        var eid = hitTestEntity(art.x, art.y);
+        if (!eid) return;
+
+        var bounds = buf.getEntityBounds(eid);
+        if (!bounds) return;
+
+        var centerX = (bounds.x1 + bounds.x2) / 2;
+        var centerY = (bounds.y1 + bounds.y2) / 2;
+        drag.active = true;
+        drag.entityId = eid;
+        drag.offsetX = art.x - centerX;
+        drag.offsetY = art.y - centerY;
+        drag.lastArtX = art.x;
+        drag.lastArtY = art.y;
+        canvas.style.cursor = 'grabbing';
+        e.preventDefault();
+      });
+
+      canvas.addEventListener('mousemove', function(e) {
+        if (!drag.active) {
+          // Hover cursor
+          var art = canvasToArt(e);
+          var eid = hitTestEntity(art.x, art.y);
+          canvas.style.cursor = eid ? 'grab' : '';
+          return;
+        }
+        var art = canvasToArt(e);
+        var dx = art.x - drag.lastArtX;
+        var dy = art.y - drag.lastArtY;
+        if (dx === 0 && dy === 0) return;
+        moveEntityPixels(drag.entityId, dx, dy);
+        drag.lastArtX = art.x;
+        drag.lastArtY = art.y;
+        e.preventDefault();
+      });
+
+      function endDrag() {
+        if (!drag.active) return;
+        drag.active = false;
+        canvas.style.cursor = '';
+
+        // Compute new normalized position from entity bounds
+        var bounds = buf.getEntityBounds(drag.entityId);
+        if (bounds && ws && ws.readyState === WebSocket.OPEN) {
+          var centerX = (bounds.x1 + bounds.x2) / 2;
+          var centerY = (bounds.y1 + bounds.y2) / 2;
+          var normX = centerX / PW;
+          var normY = centerY / PH;
+          // art-grid top-left for raw_sprite format
+          var artX = bounds.x1;
+          var artY = bounds.y1;
+
+          ws.send(JSON.stringify({
+            type: 'entity_moved',
+            entity_id: drag.entityId,
+            position: { x: normX, y: normY },
+            art_position: { x: artX, y: artY },
+          }));
+        }
+        drag.entityId = null;
+      }
+
+      canvas.addEventListener('mouseup', endDrag);
+      canvas.addEventListener('mouseleave', endDrag);
+
       // -- WebSocket --
       const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
       const ws = new WebSocket(
@@ -163,6 +306,8 @@
             break;
 
           case 'voice_start':
+            // Stop any running animation loop — voice replaces animation as feedback
+            animRunner.stop();
             NarrationClient.handleVoiceHeader(msg);
             break;
 

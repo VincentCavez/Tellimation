@@ -57,18 +57,50 @@
 
       // Connect WebSocket
       const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const ws = new WebSocket(
-        protocol + '//' + location.host + '/ws'
-        + '?participant_id=' + encodeURIComponent(participantId)
-        + '&child_age=' + encodeURIComponent(childAge)
-      );
+      var ws = null;
+      var defaultScenesLoaded = false;
 
-      ws.onopen = function() {
-        showProgress();
-        ws.send(JSON.stringify({ type: 'generate_initial_scenes' }));
-      };
+      function connectWs() {
+        ws = new WebSocket(
+          protocol + '//' + location.host + '/ws'
+          + '?participant_id=' + encodeURIComponent(participantId)
+          + '&child_age=' + encodeURIComponent(childAge)
+        );
+        ws.onopen = function() {
+          if (!defaultScenesLoaded) {
+            showProgress();
+            ws.send(JSON.stringify({ type: 'generate_initial_scenes' }));
+          }
+        };
+        ws.onmessage = onWsMessage;
+        ws.onerror = onWsError;
+      }
 
-      ws.onmessage = function(event) {
+      // Try loading pre-generated default scenes first
+      fetch('/api/default-scenes')
+        .then(function(res) {
+          if (res.ok) return res.json();
+          throw new Error('no defaults');
+        })
+        .then(function(scenes) {
+          if (Array.isArray(scenes) && scenes.length > 0) {
+            defaultScenesLoaded = true;
+            branches = scenes;
+            hideProgress();
+            container.innerHTML = '';
+            cardElements = {};
+            branches.forEach(function(scene, i) { appendThumbnail(scene, i); });
+            // Still connect WS for select_scene
+            connectWs();
+          } else {
+            connectWs();
+          }
+        })
+        .catch(function() {
+          connectWs();
+        });
+
+      function onWsMessage(event) {
         if (event.data instanceof ArrayBuffer || event.data instanceof Blob) return;
         var msg = JSON.parse(event.data);
 
@@ -81,7 +113,6 @@
         }
 
         if (msg.type === 'scene_ready') {
-          // Scene ready — show thumbnail and make it clickable immediately
           branches.push(msg.scene);
           hideProgress();
           appendThumbnail(msg.scene, branches.length - 1);
@@ -93,7 +124,6 @@
         }
 
         if (msg.type === 'initial_scenes') {
-          // Backward compat: bulk delivery (from-disk case)
           branches = msg.scenes;
           var isDisk = !!msg.from_disk;
           if (isDisk) {
@@ -133,13 +163,13 @@
           container.style.display = '';
           container.innerHTML = '<p style="color:var(--red)">' + msg.message + '</p>';
         }
-      };
+      }
 
-      ws.onerror = function() {
+      function onWsError() {
         hideProgress();
         container.style.display = '';
         container.innerHTML = '<p style="color:var(--red)">Connection error. Please reload.</p>';
-      };
+      }
 
       function appendThumbnail(scene, index) {
         var card = ScenePicker.createThumbnailCard(scene);
@@ -162,7 +192,12 @@
           card.style.opacity = '0.6';
           card.style.pointerEvents = 'none';
         }
-        ws.send(JSON.stringify({ type: 'select_scene', index: index }));
+        // Send scene data along for default-scenes case (server may not have it)
+        var msg = { type: 'select_scene', index: index };
+        if (defaultScenesLoaded) {
+          msg.scene = scene;
+        }
+        ws.send(JSON.stringify(msg));
       }
 
       btnOneMore.addEventListener('click', function() {
