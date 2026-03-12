@@ -61,6 +61,10 @@ class SessionState:
         # Child-given character names (entity_id → name), persists across scenes
         self.character_names: Dict[str, str] = {}
 
+        # Ending choice — ask "imagine an ending or continue?" at each scene end
+        self.ending_phase: bool = False          # True after first scene completes, permanent
+        self.awaiting_ending_choice: bool = False # True while waiting for child's response
+
         # Initial scenes generated for the selection page
         self.initial_scenes: List[Dict[str, Any]] = []
 

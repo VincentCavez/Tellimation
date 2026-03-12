@@ -214,7 +214,7 @@ def _build_continuation_prompt(
         active_entities=active_entities,
         inactive_entities=inactive_entities,
         child_narration=child_narration,
-        student_profile_context=profile_ctx,
+        student_profile=profile_ctx,
         scene_number=scene_number,
     )
 
