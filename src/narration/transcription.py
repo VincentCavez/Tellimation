@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import re
 from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field
@@ -18,6 +17,7 @@ from src.generation.prompts.transcription_prompt import (
     TRANSCRIPTION_SYSTEM_PROMPT,
     TRANSCRIPTION_USER_PROMPT,
 )
+from src.generation.utils import extract_json as _extract_json
 
 MODEL_ID = "gemini-3-flash-preview"
 
@@ -44,15 +44,6 @@ class TranscriptionResult(BaseModel):
 # ---------------------------------------------------------------------------
 # Internals
 # ---------------------------------------------------------------------------
-
-def _extract_json(text: str) -> Dict[str, Any]:
-    """Extract JSON from LLM response, handling markdown fences."""
-    cleaned = text.strip()
-    fence_match = re.search(r"```(?:json)?\s*\n?(.*?)\n?\s*```", cleaned, re.DOTALL)
-    if fence_match:
-        cleaned = fence_match.group(1).strip()
-    return json.loads(cleaned)
-
 
 def _parse_discrepancies(raw: List[Dict[str, Any]]) -> List[Discrepancy]:
     """Parse discrepancy dicts into Discrepancy models."""

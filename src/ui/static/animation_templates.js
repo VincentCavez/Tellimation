@@ -1,588 +1,4 @@
-// Tellimations Animation Templates & Particle System
-// 20 animation factories (8 families: I, P, A, S, T, R, Q, D) + particle presets
-// Used by the Tellimation module: Gemini selects template + params,
-// client resolves instantly instead of compiling raw JS code.
-
 'use strict';
-
-// ═══════════════════════════════════════════════════════════════════
-// Section 1: Shared Helpers
-// ═══════════════════════════════════════════════════════════════════
-
-function _collectEntityPixels(buf, PW, prefix) {
-  var pixels = [];
-  for (var i = 0; i < buf.length; i++) {
-    if (buf[i].e === prefix || buf[i].e.startsWith(prefix + '.')) {
-      pixels.push({
-        i: i,
-        x: i % PW,
-        y: Math.floor(i / PW),
-        r: buf[i]._r, g: buf[i]._g, b: buf[i]._b,
-        e: buf[i].e
-      });
-    }
-  }
-  return pixels;
-}
-
-function _blankEntityPixels(buf, pixels) {
-  for (var j = 0; j < pixels.length; j++) {
-    var idx = pixels[j].i;
-    buf[idx].r = buf[idx]._br;
-    buf[idx].g = buf[idx]._bg;
-    buf[idx].b = buf[idx]._bb;
-  }
-}
-
-function _redrawEntityPixels(buf, PW, PH, pixels, dx, dy) {
-  for (var j = 0; j < pixels.length; j++) {
-    var p = pixels[j];
-    var nx = p.x + dx, ny = p.y + dy;
-    if (nx >= 0 && nx < PW && ny >= 0 && ny < PH) {
-      var ni = ny * PW + nx;
-      buf[ni].r = p.r;
-      buf[ni].g = p.g;
-      buf[ni].b = p.b;
-    }
-  }
-}
-
-function _computeEntityBounds(buf, PW, prefix) {
-  var x1 = Infinity, y1 = Infinity, x2 = -1, y2 = -1;
-  for (var i = 0; i < buf.length; i++) {
-    if (buf[i].e === prefix || buf[i].e.startsWith(prefix + '.')) {
-      var x = i % PW, y = Math.floor(i / PW);
-      if (x < x1) x1 = x;
-      if (x > x2) x2 = x;
-      if (y < y1) y1 = y;
-      if (y > y2) y2 = y;
-    }
-  }
-  if (x2 < 0) return { x1: 0, y1: 0, x2: 0, y2: 0, cx: 0, cy: 0 };
-  return {
-    x1: x1, y1: y1, x2: x2, y2: y2,
-    cx: Math.round((x1 + x2) / 2),
-    cy: Math.round((y1 + y2) / 2)
-  };
-}
-
-function _easeEnvelope(t, easeIn, easeOut) {
-  if (t < easeIn) return t / easeIn;
-  if (t > 1 - easeOut) return (1 - t) / easeOut;
-  return 1;
-}
-
-function _clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v; }
-
-function _setPixel(buf, PW, PH, x, y, r, g, b) {
-  x = Math.round(x); y = Math.round(y);
-  if (x >= 0 && x < PW && y >= 0 && y < PH) {
-    var idx = y * PW + x;
-    buf[idx].r = r; buf[idx].g = g; buf[idx].b = b;
-  }
-}
-
-function _hueChannel(p, q, t) {
-  if (t < 0) t += 1; if (t > 1) t -= 1;
-  if (t < 1/6) return p + (q - p) * 6 * t;
-  if (t < 1/2) return q;
-  if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
-  return p;
-}
-function _hslToRgb(h, s, l) {
-  if (s === 0) { var v = Math.round(l * 255); return [v, v, v]; }
-  var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-  var pp = 2 * l - q;
-  return [Math.round(_hueChannel(pp, q, h + 1/3) * 255),
-          Math.round(_hueChannel(pp, q, h) * 255),
-          Math.round(_hueChannel(pp, q, h - 1/3) * 255)];
-}
-function _rgbToHue(r, g, b) {
-  var max = Math.max(r, g, b), min = Math.min(r, g, b);
-  if (max === min) return 0;
-  var d = max - min, h;
-  if (max === r) h = ((g - b) / d + 6) % 6;
-  else if (max === g) h = (b - r) / d + 2;
-  else h = (r - g) / d + 4;
-  return h / 6;
-}
-
-/**
- * Compute the true contour gap between two entities along the axis connecting
- * their centers. Returns { gap, ndx, ndy, impactX, impactY }.
- *
- * Works by projecting all pixels into a rotated coordinate frame aligned with
- * the A→B axis, binning by perpendicular coordinate, and finding the minimum
- * gap across bins where both entities have pixels (true silhouette collision).
- *
- * @param {Array} pixelsA  - pixels of entity A ({x, y, ...})
- * @param {Array} pixelsB  - pixels of entity B
- * @param {Object} boundsA - bounds of A (needs .cx, .cy)
- * @param {Object} boundsB - bounds of B (needs .cx, .cy)
- * @returns {Object} { gap, ndx, ndy, impactX, impactY }
- */
-function _computeContourGap(pixelsA, pixelsB, boundsA, boundsB) {
-  var aCx = boundsA.cx, aCy = boundsA.cy;
-  var bCx = boundsB.cx, bCy = boundsB.cy;
-  var ddx = bCx - aCx, ddy = bCy - aCy;
-  var centerDist = Math.sqrt(ddx * ddx + ddy * ddy);
-  if (centerDist < 1) centerDist = 1;
-  var ndx = ddx / centerDist, ndy = ddy / centerDist;
-  // Perpendicular unit vector
-  var pnx = -ndy, pny = ndx;
-
-  // Project all pixels into rotated frame (origin = A center, along = A→B axis)
-  // For A: bin by perp coord, keep max along-axis value (furthest toward B)
-  var binsA = {};
-  for (var j = 0; j < pixelsA.length; j++) {
-    var rx = pixelsA[j].x - aCx, ry = pixelsA[j].y - aCy;
-    var along = rx * ndx + ry * ndy;
-    var perp = Math.round(rx * pnx + ry * pny);
-    if (binsA[perp] === undefined || along > binsA[perp]) binsA[perp] = along;
-  }
-  // For B: bin by perp coord (same frame), keep min along-axis value (closest to A)
-  var binsB = {}, binsB_px = {};
-  for (var j = 0; j < pixelsB.length; j++) {
-    var rx = pixelsB[j].x - aCx, ry = pixelsB[j].y - aCy;
-    var along = rx * ndx + ry * ndy;
-    var perp = Math.round(rx * pnx + ry * pny);
-    if (binsB[perp] === undefined || along < binsB[perp]) {
-      binsB[perp] = along;
-      binsB_px[perp] = { x: pixelsB[j].x, y: pixelsB[j].y };
-    }
-  }
-
-  // Find min gap across shared perpendicular bins
-  var minGap = Infinity;
-  var impactPerp = 0;
-  for (var perp in binsA) {
-    if (binsB[perp] !== undefined) {
-      var g = binsB[perp] - binsA[perp];
-      if (g < minGap) { minGap = g; impactPerp = perp; }
-    }
-  }
-
-  // Fallback if no shared perpendicular bins (entities don't overlap in perp)
-  if (minGap === Infinity) {
-    var maxA = 0, minB = Infinity;
-    for (var j = 0; j < pixelsA.length; j++) {
-      var p = (pixelsA[j].x - aCx) * ndx + (pixelsA[j].y - aCy) * ndy;
-      if (p > maxA) maxA = p;
-    }
-    for (var j = 0; j < pixelsB.length; j++) {
-      var p = (pixelsB[j].x - aCx) * ndx + (pixelsB[j].y - aCy) * ndy;
-      if (p < minB) minB = p;
-    }
-    minGap = minB - maxA;
-  }
-
-  var gap = Math.max(0, minGap);
-
-  // Impact point: B's contour pixel at the closest perpendicular bin
-  var impactX, impactY;
-  if (binsB_px[impactPerp]) {
-    impactX = binsB_px[impactPerp].x;
-    impactY = binsB_px[impactPerp].y;
-  } else {
-    // Fallback: midpoint
-    impactX = Math.round((aCx + bCx) / 2);
-    impactY = Math.round((aCy + bCy) / 2);
-  }
-
-  return { gap: gap, ndx: ndx, ndy: ndy, impactX: impactX, impactY: impactY };
-}
-
-// ═══════════════════════════════════════════════════════════════════
-// Section 1b: Bitmap Pixel Font & drawText
-// ═══════════════════════════════════════════════════════════════════
-
-var _FONT_W = 5, _FONT_H = 7, _FONT_SPACING = 1;
-
-// 5×7 bitmap font — each glyph is 35 bits (row-major, top to bottom)
-var _PIXEL_FONT = {
-  'A': [0,1,1,1,0, 1,0,0,0,1, 1,0,0,0,1, 1,1,1,1,1, 1,0,0,0,1, 1,0,0,0,1, 1,0,0,0,1],
-  'B': [1,1,1,1,0, 1,0,0,0,1, 1,0,0,0,1, 1,1,1,1,0, 1,0,0,0,1, 1,0,0,0,1, 1,1,1,1,0],
-  'C': [0,1,1,1,0, 1,0,0,0,1, 1,0,0,0,0, 1,0,0,0,0, 1,0,0,0,0, 1,0,0,0,1, 0,1,1,1,0],
-  'D': [1,1,1,1,0, 1,0,0,0,1, 1,0,0,0,1, 1,0,0,0,1, 1,0,0,0,1, 1,0,0,0,1, 1,1,1,1,0],
-  'E': [1,1,1,1,1, 1,0,0,0,0, 1,0,0,0,0, 1,1,1,1,0, 1,0,0,0,0, 1,0,0,0,0, 1,1,1,1,1],
-  'F': [1,1,1,1,1, 1,0,0,0,0, 1,0,0,0,0, 1,1,1,1,0, 1,0,0,0,0, 1,0,0,0,0, 1,0,0,0,0],
-  'G': [0,1,1,1,0, 1,0,0,0,1, 1,0,0,0,0, 1,0,1,1,1, 1,0,0,0,1, 1,0,0,0,1, 0,1,1,1,0],
-  'H': [1,0,0,0,1, 1,0,0,0,1, 1,0,0,0,1, 1,1,1,1,1, 1,0,0,0,1, 1,0,0,0,1, 1,0,0,0,1],
-  'I': [1,1,1,1,1, 0,0,1,0,0, 0,0,1,0,0, 0,0,1,0,0, 0,0,1,0,0, 0,0,1,0,0, 1,1,1,1,1],
-  'J': [0,0,1,1,1, 0,0,0,1,0, 0,0,0,1,0, 0,0,0,1,0, 0,0,0,1,0, 1,0,0,1,0, 0,1,1,0,0],
-  'K': [1,0,0,0,1, 1,0,0,1,0, 1,0,1,0,0, 1,1,0,0,0, 1,0,1,0,0, 1,0,0,1,0, 1,0,0,0,1],
-  'L': [1,0,0,0,0, 1,0,0,0,0, 1,0,0,0,0, 1,0,0,0,0, 1,0,0,0,0, 1,0,0,0,0, 1,1,1,1,1],
-  'M': [1,0,0,0,1, 1,1,0,1,1, 1,0,1,0,1, 1,0,0,0,1, 1,0,0,0,1, 1,0,0,0,1, 1,0,0,0,1],
-  'N': [1,0,0,0,1, 1,1,0,0,1, 1,0,1,0,1, 1,0,0,1,1, 1,0,0,0,1, 1,0,0,0,1, 1,0,0,0,1],
-  'O': [0,1,1,1,0, 1,0,0,0,1, 1,0,0,0,1, 1,0,0,0,1, 1,0,0,0,1, 1,0,0,0,1, 0,1,1,1,0],
-  'P': [1,1,1,1,0, 1,0,0,0,1, 1,0,0,0,1, 1,1,1,1,0, 1,0,0,0,0, 1,0,0,0,0, 1,0,0,0,0],
-  'Q': [0,1,1,1,0, 1,0,0,0,1, 1,0,0,0,1, 1,0,0,0,1, 1,0,1,0,1, 1,0,0,1,0, 0,1,1,0,1],
-  'R': [1,1,1,1,0, 1,0,0,0,1, 1,0,0,0,1, 1,1,1,1,0, 1,0,1,0,0, 1,0,0,1,0, 1,0,0,0,1],
-  'S': [0,1,1,1,0, 1,0,0,0,1, 1,0,0,0,0, 0,1,1,1,0, 0,0,0,0,1, 1,0,0,0,1, 0,1,1,1,0],
-  'T': [1,1,1,1,1, 0,0,1,0,0, 0,0,1,0,0, 0,0,1,0,0, 0,0,1,0,0, 0,0,1,0,0, 0,0,1,0,0],
-  'U': [1,0,0,0,1, 1,0,0,0,1, 1,0,0,0,1, 1,0,0,0,1, 1,0,0,0,1, 1,0,0,0,1, 0,1,1,1,0],
-  'V': [1,0,0,0,1, 1,0,0,0,1, 1,0,0,0,1, 1,0,0,0,1, 0,1,0,1,0, 0,1,0,1,0, 0,0,1,0,0],
-  'W': [1,0,0,0,1, 1,0,0,0,1, 1,0,0,0,1, 1,0,0,0,1, 1,0,1,0,1, 1,1,0,1,1, 1,0,0,0,1],
-  'X': [1,0,0,0,1, 1,0,0,0,1, 0,1,0,1,0, 0,0,1,0,0, 0,1,0,1,0, 1,0,0,0,1, 1,0,0,0,1],
-  'Y': [1,0,0,0,1, 1,0,0,0,1, 0,1,0,1,0, 0,0,1,0,0, 0,0,1,0,0, 0,0,1,0,0, 0,0,1,0,0],
-  'Z': [1,1,1,1,1, 0,0,0,0,1, 0,0,0,1,0, 0,0,1,0,0, 0,1,0,0,0, 1,0,0,0,0, 1,1,1,1,1],
-  '0': [0,1,1,1,0, 1,0,0,0,1, 1,0,0,1,1, 1,0,1,0,1, 1,1,0,0,1, 1,0,0,0,1, 0,1,1,1,0],
-  '1': [0,0,1,0,0, 0,1,1,0,0, 0,0,1,0,0, 0,0,1,0,0, 0,0,1,0,0, 0,0,1,0,0, 0,1,1,1,0],
-  '2': [0,1,1,1,0, 1,0,0,0,1, 0,0,0,0,1, 0,0,0,1,0, 0,0,1,0,0, 0,1,0,0,0, 1,1,1,1,1],
-  '3': [0,1,1,1,0, 1,0,0,0,1, 0,0,0,0,1, 0,0,1,1,0, 0,0,0,0,1, 1,0,0,0,1, 0,1,1,1,0],
-  '4': [1,0,0,0,1, 1,0,0,0,1, 1,0,0,0,1, 1,1,1,1,1, 0,0,0,0,1, 0,0,0,0,1, 0,0,0,0,1],
-  '5': [1,1,1,1,1, 1,0,0,0,0, 1,0,0,0,0, 1,1,1,1,0, 0,0,0,0,1, 1,0,0,0,1, 0,1,1,1,0],
-  '6': [0,1,1,1,0, 1,0,0,0,0, 1,0,0,0,0, 1,1,1,1,0, 1,0,0,0,1, 1,0,0,0,1, 0,1,1,1,0],
-  '7': [1,1,1,1,1, 0,0,0,0,1, 0,0,0,1,0, 0,0,1,0,0, 0,0,1,0,0, 0,0,1,0,0, 0,0,1,0,0],
-  '8': [0,1,1,1,0, 1,0,0,0,1, 1,0,0,0,1, 0,1,1,1,0, 1,0,0,0,1, 1,0,0,0,1, 0,1,1,1,0],
-  '9': [0,1,1,1,0, 1,0,0,0,1, 1,0,0,0,1, 0,1,1,1,1, 0,0,0,0,1, 0,0,0,0,1, 0,1,1,1,0],
-  ' ': [0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0],
-  '.': [0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,1,0,0],
-  ',': [0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,1,0,0, 0,1,0,0,0],
-  '!': [0,0,1,0,0, 0,0,1,0,0, 0,0,1,0,0, 0,0,1,0,0, 0,0,1,0,0, 0,0,0,0,0, 0,0,1,0,0],
-  '?': [0,1,1,1,0, 1,0,0,0,1, 0,0,0,0,1, 0,0,0,1,0, 0,0,1,0,0, 0,0,0,0,0, 0,0,1,0,0],
-  '-': [0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 1,1,1,1,1, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0],
-  "'": [0,0,1,0,0, 0,0,1,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0],
-};
-
-/**
- * Render pixel-art text into the buffer.
- * @param {Array} buf   - pixel buffer (flat array of {r,g,b,e,...})
- * @param {number} PW   - buffer width
- * @param {number} PH   - buffer height
- * @param {string} text - string to render
- * @param {number} x    - top-left x position
- * @param {number} y    - top-left y position
- * @param {number} r    - red 0-255
- * @param {number} g    - green 0-255
- * @param {number} b    - blue 0-255
- * @param {string} entityId - entity ID assigned to every text pixel
- * @param {number} [scale=1] - pixel scale (each font pixel → scale×scale block)
- */
-function drawText(buf, PW, PH, text, x, y, r, g, b, entityId, scale) {
-  scale = scale || 1;
-  var cx = x;
-  var upper = text.toUpperCase();
-  for (var ci = 0; ci < upper.length; ci++) {
-    var ch = upper[ci];
-    var glyph = _PIXEL_FONT[ch];
-    if (!glyph) {
-      // Unknown character — skip with space width
-      cx += (_FONT_W + _FONT_SPACING) * scale;
-      continue;
-    }
-    for (var gy = 0; gy < _FONT_H; gy++) {
-      for (var gx = 0; gx < _FONT_W; gx++) {
-        if (glyph[gy * _FONT_W + gx]) {
-          // Draw scale×scale block
-          for (var sy = 0; sy < scale; sy++) {
-            for (var sx = 0; sx < scale; sx++) {
-              var px = cx + gx * scale + sx;
-              var py = y + gy * scale + sy;
-              if (px >= 0 && px < PW && py >= 0 && py < PH) {
-                var idx = py * PW + px;
-                buf[idx].r = r;
-                buf[idx].g = g;
-                buf[idx].b = b;
-                buf[idx].e = entityId;
-              }
-            }
-          }
-        }
-      }
-    }
-    cx += (_FONT_W + _FONT_SPACING) * scale;
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════════
-// Section 2: Particle System
-// ═══════════════════════════════════════════════════════════════════
-
-function ParticleSystem(cfg) {
-  this.particles = [];
-  this.maxParticles = cfg.maxParticles || 50;
-  // Base config (cloned per particle with jitter)
-  this._cfg = {
-    color: cfg.color || [255, 255, 255],
-    colorEnd: cfg.colorEnd || null,
-    size: cfg.size || 1,
-    maxAge: cfg.maxAge || 0.3,         // in normalized-t units
-    gravity: cfg.gravity || 0,          // px per t-unit squared
-    drag: cfg.drag || 0,
-    spreadX: cfg.spreadX || 3,
-    spreadY: cfg.spreadY || 3,
-    vx: cfg.vx || 0,
-    vy: cfg.vy || 0,
-    vxJitter: cfg.vxJitter || 0,
-    vyJitter: cfg.vyJitter || 0,
-    fadeIn: cfg.fadeIn || 0.1,
-    fadeOut: cfg.fadeOut || 0.3,
-    flicker: cfg.flicker || false,
-  };
-}
-
-ParticleSystem.prototype.burst = function(cx, cy, count) {
-  for (var i = 0; i < count && this.particles.length < this.maxParticles; i++) {
-    this._spawn(cx, cy);
-  }
-};
-
-ParticleSystem.prototype.spawn = function(cx, cy) {
-  if (this.particles.length < this.maxParticles) {
-    this._spawn(cx, cy);
-  }
-};
-
-ParticleSystem.prototype._spawn = function(cx, cy) {
-  var c = this._cfg;
-  var jx = (Math.random() - 0.5) * 2 * c.spreadX;
-  var jy = (Math.random() - 0.5) * 2 * c.spreadY;
-  this.particles.push({
-    x: cx + jx,
-    y: cy + jy,
-    vx: c.vx + (Math.random() - 0.5) * 2 * c.vxJitter,
-    vy: c.vy + (Math.random() - 0.5) * 2 * c.vyJitter,
-    age: 0,
-    maxAge: c.maxAge * (0.8 + Math.random() * 0.4),
-    alive: true,
-  });
-};
-
-ParticleSystem.prototype.update = function(dt) {
-  var c = this._cfg;
-  for (var i = this.particles.length - 1; i >= 0; i--) {
-    var p = this.particles[i];
-    p.age += dt;
-    if (p.age >= p.maxAge) {
-      this.particles.splice(i, 1);
-      continue;
-    }
-    p.vy += c.gravity * dt;
-    p.vx *= (1 - c.drag * dt);
-    p.vy *= (1 - c.drag * dt);
-    p.x += p.vx * dt;
-    p.y += p.vy * dt;
-  }
-};
-
-ParticleSystem.prototype.draw = function(buf, PW, PH) {
-  var c = this._cfg;
-  for (var i = 0; i < this.particles.length; i++) {
-    var p = this.particles[i];
-    if (!p.alive) continue;
-
-    // Flicker: randomly skip ~30% of frames
-    if (c.flicker && Math.random() < 0.3) continue;
-
-    var lifeRatio = p.age / p.maxAge;
-
-    // Alpha envelope
-    var alpha = 1;
-    if (lifeRatio < c.fadeIn) alpha = lifeRatio / c.fadeIn;
-    else if (lifeRatio > 1 - c.fadeOut) alpha = (1 - lifeRatio) / c.fadeOut;
-
-    // Color interpolation
-    var r, g, b;
-    if (c.colorEnd) {
-      r = Math.round(c.color[0] + (c.colorEnd[0] - c.color[0]) * lifeRatio);
-      g = Math.round(c.color[1] + (c.colorEnd[1] - c.color[1]) * lifeRatio);
-      b = Math.round(c.color[2] + (c.colorEnd[2] - c.color[2]) * lifeRatio);
-    } else {
-      r = c.color[0]; g = c.color[1]; b = c.color[2];
-    }
-
-    var px = Math.round(p.x), py = Math.round(p.y);
-    var sz = c.size;
-
-    for (var sy = 0; sy < sz; sy++) {
-      for (var sx = 0; sx < sz; sx++) {
-        var fx = px + sx, fy = py + sy;
-        if (fx >= 0 && fx < PW && fy >= 0 && fy < PH) {
-          var idx = fy * PW + fx;
-          // Blend with alpha
-          buf[idx].r = Math.round(buf[idx].r * (1 - alpha) + r * alpha);
-          buf[idx].g = Math.round(buf[idx].g * (1 - alpha) + g * alpha);
-          buf[idx].b = Math.round(buf[idx].b * (1 - alpha) + b * alpha);
-        }
-      }
-    }
-  }
-};
-
-// ── Particle Presets ──
-
-var ParticlePresets = {
-  stars: {
-    color: [255, 255, 100], size: 1,
-    maxAge: 0.4, gravity: 0, drag: 0.5,
-    spreadX: 2, spreadY: 2,
-    vx: 0, vy: 0, vxJitter: 40, vyJitter: 40,
-    fadeIn: 0.05, fadeOut: 0.4, flicker: true,
-  },
-  rain: {
-    color: [100, 150, 220], size: 1,
-    maxAge: 0.3, gravity: 200, drag: 0,
-    spreadX: 30, spreadY: 5,
-    vx: 0, vy: 50, vxJitter: 5, vyJitter: 10,
-    fadeIn: 0.05, fadeOut: 0.2, flicker: false,
-  },
-  smoke: {
-    color: [160, 160, 160], size: 2,
-    maxAge: 0.5, gravity: -15, drag: 1,
-    spreadX: 5, spreadY: 2,
-    vx: 0, vy: -20, vxJitter: 10, vyJitter: 5,
-    fadeIn: 0.1, fadeOut: 0.5, flicker: false,
-  },
-  fire: {
-    color: [255, 140, 0], colorEnd: [255, 50, 0], size: 1,
-    maxAge: 0.35, gravity: -30, drag: 0.5,
-    spreadX: 4, spreadY: 2,
-    vx: 0, vy: -25, vxJitter: 15, vyJitter: 8,
-    fadeIn: 0.05, fadeOut: 0.3, flicker: true,
-  },
-  explosion: {
-    color: [255, 200, 50], colorEnd: [200, 80, 0], size: 2,
-    maxAge: 0.3, gravity: 20, drag: 2,
-    spreadX: 2, spreadY: 2,
-    vx: 0, vy: 0, vxJitter: 80, vyJitter: 80,
-    fadeIn: 0.02, fadeOut: 0.4, flicker: false,
-  },
-  snowflakes: {
-    color: [230, 240, 255], size: 1,
-    maxAge: 0.6, gravity: 10, drag: 0.5,
-    spreadX: 30, spreadY: 5,
-    vx: 0, vy: 8, vxJitter: 12, vyJitter: 3,
-    fadeIn: 0.1, fadeOut: 0.3, flicker: false,
-  },
-  hearts: {
-    color: [255, 80, 100], size: 2,
-    maxAge: 0.5, gravity: -12, drag: 0.3,
-    spreadX: 5, spreadY: 3,
-    vx: 0, vy: -15, vxJitter: 8, vyJitter: 4,
-    fadeIn: 0.1, fadeOut: 0.4, flicker: false,
-  },
-  // Utility presets used by templates
-  steam: {
-    color: [220, 220, 220], size: 1,
-    maxAge: 0.4, gravity: -20, drag: 0.8,
-    spreadX: 4, spreadY: 2,
-    vx: 0, vy: -18, vxJitter: 8, vyJitter: 4,
-    fadeIn: 0.1, fadeOut: 0.4, flicker: false,
-  },
-  frost: {
-    color: [200, 230, 255], size: 1,
-    maxAge: 0.5, gravity: -5, drag: 1,
-    spreadX: 3, spreadY: 3,
-    vx: 0, vy: -5, vxJitter: 6, vyJitter: 6,
-    fadeIn: 0.1, fadeOut: 0.5, flicker: true,
-  },
-  sparkle: {
-    color: [255, 255, 200], size: 1,
-    maxAge: 0.3, gravity: 0, drag: 1,
-    spreadX: 5, spreadY: 5,
-    vx: 0, vy: 0, vxJitter: 10, vyJitter: 10,
-    fadeIn: 0.05, fadeOut: 0.3, flicker: true,
-  },
-  dust: {
-    color: [180, 170, 140], size: 1,
-    maxAge: 0.5, gravity: 8, drag: 1.5,
-    spreadX: 5, spreadY: 3,
-    vx: 0, vy: 5, vxJitter: 8, vyJitter: 5,
-    fadeIn: 0.1, fadeOut: 0.4, flicker: false,
-  },
-  anger: {
-    color: [220, 40, 40], size: 2,
-    maxAge: 0.5, gravity: 0, drag: 0,
-    spreadX: 5, spreadY: 5,
-    vx: 0, vy: 0, vxJitter: 1, vyJitter: 1,
-    fadeIn: 0.1, fadeOut: 0.3, flicker: false,
-  },
-  fear: {
-    color: [100, 160, 230], size: 1,
-    maxAge: 0.6, gravity: 15, drag: 0.5,
-    spreadX: 5, spreadY: 3,
-    vx: 0, vy: 15, vxJitter: 3, vyJitter: 3,
-    fadeIn: 0.1, fadeOut: 0.3, flicker: false,
-  },
-};
-
-// ═══════════════════════════════════════════════════════════════════
-// Section 3: Animation Templates Registry
-// ═══════════════════════════════════════════════════════════════════
-
-var AnimationTemplates = {
-  registry: {},
-
-  register: function(name, factory, defaultDuration) {
-    this.registry[name] = { factory: factory, duration: defaultDuration };
-  },
-
-  /**
-   * Build an animate function from a template spec.
-   * @param {Object} spec - { template, params, particles, duration_ms }
-   * @returns {{ animate: Function, duration_ms: number }}
-   */
-  build: function(spec) {
-    var entry = this.registry[spec.template];
-    if (!entry) {
-      console.warn('[AnimationTemplates] Unknown template: ' + spec.template + ', using spotlight fallback');
-      entry = this.registry['spotlight'] || this.registry['color_pop'];
-      if (!entry) {
-        return {
-          animate: function() {},
-          duration_ms: spec.duration_ms || 1200
-        };
-      }
-    }
-
-    var params = spec.params || {};
-    var mainAnimate = entry.factory(params);
-    var duration = spec.duration_ms || entry.duration;
-
-    // Build particle systems from spec.particles array
-    var particleSystems = [];
-    var particleSpecs = spec.particles || [];
-    for (var i = 0; i < particleSpecs.length; i++) {
-      var ps = particleSpecs[i];
-      var preset = ParticlePresets[ps.type];
-      if (preset) {
-        var cfg = {};
-        for (var k in preset) cfg[k] = preset[k];
-        if (ps.color) cfg.color = ps.color;
-        if (ps.count) cfg._burstCount = ps.count;
-        if (ps.anchor) cfg._anchor = ps.anchor;
-        particleSystems.push({ system: new ParticleSystem(cfg), cfg: cfg, spawned: false });
-      }
-    }
-
-    // Combine main animation with particle systems
-    if (particleSystems.length === 0) {
-      return { animate: mainAnimate, duration_ms: duration };
-    }
-
-    return {
-      animate: function(buf, PW, PH, t) {
-        mainAnimate(buf, PW, PH, t);
-
-        var dt = 1 / 60; // approximate frame dt in normalized time
-        for (var i = 0; i < particleSystems.length; i++) {
-          var ps = particleSystems[i];
-          if (!ps.spawned) {
-            var anchor = ps.cfg._anchor;
-            var bounds = anchor ? _computeEntityBounds(buf, PW, anchor) : { cx: PW / 2, cy: PH / 2 };
-            ps.system.burst(bounds.cx, bounds.cy, ps.cfg._burstCount || 8);
-            ps.spawned = true;
-          }
-          ps.system.update(dt);
-          ps.system.draw(buf, PW, PH);
-        }
-      },
-      duration_ms: duration
-    };
-  }
-};
-
 // ═══════════════════════════════════════════════════════════════════
 // Section 4: Animation Template Factories (8 families, 20 animations)
 //   I=Identity, P=Property, A=Action, S=Space,
@@ -612,12 +28,11 @@ AnimationTemplates.register('spotlight', function(params) {
     var haloSize = Math.round(5 + (maxHaloSize - 5) * env * pulse);
     var hr = haloColor[0], hg = haloColor[1], hb = haloColor[2];
     var haloAlphaMax = 0.7 * env * pulse;
-    var prefixDot = prefix + '.';
 
     // Single pass: dim non-target, brighten target, draw silhouette halo
     for (var i = 0; i < buf.length; i++) {
       var p = buf[i];
-      var isTarget = (p.e === prefix || p.e.startsWith(prefixDot));
+      var isTarget = _isEntity(p.e, prefix);
 
       if (isTarget) {
         // Brighten target entity
@@ -732,9 +147,7 @@ AnimationTemplates.register('nametag', function(params) {
         var py = Math.round(holeScreenY + stringDy * progress + sny * waveOff);
         if (px >= 0 && px < PW && py >= 0 && py < PH) {
           var si = py * PW + px;
-          buf[si].r = Math.round(buf[si].r * (1 - env) + stringColor[0] * env);
-          buf[si].g = Math.round(buf[si].g * (1 - env) + stringColor[1] * env);
-          buf[si].b = Math.round(buf[si].b * (1 - env) + stringColor[2] * env);
+          _blendPixel(buf, si, stringColor[0], stringColor[1], stringColor[2], env);
         }
       }
     }
@@ -780,9 +193,7 @@ AnimationTemplates.register('nametag', function(params) {
         } else {
           cr = bgColor[0]; cg = bgColor[1]; cb = bgColor[2];
         }
-        buf[di].r = Math.round(buf[di].r * (1 - env) + cr * env);
-        buf[di].g = Math.round(buf[di].g * (1 - env) + cg * env);
-        buf[di].b = Math.round(buf[di].b * (1 - env) + cb * env);
+        _blendPixel(buf, di, cr, cg, cb, env);
       }
     }
 
@@ -804,9 +215,7 @@ AnimationTemplates.register('nametag', function(params) {
               var drawY2 = textStartY + gy * textScale + sy2;
               if (drawX2 >= 0 && drawX2 < PW && drawY2 >= 0 && drawY2 < PH) {
                 var ti = drawY2 * PW + drawX2;
-                buf[ti].r = Math.round(buf[ti].r * (1 - env) + textColor[0] * env);
-                buf[ti].g = Math.round(buf[ti].g * (1 - env) + textColor[1] * env);
-                buf[ti].b = Math.round(buf[ti].b * (1 - env) + textColor[2] * env);
+                _blendPixel(buf, ti, textColor[0], textColor[1], textColor[2], env);
               }
             }
           }
@@ -982,7 +391,6 @@ AnimationTemplates.register('stamp', function(params) {
 AnimationTemplates.register('color_pop', function(params) {
   var prefix = params.entityPrefix || '';
   var desatStr = params.desaturationStrength != null ? params.desaturationStrength : 0.8;
-  var prefixDot = prefix + '.';
   var cycleCount = 2;  // full rainbow cycles over 3s
 
   return function animate(buf, PW, PH, t) {
@@ -991,7 +399,7 @@ AnimationTemplates.register('color_pop', function(params) {
 
     for (var i = 0; i < buf.length; i++) {
       var p = buf[i];
-      if (p.e === prefix || p.e.startsWith(prefixDot)) {
+      if (_isEntity(p.e, prefix)) {
         var origHue = _rgbToHue(p._r, p._g, p._b);
         var hue = ((t * cycleCount + origHue) % 1 + 1) % 1;
         var rgb = _hslToRgb(hue, 0.7, 0.5);
@@ -1021,7 +429,7 @@ AnimationTemplates.register('reveal', function(params) {
 
     // Make occluding entity more transparent to reveal what's behind
     for (var i = 0; i < buf.length; i++) {
-      if (buf[i].e === prefix || buf[i].e.startsWith(prefix + '.')) {
+      if (_isEntity(buf[i].e, prefix)) {
         buf[i].r = Math.round(buf[i]._r * (1 - alpha) + buf[i]._br * alpha);
         buf[i].g = Math.round(buf[i]._g * (1 - alpha) + buf[i]._bg * alpha);
         buf[i].b = Math.round(buf[i]._b * (1 - alpha) + buf[i]._bb * alpha);
@@ -1036,19 +444,17 @@ AnimationTemplates.register('reveal', function(params) {
         for (var x = bounds.x1; x <= bounds.x2; x++) {
           if (x < 0 || x >= PW || y < 0 || y >= PH) continue;
           var idx = y * PW + x;
-          var isEntity = buf[idx].e === prefix || buf[idx].e.startsWith(prefix + '.');
+          var isEntity = _isEntity(buf[idx].e, prefix);
           if (!isEntity) continue;
           var isBorder = false;
           for (var n = 0; n < 4; n++) {
             var nx = x + neighbors[n][0], ny = y + neighbors[n][1];
             if (nx < 0 || nx >= PW || ny < 0 || ny >= PH) { isBorder = true; break; }
             var ne = buf[ny * PW + nx].e;
-            if (ne !== prefix && !ne.startsWith(prefix + '.')) { isBorder = true; break; }
+            if (!_isEntity(ne, prefix)) { isBorder = true; break; }
           }
           if (isBorder) {
-            buf[idx].r = Math.round(buf[idx].r * (1 - env) + 255 * env);
-            buf[idx].g = Math.round(buf[idx].g * (1 - env) + 255 * env);
-            buf[idx].b = Math.round(buf[idx].b * (1 - env) + 255 * env);
+            _blendPixel(buf, idx, 255, 255, 255, env);
           }
         }
       }
@@ -1066,9 +472,7 @@ function _drawEmanationSprite(buf, PW, PH, type, cx, cy, size, alpha) {
   if (alpha < 0.05) return;
   var _blend = function(idx, r, g, b, a) {
     if (idx < 0 || idx >= buf.length) return;
-    buf[idx].r = Math.round(buf[idx].r * (1 - a) + r * a);
-    buf[idx].g = Math.round(buf[idx].g * (1 - a) + g * a);
-    buf[idx].b = Math.round(buf[idx].b * (1 - a) + b * a);
+    _blendPixel(buf, idx, r, g, b, a);
   };
   var px, py, idx;
 
@@ -1258,7 +662,6 @@ AnimationTemplates.register('emanation', function(params) {
   var prefix = params.entityPrefix || '';
   var pType = params.particleType || 'steam';
   var totalSprites = _clamp(params.particleCount || 18, 8, 30);
-  var prefixDot = prefix + '.';
 
   // Stronger tints per type — applied to entity base color during animation
   var tints = {
@@ -1318,7 +721,7 @@ AnimationTemplates.register('emanation', function(params) {
 
     // Tint entity
     for (var i = 0; i < buf.length; i++) {
-      if (buf[i].e === prefix || buf[i].e.startsWith(prefixDot)) {
+      if (_isEntity(buf[i].e, prefix)) {
         buf[i].r = _clamp(buf[i]._r + Math.round(tint.r * env), 0, 255);
         buf[i].g = _clamp(buf[i]._g + Math.round(tint.g * env), 0, 255);
         buf[i].b = _clamp(buf[i]._b + Math.round(tint.b * env), 0, 255);
@@ -1430,9 +833,7 @@ AnimationTemplates.register('flashback', function(params) {
           var px = wx + w;
           if (px >= 0 && px < PW) {
             var idx = y * PW + px;
-            buf[idx].r = Math.round(buf[idx].r * (1 - scratchA));
-            buf[idx].g = Math.round(buf[idx].g * (1 - scratchA));
-            buf[idx].b = Math.round(buf[idx].b * (1 - scratchA));
+            _blendPixel(buf, idx, 0, 0, 0, scratchA);
           }
         }
       }
@@ -1453,9 +854,7 @@ AnimationTemplates.register('flashback', function(params) {
             var py = dy + sy, pxx = dx + sxx;
             if (py >= 0 && py < PH && pxx >= 0 && pxx < PW) {
               var si = py * PW + pxx;
-              buf[si].r = Math.round(buf[si].r * (1 - speckA));
-              buf[si].g = Math.round(buf[si].g * (1 - speckA));
-              buf[si].b = Math.round(buf[si].b * (1 - speckA));
+              _blendPixel(buf, si, 0, 0, 0, speckA);
             }
           }
         }
@@ -1599,10 +998,9 @@ AnimationTemplates.register('motion_lines', function(params) {
     // Pre-compute outermost entity pixels per row and column on first frame
     if (!silhouetteCache) {
       silhouetteCache = { byRow: {}, byCol: {} };
-      var prefixDot = prefix + '.';
       for (var i = 0; i < buf.length; i++) {
         var e = buf[i].e;
-        if (e !== prefix && !e.startsWith(prefixDot)) continue;
+        if (!_isEntity(e, prefix)) continue;
         var ex = i % PW, ey = (i - ex) / PW;
         if (!silhouetteCache.byRow[ey]) {
           silhouetteCache.byRow[ey] = { minX: ex, maxX: ex };
@@ -1728,9 +1126,7 @@ AnimationTemplates.register('motion_lines', function(params) {
             var sy = Math.round(startY + streakDirY * d + perpY * tw * 0.7);
             if (sx >= 0 && sx < PW && sy >= 0 && sy < PH) {
               var si = sy * PW + sx;
-              buf[si].r = Math.round(buf[si].r * (1 - dAlpha) + sc[0] * dAlpha);
-              buf[si].g = Math.round(buf[si].g * (1 - dAlpha) + sc[1] * dAlpha);
-              buf[si].b = Math.round(buf[si].b * (1 - dAlpha) + sc[2] * dAlpha);
+              _blendPixel(buf, si, sc[0], sc[1], sc[2], dAlpha);
             }
           }
         }
@@ -1986,50 +1382,7 @@ AnimationTemplates.register('causal_push', function(params) {
       }
       starAlpha = Math.max(0, Math.min(1, starAlpha));
 
-      // Core (3×3)
-      for (var dy = -1; dy <= 1; dy++) {
-        for (var dx = -1; dx <= 1; dx++) {
-          var sx = ipx + dx, sy = ipy + dy;
-          if (sx >= 0 && sx < PW && sy >= 0 && sy < PH) {
-            var si = sy * PW + sx;
-            buf[si].r = Math.min(255, Math.round(buf[si].r * (1 - starAlpha) + 255 * starAlpha));
-            buf[si].g = Math.min(255, Math.round(buf[si].g * (1 - starAlpha) + 255 * starAlpha));
-            buf[si].b = Math.min(255, Math.round(buf[si].b * (1 - starAlpha) + 180 * starAlpha));
-          }
-        }
-      }
-      // Cardinal spikes (length 6)
-      var spikeLen = 6;
-      var cardinals = [[1,0],[-1,0],[0,1],[0,-1]];
-      for (var c = 0; c < 4; c++) {
-        for (var d = 2; d <= spikeLen; d++) {
-          var fade = 1 - (d - 1) / spikeLen;
-          var sa = starAlpha * fade;
-          var sx = ipx + cardinals[c][0] * d, sy = ipy + cardinals[c][1] * d;
-          if (sx >= 0 && sx < PW && sy >= 0 && sy < PH) {
-            var si = sy * PW + sx;
-            buf[si].r = Math.min(255, Math.round(buf[si].r * (1 - sa) + 255 * sa));
-            buf[si].g = Math.min(255, Math.round(buf[si].g * (1 - sa) + 255 * sa));
-            buf[si].b = Math.min(255, Math.round(buf[si].b * (1 - sa) + 120 * sa));
-          }
-        }
-      }
-      // Diagonal spikes (length 4)
-      var diagLen = 4;
-      var diags = [[1,1],[-1,1],[1,-1],[-1,-1]];
-      for (var c = 0; c < 4; c++) {
-        for (var d = 2; d <= diagLen; d++) {
-          var fade = 1 - (d - 1) / diagLen;
-          var sa = starAlpha * fade;
-          var sx = ipx + diags[c][0] * d, sy = ipy + diags[c][1] * d;
-          if (sx >= 0 && sx < PW && sy >= 0 && sy < PH) {
-            var si = sy * PW + sx;
-            buf[si].r = Math.min(255, Math.round(buf[si].r * (1 - sa) + 255 * sa));
-            buf[si].g = Math.min(255, Math.round(buf[si].g * (1 - sa) + 230 * sa));
-            buf[si].b = Math.min(255, Math.round(buf[si].b * (1 - sa) + 80 * sa));
-          }
-        }
-      }
+      _drawStarBurst(buf, PW, PH, ipx, ipy, starAlpha, 6, 4);
     }
   };
 }, 1500);
@@ -2051,7 +1404,7 @@ AnimationTemplates.register('sequential_glow', function(params) {
 
       var isActive = false;
       for (var a = 0; a <= activeIdx; a++) {
-        if (p.e === prefixes[a] || p.e.startsWith(prefixes[a] + '.')) {
+        if (_isEntity(p.e, prefixes[a])) {
           if (a === activeIdx) {
             isActive = true;
           }
@@ -2069,7 +1422,7 @@ AnimationTemplates.register('sequential_glow', function(params) {
         // Check if this is any of the listed entities (dim them)
         var isListed = false;
         for (var k = 0; k < n; k++) {
-          if (p.e === prefixes[k] || p.e.startsWith(prefixes[k] + '.')) {
+          if (_isEntity(p.e, prefixes[k])) {
             isListed = true; break;
           }
         }
@@ -2238,9 +1591,7 @@ AnimationTemplates.register('ghost_outline', function(params) {
         var isEdge = edgeFrac > 0.8;
         if (isEdge && (px + py) % 2 !== 0) continue;
         var sa = shapeAlpha * (0.6 - 0.2 * edgeFrac);
-        buf[pi].r = Math.round(buf[pi].r * (1 - sa) + gc[0] * sa);
-        buf[pi].g = Math.round(buf[pi].g * (1 - sa) + gc[1] * sa);
-        buf[pi].b = Math.round(buf[pi].b * (1 - sa) + gc[2] * sa);
+        _blendPixel(buf, pi, gc[0], gc[1], gc[2], sa);
       }
     }
 
@@ -2291,9 +1642,7 @@ AnimationTemplates.register('ghost_outline', function(params) {
             var sx = qx0 + nx, sy = qy0 + ny;
             if (sx >= 0 && sx < PW && sy >= 0 && sy < PH) {
               var si = sy * PW + sx;
-              buf[si].r = Math.round(buf[si].r * (1 - qa) + 0);
-              buf[si].g = Math.round(buf[si].g * (1 - qa) + 0);
-              buf[si].b = Math.round(buf[si].b * (1 - qa) + 0);
+              _blendPixel(buf, si, 0, 0, 0, qa);
             }
           }
         }
@@ -2305,9 +1654,7 @@ AnimationTemplates.register('ghost_outline', function(params) {
           var sx = qx0 + qx, sy = qy0 + qy;
           if (sx >= 0 && sx < PW && sy >= 0 && sy < PH) {
             var si = sy * PW + sx;
-            buf[si].r = Math.min(255, Math.round(buf[si].r * (1 - qa) + 255 * qa));
-            buf[si].g = Math.min(255, Math.round(buf[si].g * (1 - qa) + 255 * qa));
-            buf[si].b = Math.min(255, Math.round(buf[si].b * (1 - qa) + 220 * qa));
+            _blendPixel(buf, si, 255, 255, 220, qa);
           }
         }
       }
@@ -2552,52 +1899,9 @@ AnimationTemplates.register('repel', function(params) {
       var ipx = cachedImpactX + dxB;
       var ipy = cachedImpactY + dyB;
 
-      // 1) Core flash (3x3 bright white-yellow)
-      for (var dy = -1; dy <= 1; dy++) {
-        for (var dx = -1; dx <= 1; dx++) {
-          var sx = ipx + dx, sy = ipy + dy;
-          if (sx >= 0 && sx < PW && sy >= 0 && sy < PH) {
-            var si = sy * PW + sx;
-            buf[si].r = Math.min(255, Math.round(buf[si].r * (1 - bonkAlpha) + 255 * bonkAlpha));
-            buf[si].g = Math.min(255, Math.round(buf[si].g * (1 - bonkAlpha) + 255 * bonkAlpha));
-            buf[si].b = Math.min(255, Math.round(buf[si].b * (1 - bonkAlpha) + 180 * bonkAlpha));
-          }
-        }
-      }
+      _drawStarBurst(buf, PW, PH, ipx, ipy, bonkAlpha, 4, 3);
 
-      // 2) Cardinal star spikes (length 4)
-      var cardinals = [[1,0],[-1,0],[0,1],[0,-1]];
-      for (var c = 0; c < 4; c++) {
-        for (var d = 2; d <= 4; d++) {
-          var fade = 1 - (d - 1) / 5;
-          var sa = bonkAlpha * fade;
-          var sx = ipx + cardinals[c][0] * d, sy = ipy + cardinals[c][1] * d;
-          if (sx >= 0 && sx < PW && sy >= 0 && sy < PH) {
-            var si = sy * PW + sx;
-            buf[si].r = Math.min(255, Math.round(buf[si].r * (1 - sa) + 255 * sa));
-            buf[si].g = Math.min(255, Math.round(buf[si].g * (1 - sa) + 255 * sa));
-            buf[si].b = Math.min(255, Math.round(buf[si].b * (1 - sa) + 120 * sa));
-          }
-        }
-      }
-
-      // 3) Diagonal star spikes (length 3)
-      var diags = [[1,1],[-1,1],[1,-1],[-1,-1]];
-      for (var c = 0; c < 4; c++) {
-        for (var d = 2; d <= 3; d++) {
-          var fade = 1 - (d - 1) / 4;
-          var sa = bonkAlpha * fade;
-          var sx = ipx + diags[c][0] * d, sy = ipy + diags[c][1] * d;
-          if (sx >= 0 && sx < PW && sy >= 0 && sy < PH) {
-            var si = sy * PW + sx;
-            buf[si].r = Math.min(255, Math.round(buf[si].r * (1 - sa) + 255 * sa));
-            buf[si].g = Math.min(255, Math.round(buf[si].g * (1 - sa) + 230 * sa));
-            buf[si].b = Math.min(255, Math.round(buf[si].b * (1 - sa) + 80 * sa));
-          }
-        }
-      }
-
-      // 4) Expanding impact ring
+      // Expanding impact ring
       var ringProgress = _clamp((t - bonkStart) / (bonkEnd - bonkStart), 0, 1);
       var ringRadius = 2 + ringProgress * 6;  // expands 2px -> 8px
       var ringAlpha = bonkAlpha * 0.7;
@@ -2608,9 +1912,7 @@ AnimationTemplates.register('repel', function(params) {
         var ry = Math.round(ipy + Math.sin(angle) * ringRadius);
         if (rx >= 0 && rx < PW && ry >= 0 && ry < PH) {
           var ri = ry * PW + rx;
-          buf[ri].r = Math.min(255, Math.round(buf[ri].r * (1 - ringAlpha) + 255 * ringAlpha));
-          buf[ri].g = Math.min(255, Math.round(buf[ri].g * (1 - ringAlpha) + 220 * ringAlpha));
-          buf[ri].b = Math.min(255, Math.round(buf[ri].b * (1 - ringAlpha) + 80 * ringAlpha));
+          _blendPixel(buf, ri, 255, 220, 80, ringAlpha);
         }
       }
     }
@@ -2669,9 +1971,7 @@ AnimationTemplates.register('speech_bubble', function(params) {
         var nx = (x - bubbleCX) / (rx + 1), ny = (y - bubbleCY) / (ry + 1);
         if (nx * nx + ny * ny <= 1.0) {
           var idx = y * PW + x;
-          buf[idx].r = Math.round(buf[idx].r * (1 - alpha));
-          buf[idx].g = Math.round(buf[idx].g * (1 - alpha));
-          buf[idx].b = Math.round(buf[idx].b * (1 - alpha));
+          _blendPixel(buf, idx, 0, 0, 0, alpha);
         }
       }
     }
@@ -2684,9 +1984,7 @@ AnimationTemplates.register('speech_bubble', function(params) {
         var nx = (x - bubbleCX) / rx, ny = (y - bubbleCY) / ry;
         if (nx * nx + ny * ny <= 1.0) {
           var idx = y * PW + x;
-          buf[idx].r = Math.round(buf[idx].r * (1 - alpha) + 255 * alpha);
-          buf[idx].g = Math.round(buf[idx].g * (1 - alpha) + 255 * alpha);
-          buf[idx].b = Math.round(buf[idx].b * (1 - alpha) + 255 * alpha);
+          _blendPixel(buf, idx, 255, 255, 255, alpha);
         }
       }
     }
@@ -2702,9 +2000,7 @@ AnimationTemplates.register('speech_bubble', function(params) {
         for (var x = hcx - hw; x <= hcx + hw; x++) {
           if (x < 0 || x >= PW) continue;
           var idx = y * PW + x;
-          buf[idx].r = Math.round(buf[idx].r * (1 - alpha) + 255 * alpha);
-          buf[idx].g = Math.round(buf[idx].g * (1 - alpha) + 255 * alpha);
-          buf[idx].b = Math.round(buf[idx].b * (1 - alpha) + 255 * alpha);
+          _blendPixel(buf, idx, 255, 255, 255, alpha);
         }
       }
       // Draw horn outline edges (black lines)
@@ -2722,9 +2018,7 @@ AnimationTemplates.register('speech_bubble', function(params) {
           var epy = Math.round(ey0 + edy * es / esteps);
           if (epx >= 0 && epx < PW && epy >= 0 && epy < PH) {
             var epi = epy * PW + epx;
-            buf[epi].r = Math.round(buf[epi].r * (1 - alpha));
-            buf[epi].g = Math.round(buf[epi].g * (1 - alpha));
-            buf[epi].b = Math.round(buf[epi].b * (1 - alpha));
+            _blendPixel(buf, epi, 0, 0, 0, alpha);
           }
         }
       }
@@ -2739,9 +2033,7 @@ AnimationTemplates.register('speech_bubble', function(params) {
           var dpx = dotCXs[di] - 1 + ddx, dpy = dotTopY + ddy;
           if (dpx >= 0 && dpx < PW && dpy >= 0 && dpy < PH) {
             var dpi = dpy * PW + dpx;
-            buf[dpi].r = Math.round(buf[dpi].r * (1 - alpha));
-            buf[dpi].g = Math.round(buf[dpi].g * (1 - alpha));
-            buf[dpi].b = Math.round(buf[dpi].b * (1 - alpha));
+            _blendPixel(buf, dpi, 0, 0, 0, alpha);
           }
         }
       }
@@ -2807,9 +2099,7 @@ AnimationTemplates.register('thought_bubble', function(params) {
       for (var sx = sxMin; sx <= sxMax; sx++) {
         if (inCloud(sx, sy, bcx, bcy, 1)) {
           var si = sy * PW + sx;
-          buf[si].r = Math.round(buf[si].r * (1 - alpha));
-          buf[si].g = Math.round(buf[si].g * (1 - alpha));
-          buf[si].b = Math.round(buf[si].b * (1 - alpha));
+          _blendPixel(buf, si, 0, 0, 0, alpha);
         }
       }
     }
@@ -2819,9 +2109,7 @@ AnimationTemplates.register('thought_bubble', function(params) {
       for (var sx = sxMin; sx <= sxMax; sx++) {
         if (inCloud(sx, sy, bcx, bcy, 0)) {
           var si = sy * PW + sx;
-          buf[si].r = Math.round(buf[si].r * (1 - alpha) + 255 * alpha);
-          buf[si].g = Math.round(buf[si].g * (1 - alpha) + 255 * alpha);
-          buf[si].b = Math.round(buf[si].b * (1 - alpha) + 255 * alpha);
+          _blendPixel(buf, si, 255, 255, 255, alpha);
         }
       }
     }
@@ -2843,9 +2131,7 @@ AnimationTemplates.register('thought_bubble', function(params) {
           var tdx = tx - tcx, tdy = ty - tcy, outerR = tr + 1;
           if (tdx * tdx + tdy * tdy <= outerR * outerR) {
             var toi = ty * PW + tx;
-            buf[toi].r = Math.round(buf[toi].r * (1 - alpha));
-            buf[toi].g = Math.round(buf[toi].g * (1 - alpha));
-            buf[toi].b = Math.round(buf[toi].b * (1 - alpha));
+            _blendPixel(buf, toi, 0, 0, 0, alpha);
           }
         }
       }
@@ -2856,9 +2142,7 @@ AnimationTemplates.register('thought_bubble', function(params) {
           var tdx = tx - tcx, tdy = ty - tcy;
           if (tdx * tdx + tdy * tdy <= tr * tr) {
             var twi = ty * PW + tx;
-            buf[twi].r = Math.round(buf[twi].r * (1 - alpha) + 255 * alpha);
-            buf[twi].g = Math.round(buf[twi].g * (1 - alpha) + 255 * alpha);
-            buf[twi].b = Math.round(buf[twi].b * (1 - alpha) + 255 * alpha);
+            _blendPixel(buf, twi, 255, 255, 255, alpha);
           }
         }
       }
@@ -2873,9 +2157,7 @@ AnimationTemplates.register('thought_bubble', function(params) {
           var dpx = dotCXs[di] - 1 + ddx, dpy = dotTopY + ddy;
           if (dpx >= 0 && dpx < PW && dpy >= 0 && dpy < PH) {
             var dpi = dpy * PW + dpx;
-            buf[dpi].r = Math.round(buf[dpi].r * (1 - alpha));
-            buf[dpi].g = Math.round(buf[dpi].g * (1 - alpha));
-            buf[dpi].b = Math.round(buf[dpi].b * (1 - alpha));
+            _blendPixel(buf, dpi, 0, 0, 0, alpha);
           }
         }
       }
@@ -2942,9 +2224,7 @@ AnimationTemplates.register('alert', function(params) {
               var px = mx0 + rx + ox, py = y0 + ry + oy;
               if (px < 0 || px >= PW || py < 0 || py >= PH) continue;
               var pi = py * PW + px;
-              buf[pi].r = Math.round(buf[pi].r * (1 - alpha));
-              buf[pi].g = Math.round(buf[pi].g * (1 - alpha));
-              buf[pi].b = Math.round(buf[pi].b * (1 - alpha));
+              _blendPixel(buf, pi, 0, 0, 0, alpha);
             }
           }
         }
@@ -2959,9 +2239,7 @@ AnimationTemplates.register('alert', function(params) {
               var px = mx0 + rx + ox, py = y0 + ry + oy;
               if (px < 0 || px >= PW || py < 0 || py >= PH) continue;
               var pi = py * PW + px;
-              buf[pi].r = Math.round(buf[pi].r * (1 - alpha) + 210 * alpha);
-              buf[pi].g = Math.round(buf[pi].g * (1 - alpha) + 40 * alpha);
-              buf[pi].b = Math.round(buf[pi].b * (1 - alpha) + 20 * alpha);
+              _blendPixel(buf, pi, 210, 40, 20, alpha);
             }
           }
         }
@@ -2974,9 +2252,7 @@ AnimationTemplates.register('alert', function(params) {
           var px = mx0 + rx, py = y0 + ry;
           if (px < 0 || px >= PW || py < 0 || py >= PH) continue;
           var pi = py * PW + px;
-          buf[pi].r = Math.round(buf[pi].r * (1 - alpha) + 255 * alpha);
-          buf[pi].g = Math.round(buf[pi].g * (1 - alpha) + 220 * alpha);
-          buf[pi].b = Math.round(buf[pi].b * (1 - alpha) + 30 * alpha);
+          _blendPixel(buf, pi, 255, 220, 30, alpha);
         }
       }
     }
@@ -2984,7 +2260,7 @@ AnimationTemplates.register('alert', function(params) {
     // Gentle entity pulse
     var pulse = 1 + 0.12 * env * (0.5 + 0.5 * Math.sin(t * Math.PI * 5));
     for (var i = 0; i < buf.length; i++) {
-      if (buf[i].e === prefix || buf[i].e.startsWith(prefix + '.')) {
+      if (_isEntity(buf[i].e, prefix)) {
         buf[i].r = Math.min(255, Math.round(buf[i]._r * pulse));
         buf[i].g = Math.min(255, Math.round(buf[i]._g * pulse));
         buf[i].b = Math.min(255, Math.round(buf[i]._b * pulse));
@@ -3094,13 +2370,9 @@ AnimationTemplates.register('interjection', function(params) {
         var rm = rMax(angle);
         var pi = sy * PW + sx;
         if (r <= rm) {
-          buf[pi].r = Math.round(buf[pi].r * (1 - alpha) + 255 * alpha);
-          buf[pi].g = Math.round(buf[pi].g * (1 - alpha) + 210 * alpha);
-          buf[pi].b = Math.round(buf[pi].b * (1 - alpha) + 20 * alpha);
+          _blendPixel(buf, pi, 255, 210, 20, alpha);
         } else if (r <= rm + 2) {
-          buf[pi].r = Math.round(buf[pi].r * (1 - alpha));
-          buf[pi].g = Math.round(buf[pi].g * (1 - alpha));
-          buf[pi].b = Math.round(buf[pi].b * (1 - alpha));
+          _blendPixel(buf, pi, 0, 0, 0, alpha);
         }
       }
     }
