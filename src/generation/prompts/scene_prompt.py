@@ -64,12 +64,17 @@ without seeing any entities.>",
         "id": "<entity_type>_<NN>",
         "type": "<noun>",
         "properties": {
-          "color": "<specific color — not just 'red' but 'warm crimson' or 'dusty terracotta'>",
-          "size": "<small|medium|large — with relative scale context>",
-          "texture": "<surface quality: fluffy, smooth, rough, scaly, glossy, matte, feathery>",
-          "pattern": "<visual pattern: spotted, striped, solid, speckled, checkered, gradient>",
-          "distinctive_features": "<SELF-CONTAINED intrinsic visual trait — NO references to other entities or surfaces>",
-          ... other adjectives as needed
+          "color": "<specific color using COMMON words — 'bright orange with a white belly', \
+'dark brown with lighter spots'. NO rare words like chartreuse, vermillion, cerulean.>",
+          "size": "<small|medium|large — with relative scale: 'small, about the size of a shoe'>",
+          "texture": "<surface quality using COMMON words: soft, fluffy, smooth, rough, bumpy, \
+shiny, furry, feathery, sticky, wet, dry>",
+          "pattern": "<visual pattern: spotted, striped, solid, speckled, checkered, dotted>",
+          "shape": "<overall shape: round, long, flat, pointy, curly, thin, wide>",
+          "distinctive_features": "<SELF-CONTAINED intrinsic visual trait — NO references to \
+other entities or surfaces. Use 2-3 COMMON descriptors.>",
+          "state": "<current state: old, new, broken, clean, dirty, open, closed, wet, dry>",
+          ... other adjectives as needed (at least 6 properties per entity)
         },
         "position": {"x": <float 0.0-1.0>, "y": <float 0.0-1.0>, "spatial_ref": "<on/under/beside entity_id or null>"},
         "emotion": "<emotion or null>",
@@ -77,6 +82,9 @@ without seeing any entities.>",
 NO references to other entities or surfaces. \
 BAD: 'leaning against the tree'. GOOD: 'standing on hind legs, front paws raised, head tilted up'>",
         "carried_over": <true if entity existed in previous scene, false if new>,
+        "pose_changed": <true if carried_over entity has a NEW pose/action that differs from \
+the previous scene. When true, a new sprite image will be generated. When false (default), \
+the existing sprite is reused as-is. Only relevant when carried_over is true.>,
         "width_hint": <float 0.0-1.0 — entity width as proportion of canvas width>,
         "height_hint": <float 0.0-1.0 — entity height as proportion of canvas height>
       }
@@ -97,8 +105,9 @@ false if same setting. For initial scenes always true.>
 # Entity rules
 
 - Every entity MUST have a unique id formatted as `<type>_<NN>` (e.g. `rabbit_01`, `tree_02`).
-- Each entity MUST have at least 4 properties: `color` (mandatory for non-background), \
-`size`, `texture`, and `distinctive_features`. Add more as appropriate.
+- Each entity MUST have at least 6 properties: `color` (mandatory), `size`, `texture`, \
+`pattern`, `distinctive_features`, and `state` or `shape`. Add more as appropriate. \
+Each property should use 2-3 specific COMMON words, not just one vague adjective.
 - **Minimum entities: 3 (1 main character + 2 supporting interactive elements)**
 - **Maximum entities: 5** (avoid cluttered scenes)
 - Every scene MUST have exactly 1 main character (a child or relatable animal) — \
@@ -164,22 +173,38 @@ If your descriptions are sparse, the visuals will be generic and lifeless.
 
 For EVERY entity, you MUST provide:
 
-## Color specificity
-- BAD: "brown", "green", "blue"
-- GOOD: "warm chestnut brown with lighter tan underbelly", "deep emerald with \
-yellow-green leaf tips"
+## Color specificity (use COMMON words a child knows)
+- BAD: "brown", "chartreuse", "cerulean", "vermillion"
+- GOOD: "warm light brown with a darker brown belly", "bright yellow-green", \
+"bright blue like the sky", "dark red"
+- Use color compounds: "bright red", "dark blue", "light green", "warm orange"
 
-## Texture and material
-- "soft fluffy fur with slightly darker guard hairs"
-- "rough weathered bark with deep vertical grooves"
+## Texture and material (simple, everyday words)
+- GOOD: "very soft and fluffy, like a stuffed toy"
+- GOOD: "rough and bumpy, like tree bark"
+- BAD: "gossamer", "iridescent", "luminescent"
+- GOOD: "shiny and smooth", "fuzzy and warm", "hard and cold"
 
 ## Distinctive features (SELF-CONTAINED — NO references to other entities!)
 - Describe what makes this entity unique using ONLY intrinsic visual properties.
 - Spatial relationships go in `relations[]`, NOT here.
+- Use 2-3 COMMON descriptors that a child age 7-11 would say.
 - BAD: "stuck to the tree by a silver pin" (references "the tree")
-- GOOD: "held by a silver pin at the top, with a faint blue glow along its edges"
+- GOOD: "held by a shiny silver pin at the top, with a soft blue glow along its edges"
 - BAD: "three bright red berries growing near the base of the oak"
-- GOOD: "three bright red berries clustered near its base"
+- GOOD: "three bright red round berries close together"
+
+## Vocabulary rule: COMMON EVERYDAY WORDS ONLY
+All descriptions MUST use words children age 7-11 know and use regularly:
+- Colors: red, blue, green, yellow, orange, brown, white, black, pink, purple, \
+grey + compounds (bright red, dark blue, light green)
+- Sizes: big, small, tiny, tall, short, long, wide, thin, fat, round, flat
+- Textures: soft, hard, smooth, rough, fuzzy, furry, bumpy, sticky, wet, dry, \
+shiny, dull
+- States: old, new, broken, clean, dirty, open, closed, full, empty, hot, cold
+- Emotions: happy, sad, angry, scared, surprised, tired, excited, proud, shy, curious
+AVOID: chartreuse, azure, cerulean, mahogany, obsidian, gossamer, iridescent, \
+luminescent, diminutive, colossal, resplendent, vermillion
 
 ## Pose and body language (SELF-CONTAINED — NO references to other entities!)
 - Each entity's pose is used to generate an ISOLATED sprite image on a blank background.
@@ -395,69 +420,95 @@ Requirements:
 CONTINUATION_SCENE_USER_PROMPT = """\
 Generate the next scene in an ongoing story.
 
-# Story so far
+# Story so far (with what the child said)
 {story_context}
+
+# What the child said about the PREVIOUS scene
+{child_narration}
+
+Use these utterances to understand the child's narrative direction. Build the \
+next scene as a natural continuation of what the child described. If the child \
+introduced story elements (e.g., "the rabbit wants to go home"), follow that thread.
 
 # Previous scene manifest
 {previous_manifest}
 
-# Active entities (with existing sprite code)
+# Active entities (currently in scene, with existing sprite data)
 {active_entities}
 
 Note: Character names (e.g. name="Charlie") are given by the child for \
 narrative context. Use them in narrative_text but do NOT embed character \
 names as text in sprite_code or pixel art.
 
+# Previously seen entities (no longer active, but available for recall)
+{inactive_entities}
+
+If the story calls for a previously seen entity to return, include it with \
+carried_over: true. The system will retrieve its stored sprite. Only recall \
+entities if narratively justified (e.g., the child mentioned them).
+
 {student_profile_context}
 
-# CORE PRINCIPLE: Maintain narrative coherence and character focus
+# CRITICAL: INCREMENTAL SCENE TRANSITIONS
 
-The main character(s) from the previous scene(s) SHOULD persist and continue the story. \
-If the main character is gone, the story loses its anchor. Only introduce new main \
-characters in exceptional cases (e.g., meeting a new character becomes the turning point).
+Make MINIMAL changes between scenes. Prefer reusing what exists:
 
-# Instructions for scene elements
+1. **Reposition, don't regenerate**: If an entity just needs to move, change \
+its position but mark it carried_over: true, pose_changed: false. No new image \
+generation is needed — the existing sprite is reused at the new position.
+2. **Reuse backgrounds**: Set background_changed: false unless the location \
+actually changes. A character walking further in the same forest does NOT need \
+a new background. Same room, same park, same place = background_changed: false.
+3. **Add sparingly**: Introduce at most 1-2 NEW entities per scene. The rest \
+should be carried over.
+4. **Remove sparingly**: Only remove entities that have LEFT the scene in the \
+story (e.g., "the bird flew away"). Entities not mentioned by the child can stay.
+5. **Recall old entities**: If the child references an entity from a previous \
+scene (listed in "Previously seen entities"), bring it back with carried_over: true.
+6. **Pose changes**: If a carried-over entity needs a different pose or action \
+(e.g., was sitting, now running), set carried_over: true AND pose_changed: true. \
+This triggers sprite regeneration with the new pose.
 
-**Carry over the main character(s)** (mark as carried_over: true). They remain the heart \
-of the story.
+# Entity descriptions: MAXIMUM RICHNESS with COMMON WORDS
+
+Every entity MUST have at least 6 properties using COMMON, EVERYDAY words \
+children age 7-11 know and use:
+
+- Colors: bright red, dark blue, light green, warm orange (NOT chartreuse, cerulean)
+- Textures: soft, fuzzy, rough, shiny, bumpy, smooth (NOT gossamer, iridescent)
+- Sizes: very big, tiny, tall, short, round, flat (NOT colossal, diminutive)
+- States: old, new, broken, clean, dirty, wet, dry, open, closed
+
+Each property should use 2-3 specific common words:
+- BAD: "color": "brown"
+- GOOD: "color": "warm light brown with a darker brown belly and white paws"
+- BAD: "texture": "soft"
+- GOOD: "texture": "very soft and fluffy, like a stuffed toy"
+
+# Scene elements
+
+**Carry over the main character(s)** (carried_over: true). They are the heart of the story.
 
 **Add 1-2 NEW supporting elements** that:
 - Have a DIRECT RELATIONSHIP to the main character or the unfolding plot
-- Are INTERACTIVE and can CATALYZE NEW NARRATIVE EVENTS. Examples:
-  * A STORM → danger, shelter-seeking, rescue
-  * A RIVAL or FRIEND → conflict, teamwork, or secrets
-  * A GIFT or TREASURE → discovery, joy, puzzle-solving
-  * A ROPE → climbing, escaping, pulling something
-  * A LADDER → reaching something, escaping, helping
-  * A BUCKET → fetching water, digging, collecting something
-  * A DARK CAVE or ROOM → exploration, mystery, fear
-  * A WALL or BARRIER → something to overcome or hide behind
-  * A FIRE or LIGHT → warmth, danger, or revealing hidden things
-  * A BRIDGE → crossing, meeting someone, or taking a risk
-  * A KEY or LOCK → unlocking a secret, opening a path
+- Are INTERACTIVE and can CATALYZE NARRATIVE EVENTS: a telephone, bicycle, book, \
+door, ball, gift, key, ladder, rope, friend, rival, treasure, cave, bridge
 
-**WHAT NOT TO ADD:**
-- Abstract or random objects with no narrative connection (floating shapes, random droplets, \
-  clouds with no purpose)
-- Duplicate object types from the previous scene unless the plot demands it
-- Narrative-inert background elements (those should be in background_description only)
-- Objects that don't advance the plot or provide emotional/interactive value
+**DO NOT add:**
+- Abstract or decorative objects with no narrative connection
+- Duplicate object types from the previous scene
+- Narrative-inert background elements (those go in background_description only)
 
 **DO NOT:**
-- Remove all supporting elements — keep 2-4 interactive entities (including the main character)
-- Introduce 4+ brand new characters (too many to narrate)
+- Remove all supporting elements — keep 3-5 entities total
+- Introduce 4+ brand new entities
 - Replace the main character without strong narrative justification
 
 # Guidelines
-- Continue the narrative naturally from where it left off
-- Keep existing main character(s) (mark carried_over: true)
-- New supporting elements must have narrative potential
-- Generate sprite_code ONLY for new entities (carried_over: false)
-- List all persisting entity IDs in carried_over_entities
-- Set background_changed: false if same location/time. Set true if scene moves or time shifts
-- Adapt complexity based on the student profile:
-  - If the child struggles with a skill area, create more opportunities
-  - If strong, maintain but don't over-emphasize
-- Advance the plot — each scene must move the story forward
+- Continue the narrative naturally from what the child said
+- Keep existing main character(s) (carried_over: true)
+- Adapt complexity based on the student profile (MISL gaps → more affordances)
+- Advance the plot — something new should happen
+- At least 2 spatial relations between entities
 - Scene ID: "scene_{scene_number:02d}"
 """
