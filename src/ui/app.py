@@ -33,6 +33,7 @@ from src.analytics.session_report import generate_report
 from src.generation.scene_generator import STORY_THEMES, generate_scene_assets
 from src.generation.scene_neg_generator import generate_scene_manifest
 from src.interaction.decision_logic import (
+    MAX_MISL_OPPORTUNITIES_PER_SCENE,
     get_accepted_utterances,
     get_misl_dimensions_suggested,
     process_assessment,
@@ -976,6 +977,11 @@ async def _handle_audio(
             await _handle_naming(session, ws, transcription)
             return
 
+        # ── Ending choice phase: child responds to "imagine an ending?" ──
+        if session.awaiting_ending_choice:
+            await _handle_ending_choice(session, ws, transcription)
+            return
+
         # Add child utterance to conversation + narration history
         session.narration_history.append(transcription)
         session.conversation_history.append({
@@ -1093,44 +1099,69 @@ async def _handle_audio(
             target_id = elements[0] if elements else ""
             misl_dim = first_opp.get("dimension", "character")
 
-            # Send assessment_result WITHOUT guidance_text (text will come later after animation)
-            await ws.send_json({
-                "type": "assessment_result",
-                "action": "guide",
-                "target_id": target_id,
-                "dimension": misl_dim,
-            })
+            # Was this the LAST MISL opportunity for this scene?
+            is_last_opportunity = (
+                session.current_scene_log.misl_opportunities_given
+                >= MAX_MISL_OPPORTUNITIES_PER_SCENE
+            )
 
-            esc_key = f"{target_id}::{misl_dim}"
+            if is_last_opportunity:
+                # ── Last suggestion: skip animation, advance directly ──
+                logger.info("[scene] Last MISL opportunity given → auto-advancing")
+                await _advance_scene(session, ws)
+            else:
+                # Send assessment_result WITHOUT guidance_text (text will come later after animation)
+                await ws.send_json({
+                    "type": "assessment_result",
+                    "action": "guide",
+                    "target_id": target_id,
+                    "dimension": misl_dim,
+                })
 
-            if esc_key in session.voice_escalated_errors:
-                # Same suggestion after voice → skip animation, voice only
-                if suggestion:
-                    session.conversation_history.append({
-                        "role": "system",
-                        "text": suggestion,
-                        "action": "repeat_voice_guidance",
-                    })
-                    asyncio.ensure_future(send_voice(session, ws, suggestion))
+                esc_key = f"{target_id}::{misl_dim}"
 
-            elif target_id:
-                decision = await execute_animation(
-                    session, ws, target_id,
-                    misl_element=misl_dim,
-                )
+                if esc_key in session.voice_escalated_errors:
+                    # Same suggestion after voice → skip animation, voice only
+                    if suggestion:
+                        session.conversation_history.append({
+                            "role": "system",
+                            "text": suggestion,
+                            "action": "repeat_voice_guidance",
+                        })
+                        asyncio.ensure_future(send_voice(session, ws, suggestion))
 
-                # Animation-first: NO text during animation.
-                # Voice + text only fires if child doesn't self-correct (see _resolve_pending_animation).
-                if decision and suggestion:
-                    _set_pending_animation(
-                        session, target_id, misl_dim, suggestion, decision,
+                elif target_id:
+                    decision = await execute_animation(
+                        session, ws, target_id,
+                        misl_element=misl_dim,
                     )
+
+                    # Animation-first: NO text during animation.
+                    # Voice + text only fires if child doesn't self-correct.
+                    if decision and suggestion:
+                        _set_pending_animation(
+                            session, target_id, misl_dim, suggestion, decision,
+                        )
+                    elif suggestion:
+                        # Animation failed entirely → send guidance text now
+                        await ws.send_json({
+                            "type": "guidance_text",
+                            "guidance_text": suggestion,
+                            "target_id": target_id,
+                            "dimension": misl_dim,
+                        })
+                        session.conversation_history.append({
+                            "role": "system",
+                            "text": suggestion,
+                            "action": "misl_guidance",
+                        })
+
                 elif suggestion:
-                    # Animation failed entirely, send guidance text now
+                    # No target to animate — send guidance text immediately
                     await ws.send_json({
                         "type": "guidance_text",
                         "guidance_text": suggestion,
-                        "target_id": target_id,
+                        "target_id": "",
                         "dimension": misl_dim,
                     })
                     session.conversation_history.append({
@@ -1138,34 +1169,11 @@ async def _handle_audio(
                         "text": suggestion,
                         "action": "misl_guidance",
                     })
-
-            elif suggestion:
-                # No target to animate — send guidance text immediately
-                await ws.send_json({
-                    "type": "guidance_text",
-                    "guidance_text": suggestion,
-                    "target_id": "",
-                    "dimension": misl_dim,
-                })
-                session.conversation_history.append({
-                    "role": "system",
-                    "text": suggestion,
-                    "action": "misl_guidance",
-                })
-                asyncio.ensure_future(send_voice(session, ws, suggestion))
+                    asyncio.ensure_future(send_voice(session, ws, suggestion))
 
         elif action == "accept_and_advance":
-            # Scene complete — advance to next scene
-            await ws.send_json({
-                "type": "assessment_result",
-                "action": "accept",
-            })
-
-            if len(session.completed_scene_ids) < MAX_SCENES:
-                session.student_profile.scenes_completed += 1
-                await _handle_generate_scene(session, ws, is_continuation=True)
-            else:
-                await ws.send_json({"type": "story_complete"})
+            # Scene complete (no MISL opportunities left) — advance immediately
+            await _advance_scene(session, ws)
 
         # Persist profile after every utterance
         save_student_profile(session.participant_id, session.student_profile)
@@ -1173,6 +1181,103 @@ async def _handle_audio(
     except Exception as e:
         logger.exception("Audio processing error")
         await ws.send_json({"type": "error", "message": str(e)})
+
+
+async def _advance_scene(session: SessionState, ws: _WebSocketAdapter) -> None:
+    """Intercept scene advance to ask the child about ending their story."""
+    session.ending_phase = True  # permanent once first scene completes
+    await _ask_ending_choice(session, ws)
+
+
+async def _do_advance_scene(session: SessionState, ws: _WebSocketAdapter) -> None:
+    """Signal client that the scene is transitioning, then generate the next scene."""
+    await ws.send_json({"type": "scene_transitioning"})
+
+    if len(session.completed_scene_ids) < MAX_SCENES:
+        session.student_profile.scenes_completed += 1
+        await _handle_generate_scene(session, ws, is_continuation=True)
+    else:
+        await ws.send_json({"type": "story_complete"})
+
+
+async def _ask_ending_choice(session: SessionState, ws: _WebSocketAdapter) -> None:
+    """Ask the child if they want to imagine an ending or keep going."""
+    session.awaiting_ending_choice = True
+    await ws.send_json({"type": "ending_choice_prompt"})
+    prompt_text = (
+        "Would you like to imagine how the story ends? "
+        "Tell me the ending! Or if you want to keep going, just say so."
+    )
+    asyncio.ensure_future(send_voice(session, ws, prompt_text))
+
+
+async def _classify_ending_intent(api_key: str, transcription: str) -> str:
+    """Classify whether the child wants to end the story or continue.
+
+    Returns 'ending' or 'continue'.
+    """
+    prompt = (
+        "A child is telling a story and was asked if they want to imagine "
+        "an ending or keep going. They said:\n"
+        f'"{transcription}"\n\n'
+        "Classify their intent as exactly one of:\n"
+        "- ENDING — they are narrating a conclusion, saying goodbye to characters, "
+        "or expressing they want to finish the story\n"
+        "- CONTINUE — they want to keep going, add more, or their response is "
+        "a new story sentence (not an ending)\n\n"
+        "Reply with a single word: ENDING or CONTINUE"
+    )
+
+    try:
+        client = genai.Client(api_key=api_key)
+        response = await asyncio.wait_for(
+            client.aio.models.generate_content(
+                model=_SHORT_LLM_MODEL,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    thinking_config=types.ThinkingConfig(thinking_budget=256),
+                    temperature=0.0,
+                ),
+            ),
+            timeout=_SHORT_LLM_TIMEOUT,
+        )
+        raw = response.text.strip().upper()
+        logger.info("[ending] Classification raw: '%s'", raw)
+        if "ENDING" in raw:
+            return "ending"
+        return "continue"
+    except Exception:
+        logger.warning("[ending] Classification failed, defaulting to continue")
+        return "continue"
+
+
+async def _handle_ending_choice(
+    session: SessionState, ws: _WebSocketAdapter, transcription: str,
+) -> None:
+    """Process the child's response to the ending choice prompt."""
+    session.awaiting_ending_choice = False
+
+    intent = await _classify_ending_intent(session.api_key, transcription)
+    logger.info("[ending] Child intent: %s", intent)
+
+    if intent == "ending":
+        # Add the ending utterance to the story log
+        session.narration_history.append(transcription)
+        session.conversation_history.append({
+            "role": "child",
+            "text": transcription,
+        })
+
+        # Congratulate and signal story end
+        congrats = (
+            "What a wonderful ending! You did an amazing job telling this story. "
+            "I loved every part of it!"
+        )
+        await ws.send_json({"type": "story_ended"})
+        asyncio.ensure_future(send_voice(session, ws, congrats))
+    else:
+        # Child wants to continue — proceed with normal scene advance
+        await _do_advance_scene(session, ws)
 
 
 def _set_pending_animation(

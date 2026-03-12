@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
+  <div class="falling-pixels-bg" id="falling-pixels"></div>
   <div class="login-wrapper">
     <div class="login-card">
       <div class="login-logo">
@@ -21,7 +22,7 @@
         <input type="text" id="participant-code" placeholder="4-digit code" maxlength="4" autocomplete="off">
       </div>
       <div class="field">
-        <label for="child-age">Child's Age</label>
+        <label for="child-age">Your age</label>
         <select id="child-age">
           <option value="7">7</option>
           <option value="8" selected>8</option>
@@ -72,6 +73,44 @@
     codeInput.addEventListener('keydown', function(e) {
       if (e.key === 'Enter') proceed();
     });
+  </script>
+  <script>
+    // Falling pixels animation in margins
+    const colors = ['#DB0038', '#F7C200', '#519DD9', '#53BAC1', '#EDEDED'];
+    const pixelsContainer = document.getElementById('falling-pixels');
+    let activePixels = 0;
+    const maxPixels = 8;
+
+    function createPixel() {
+      if (activePixels >= maxPixels) return;
+
+      const pixel = document.createElement('div');
+      pixel.className = 'falling-pixel';
+
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      pixel.style.backgroundColor = color;
+
+      // Random x position (left or right margin)
+      const side = Math.random() < 0.5 ? 'left' : 'right';
+      const x = side === 'left' ? Math.random() * 40 : 100 - Math.random() * 40;
+      pixel.style.left = x + '%';
+      pixel.style.top = '-20px';
+
+      // Random duration (3-6s)
+      const duration = 3 + Math.random() * 3;
+      pixel.style.animation = `fall ${duration}s linear forwards`;
+
+      pixelsContainer.appendChild(pixel);
+      activePixels++;
+
+      setTimeout(() => {
+        pixel.remove();
+        activePixels--;
+      }, duration * 1000);
+    }
+
+    // Spawn pixels continuously
+    setInterval(createPixel, 600);
   </script>
 </body>
 </html>

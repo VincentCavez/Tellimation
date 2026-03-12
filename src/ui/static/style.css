@@ -65,6 +65,13 @@ a { color: var(--teal); text-decoration: none; }
 }
 .btn-red:hover { box-shadow: 0 6px 28px rgba(219,0,56,0.5); }
 
+.btn-green {
+  background: #27ae60;
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(39,174,96,0.35);
+}
+.btn-green:hover { box-shadow: 0 6px 28px rgba(39,174,96,0.5); }
+
 .btn-ghost {
   background: transparent;
   color: var(--teal);
@@ -87,6 +94,7 @@ a { color: var(--teal); text-decoration: none; }
   width: 100%;
   padding: 2rem;
   position: relative;
+  z-index: 10;
 }
 .login-wrapper::before {
   content: '';
@@ -196,6 +204,8 @@ a { color: var(--teal); text-decoration: none; }
   gap: 0.4rem;
   width: 100%;
   max-width: 960px;
+  position: relative;
+  z-index: 10;
 }
 
 .sel-title {
@@ -439,7 +449,19 @@ a { color: var(--teal); text-decoration: none; }
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 8px 40px rgba(0,0,0,0.5);
-  border: 2px solid var(--dark3);
+  border: 3px solid var(--dark3);
+}
+
+/* Spinning border while next scene loads */
+.scene-canvas-wrapper.scene-loading {
+  animation: border-chase 1.2s linear infinite;
+}
+@keyframes border-chase {
+  0%   { border-color: var(--red) transparent transparent transparent; }
+  25%  { border-color: transparent var(--yellow) transparent transparent; }
+  50%  { border-color: transparent transparent var(--blue) transparent; }
+  75%  { border-color: transparent transparent transparent var(--teal); }
+  100% { border-color: var(--red) transparent transparent transparent; }
 }
 
 .scene-canvas-wrapper canvas {
@@ -569,6 +591,36 @@ a { color: var(--teal); text-decoration: none; }
 /* Legacy spinner fallback */
 .spinner {
   display: none;
+}
+
+/* ---- Falling pixels animation (margins) ---- */
+.falling-pixels-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.falling-pixel {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes fall {
+  from {
+    transform: translateY(-20px);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
 }
 
 /* ---- Responsive ---- */

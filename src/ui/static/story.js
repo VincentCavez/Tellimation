@@ -289,6 +289,14 @@
             handleRemoveTempSprite(msg);
             break;
 
+          case 'scene_transitioning':
+            handleSceneTransitioning();
+            break;
+
+          case 'scene_ready':
+            handleSceneReady(msg.scene);
+            break;
+
           case 'scene_complete':
             handleSceneComplete();
             break;
@@ -299,6 +307,14 @@
 
           case 'story_complete':
             handleStoryComplete();
+            break;
+
+          case 'ending_choice_prompt':
+            handleEndingChoicePrompt();
+            break;
+
+          case 'story_ended':
+            handleStoryEnded();
             break;
 
           case 'new_scene':
@@ -418,11 +434,36 @@
       // Expose animRunner for narration.js to stop loops on recording
       window.animRunner = animRunner;
 
-      // -- Scene complete → show branch picker --
+      // -- Scene transitioning → spinning border while next scene loads --
+      var canvasWrapper = document.querySelector('.scene-canvas-wrapper');
       var branchPicker = document.getElementById('branch-picker');
       var branchThumbnails = document.getElementById('branch-thumbnails');
       var transcriptionBox = document.getElementById('transcription-box');
       var pttHint = document.getElementById('ptt-hint');
+
+      function handleSceneTransitioning() {
+        // Hide push-to-talk UI
+        transcriptionBox.style.display = 'none';
+        pttHint.style.display = 'none';
+        feedbackEl.textContent = '';
+        // Show spinning border around the canvas
+        canvasWrapper.classList.add('scene-loading');
+      }
+
+      function handleSceneReady(scene) {
+        // Stop any running animation
+        animRunner.stopLoop();
+        // Remove spinning border
+        canvasWrapper.classList.remove('scene-loading');
+        // Update scene number
+        sceneNumber++;
+        document.getElementById('scene-num').textContent = sceneNumber;
+        // Render the new scene
+        renderScene(scene);
+        // Show PTT again
+        transcriptionBox.style.display = '';
+        pttHint.style.display = '';
+      }
 
       function handleSceneComplete() {
         // Disable push-to-talk
@@ -449,6 +490,28 @@
           '<div style="text-align:center; padding:2rem;">' +
           '<h2 style="color:#2c3e50; margin-bottom:0.5rem;">The End!</h2>' +
           '<p style="color:#666; font-size:1.1rem;">Great job telling the story!</p>' +
+          '</div>';
+      }
+
+      function handleEndingChoicePrompt() {
+        // PTT stays visible so the child can respond
+        transcriptionBox.style.display = '';
+        pttHint.style.display = '';
+        pttHint.textContent = 'Hold Space to tell your ending — or say "keep going"';
+        feedbackEl.textContent = '';
+      }
+
+      function handleStoryEnded() {
+        // Hide PTT
+        transcriptionBox.style.display = 'none';
+        pttHint.style.display = 'none';
+        // Show "The End!" in branch picker area
+        branchPicker.style.display = '';
+        branchThumbnails.innerHTML =
+          '<div style="text-align:center; padding:2rem;">' +
+          '<h2 style="color:#2c3e50; margin-bottom:0.5rem;">The End!</h2>' +
+          '<p style="color:#666; font-size:1.1rem; margin-bottom:1.5rem;">What a wonderful story! You did an amazing job!</p>' +
+          '<button class="btn btn-green" onclick="alert(\'Download coming soon!\')">Download Story</button>' +
           '</div>';
       }
 
