@@ -65,6 +65,7 @@ class Entity(BaseModel):
     orientation: Optional[str] = None          # "facing_left", "facing_right", "facing_viewer", or "facing:<entity_id>"
     scale_factor: Optional[float] = None       # 0.5-1.5 relative scale hint
     sensory: Optional[Dict[str, str]] = None   # {"temperature": "cold", "sound": "chirping"}
+    pose_changed: bool = False                   # True → regenerate sprite even if carried_over
 
 
 class Relation(BaseModel):
