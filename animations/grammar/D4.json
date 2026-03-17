@@ -1,0 +1,19 @@
+{
+  "id": "D4",
+  "name": "Interjection",
+  "category": "Discourse",
+  "mode": "correction",
+  "scaffolding_intent": "Displays a comic-style starburst with the problematic word from the child's speech, flagging grammatical or tense errors",
+  "misl_elements": ["G", "T"],
+  "target_type": "entity",
+  "parameters": [
+    {
+      "name": "word",
+      "type": "string",
+      "range": [],
+      "default": "?",
+      "description": "Word or symbol displayed in the starburst"
+    }
+  ],
+  "code_template": "interjection({target}, {word})"
+}

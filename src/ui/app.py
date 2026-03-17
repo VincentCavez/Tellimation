@@ -52,7 +52,8 @@ from src.persistence import (
 from google import genai
 from google.genai import types
 
-from src.ui.animation_handler import execute_animation, send_voice
+from src.models.assessment import Discrepancy
+from src.ui.animation_handler import execute_animation, execute_invocation_array, send_voice
 
 logging.basicConfig(
     level=logging.INFO,
@@ -181,6 +182,25 @@ async def admin_page():
 
 
 # ---------------------------------------------------------------------------
+# Study pages
+# ---------------------------------------------------------------------------
+
+@app.get("/study", response_class=HTMLResponse)
+async def study_login_page():
+    return (TEMPLATES_DIR / "study_login.html").read_text()
+
+
+@app.get("/study/landing", response_class=HTMLResponse)
+async def study_landing_page():
+    return (TEMPLATES_DIR / "study_landing.html").read_text()
+
+
+@app.get("/study/story", response_class=HTMLResponse)
+async def study_story_page():
+    return (TEMPLATES_DIR / "study_story.html").read_text()
+
+
+# ---------------------------------------------------------------------------
 # REST API endpoints
 # ---------------------------------------------------------------------------
 
@@ -234,6 +254,159 @@ async def validate_code(request: Request):
     if code in VALID_CODES:
         return JSONResponse(content={"valid": True})
     return JSONResponse(status_code=401, content={"valid": False})
+
+
+# ---------------------------------------------------------------------------
+# Study API endpoints
+# ---------------------------------------------------------------------------
+
+_STUDY_ASSIGNMENTS: Optional[Dict[str, Any]] = None
+_STUDY_STORIES: Optional[Dict[str, Any]] = None
+_CONFIG_DIR = BASE_DIR.resolve().parent.parent / "config"
+
+
+def _load_study_config() -> None:
+    """Lazy-load study assignment and story config files."""
+    global _STUDY_ASSIGNMENTS, _STUDY_STORIES
+    if _STUDY_ASSIGNMENTS is None:
+        path = _CONFIG_DIR / "study_assignments.json"
+        if path.exists():
+            _STUDY_ASSIGNMENTS = json.loads(path.read_text())
+        else:
+            _STUDY_ASSIGNMENTS = {}
+    if _STUDY_STORIES is None:
+        path = _CONFIG_DIR / "study_stories.json"
+        if path.exists():
+            _STUDY_STORIES = json.loads(path.read_text())
+        else:
+            _STUDY_STORIES = {}
+
+
+@app.post("/api/study/validate")
+async def study_validate(request: Request):
+    """Validate a study participant number (1-12)."""
+    body = await request.json()
+    num = body.get("number")
+    try:
+        num = int(num)
+    except (TypeError, ValueError):
+        return JSONResponse(status_code=400, content={"valid": False})
+    if 1 <= num <= 12:
+        return JSONResponse(content={"valid": True})
+    return JSONResponse(status_code=400, content={"valid": False})
+
+
+def _parse_study_order(order: List[str]) -> tuple:
+    """Parse +/- notation order into (order_labels, animated_set).
+
+    E.g. ["A+", "C-", "B+", "D-"] -> (["A","C","B","D"], {"A","B"})
+    """
+    labels = []
+    animated = set()
+    for entry in order:
+        label = entry[:-1]  # strip +/-
+        labels.append(label)
+        if entry.endswith("+"):
+            animated.add(label)
+    return labels, animated
+
+
+def _load_study_scene(data_dir: Path, story_meta: Dict[str, Any], scene_num: int) -> Optional[Dict[str, Any]]:
+    """Load a single study scene from disk."""
+    scene_dir = story_meta.get("scene_dir", "")
+    if not scene_dir:
+        return None
+    scene_path = data_dir.parent / scene_dir / f"scene_{scene_num}.json"
+    if not scene_path.exists():
+        return None
+    try:
+        return json.loads(scene_path.read_text())
+    except (json.JSONDecodeError, OSError) as exc:
+        logger.warning("Failed to load study scene %s: %s", scene_path, exc)
+        return None
+
+
+@app.get("/api/study/assignment")
+async def study_assignment(participant: int):
+    """Return the study assignment for a participant number."""
+    _load_study_config()
+    key = str(participant)
+    assignment = (_STUDY_ASSIGNMENTS or {}).get(key)
+    if not assignment:
+        return JSONResponse(status_code=404, content={"error": "Unknown participant number"})
+
+    stories_config = _STUDY_STORIES or {}
+    raw_order = assignment["order"]
+    order_labels, animated_set = _parse_study_order(raw_order)
+
+    # Load first scene of each story for thumbnails
+    data_dir = _find_data_dir()
+    stories: Dict[str, Any] = {}
+    for label in ["A", "B", "C", "D"]:
+        story_meta = stories_config.get(label, {})
+        scene_data: Dict[str, Any] = {
+            "name": story_meta.get("name", f"Story {label}"),
+            "scene_count": story_meta.get("scene_count", 0),
+            "animated": label in animated_set,
+        }
+        if data_dir:
+            full_scene = _load_study_scene(data_dir, story_meta, 1)
+            if full_scene:
+                scene_data["sprite_code"] = full_scene.get("sprite_code", {})
+        stories[label] = scene_data
+
+    # Load training scenes
+    training_scenes: List[Dict[str, Any]] = []
+    training_config = stories_config.get("training", [])
+    for t_entry in training_config:
+        t_dir = t_entry.get("scene_dir", "")
+        t_file = t_entry.get("scene_file", "")
+        if data_dir and t_dir and t_file:
+            t_path = data_dir.parent / t_dir / t_file
+            if t_path.exists():
+                try:
+                    t_scene = json.loads(t_path.read_text())
+                    training_scenes.append({
+                        "sprite_code": t_scene.get("sprite_code", {}),
+                    })
+                except (json.JSONDecodeError, OSError) as exc:
+                    logger.warning("Failed to load training scene %s: %s", t_path, exc)
+
+    return JSONResponse(content={
+        "participant": participant,
+        "order": order_labels,
+        "raw_order": raw_order,
+        "animated": list(animated_set),
+        "stories": stories,
+        "training_scenes": training_scenes,
+    })
+
+
+@app.get("/api/study/scene")
+async def study_scene(story: str, scene: int):
+    """Load a specific study scene for playback.
+
+    Returns the full scene data (sprite_code, manifest, narrative_text, ground_truth).
+    """
+    _load_study_config()
+    stories_config = _STUDY_STORIES or {}
+    story_meta = stories_config.get(story.upper())
+    if not story_meta:
+        return JSONResponse(status_code=404, content={"error": f"Unknown story {story}"})
+
+    scene_count = story_meta.get("scene_count", 0)
+    if scene < 1 or scene > scene_count:
+        return JSONResponse(status_code=400, content={"error": f"Scene {scene} out of range (1-{scene_count})"})
+
+    data_dir = _find_data_dir()
+    if not data_dir:
+        return JSONResponse(status_code=500, content={"error": "data/ directory not found"})
+
+    full_scene = _load_study_scene(data_dir, story_meta, scene)
+    if not full_scene:
+        return JSONResponse(status_code=404, content={"error": f"Scene {story}/{scene} not found on disk"})
+
+    return JSONResponse(content=full_scene)
 
 
 @app.get("/api/simulation-scene")
@@ -303,9 +476,72 @@ class _WebSocketAdapter:
             pass  # client disconnected
 
 
+
 # ---------------------------------------------------------------------------
 # WebSocket handler
 # ---------------------------------------------------------------------------
+
+@app.websocket("/ws/study")
+async def study_websocket_endpoint(websocket: WebSocket):
+    """WebSocket for study mode — reuses main handler with study_mode flag.
+
+    Study mode differences:
+    - Pre-generated scenes loaded via 'study_scene_loaded' message
+    - 'animated' param controls whether animations/voice fire (+ vs - condition)
+    - Assessment always runs and is logged regardless of condition
+    """
+    await websocket.accept()
+
+    api_key = os.environ.get("GEMINI_API_KEY", "")
+    participant = websocket.query_params.get("participant", "")
+    story_key = websocket.query_params.get("story", "")
+    is_animated = websocket.query_params.get("animated", "0") == "1"
+
+    if not api_key:
+        await websocket.send_json({"type": "error", "message": "Missing API key"})
+        await websocket.close()
+        return
+
+    session = SessionState(api_key, f"study_{participant}")
+    session.student_profile.age = 8
+    session.naming_phase = False  # Study: no naming phase
+    session.awaiting_ending_choice = False  # Study: no ending choice
+    # Store animation flag on session for use in audio handler
+    session.study_animations_enabled = is_animated  # type: ignore[attr-defined]
+    ws = _WebSocketAdapter(websocket)
+
+    try:
+        while True:
+            message = await websocket.receive()
+
+            if "bytes" in message:
+                await _handle_study_audio(session, message["bytes"], ws)
+                continue
+
+            if "text" not in message:
+                continue
+
+            data = json.loads(message["text"])
+            msg_type = data.get("type", "")
+
+            if msg_type == "study_scene_loaded":
+                scene = data.get("scene")
+                if scene:
+                    await _hydrate_scene(session, scene, ws)
+
+            elif msg_type == "entity_moved":
+                await _handle_entity_moved(session, data)
+
+    except WebSocketDisconnect:
+        logger.info("Study client disconnected: participant=%s story=%s",
+                     participant, story_key)
+    except Exception:
+        logger.exception("Study WebSocket error for participant=%s", participant)
+        try:
+            await websocket.send_json({"type": "error", "message": "Internal server error"})
+        except Exception:
+            pass
+
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
@@ -720,6 +956,9 @@ async def _hydrate_scene(
 ) -> None:
     """Re-hydrate session from a scene dict (e.g. after page navigation)."""
     _apply_scene_to_session(session, scene)
+    # In study mode, skip initial oral guidance — system never speaks
+    if getattr(session, "study_animations_enabled", None) is not None:
+        return
     await _send_initial_guidance(session, ws)
 
 
@@ -753,7 +992,7 @@ async def _generate_story_intro(
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     thinking_config=types.ThinkingConfig(thinking_budget=256),
-                    temperature=0.7,
+                    temperature=1.0,
                 ),
             ),
             timeout=_SHORT_LLM_TIMEOUT,
@@ -793,7 +1032,7 @@ async def _extract_character_name(
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     thinking_config=types.ThinkingConfig(thinking_budget=256),
-                    temperature=0.0,
+                    temperature=1.0,
                 ),
             ),
             timeout=_SHORT_LLM_TIMEOUT,
@@ -925,6 +1164,112 @@ async def _send_initial_guidance(
 
 
 # ---------------------------------------------------------------------------
+# Study audio handling
+# ---------------------------------------------------------------------------
+
+async def _transcribe_study_audio(api_key: str, audio_bytes: bytes) -> str:
+    """Bare transcription for study mode — no storytelling context at all."""
+    audio_part = types.Part.from_bytes(data=audio_bytes, mime_type="audio/webm")
+    client = genai.Client(api_key=api_key)
+    response = await client.aio.models.generate_content(
+        model="gemini-2.0-flash",
+        contents=[
+            audio_part,
+            types.Part.from_text(text=(
+                "Transcribe EXACTLY what is said in this audio. "
+                "Include hesitations (um, uh). "
+                "If the audio is silent or unclear, return an empty string. "
+                "Return ONLY the transcription text, nothing else."
+            )),
+        ],
+        config=types.GenerateContentConfig(
+            temperature=1.0,
+        ),
+    )
+    return (response.text or "").strip()
+
+
+async def _handle_study_audio(
+    session: SessionState,
+    audio_bytes: bytes,
+    ws: _WebSocketAdapter,
+) -> None:
+    """Study mode audio handler.
+
+    Step 1: Pure transcription (no narrative context to prevent hallucination).
+    Step 2 (animated only): feed transcription into assessment + animation pipeline.
+    """
+    # 1. Pure transcription — no storytelling context, no history
+    try:
+        transcription = await _transcribe_study_audio(session.api_key, audio_bytes)
+    except Exception:
+        logger.exception("[study] Transcription failed")
+        return
+
+    # Send pure transcription to client
+    await ws.send_json({
+        "type": "transcription",
+        "text": transcription,
+    })
+
+    if not transcription:
+        return
+
+    session.narration_history.append(transcription)
+
+    # 2. For animated condition: run assessment + animation pipeline
+    is_animated = getattr(session, "study_animations_enabled", False)
+    if is_animated and session.current_manifest and session.current_scene_log:
+        try:
+            # Feed the already-obtained transcription into the assessment pipeline
+            session.conversation_history.append({
+                "role": "child",
+                "text": transcription,
+            })
+            session.student_profile.total_utterances += 1
+
+            story_so_far = get_accepted_utterances(session.current_scene_log)
+            misl_already = get_misl_dimensions_suggested(session.current_scene_log)
+
+            assessment = await assess_utterance(
+                api_key=session.api_key,
+                manifest=session.current_manifest,
+                utterance_text=transcription,
+                story_so_far=story_so_far,
+                misl_already_suggested=misl_already,
+                misl_difficulty_profile=session.student_profile.misl_difficulty_profile,
+                character_names=session.character_names,
+            )
+
+            action, action_data = process_assessment(
+                utterance_text=transcription,
+                response=assessment,
+                scene_log=session.current_scene_log,
+                misl_difficulty_profile=session.student_profile.misl_difficulty_profile,
+            )
+
+            # Extract discrepancies for animation
+            discrepancies: List[Discrepancy] = []
+            if action_data and "discrepancies" in action_data:
+                for d in action_data["discrepancies"]:
+                    if isinstance(d, dict):
+                        discrepancies.append(Discrepancy(**d))
+                    elif isinstance(d, Discrepancy):
+                        discrepancies.append(d)
+
+            # Execute animations only (voice is blocked by send_voice guard)
+            if action == "correct" and discrepancies:
+                await execute_invocation_array(session, ws, discrepancies)
+            elif action == "accept_and_guide" and discrepancies:
+                suggestion_discs = [d for d in discrepancies if d.pass_type == "suggestion"]
+                if suggestion_discs:
+                    await execute_invocation_array(session, ws, suggestion_discs)
+
+        except Exception:
+            logger.exception("[study] Assessment/animation failed")
+
+
+# ---------------------------------------------------------------------------
 # Audio handling (interactive loop)
 # ---------------------------------------------------------------------------
 
@@ -943,9 +1288,10 @@ async def _handle_audio(
     Pipeline:
       0. Check pending animation outcome from previous utterance
       1. transcribe_audio → text
-      2. assess_utterance → factual_errors / misl_opportunities
+      2. assess_utterance → two-pass (correction + enrichment) → discrepancies
       3. process_assessment → deterministic action
-      4. Execute action (correct / accept_and_guide / accept_and_advance)
+      4. generate_invocation_array → structured animation sequence
+      5. execute_invocation_array → play animations with delays
     """
     if session.current_manifest is None or session.current_scene_log is None:
         await ws.send_json({"type": "error", "message": "No active scene"})
@@ -1022,12 +1368,27 @@ async def _handle_audio(
         )
 
         # 4. Execute action
+        # Extract discrepancies for the new invocation array pipeline
+        discrepancies: List[Discrepancy] = []
+        if action_data and "discrepancies" in action_data:
+            for d in action_data["discrepancies"]:
+                if isinstance(d, dict):
+                    discrepancies.append(Discrepancy(**d))
+                elif isinstance(d, Discrepancy):
+                    discrepancies.append(d)
+
         if action == "correct":
             # Factual errors — animate errored entity, defer voice
             errors = action_data["factual_errors"]
-            first_error = errors[0]
+            first_error = errors[0] if errors else {}
             target_id = first_error.get("manifest_ref", "").split(".")[0]
             explanation = first_error.get("explanation", "")
+
+            # If no target from legacy field, try discrepancies
+            if not target_id and discrepancies:
+                first_disc = discrepancies[0]
+                target_id = first_disc.target_entities[0] if first_disc.target_entities else ""
+                explanation = explanation or first_disc.description
 
             # Send assessment_result WITHOUT guidance_text (text will come later after animation)
             await ws.send_json({
@@ -1038,6 +1399,8 @@ async def _handle_audio(
             })
 
             misl_el = "character"
+            if discrepancies and discrepancies[0].misl_elements:
+                misl_el = discrepancies[0].misl_elements[0]
             esc_key = f"{target_id}::{misl_el}"
 
             if esc_key in session.voice_escalated_errors:
@@ -1050,21 +1413,42 @@ async def _handle_audio(
                     })
                     asyncio.ensure_future(send_voice(session, ws, explanation))
 
+            elif discrepancies:
+                # Use invocation array pipeline for all discrepancies
+                decision = await execute_invocation_array(
+                    session, ws, discrepancies,
+                )
+
+                # Animation-first: NO text during animation.
+                if decision and explanation:
+                    _set_pending_animation(
+                        session, target_id, misl_el, explanation, decision,
+                    )
+                elif explanation:
+                    await ws.send_json({
+                        "type": "correction_text",
+                        "guidance_text": explanation,
+                        "target_id": target_id,
+                    })
+                    session.conversation_history.append({
+                        "role": "system",
+                        "text": explanation,
+                        "action": "correction",
+                    })
+
             elif target_id:
+                # Fallback: single animation call (legacy path)
                 decision = await execute_animation(
                     session, ws, target_id,
                     misl_element=misl_el,
                     problematic_segment=first_error.get("utterance_fragment"),
                 )
 
-                # Animation-first: NO text during animation.
-                # Voice + text only fires if child doesn't self-correct (see _resolve_pending_animation).
                 if decision and explanation:
                     _set_pending_animation(
                         session, target_id, misl_el, explanation, decision,
                     )
                 elif explanation:
-                    # Animation failed entirely, send correction text now
                     await ws.send_json({
                         "type": "correction_text",
                         "guidance_text": explanation,
@@ -1093,11 +1477,18 @@ async def _handle_audio(
         elif action == "accept_and_guide":
             # MISL guidance — animate, defer text display
             opps = action_data["misl_opportunities"]
-            first_opp = opps[0]
+            first_opp = opps[0] if opps else {}
             suggestion = first_opp.get("suggestion", "")
             elements = first_opp.get("manifest_elements", [])
             target_id = elements[0] if elements else ""
             misl_dim = first_opp.get("dimension", "character")
+
+            # Enrich from discrepancies if available
+            suggestion_discrepancies = [d for d in discrepancies if d.pass_type == "suggestion"]
+            if not target_id and suggestion_discrepancies:
+                first_sd = suggestion_discrepancies[0]
+                target_id = first_sd.target_entities[0] if first_sd.target_entities else ""
+                suggestion = suggestion or first_sd.description
 
             # Was this the LAST MISL opportunity for this scene?
             is_last_opportunity = (
@@ -1130,20 +1521,42 @@ async def _handle_audio(
                         })
                         asyncio.ensure_future(send_voice(session, ws, suggestion))
 
-                elif target_id:
-                    decision = await execute_animation(
-                        session, ws, target_id,
-                        misl_element=misl_dim,
+                elif suggestion_discrepancies:
+                    # Use invocation array pipeline for suggestion discrepancies
+                    decision = await execute_invocation_array(
+                        session, ws, suggestion_discrepancies,
                     )
 
                     # Animation-first: NO text during animation.
-                    # Voice + text only fires if child doesn't self-correct.
                     if decision and suggestion:
                         _set_pending_animation(
                             session, target_id, misl_dim, suggestion, decision,
                         )
                     elif suggestion:
-                        # Animation failed entirely → send guidance text now
+                        await ws.send_json({
+                            "type": "guidance_text",
+                            "guidance_text": suggestion,
+                            "target_id": target_id,
+                            "dimension": misl_dim,
+                        })
+                        session.conversation_history.append({
+                            "role": "system",
+                            "text": suggestion,
+                            "action": "misl_guidance",
+                        })
+
+                elif target_id:
+                    # Fallback: single animation call (legacy path)
+                    decision = await execute_animation(
+                        session, ws, target_id,
+                        misl_element=misl_dim,
+                    )
+
+                    if decision and suggestion:
+                        _set_pending_animation(
+                            session, target_id, misl_dim, suggestion, decision,
+                        )
+                    elif suggestion:
                         await ws.send_json({
                             "type": "guidance_text",
                             "guidance_text": suggestion,
@@ -1236,7 +1649,7 @@ async def _classify_ending_intent(api_key: str, transcription: str) -> str:
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     thinking_config=types.ThinkingConfig(thinking_budget=256),
-                    temperature=0.0,
+                    temperature=1.0,
                 ),
             ),
             timeout=_SHORT_LLM_TIMEOUT,

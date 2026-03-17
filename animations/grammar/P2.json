@@ -1,0 +1,26 @@
+{
+  "id": "P2",
+  "name": "Emanation",
+  "category": "Property",
+  "mode": "both",
+  "scaffolding_intent": "Emits particle sprites around the entity to reveal non-visible properties or emotions, scaffolding sensory adjectives and internal responses",
+  "misl_elements": ["ENP", "ADV", "IR"],
+  "target_type": "entity",
+  "parameters": [
+    {
+      "name": "particleType",
+      "type": "enum",
+      "range": ["steam", "frost", "sparkle", "dust", "hearts", "anger", "fear"],
+      "default": "steam",
+      "description": "Type of emanation particle"
+    },
+    {
+      "name": "particleCount",
+      "type": "int",
+      "range": [8, 30],
+      "default": 15,
+      "description": "Number of particles emitted"
+    }
+  ],
+  "code_template": "emanation({target}, {particleType}, {particleCount})"
+}

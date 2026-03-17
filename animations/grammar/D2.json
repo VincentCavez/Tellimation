@@ -1,0 +1,19 @@
+{
+  "id": "D2",
+  "name": "Thought Bubble",
+  "category": "Discourse",
+  "mode": "suggestion",
+  "scaffolding_intent": "Displays a pixelated thought bubble above the character, scaffolding internal response, plan, and mental verbs",
+  "misl_elements": ["IR", "P", "M"],
+  "target_type": "entity",
+  "parameters": [
+    {
+      "name": "bubbleText",
+      "type": "string",
+      "range": [],
+      "default": "...",
+      "description": "Text to display inside the thought bubble"
+    }
+  ],
+  "code_template": "thought_bubble({target}, {bubbleText})"
+}

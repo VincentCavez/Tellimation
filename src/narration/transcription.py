@@ -71,7 +71,7 @@ async def transcribe_audio(
         config=types.GenerateContentConfig(
             system_instruction=TRANSCRIPTION_SYSTEM_PROMPT,
             thinking_config=types.ThinkingConfig(thinking_budget=256),
-            temperature=0.3,
+            temperature=1.0,
             response_mime_type="application/json",
         ),
     )

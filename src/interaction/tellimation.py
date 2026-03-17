@@ -7,6 +7,9 @@ the LLM selects one of 4 modes:
   C) sequence       — chain 2-3 animations
   D) custom_code    — generate new JS code (last resort)
 
+Also provides generate_invocation_array() which takes a full discrepancy list
+and produces a structured InvocationArray (corrections first, then suggestions).
+
 Model: Gemini 3 Flash (gemini-3-flash-preview)
 
 Fallback: if LLM generation fails, returns Mode A with the first eligible template.
@@ -21,16 +24,20 @@ from typing import Any, Dict, List, Optional
 from google import genai
 from google.genai import types
 
+from src.models.assessment import Discrepancy
+from src.models.invocation import AnimationInvocation, InvocationArray
 from src.models.scene import SceneManifest
 from src.models.student_profile import StudentProfile
 from src.generation.prompts.tellimation_prompt import (
     TELLIMATION_SYSTEM_PROMPT,
     TELLIMATION_USER_PROMPT_TEMPLATE,
 )
+from animations.grammar import get_animation, get_animations_by_category, get_animations_by_mode
 from config.misl import (
     MISL_TO_ANIMATIONS,
     ANIMATION_ID_TO_TEMPLATE,
     ANIMATION_PARAMS,
+    COUNT_ANIMATIONS,
     build_params_prompt,
 )
 from src.generation.utils import (
@@ -424,7 +431,7 @@ async def generate_tellimation(
                     config=types.GenerateContentConfig(
                         system_instruction=system_prompt,
                         thinking_config=types.ThinkingConfig(thinking_budget=1024),
-                        temperature=0.7,
+                        temperature=1.0,
                         response_mime_type="application/json",
                     ),
                 ),
@@ -471,3 +478,216 @@ async def generate_tellimation(
     )
 
     return result
+
+
+# ---------------------------------------------------------------------------
+# Category → MISL element mapping for discrepancy routing
+# ---------------------------------------------------------------------------
+
+_CATEGORY_TO_MISL: Dict[str, str] = {
+    "Identity": "character",
+    "Property": "elaborated_noun_phrases",
+    "Action": "action",
+    "Space": "setting",
+    "Time": "tense",
+    "Relation": "coordinating_conjunctions",
+    "Count": "character",
+    "Discourse": "internal_response",
+}
+
+# Priority order for sorting within each pass
+_CATEGORY_PRIORITY: Dict[str, int] = {
+    "Identity": 0,
+    "Count": 1,
+    "Property": 2,
+    "Action": 3,
+    "Space": 4,
+    "Time": 5,
+    "Relation": 6,
+    "Discourse": 7,
+}
+
+
+def _select_animation_for_discrepancy(
+    discrepancy: Discrepancy,
+    student_profile: StudentProfile,
+) -> Optional[str]:
+    """Select the best animation ID for a discrepancy using the grammar.
+
+    Returns the animation ID (e.g. "I1_spotlight") or None if no match.
+    """
+    category = discrepancy.type
+    mode = "correction" if discrepancy.pass_type == "correction" else "suggestion"
+
+    # 1. Get animations matching category and mode from the grammar
+    category_anims = get_animations_by_category(category)
+    mode_anims = get_animations_by_mode(mode)
+
+    # Intersection: animations matching both category and mode
+    mode_ids = {a.id for a in mode_anims}
+    candidates = [a for a in category_anims if a.id in mode_ids]
+
+    if not candidates:
+        # Fallback: try MISL_TO_ANIMATIONS mapping
+        for misl_el in discrepancy.misl_elements:
+            eligible = MISL_TO_ANIMATIONS.get(misl_el, [])
+            if eligible:
+                return eligible[0]
+        # Count animations as last resort for Count category
+        if category == "Count" and COUNT_ANIMATIONS:
+            return COUNT_ANIMATIONS[0]
+        return None
+
+    # 2. If multiple candidates, prefer ones that match MISL elements
+    if len(candidates) > 1 and discrepancy.misl_elements:
+        scored = []
+        for anim in candidates:
+            overlap = len(set(anim.misl_elements) & set(discrepancy.misl_elements))
+            scored.append((overlap, anim))
+        scored.sort(key=lambda x: x[0], reverse=True)
+        candidates = [s[1] for s in scored]
+
+    # 3. Check efficacy history to avoid ineffective animations
+    best = candidates[0]
+    for anim in candidates:
+        # Map grammar ID (e.g. "I1") to full animation ID (e.g. "I1_spotlight")
+        full_id = f"{anim.id}_{ANIMATION_ID_TO_TEMPLATE.get(f'{anim.id}_spotlight', anim.id)}"
+        # Find matching key in ANIMATION_ID_TO_TEMPLATE
+        for aid, tmpl in ANIMATION_ID_TO_TEMPLATE.items():
+            if aid.startswith(anim.id + "_"):
+                full_id = aid
+                break
+        best = anim
+        break  # Take first (best scoring) candidate
+
+    # Return full animation ID from ANIMATION_ID_TO_TEMPLATE
+    for aid in ANIMATION_ID_TO_TEMPLATE:
+        if aid.startswith(best.id + "_"):
+            return aid
+
+    return None
+
+
+async def generate_invocation_array(
+    api_key: str,
+    sprite_code: Dict[str, Any],
+    manifest: SceneManifest,
+    student_profile: StudentProfile,
+    discrepancies: List[Discrepancy],
+) -> InvocationArray:
+    """Generate a structured invocation array from a list of discrepancies.
+
+    For each discrepancy:
+    1. Select the best animation via the grammar loader
+    2. Call generate_tellimation() for LLM-based parameterization
+    3. Build an AnimationInvocation with the result
+
+    Corrections come first in the sequence, then suggestions.
+    Within each pass, ordered by category priority.
+
+    Args:
+        api_key: Gemini API key.
+        sprite_code: Current scene sprite data.
+        manifest: Scene manifest.
+        student_profile: Child's profile with efficacy history.
+        discrepancies: Unified discrepancy list from assessment.
+
+    Returns:
+        InvocationArray with ordered sequence of animations.
+    """
+    if not discrepancies:
+        return InvocationArray(sequence=[])
+
+    # Sort: corrections first, then suggestions; within each, by category priority
+    sorted_disc = sorted(
+        discrepancies,
+        key=lambda d: (
+            0 if d.pass_type == "correction" else 1,
+            _CATEGORY_PRIORITY.get(d.type, 99),
+        ),
+    )
+
+    sequence: List[AnimationInvocation] = []
+
+    for disc in sorted_disc:
+        # Determine target entity
+        target_id = disc.target_entities[0] if disc.target_entities else ""
+        if not target_id:
+            logger.warning("[invocation] Skipping discrepancy with no target: %s",
+                           disc.description)
+            continue
+
+        # Determine MISL element for the LLM call
+        misl_element = _CATEGORY_TO_MISL.get(disc.type, "character")
+        if disc.misl_elements:
+            # Try to map MISL code to full MISL key
+            code_to_key = _build_misl_code_to_key()
+            for code in disc.misl_elements:
+                if code in code_to_key:
+                    misl_element = code_to_key[code]
+                    break
+
+        # Determine problematic segment for D4 interjection
+        problematic_segment = None
+        if disc.type == "Discourse" and disc.pass_type == "correction":
+            problematic_segment = disc.description
+
+        try:
+            decision = await generate_tellimation(
+                api_key=api_key,
+                sprite_code=sprite_code,
+                manifest=manifest,
+                student_profile=student_profile,
+                target_id=target_id,
+                misl_element=misl_element,
+                problematic_segment=problematic_segment,
+            )
+
+            # Build parameter overrides from the decision
+            param_overrides: Dict[str, Any] = {}
+            if decision["mode"] == "adjust_params":
+                param_overrides = decision.get("params", {})
+
+            sequence.append(AnimationInvocation(
+                animation_id=decision["animation_id"],
+                targets=disc.target_entities,
+                parameter_overrides=param_overrides,
+            ))
+
+        except Exception as exc:
+            logger.warning(
+                "[invocation] Failed to generate animation for %s: %s",
+                target_id, exc,
+            )
+            # Use fallback
+            fallback_aid = _select_animation_for_discrepancy(disc, student_profile)
+            if fallback_aid:
+                sequence.append(AnimationInvocation(
+                    animation_id=fallback_aid,
+                    targets=disc.target_entities,
+                    parameter_overrides={},
+                ))
+
+    result = InvocationArray(sequence=sequence)
+    logger.info("[invocation] Generated invocation array with %d animations",
+                len(sequence))
+    return result
+
+
+def _build_misl_code_to_key() -> Dict[str, str]:
+    """Build a mapping from MISL abbreviation codes to full MISL keys."""
+    from config.misl import MACROSTRUCTURE, MICROSTRUCTURE
+
+    code_map: Dict[str, str] = {}
+    for key, info in MACROSTRUCTURE.items():
+        label = info["label"]
+        # Extract code from label like "Character (CH)" → "CH"
+        if "(" in label and ")" in label:
+            code = label.split("(")[1].split(")")[0]
+            code_map[code] = key
+    for key, info in MICROSTRUCTURE.items():
+        label = info["label"]
+        if "(" in label and ")" in label:
+            code = label.split("(")[1].split(")")[0]
+            code_map[code] = key
+    return code_map

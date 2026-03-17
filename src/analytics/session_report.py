@@ -127,7 +127,7 @@ async def generate_report(
         config=types.GenerateContentConfig(
             system_instruction=REPORT_SYSTEM_PROMPT,
             thinking_config=types.ThinkingConfig(thinking_budget=1024),
-            temperature=0.4,
+            temperature=1.0,
         ),
     )
 

@@ -25,10 +25,20 @@ class MISLOpportunity(BaseModel):
     suggestion: str
 
 
+class Discrepancy(BaseModel):
+    """A unified discrepancy item from either correction or enrichment pass."""
+    pass_type: str  # "correction" or "suggestion"
+    type: str       # animation category: Identity, Count, Property, Action, Space, Time, Relation, Discourse
+    target_entities: List[str] = Field(default_factory=list)
+    misl_elements: List[str] = Field(default_factory=list)
+    description: str = ""
+
+
 class AssessmentResponse(BaseModel):
-    """Structured output from the single-call Gemini assessment."""
+    """Structured output from the two-pass Gemini assessment."""
     factual_errors: List[FactualError] = Field(default_factory=list)
     misl_opportunities: List[MISLOpportunity] = Field(default_factory=list)
+    discrepancies: List[Discrepancy] = Field(default_factory=list)
     utterance_is_acceptable: bool = True
 
 
