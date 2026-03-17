@@ -1,0 +1,40 @@
+{
+  "id": "I1",
+  "name": "Spotlight",
+  "category": "Identity",
+  "mode": "both",
+  "scaffolding_intent": "Isolates a character or object by darkening the scene and adding a luminous halo, prompting the child to identify and name it",
+  "misl_elements": ["CH"],
+  "target_type": "entity",
+  "parameters": [
+    {
+      "name": "dimStrength",
+      "type": "float",
+      "range": [0, 1],
+      "default": 0.7,
+      "description": "How much non-target pixels are dimmed"
+    },
+    {
+      "name": "glowStrength",
+      "type": "float",
+      "range": [0, 1],
+      "default": 0.35,
+      "description": "Glow intensity on target entity"
+    },
+    {
+      "name": "haloColor",
+      "type": "rgb",
+      "range": [0, 255],
+      "default": [255, 240, 180],
+      "description": "Color of the halo around entity"
+    },
+    {
+      "name": "maxHaloSize",
+      "type": "int",
+      "range": [5, 20],
+      "default": 14,
+      "description": "Maximum halo radius in pixels"
+    }
+  ],
+  "code_template": "spotlight({target}, {dimStrength}, {glowStrength}, {haloColor}, {maxHaloSize})"
+}

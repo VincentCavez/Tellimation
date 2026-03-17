@@ -1,0 +1,19 @@
+{
+  "id": "C3",
+  "name": "Ghost Outline",
+  "category": "Count",
+  "mode": "correction",
+  "scaffolding_intent": "Displays an amorphous shape with a question mark that dissolves, scaffolding absence — something is missing from the narration",
+  "misl_elements": [],
+  "target_type": "entity",
+  "parameters": [
+    {
+      "name": "puddleColor",
+      "type": "rgb",
+      "range": [0, 255],
+      "default": [60, 65, 85],
+      "description": "Color of the dark puddle shape"
+    }
+  ],
+  "code_template": "ghost_outline({target}, {puddleColor})"
+}

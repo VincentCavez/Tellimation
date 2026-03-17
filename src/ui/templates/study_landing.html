@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tellimations Study</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="falling-pixels-bg" id="falling-pixels"></div>
+
+  <div class="study-landing-container">
+    <div class="login-logo" style="margin-bottom: 2rem;">
+      <span class="t2">Tell</span><span class="t3">imations</span>
+    </div>
+
+    <!-- Training block -->
+    <div class="study-block">
+      <div class="thumbnail-row" id="training-thumbnails"></div>
+      <div class="study-btn-wrap">
+        <button class="btn btn-ghost" id="btn-training">Training</button>
+      </div>
+    </div>
+
+    <!-- Ready block -->
+    <div class="study-block">
+      <div class="thumbnail-row" id="story-thumbnails"></div>
+      <div class="study-btn-wrap">
+        <button class="btn btn-red" id="btn-ready">Ready</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/engine.js?v=2"></script>
+  <script src="/static/scene_picker.js?v=2"></script>
+  <script src="/static/study_landing.js?v=1"></script>
+  <script>
+    // Falling pixels animation in margins
+    const colors = ['#DB0038', '#F7C200', '#519DD9', '#53BAC1', '#EDEDED'];
+    const pixelsContainer = document.getElementById('falling-pixels');
+    let activePixels = 0;
+    const maxPixels = 8;
+
+    function createPixel() {
+      if (activePixels >= maxPixels) return;
+      const pixel = document.createElement('div');
+      pixel.className = 'falling-pixel';
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      pixel.style.backgroundColor = color;
+      const side = Math.random() < 0.5 ? 'left' : 'right';
+      const x = side === 'left' ? Math.random() * 40 : 100 - Math.random() * 40;
+      pixel.style.left = x + '%';
+      pixel.style.top = '-20px';
+      const duration = 3 + Math.random() * 3;
+      pixel.style.animation = `fall ${duration}s linear forwards`;
+      pixelsContainer.appendChild(pixel);
+      activePixels++;
+      setTimeout(() => { pixel.remove(); activePixels--; }, duration * 1000);
+    }
+    setInterval(createPixel, 600);
+  </script>
+</body>
+</html>

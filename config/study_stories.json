@@ -1,0 +1,26 @@
+{
+  "A": {
+    "name": "The Runaway Wagon",
+    "scene_dir": "data/study_scenes/A",
+    "scene_count": 5
+  },
+  "B": {
+    "name": "The Balloon Seller",
+    "scene_dir": "data/study_scenes/B",
+    "scene_count": 5
+  },
+  "C": {
+    "name": "The Market Mix-Up",
+    "scene_dir": "data/study_scenes/C",
+    "scene_count": 5
+  },
+  "D": {
+    "name": "The Night Garden",
+    "scene_dir": "data/study_scenes/D",
+    "scene_count": 5
+  },
+  "training": [
+    {"scene_dir": "data/study_scenes/training", "scene_file": "scene_1.json"},
+    {"scene_dir": "data/study_scenes/training", "scene_file": "scene_2.json"}
+  ]
+}

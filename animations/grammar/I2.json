@@ -1,0 +1,33 @@
+{
+  "id": "I2",
+  "name": "Nametag",
+  "category": "Identity",
+  "mode": "both",
+  "scaffolding_intent": "Displays a floating label with ellipsis attached to the entity, inviting the child to name it",
+  "misl_elements": ["CH"],
+  "target_type": "entity",
+  "parameters": [
+    {
+      "name": "bgColor",
+      "type": "rgb",
+      "range": [0, 255],
+      "default": [40, 40, 55],
+      "description": "Label background color"
+    },
+    {
+      "name": "textColor",
+      "type": "rgb",
+      "range": [0, 255],
+      "default": [255, 255, 200],
+      "description": "Label text color"
+    },
+    {
+      "name": "stringColor",
+      "type": "rgb",
+      "range": [0, 255],
+      "default": [180, 180, 180],
+      "description": "Connecting string color"
+    }
+  ],
+  "code_template": "nametag({target}, {bgColor}, {textColor}, {stringColor})"
+}

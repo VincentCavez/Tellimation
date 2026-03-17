@@ -123,7 +123,7 @@ async def generate_scene_intro(
             config=types.GenerateContentConfig(
                 system_instruction=SCENE_INTRO_SYSTEM_PROMPT,
                 thinking_config=types.ThinkingConfig(thinking_budget=256),
-                temperature=0.8,
+                temperature=1.0,
             ),
         )
         text = response.text.strip().strip('"').strip("'")
@@ -200,7 +200,7 @@ async def generate_correction_text(
                 thinking_config=types.ThinkingConfig(
                     thinking_budget=256,
                 ),
-                temperature=0.7,
+                temperature=1.0,
             ),
         )
         text = response.text.strip().strip('"').strip("'")
@@ -257,7 +257,7 @@ async def generate_branch_narration(
                 thinking_config=types.ThinkingConfig(
                     thinking_budget=256,
                 ),
-                temperature=0.8,
+                temperature=1.0,
             ),
         )
         text = response.text.strip()

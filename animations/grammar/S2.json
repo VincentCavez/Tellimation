@@ -1,0 +1,26 @@
+{
+  "id": "S2",
+  "name": "Stamp",
+  "category": "Space",
+  "mode": "both",
+  "scaffolding_intent": "Entity lifts to reveal a silhouette then snaps back with cracks radiating on impact, reinforcing actual spatial location",
+  "misl_elements": ["S"],
+  "target_type": "entity",
+  "parameters": [
+    {
+      "name": "liftPixels",
+      "type": "int",
+      "range": [10, 30],
+      "default": 22,
+      "description": "How many pixels the entity lifts up"
+    },
+    {
+      "name": "crackCount",
+      "type": "int",
+      "range": [6, 18],
+      "default": 12,
+      "description": "Number of crack lines on impact"
+    }
+  ],
+  "code_template": "stamp({target}, {liftPixels}, {crackCount})"
+}

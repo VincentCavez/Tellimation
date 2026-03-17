@@ -1,0 +1,19 @@
+{
+  "id": "C1",
+  "name": "Sequential Glow",
+  "category": "Count",
+  "mode": "correction",
+  "scaffolding_intent": "Entities glow one at a time in sequence to create a visual count, correcting quantity errors",
+  "misl_elements": [],
+  "target_type": "entities",
+  "parameters": [
+    {
+      "name": "entityPrefixes",
+      "type": "string_array",
+      "range": [],
+      "default": [],
+      "description": "Ordered list of entity IDs to glow in sequence"
+    }
+  ],
+  "code_template": "sequential_glow({target}, {entityPrefixes})"
+}

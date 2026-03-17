@@ -5,6 +5,9 @@ efficacy tracking) and voice (TTS) concerns.
 
 The tellimation module now returns a 4-mode decision dict. This handler
 translates the decision into WebSocket messages for the client.
+
+Also provides execute_invocation_array() which iterates through a structured
+InvocationArray and plays each animation with appropriate delays.
 """
 
 from __future__ import annotations
@@ -12,12 +15,15 @@ from __future__ import annotations
 import asyncio
 import logging
 import time
-from typing import Any, Dict, Optional, Protocol
+from typing import Any, Dict, List, Optional, Protocol
 
 from google import genai
 from google.genai import types
 
-from src.interaction.tellimation import generate_tellimation
+from config.misl import ANIMATION_ID_TO_TEMPLATE
+from src.interaction.tellimation import generate_invocation_array, generate_tellimation
+from src.models.assessment import Discrepancy
+from src.models.invocation import AnimationInvocation, InvocationArray
 from src.models.scene import SceneManifest
 from src.models.student_profile import AnimationDecision, StudentProfile
 from src.narration.voice_guidance import text_to_speech
@@ -78,7 +84,7 @@ async def generate_oral_guidance(
             contents=prompt,
             config=types.GenerateContentConfig(
                 thinking_config=types.ThinkingConfig(thinking_budget=256),
-                temperature=0.7,
+                temperature=1.0,
             ),
         ),
         timeout=_ORAL_GUIDANCE_TIMEOUT,
@@ -160,6 +166,11 @@ async def execute_animation(
     Returns the decision dict on success (for deferred voice tracking),
     or None on failure.
     """
+    # Study control condition: skip animations
+    if getattr(session, "study_animations_enabled", None) is False:
+        logger.info("[study-control] Skipping animation for %s (control condition)", target_id)
+        return None
+
     try:
         decision = await generate_tellimation(
             api_key=session.api_key,
@@ -262,6 +273,91 @@ async def execute_animation(
 
 
 # ---------------------------------------------------------------------------
+# Invocation array execution
+# ---------------------------------------------------------------------------
+
+_INTER_ANIMATION_DELAY_MS = 500
+
+
+async def execute_invocation_array(
+    session: Any,  # SessionState
+    ws: WSProtocol,
+    discrepancies: List[Discrepancy],
+) -> Optional[Dict[str, Any]]:
+    """Generate and execute a full invocation array from discrepancies.
+
+    Calls generate_invocation_array() to get the structured sequence,
+    then iterates through it, playing each animation with delays.
+
+    Returns the first animation's decision dict (for pending animation
+    tracking / voice escalation), or None on failure.
+    """
+    # Study control condition: skip animations but log that we would have animated
+    if getattr(session, "study_animations_enabled", None) is False:
+        logger.info("[study-control] Skipping animation for %d discrepancies (control condition)",
+                     len(discrepancies))
+        return None
+
+    try:
+        invocation = await generate_invocation_array(
+            api_key=session.api_key,
+            sprite_code=(
+                session.current_scene.get("sprite_code", {})
+                if session.current_scene else {}
+            ),
+            manifest=session.current_manifest,
+            student_profile=session.student_profile,
+            discrepancies=discrepancies,
+        )
+    except Exception:
+        logger.warning("[animation] Invocation array generation failed")
+        return None
+
+    if not invocation.sequence:
+        logger.info("[animation] Empty invocation array, nothing to play")
+        return None
+
+    first_decision = None
+
+    for i, item in enumerate(invocation.sequence):
+        target_id = item.targets[0] if item.targets else ""
+        if not target_id:
+            continue
+
+        # Determine MISL element from the animation ID
+        misl_element = "character"
+        # Find the matching discrepancy for context
+        for disc in discrepancies:
+            if disc.target_entities and disc.target_entities[0] == target_id:
+                if disc.misl_elements:
+                    misl_element = disc.misl_elements[0]
+                break
+
+        # Use execute_animation for each item to get full decision + tracking
+        decision = await execute_animation(
+            session=session,
+            ws=ws,
+            target_id=target_id,
+            misl_element=misl_element,
+        )
+
+        if i == 0:
+            first_decision = decision
+
+        # Delay between animations (except after the last one)
+        if i < len(invocation.sequence) - 1:
+            await asyncio.sleep(_INTER_ANIMATION_DELAY_MS / 1000)
+
+    # Send the invocation array structure to the client for reference
+    await ws.send_json({
+        "type": "invocation_array",
+        "sequence": [inv.model_dump() for inv in invocation.sequence],
+    })
+
+    return first_decision
+
+
+# ---------------------------------------------------------------------------
 # Voice (TTS)
 # ---------------------------------------------------------------------------
 
@@ -271,6 +367,11 @@ async def send_voice(
     text: str,
 ) -> None:
     """Generate TTS audio and send to client (serialized via voice lock)."""
+    # Study mode: skip ALL voice output (system never speaks)
+    if getattr(session, "study_animations_enabled", None) is not None:
+        logger.info("[study] Skipping voice: %s", text[:80])
+        return
+
     async with session._voice_lock:
         try:
             audio_bytes = await text_to_speech(

@@ -1,0 +1,26 @@
+{
+  "id": "T1",
+  "name": "Flashback",
+  "category": "Time",
+  "mode": "both",
+  "scaffolding_intent": "Applies an old-film desaturation effect to signal past tense, scaffolding temporal language",
+  "misl_elements": ["T"],
+  "target_type": "scene",
+  "parameters": [
+    {
+      "name": "flickerIntensity",
+      "type": "float",
+      "range": [0, 1],
+      "default": 0.08,
+      "description": "Brightness flicker amplitude (projector effect)"
+    },
+    {
+      "name": "scratchCount",
+      "type": "int",
+      "range": [0, 5],
+      "default": 3,
+      "description": "Max number of vertical scratch lines per frame"
+    }
+  ],
+  "code_template": "flashback({target}, {flickerIntensity}, {scratchCount})"
+}

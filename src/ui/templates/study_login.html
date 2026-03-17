@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tellimations Study</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="falling-pixels-bg" id="falling-pixels"></div>
+  <div class="login-wrapper">
+    <div class="login-card">
+      <div class="login-logo">
+        <span class="t2">Tell</span><span class="t3">imations</span>
+      </div>
+      <div class="login-sub">User Study</div>
+
+      <div class="field">
+        <label for="participant-number">Participant Number</label>
+        <input type="number" id="participant-number" placeholder="1 - 12" min="1" max="12" autocomplete="off">
+      </div>
+      <div class="login-btn-wrap">
+        <button class="btn btn-red" id="btn-ok">Enter</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    const btnOk = document.getElementById('btn-ok');
+    const numInput = document.getElementById('participant-number');
+
+    async function proceed() {
+      const num = parseInt(numInput.value, 10);
+      if (!num || num < 1 || num > 12) { numInput.focus(); return; }
+
+      btnOk.disabled = true;
+      try {
+        const resp = await fetch('/api/study/validate', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({number: num})
+        });
+        if (!resp.ok) {
+          alert('Invalid number. Please enter a number between 1 and 12.');
+          numInput.select();
+          return;
+        }
+        sessionStorage.setItem('participant_number', String(num));
+        window.location.href = '/study/landing';
+      } finally {
+        btnOk.disabled = false;
+      }
+    }
+
+    btnOk.addEventListener('click', proceed);
+    numInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') proceed();
+    });
+  </script>
+  <script>
+    // Falling pixels animation in margins
+    const colors = ['#DB0038', '#F7C200', '#519DD9', '#53BAC1', '#EDEDED'];
+    const pixelsContainer = document.getElementById('falling-pixels');
+    let activePixels = 0;
+    const maxPixels = 8;
+
+    function createPixel() {
+      if (activePixels >= maxPixels) return;
+      const pixel = document.createElement('div');
+      pixel.className = 'falling-pixel';
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      pixel.style.backgroundColor = color;
+      const side = Math.random() < 0.5 ? 'left' : 'right';
+      const x = side === 'left' ? Math.random() * 40 : 100 - Math.random() * 40;
+      pixel.style.left = x + '%';
+      pixel.style.top = '-20px';
+      const duration = 3 + Math.random() * 3;
+      pixel.style.animation = `fall ${duration}s linear forwards`;
+      pixelsContainer.appendChild(pixel);
+      activePixels++;
+      setTimeout(() => { pixel.remove(); activePixels--; }, duration * 1000);
+    }
+    setInterval(createPixel, 600);
+  </script>
+</body>
+</html>

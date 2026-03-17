@@ -1,0 +1,26 @@
+{
+  "id": "D3",
+  "name": "Alert",
+  "category": "Discourse",
+  "mode": "both",
+  "scaffolding_intent": "Displays exclamation mark sprites above the entity, signaling an important event or reaction that should be narrated",
+  "misl_elements": ["IE", "IR"],
+  "target_type": "entity",
+  "parameters": [
+    {
+      "name": "markCount",
+      "type": "int",
+      "range": [1, 3],
+      "default": 3,
+      "description": "Number of exclamation marks"
+    },
+    {
+      "name": "color",
+      "type": "rgb",
+      "range": [0, 255],
+      "default": [255, 220, 30],
+      "description": "Fill color of the exclamation marks"
+    }
+  ],
+  "code_template": "alert({target}, {markCount}, {color})"
+}
