@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tellimations Study</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="story-container">
+    <!-- Scene label -->
+    <div class="story-scene-label">
+      <a href="/study/landing" class="home-link">Back</a>
+      <span class="label-sep">/</span>
+      <span id="story-name">Story</span>
+      <span class="label-sep">/</span>
+      Scene <span id="scene-num">1</span> of <span id="scene-total">5</span>
+    </div>
+
+    <!-- Main scene canvas -->
+    <div class="scene-canvas-wrapper">
+      <canvas id="scene-canvas"></canvas>
+    </div>
+
+    <!-- Transcription zone + Next Scene button side by side -->
+    <div class="study-controls-row">
+      <div class="transcription-box" id="transcription-box">
+        <span class="transcription-text" id="transcription-feedback"></span>
+        <span class="ptt-hint-inline" id="ptt-hint">Hold <kbd>Space</kbd> to speak</span>
+      </div>
+      <button class="btn btn-red" id="btn-next-scene">Next Scene</button>
+      <button class="btn btn-ghost" id="btn-finish-story" style="display:none">Finish Story</button>
+    </div>
+  </div>
+
+  <script src="/static/engine.js?v=2"></script>
+  <script src="/static/animation_helpers.js?v=2"></script>
+  <script src="/static/animation_templates.js?v=2"></script>
+  <script src="/static/animations.js?v=2"></script>
+  <script src="/static/narration.js?v=2"></script>
+  <script src="/static/study_story.js?v=6"></script>
+</body>
+</html>

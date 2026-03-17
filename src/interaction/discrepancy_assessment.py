@@ -1,8 +1,12 @@
 """Discrepancy assessment module.
 
-Single Gemini call per utterance: compares the child's speech against the
-scene manifest + MISL taxonomy to detect factual errors and identify MISL
-scaffolding opportunities.
+Two-pass Gemini assessment per utterance:
+  Pass 1 (Correction): detect factual errors in the child's utterance.
+  Pass 2 (Enrichment): identify MISL scaffolding opportunities.
+
+The orchestrator function assess_utterance() runs both passes sequentially
+and merges results into a single AssessmentResponse with a unified
+discrepancies list (corrections first, then suggestions).
 
 Model: Gemini 3 Flash (gemini-3-flash-preview)
 """
@@ -18,12 +22,19 @@ from google import genai
 from google.genai import types
 
 from config.misl import MACROSTRUCTURE, MICROSTRUCTURE
-from src.models.assessment import AssessmentResponse, FactualError, MISLOpportunity
+from src.models.assessment import (
+    AssessmentResponse,
+    Discrepancy,
+    FactualError,
+    MISLOpportunity,
+)
 from src.models.scene import SceneManifest
 from src.models.student_profile import MISLDifficultyProfile
 from src.generation.prompts.assessment_prompt import (
-    ASSESSMENT_SYSTEM_PROMPT,
-    ASSESSMENT_USER_PROMPT_TEMPLATE,
+    CORRECTION_SYSTEM_PROMPT,
+    CORRECTION_USER_PROMPT_TEMPLATE,
+    ENRICHMENT_SYSTEM_PROMPT,
+    ENRICHMENT_USER_PROMPT_TEMPLATE,
 )
 from src.generation.utils import (
     extract_json as _extract_json,
@@ -56,71 +67,35 @@ def _build_misl_taxonomy() -> str:
     return "\n".join(lines)
 
 
-async def assess_utterance(
-    api_key: str,
+def _build_names_text(
     manifest: SceneManifest,
-    utterance_text: str,
-    story_so_far: List[str],
-    misl_already_suggested: List[str],
-    misl_difficulty_profile: MISLDifficultyProfile,
-    character_names: Optional[Dict[str, str]] = None,
-) -> AssessmentResponse:
-    """Assess a child's utterance against the scene manifest and MISL taxonomy.
-
-    Single Gemini call that checks for factual errors and identifies MISL
-    opportunities for scaffolding.
-
-    Args:
-        api_key: Gemini API key.
-        manifest: The current scene's manifest.
-        utterance_text: The transcribed child utterance.
-        story_so_far: List of accepted utterance texts in this scene.
-        misl_already_suggested: MISL dimensions already prompted this scene.
-        misl_difficulty_profile: Persistent MISL difficulty data.
-
-    Returns:
-        AssessmentResponse with factual errors and/or MISL opportunities.
-    """
-    client = genai.Client(api_key=api_key)
-
-    # Build user prompt
-    manifest_json = json.dumps(manifest.model_dump(), indent=2)
-    misl_taxonomy = _build_misl_taxonomy()
-
-    if story_so_far:
-        story_text = "\n".join(
-            f'{i+1}. "{utt}"' for i, utt in enumerate(story_so_far)
-        )
-    else:
-        story_text = "(No accepted utterances yet — this is the first.)"
-
-    if misl_already_suggested:
-        suggested_text = ", ".join(misl_already_suggested)
-    else:
-        suggested_text = "(None yet.)"
-
-    difficulty_text = misl_difficulty_profile.to_prompt_context()
-
+    character_names: Optional[Dict[str, str]],
+) -> str:
     if character_names:
         names_lines = []
         for eid, name in character_names.items():
             ent = manifest.get_entity(eid)
             etype = ent.type if ent else eid
-            names_lines.append(f"- {eid} is named \"{name}\" (type: {etype})")
-        names_text = "\n".join(names_lines)
-    else:
-        names_text = "(No character names given yet.)"
+            names_lines.append(f'- {eid} is named "{name}" (type: {etype})')
+        return "\n".join(names_lines)
+    return "(No character names given yet.)"
 
-    user_prompt = ASSESSMENT_USER_PROMPT_TEMPLATE.format(
-        manifest_json=manifest_json,
-        misl_taxonomy=misl_taxonomy,
-        utterance_text=utterance_text,
-        story_so_far=story_text,
-        misl_already_suggested=suggested_text,
-        misl_difficulty_profile=difficulty_text,
-        character_names=names_text,
-    )
 
+def _build_story_text(story_so_far: List[str]) -> str:
+    if story_so_far:
+        return "\n".join(
+            f'{i+1}. "{utt}"' for i, utt in enumerate(story_so_far)
+        )
+    return "(No accepted utterances yet — this is the first.)"
+
+
+async def _gemini_call(
+    client: genai.Client,
+    system_prompt: str,
+    user_prompt: str,
+    thinking_budget: int = 512,
+) -> Dict:
+    """Make a single Gemini call with retries. Returns parsed JSON dict."""
     last_exc: Optional[Exception] = None
 
     for attempt in range(1, MAX_RETRIES + 1):
@@ -130,59 +105,17 @@ async def assess_utterance(
                     model=MODEL_ID,
                     contents=user_prompt,
                     config=types.GenerateContentConfig(
-                        system_instruction=ASSESSMENT_SYSTEM_PROMPT,
-                        thinking_config=types.ThinkingConfig(thinking_budget=512),
-                        temperature=0.7,
+                        system_instruction=system_prompt,
+                        thinking_config=types.ThinkingConfig(
+                            thinking_budget=thinking_budget
+                        ),
+                        temperature=1.0,
                         response_mime_type="application/json",
                     ),
                 ),
                 timeout=ASSESSMENT_TIMEOUT,
             )
-
-            data = _extract_json(_get_response_text(response))
-
-            # Parse factual errors
-            raw_errors = data.get("factual_errors", [])
-            factual_errors = []
-            if isinstance(raw_errors, list):
-                for item in raw_errors:
-                    if isinstance(item, dict):
-                        factual_errors.append(FactualError(
-                            utterance_fragment=item.get("utterance_fragment", ""),
-                            manifest_ref=item.get("manifest_ref", ""),
-                            explanation=item.get("explanation", ""),
-                        ))
-
-            # Parse MISL opportunities
-            raw_opps = data.get("misl_opportunities", [])
-            misl_opportunities = []
-            if isinstance(raw_opps, list):
-                for item in raw_opps:
-                    if isinstance(item, dict):
-                        misl_opportunities.append(MISLOpportunity(
-                            dimension=item.get("dimension", ""),
-                            manifest_elements=item.get("manifest_elements", []),
-                            suggestion=item.get("suggestion", ""),
-                        ))
-
-            acceptable = data.get("utterance_is_acceptable", True)
-            if not isinstance(acceptable, bool):
-                acceptable = True
-
-            result = AssessmentResponse(
-                factual_errors=factual_errors,
-                misl_opportunities=misl_opportunities,
-                utterance_is_acceptable=acceptable,
-            )
-
-            logger.info(
-                "[assessment] errors=%d opportunities=%d acceptable=%s",
-                len(factual_errors),
-                len(misl_opportunities),
-                acceptable,
-            )
-
-            return result
+            return _extract_json(_get_response_text(response))
 
         except asyncio.TimeoutError:
             logger.warning(
@@ -199,9 +132,223 @@ async def assess_utterance(
             )
             last_exc = exc
 
-    # All retries exhausted — return a safe fallback (accept the utterance)
-    logger.error(
-        "[assessment] All %d attempts failed, accepting utterance by default",
-        MAX_RETRIES,
+    raise last_exc or RuntimeError("All assessment retries exhausted")
+
+
+# ---------------------------------------------------------------------------
+# Pass 1: Correction
+# ---------------------------------------------------------------------------
+
+async def assess_corrections(
+    api_key: str,
+    manifest: SceneManifest,
+    utterance_text: str,
+    story_so_far: List[str],
+    character_names: Optional[Dict[str, str]] = None,
+) -> List[Discrepancy]:
+    """Pass 1: Detect factual errors in the child's utterance.
+
+    Returns a list of Discrepancy objects with pass_type="correction".
+    """
+    client = genai.Client(api_key=api_key)
+
+    manifest_json = json.dumps(manifest.model_dump(), indent=2)
+    story_text = _build_story_text(story_so_far)
+    names_text = _build_names_text(manifest, character_names)
+
+    user_prompt = CORRECTION_USER_PROMPT_TEMPLATE.format(
+        manifest_json=manifest_json,
+        utterance_text=utterance_text,
+        story_so_far=story_text,
+        character_names=names_text,
     )
-    return AssessmentResponse(utterance_is_acceptable=True)
+
+    data = await _gemini_call(client, CORRECTION_SYSTEM_PROMPT, user_prompt)
+
+    discrepancies: List[Discrepancy] = []
+    raw_items = data.get("discrepancies", [])
+    if isinstance(raw_items, list):
+        for item in raw_items:
+            if isinstance(item, dict):
+                discrepancies.append(Discrepancy(
+                    pass_type="correction",
+                    type=item.get("type", "Identity"),
+                    target_entities=item.get("target_entities", []),
+                    misl_elements=item.get("misl_elements", []),
+                    description=item.get("description", ""),
+                ))
+
+    logger.info("[assessment:correction] Found %d correction discrepancies",
+                len(discrepancies))
+    return discrepancies
+
+
+# ---------------------------------------------------------------------------
+# Pass 2: Enrichment
+# ---------------------------------------------------------------------------
+
+async def assess_enrichment(
+    api_key: str,
+    manifest: SceneManifest,
+    utterance_text: str,
+    story_so_far: List[str],
+    misl_already_suggested: List[str],
+    misl_difficulty_profile: MISLDifficultyProfile,
+    character_names: Optional[Dict[str, str]] = None,
+    correction_results: Optional[List[Discrepancy]] = None,
+) -> List[Discrepancy]:
+    """Pass 2: Identify MISL enrichment opportunities.
+
+    Returns a list of Discrepancy objects with pass_type="suggestion".
+    """
+    client = genai.Client(api_key=api_key)
+
+    manifest_json = json.dumps(manifest.model_dump(), indent=2)
+    misl_taxonomy = _build_misl_taxonomy()
+    story_text = _build_story_text(story_so_far)
+    names_text = _build_names_text(manifest, character_names)
+
+    suggested_text = (
+        ", ".join(misl_already_suggested) if misl_already_suggested
+        else "(None yet.)"
+    )
+    difficulty_text = misl_difficulty_profile.to_prompt_context()
+
+    if correction_results:
+        correction_text = json.dumps(
+            [d.model_dump() for d in correction_results], indent=2
+        )
+    else:
+        correction_text = "(No errors found in correction pass.)"
+
+    user_prompt = ENRICHMENT_USER_PROMPT_TEMPLATE.format(
+        manifest_json=manifest_json,
+        misl_taxonomy=misl_taxonomy,
+        utterance_text=utterance_text,
+        story_so_far=story_text,
+        misl_already_suggested=suggested_text,
+        misl_difficulty_profile=difficulty_text,
+        character_names=names_text,
+        correction_results=correction_text,
+    )
+
+    data = await _gemini_call(client, ENRICHMENT_SYSTEM_PROMPT, user_prompt)
+
+    discrepancies: List[Discrepancy] = []
+    raw_items = data.get("discrepancies", [])
+    if isinstance(raw_items, list):
+        for item in raw_items:
+            if isinstance(item, dict):
+                discrepancies.append(Discrepancy(
+                    pass_type="suggestion",
+                    type=item.get("type", "Discourse"),
+                    target_entities=item.get("target_entities", []),
+                    misl_elements=item.get("misl_elements", []),
+                    description=item.get("description", ""),
+                ))
+
+    logger.info("[assessment:enrichment] Found %d enrichment discrepancies",
+                len(discrepancies))
+    return discrepancies
+
+
+# ---------------------------------------------------------------------------
+# Orchestrator: two-pass assess_utterance
+# ---------------------------------------------------------------------------
+
+async def assess_utterance(
+    api_key: str,
+    manifest: SceneManifest,
+    utterance_text: str,
+    story_so_far: List[str],
+    misl_already_suggested: List[str],
+    misl_difficulty_profile: MISLDifficultyProfile,
+    character_names: Optional[Dict[str, str]] = None,
+) -> AssessmentResponse:
+    """Two-pass assessment of a child's utterance.
+
+    Pass 1: Detect factual errors (corrections).
+    Pass 2: Identify MISL scaffolding opportunities (enrichment).
+
+    Results are merged into a single AssessmentResponse with:
+    - discrepancies: unified list, corrections first then suggestions
+    - factual_errors: backward-compatible list from Pass 1
+    - misl_opportunities: backward-compatible list from Pass 2
+    - utterance_is_acceptable: False if corrections exist, True otherwise
+
+    Args:
+        api_key: Gemini API key.
+        manifest: The current scene's manifest.
+        utterance_text: The transcribed child utterance.
+        story_so_far: List of accepted utterance texts in this scene.
+        misl_already_suggested: MISL dimensions already prompted this scene.
+        misl_difficulty_profile: Persistent MISL difficulty data.
+        character_names: Map of entity_id → child-given name.
+
+    Returns:
+        AssessmentResponse with two-pass results.
+    """
+    # --- Pass 1: Correction ---
+    try:
+        corrections = await assess_corrections(
+            api_key=api_key,
+            manifest=manifest,
+            utterance_text=utterance_text,
+            story_so_far=story_so_far,
+            character_names=character_names,
+        )
+    except Exception as exc:
+        logger.error("[assessment] Correction pass failed: %s", exc)
+        corrections = []
+
+    # --- Pass 2: Enrichment ---
+    try:
+        suggestions = await assess_enrichment(
+            api_key=api_key,
+            manifest=manifest,
+            utterance_text=utterance_text,
+            story_so_far=story_so_far,
+            misl_already_suggested=misl_already_suggested,
+            misl_difficulty_profile=misl_difficulty_profile,
+            character_names=character_names,
+            correction_results=corrections,
+        )
+    except Exception as exc:
+        logger.error("[assessment] Enrichment pass failed: %s", exc)
+        suggestions = []
+
+    # --- Merge into unified discrepancies list (corrections first) ---
+    discrepancies = corrections + suggestions
+
+    # --- Build backward-compatible fields ---
+    factual_errors: List[FactualError] = []
+    for d in corrections:
+        factual_errors.append(FactualError(
+            utterance_fragment="",
+            manifest_ref=", ".join(d.target_entities),
+            explanation=d.description,
+        ))
+
+    misl_opportunities: List[MISLOpportunity] = []
+    for d in suggestions:
+        misl_opportunities.append(MISLOpportunity(
+            dimension=d.misl_elements[0] if d.misl_elements else d.type,
+            manifest_elements=d.target_entities,
+            suggestion=d.description,
+        ))
+
+    acceptable = len(corrections) == 0
+
+    result = AssessmentResponse(
+        factual_errors=factual_errors,
+        misl_opportunities=misl_opportunities,
+        discrepancies=discrepancies,
+        utterance_is_acceptable=acceptable,
+    )
+
+    logger.info(
+        "[assessment] corrections=%d suggestions=%d acceptable=%s",
+        len(corrections), len(suggestions), acceptable,
+    )
+
+    return result

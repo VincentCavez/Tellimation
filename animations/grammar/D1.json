@@ -1,0 +1,19 @@
+{
+  "id": "D1",
+  "name": "Speech Bubble",
+  "category": "Discourse",
+  "mode": "suggestion",
+  "scaffolding_intent": "Displays a pixelated speech bubble above the character, scaffolding dialogue and direct speech using linguistic verbs",
+  "misl_elements": ["L"],
+  "target_type": "entity",
+  "parameters": [
+    {
+      "name": "bubbleText",
+      "type": "string",
+      "range": [],
+      "default": "...",
+      "description": "Text to display inside the speech bubble"
+    }
+  ],
+  "code_template": "speech_bubble({target}, {bubbleText})"
+}

@@ -1,0 +1,19 @@
+{
+  "id": "R1",
+  "name": "Magnetism",
+  "category": "Relation",
+  "mode": "both",
+  "scaffolding_intent": "Two elements drift toward each other with sparkle particles, scaffolding coordinating conjunctions and co-mention",
+  "misl_elements": ["CC"],
+  "target_type": "entities",
+  "parameters": [
+    {
+      "name": "entityPrefixB",
+      "type": "string",
+      "range": [],
+      "default": "",
+      "description": "Entity ID of the second element (attracted toward)"
+    }
+  ],
+  "code_template": "magnetism({target}, {entityPrefixB})"
+}

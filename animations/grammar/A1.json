@@ -1,0 +1,33 @@
+{
+  "id": "A1",
+  "name": "Motion Lines",
+  "category": "Action",
+  "mode": "both",
+  "scaffolding_intent": "Shows directional speed streaks behind the entity to scaffold movement verbs and action descriptions",
+  "misl_elements": ["A", "IE"],
+  "target_type": "entity",
+  "parameters": [
+    {
+      "name": "direction",
+      "type": "enum",
+      "range": ["left", "right", "any"],
+      "default": "any",
+      "description": "Direction of motion lines"
+    },
+    {
+      "name": "lineLength",
+      "type": "int",
+      "range": [10, 30],
+      "default": 20,
+      "description": "Length of each motion line in pixels"
+    },
+    {
+      "name": "amplitude",
+      "type": "int",
+      "range": [5, 15],
+      "default": 10,
+      "description": "Vertical wave amplitude"
+    }
+  ],
+  "code_template": "motion_lines({target}, {direction}, {lineLength}, {amplitude})"
+}

@@ -1,0 +1,26 @@
+{
+  "id": "R2",
+  "name": "Repel",
+  "category": "Relation",
+  "mode": "both",
+  "scaffolding_intent": "Two elements push apart like same-polarity magnets, scaffolding incorrect grouping or contrastive conjunctions",
+  "misl_elements": ["CC"],
+  "target_type": "entities",
+  "parameters": [
+    {
+      "name": "entityPrefixB",
+      "type": "string",
+      "range": [],
+      "default": "",
+      "description": "Entity ID of the second element (repelled from)"
+    },
+    {
+      "name": "repelPixels",
+      "type": "int",
+      "range": [5, 40],
+      "default": 20,
+      "description": "Maximum repulsion distance in pixels"
+    }
+  ],
+  "code_template": "repel({target}, {entityPrefixB}, {repelPixels})"
+}
