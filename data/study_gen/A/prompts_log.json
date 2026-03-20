@@ -1,0 +1,20 @@
+[
+  {
+    "scene": 1,
+    "type": "background",
+    "prompt": "Create a BACKGROUND ONLY illustration \u2014 no characters, no objects, no entities. Just the environment and atmosphere. Clean children's illustration style.\n\n## Scene environment\nA warm, sun-drenched kitchen interior in a cozy cottage. The walls are painted a soft creamy yellow with warm terracotta tiles on the floor. A large wooden counter sits in the center-left area. Wooden shelves with colorful jars and bowls line the back wall. A window with white lace curtains lets in bright afternoon sunlight, casting warm golden rays across the room. The atmosphere is inviting and homey, with soft warm lighting throughout. No people, no animals, no characters, no objects on surfaces.\n\n## Style Guidelines \u2014 CRITICAL\n- **Clean children's illustration style**: smooth gradients, clear shapes,   warm and friendly. Suitable for ages 7-11.\n- **Flat side-view** (like a 2D storybook): no perspective.\n- **The ground or floor surface MUST be clearly visible** at approximately   70% from the top of the image.\n- **Rich details**: atmospheric gradients, clouds, distant elements, textures.\n- **NO characters or objects** \u2014 purely the background environment.\n- **NO text, labels, numbers, coordinates, or writing of any kind** in the image.\n- **Warm, friendly, child-appropriate** feel.\n",
+    "success": true
+  },
+  {
+    "scene": 1,
+    "type": "full_scene",
+    "prompt": "Create a complete scene illustration with all characters and objects. Clean children's illustration style.\n\n## Scene\nA warm, sun-drenched kitchen interior. A boy with curly brown hair stands beside an elderly grandmother in a sage green apron. They are placing fresh golden-brown cookies onto a bright red wagon near a wooden table. A small brown dog with floppy ears watches from under the oak table. Afternoon sunlight streams through a window with white lace curtains. Warm, cozy atmosphere with terracotta tiles and creamy yellow walls. Clean children's illustration style, flat side-view like a 2D storybook. Warm and friendly, suitable for ages 7-11.\n\n## Style Guidelines \u2014 CRITICAL\n- **Clean children's illustration style**: smooth gradients, clear shapes,   warm and friendly. Suitable for ages 7-11.\n- **Flat side-view** (like a 2D storybook): no perspective.\n- **The ground or floor surface MUST be clearly visible** at approximately   70% from the top of the image.\n- **Rich details**: atmospheric gradients, clear character features, expressive poses.\n- **Characters must be clearly visible and distinct**: each character should be   easy to identify and separate from the background.\n- **NO text, labels, numbers, coordinates, or writing of any kind** in the image.\n- **Warm, friendly, child-appropriate** feel.\n- **NO ANTHROPOMORPHISM** for non-living objects: tables, wagons, and objects   must NOT have faces, eyes, or human expressions.\n\n## Reference Images (CRITICAL)\nThe attached images are reference sheets for this scene.\n- The FIRST image is the background environment. You MUST use the same environment, colors, lighting, and composition as this background, then add the characters and objects on top of it.\n- The remaining images are character reference sheets. You MUST draw the characters matching the visual style, colors, proportions, and distinctive features shown in these references.\nMaintain consistency \u2014 the background and characters should look the same across all scenes.\n",
+    "success": true,
+    "ref_images_used": [
+      "boy",
+      "grandmother",
+      "dog",
+      "wagon"
+    ]
+  }
+]
