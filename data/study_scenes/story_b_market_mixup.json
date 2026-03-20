@@ -93,8 +93,8 @@
       "title": "The Trick",
       "background_prompt": "The same narrow lane, with a barrel on the ground below the low rooftop. No people, no animals.",
       "full_scene_prompt": "A narrow lane. The boy's mother places a banana on a barrel below a low rooftop. A sneaky brown monkey is climbing slowly down from the rooftop, reaching for the banana. The big bag is falling from the monkey's hand. The boy in the blue cap watches from behind his mother.",
-      "entities_in_scene": ["boy", "mother", "monkey"],
-      "key_objects": ["banana", "barrel", "big bag", "rooftop"],
+      "entities_in_scene": ["boy","banana", "mother", "monkey","bag"],
+      "key_objects": ["banana", "barrel", "big bag", "rooftop","bag"],
       "misl_targets": {
         "macro": {
           "CH": ["boy", "mother", "monkey"],

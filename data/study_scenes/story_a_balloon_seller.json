@@ -40,7 +40,7 @@
       "title": "The Walk",
       "background_prompt": "A path along a lake in a park, trees on one side, calm water on the other. Sunny day. No people, no animals.",
       "full_scene_prompt": "A path along a lake in a park. A shy boy with round glasses walks proudly, holding a big yellow balloon by its string tightly. A tiny white bird has landed on the balloon and is pecking at it. The boy shoos the bird gently with his other hand. Calm lake and trees in the background.",
-      "entities_in_scene": ["boy", "bird", "balloon"],
+      "entities_in_scene": ["boy", "balloon", "bird"],
       "key_objects": ["yellow balloon", "balloon string", "lake", "path"],
       "misl_targets": {
         "macro": {

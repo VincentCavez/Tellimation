@@ -2,8 +2,8 @@
   "story_id": "C",
   "title": "The Night Garden",
   "characters": {
-    "boy": "a boy in striped pajamas with a small flashlight",
-    "sister": "his older sister with a green scarf",
+    "girl": "a girl in striped pajamas with a small flashlight",
+    "sister": "her older sister with a green scarf",
     "firefly": "a large glowing firefly"
   },
   "scenes": [
@@ -11,17 +11,17 @@
       "scene_number": 1,
       "title": "The Light",
       "background_prompt": "A child's bedroom at night, a bed with pillows, a small table beside it, a window showing darkness outside with a faint glow. Cozy room, dim lighting. No people, no animals.",
-      "full_scene_prompt": "A child's bedroom at night. A boy in striped pajamas stands by the window, holding a small flashlight he grabbed from the small table next to his bed. A strange glow is visible through the window outside. His older sister with a green scarf stands at the door, having just followed him. Dim room, nighttime.",
-      "entities_in_scene": ["boy", "sister"],
+      "full_scene_prompt": "A child's bedroom at night. A girl in striped pajamas stands by the window, holding a small flashlight he grabbed from the small table next to his bed. A strange glow is visible through the window outside. His older sister with a green scarf stands at the door, having just followed her. Dim room, nighttime.",
+      "entities_in_scene": ["girl", "sister"],
       "key_objects": ["bedroom window", "small flashlight", "small table", "strange glow"],
       "misl_targets": {
         "macro": {
-          "CH": ["boy in striped pajamas", "older sister with green scarf"],
+          "CH": ["girl in striped pajamas", "older sister with green scarf"],
           "S": ["bedroom", "nighttime"],
           "IE": ["strange glow through window"],
           "IR": null,
           "P": null,
-          "A": ["sees glow", "grabs flashlight", "sister hears him", "follows him down stairs"],
+          "A": ["sees glow", "grabs flashlight", "sister hears her", "follows her down stairs"],
           "CO": null
         },
         "micro": {
@@ -38,17 +38,17 @@
       "scene_number": 2,
       "title": "The Garden",
       "background_prompt": "A dark garden at night seen from a back door. Bushes, a path leading deeper into the garden, long shadows. Moonlight. No people, no animals.",
-      "full_scene_prompt": "A dark garden at night. A boy in striped pajamas shines a small flashlight ahead, making long shadows on the bushes. His older sister with a green scarf stands beside him near the back door. A large glowing firefly floats just ahead of them on the path, moving toward the back of the garden. Moonlight, dark sky.",
-      "entities_in_scene": ["boy", "sister", "firefly"],
+      "full_scene_prompt": "A dark garden at night. A girl in striped pajamas shines a small flashlight ahead, making long shadows on the bushes. Her older sister with a green scarf stands beside her near the back door. A large glowing firefly floats just ahead of them on the path, moving toward the back of the garden. Moonlight, dark sky.",
+      "entities_in_scene": ["girl", "sister", "firefly"],
       "key_objects": ["back door", "bushes", "long shadows", "garden path"],
       "misl_targets": {
         "macro": {
-          "CH": ["boy", "sister", "large glowing firefly"],
+          "CH": ["girl", "sister", "large glowing firefly"],
           "S": ["dark garden"],
           "IE": null,
           "IR": null,
           "P": null,
-          "A": ["step through back door", "flashlight makes shadows", "firefly floats ahead", "firefly moves toward back of garden", "boy whispers to sister"],
+          "A": ["step through back door", "flashlight makes shadows", "firefly floats ahead", "firefly moves toward back of garden", "girl whispers to sister"],
           "CO": null
         },
         "micro": {
@@ -65,17 +65,17 @@
       "scene_number": 3,
       "title": "The Path",
       "background_prompt": "A narrow path between thick bushes at night, a tree root across the path, a rusty metal gate barely visible at the end. Moonlight filtering through. No people, no animals.",
-      "full_scene_prompt": "A narrow path between thick bushes at night. The older sister with a green scarf has tripped on a root. The boy in striped pajamas helps her up. A green scarf lies on the ground. A large glowing firefly floats above a rusty gate at the end of the path, waiting. Moonlight.",
-      "entities_in_scene": ["boy", "sister", "firefly"],
+      "full_scene_prompt": "A narrow path between thick bushes at night. The older sister with a green scarf has tripped on a root. The girl in striped pajamas helps her up. A green scarf lies on the ground. A large glowing firefly floats above a rusty gate at the end of the path, waiting. Moonlight.",
+      "entities_in_scene": ["girl", "sister", "firefly"],
       "key_objects": ["narrow path", "thick bushes", "root", "green scarf", "rusty gate"],
       "misl_targets": {
         "macro": {
-          "CH": ["boy", "sister", "firefly"],
+          "CH": ["girl", "sister", "firefly"],
           "S": ["narrow path"],
           "IE": null,
           "IR": ["surprised by the gate"],
           "P": null,
-          "A": ["follow firefly", "sister trips on root", "drops scarf", "boy helps her up", "firefly waits", "firefly floats above gate"],
+          "A": ["follow firefly", "sister trips on root", "drops scarf", "girl helps her up", "firefly waits", "firefly floats above gate"],
           "CO": null
         },
         "micro": {
@@ -92,17 +92,17 @@
       "scene_number": 4,
       "title": "The Greenhouse",
       "background_prompt": "Inside an old greenhouse at night, cracked glass walls, vines growing on the frame, strange plants with big leaves, soft golden light filling the air. No people, no animals.",
-      "full_scene_prompt": "Inside an old greenhouse at night. Dozens of glowing fireflies fill the air with soft golden light. A boy in striped pajamas holds out his hand, and one large glowing firefly has landed on it. His older sister with a green scarf looks around in wonder. Cracked glass walls, vines, strange plants with big leaves growing everywhere.",
-      "entities_in_scene": ["boy", "sister", "firefly"],
+      "full_scene_prompt": "Inside an old greenhouse at night. Dozens of glowing fireflies fill the air with soft golden light. A girl in striped pajamas holds out his hand, and one large glowing firefly has landed on it. Her older sister with a green scarf looks around in wonder. Cracked glass walls, vines, strange plants with big leaves growing everywhere.",
+      "entities_in_scene": ["girl", "sister", "firefly"],
       "key_objects": ["old greenhouse", "cracked glass walls", "vines", "strange plants", "big leaves"],
       "misl_targets": {
         "macro": {
-          "CH": ["boy", "sister", "fireflies"],
+          "CH": ["girl", "sister", "fireflies"],
           "S": ["old greenhouse"],
           "IE": null,
           "IR": null,
           "P": null,
-          "A": ["push open gate", "find greenhouse", "fireflies fill the air", "firefly lands on boy's hand"],
+          "A": ["push open gate", "find greenhouse", "fireflies fill the air", "firefly lands on girl's hand"],
           "CO": null
         },
         "micro": {
@@ -119,17 +119,17 @@
       "scene_number": 5,
       "title": "The Secret",
       "background_prompt": "A child's bedroom at night, same as scene 1. A bed with a pillow, a small table, the window now showing a faint glow in the distance. Cozy, dim. No people, no animals.",
-      "full_scene_prompt": "A child's bedroom at night. A boy in striped pajamas sits on his bed drawing a map on paper. A pillow is lifted showing where he will hide the map. His older sister with a green scarf around her neck sits beside him, smiling. The green scarf is slightly dirty. The window shows a faint glow in the distance outside.",
-      "entities_in_scene": ["boy", "sister"],
+      "full_scene_prompt": "A child's bedroom at night. A girl in striped pajamas sits on her bed drawing a map on paper. A pillow is lifted showing where she will hide the map. Her older sister with a green scarf around her neck sits beside her, smiling. The green scarf is slightly dirty. The window shows a faint glow in the distance outside.",
+      "entities_in_scene": ["girl", "sister"],
       "key_objects": ["map", "pillow", "bed", "green scarf", "window"],
       "misl_targets": {
         "macro": {
-          "CH": ["boy", "sister"],
+          "CH": ["girl", "sister"],
           "S": ["back to bedroom"],
           "IE": null,
           "IR": null,
           "P": ["plan to come back tomorrow night"],
-          "A": ["sister picks up scarf", "close gate carefully", "boy draws map", "hides map under pillow", "they agree to return"],
+          "A": ["sister picks up scarf", "close gate carefully", "girl draws map", "hides map under pillow", "they agree to return"],
           "CO": ["secret discovered, plan to return"]
         },
         "micro": {

@@ -135,6 +135,13 @@
   // --- Render scene (matches main story.js pattern) ---
   function renderScene(scene) {
     currentSceneRef = scene;
+
+    // HD format: draw images directly on canvas, bypass pixel buffer
+    if (scene.format === 'hd') {
+      renderSceneHD(scene);
+      return;
+    }
+
     buf.clear();
 
     var spriteCode = scene.sprite_code || {};
@@ -201,6 +208,470 @@
       renderEntitiesAndFlush();
     }
   }
+
+  // --- HD entity contour data (precomputed at load time) ---
+  // hdEntityData[entityId] = { mask, contour, bounds, distField }
+  //   mask:      Uint8Array(W*H), 1 = entity pixel, 0 = transparent
+  //   contour:   Array of {x, y, idx} — border pixels (opaque with a transparent neighbor)
+  //   bounds:    {x1, y1, x2, y2} — bounding box
+  //   distField: Uint8Array(W*H), 0 = inside entity, 1..N = distance from contour, 255 = far
+  var hdEntityData = {};
+  window.hdEntityData = hdEntityData;
+
+  function computeEntityContour(entityId, img, w, h) {
+    // Draw entity image on offscreen canvas to read pixel data
+    var off = document.createElement('canvas');
+    off.width = w;
+    off.height = h;
+    var offCtx = off.getContext('2d');
+    offCtx.drawImage(img, 0, 0);
+    var imgData = offCtx.getImageData(0, 0, w, h);
+    var px = imgData.data;
+    var total = w * h;
+
+    // Build mask (1 = opaque pixel)
+    var mask = new Uint8Array(total);
+    var x1 = w, y1 = h, x2 = -1, y2 = -1;
+    for (var i = 0; i < total; i++) {
+      var a = px[i * 4 + 3];
+      if (a <= 10) continue; // fully transparent
+      var r = px[i * 4], g = px[i * 4 + 1], b = px[i * 4 + 2];
+      // Remove white halo: semi-transparent white-ish pixels from bg removal
+      if (a < 200 && r > 200 && g > 200 && b > 200) {
+        px[i * 4 + 3] = 0;
+        continue;
+      }
+      mask[i] = 1;
+      var mx = i % w, my = (i - mx) / w;
+      if (mx < x1) x1 = mx;
+      if (mx > x2) x2 = mx;
+      if (my < y1) y1 = my;
+      if (my > y2) y2 = my;
+    }
+
+    // Find contour: opaque pixels with at least one transparent 4-neighbor
+    var contour = [];
+    for (var i = 0; i < total; i++) {
+      if (!mask[i]) continue;
+      var cx = i % w, cy = (i - cx) / w;
+      if ((cx > 0     && !mask[i - 1]) ||
+          (cx < w - 1 && !mask[i + 1]) ||
+          (cy > 0     && !mask[i - w]) ||
+          (cy < h - 1 && !mask[i + w])) {
+        contour.push({ x: cx, y: cy, idx: i });
+      }
+    }
+
+    // BFS distance field from contour outward (max 20px)
+    var maxDist = 20;
+    var distField = new Uint8Array(total);
+    distField.fill(255);
+    // Mark entity pixels as 0
+    for (var i = 0; i < total; i++) {
+      if (mask[i]) distField[i] = 0;
+    }
+    // Seed BFS from contour neighbors
+    var queue = [];
+    for (var c = 0; c < contour.length; c++) {
+      var ci = contour[c].idx;
+      var cx = ci % w, cy = (ci - cx) / w;
+      if (cx > 0     && distField[ci - 1] === 255) { distField[ci - 1] = 1; queue.push(ci - 1); }
+      if (cx < w - 1 && distField[ci + 1] === 255) { distField[ci + 1] = 1; queue.push(ci + 1); }
+      if (cy > 0     && distField[ci - w] === 255) { distField[ci - w] = 1; queue.push(ci - w); }
+      if (cy < h - 1 && distField[ci + w] === 255) { distField[ci + w] = 1; queue.push(ci + w); }
+    }
+    var dist = 1;
+    while (queue.length > 0 && dist < maxDist) {
+      dist++;
+      var next = [];
+      for (var q = 0; q < queue.length; q++) {
+        var ci = queue[q];
+        var cx = ci % w, cy = (ci - cx) / w;
+        if (cx > 0     && distField[ci - 1] === 255) { distField[ci - 1] = dist; next.push(ci - 1); }
+        if (cx < w - 1 && distField[ci + 1] === 255) { distField[ci + 1] = dist; next.push(ci + 1); }
+        if (cy > 0     && distField[ci - w] === 255) { distField[ci - w] = dist; next.push(ci - w); }
+        if (cy < h - 1 && distField[ci + w] === 255) { distField[ci + w] = dist; next.push(ci + w); }
+      }
+      queue = next;
+    }
+
+    // Write back cleaned image (white halo pixels zeroed out)
+    offCtx.putImageData(imgData, 0, 0);
+
+    hdEntityData[entityId] = {
+      mask: mask,
+      contour: contour,
+      bounds: { x1: x1, y1: y1, x2: x2, y2: y2 },
+      distField: distField,
+      width: w,
+      height: h,
+      cleanCanvas: off,
+    };
+  }
+
+  // --- Capture bg-only pixels at half resolution (before entities are drawn) ---
+  var HD_SCALE = 2; // downscale factor: full_res / HD_SCALE = animation buffer
+  function captureBgPixels(fullW, fullH) {
+    var aw = Math.ceil(fullW / HD_SCALE);
+    var ah = Math.ceil(fullH / HD_SCALE);
+    var off = document.createElement('canvas');
+    off.width = aw;
+    off.height = ah;
+    var offCtx = off.getContext('2d');
+    offCtx.imageSmoothingEnabled = true;
+    offCtx.drawImage(canvas, 0, 0, aw, ah);
+    return offCtx.getImageData(0, 0, aw, ah).data;
+  }
+
+  // --- Build PixelBuffer from HD canvas at half resolution ---
+  function buildHDPixelBuffer(fullW, fullH, bgPixels) {
+    var aw = Math.ceil(fullW / HD_SCALE); // animation buffer width
+    var ah = Math.ceil(fullH / HD_SCALE); // animation buffer height
+
+    // Downscale the canvas into an offscreen canvas
+    var off = document.createElement('canvas');
+    off.width = aw;
+    off.height = ah;
+    var offCtx = off.getContext('2d');
+    offCtx.imageSmoothingEnabled = true;
+    offCtx.drawImage(canvas, 0, 0, aw, ah);
+    var imgData = offCtx.getImageData(0, 0, aw, ah);
+    var px = imgData.data;
+    var total = aw * ah;
+
+    var hdBuf = new PixelBuffer(aw, ah);
+
+    // Fill pixel data
+    for (var i = 0; i < total; i++) {
+      var p = hdBuf.data[i];
+      p.r = px[i * 4];
+      p.g = px[i * 4 + 1];
+      p.b = px[i * 4 + 2];
+      p.e = 'bg';
+    }
+
+    // Downsample entity masks and stamp IDs
+    var entityIds = scene_entity_order || [];
+    var downMasks = {};
+    for (var ei = 0; ei < entityIds.length; ei++) {
+      var eid = entityIds[ei];
+      var ed = hdEntityData[eid];
+      if (!ed) continue;
+      var dm = new Uint8Array(total);
+      for (var y = 0; y < ah; y++) {
+        for (var x = 0; x < aw; x++) {
+          // Check if any pixel in the source 2×2 block is opaque
+          var sx = x * HD_SCALE, sy = y * HD_SCALE;
+          var hit = false;
+          for (var dy = 0; dy < HD_SCALE && !hit; dy++) {
+            for (var dx = 0; dx < HD_SCALE && !hit; dx++) {
+              var fi = (sy + dy) * fullW + (sx + dx);
+              if (fi < ed.mask.length && ed.mask[fi]) hit = true;
+            }
+          }
+          if (hit) {
+            var di = y * aw + x;
+            dm[di] = 1;
+            hdBuf.data[di].e = eid;
+          }
+        }
+      }
+      downMasks[eid] = dm;
+    }
+
+    // Compute distance fields at half resolution from downsampled masks
+    hdBuf.distFields = {};
+    for (var eid in downMasks) {
+      var mask = downMasks[eid];
+      var field = new Uint8Array(total);
+      field.fill(255);
+      for (var i = 0; i < total; i++) { if (mask[i]) field[i] = 0; }
+      // Find contour
+      var edgeQueue = [];
+      for (var i = 0; i < total; i++) {
+        if (field[i] !== 0) continue;
+        var cx = i % aw, cy = (i - cx) / aw;
+        if ((cx > 0      && field[i - 1]  !== 0) ||
+            (cx < aw - 1 && field[i + 1]  !== 0) ||
+            (cy > 0      && field[i - aw] !== 0) ||
+            (cy < ah - 1 && field[i + aw] !== 0)) {
+          edgeQueue.push(i);
+        }
+      }
+      // BFS
+      var queue = [];
+      for (var q = 0; q < edgeQueue.length; q++) {
+        var ci = edgeQueue[q], cx = ci % aw, cy = (ci - cx) / aw;
+        if (cx > 0      && field[ci - 1]  === 255) { field[ci - 1]  = 1; queue.push(ci - 1); }
+        if (cx < aw - 1 && field[ci + 1]  === 255) { field[ci + 1]  = 1; queue.push(ci + 1); }
+        if (cy > 0      && field[ci - aw] === 255) { field[ci - aw] = 1; queue.push(ci - aw); }
+        if (cy < ah - 1 && field[ci + aw] === 255) { field[ci + aw] = 1; queue.push(ci + aw); }
+      }
+      var dist = 1, maxDist = 20;
+      while (queue.length > 0 && dist < maxDist) {
+        dist++;
+        var next = [];
+        for (var q = 0; q < queue.length; q++) {
+          var ci = queue[q], cx = ci % aw, cy = (ci - cx) / aw;
+          if (cx > 0      && field[ci - 1]  === 255) { field[ci - 1]  = dist; next.push(ci - 1); }
+          if (cx < aw - 1 && field[ci + 1]  === 255) { field[ci + 1]  = dist; next.push(ci + 1); }
+          if (cy > 0      && field[ci - aw] === 255) { field[ci - aw] = dist; next.push(ci - aw); }
+          if (cy < ah - 1 && field[ci + aw] === 255) { field[ci + aw] = dist; next.push(ci + aw); }
+        }
+        queue = next;
+      }
+      hdBuf.distFields[eid] = field;
+    }
+    hdBuf.data._distFields = hdBuf.distFields;
+
+    // Build entityLayers — use each entity's own image (not the composited canvas)
+    // so that overlapping pixels get the correct per-entity colors
+    for (var ei = 0; ei < entityIds.length; ei++) {
+      var eid = entityIds[ei];
+      var dm = downMasks[eid];
+      var ed = window.hdEntityData && window.hdEntityData[eid];
+      if (!dm) continue;
+      var layer = [];
+      if (ed && ed.cleanCanvas) {
+        var entOff = document.createElement('canvas');
+        entOff.width = aw; entOff.height = ah;
+        var entCtx = entOff.getContext('2d');
+        entCtx.imageSmoothingEnabled = true;
+        entCtx.drawImage(ed.cleanCanvas, 0, 0, aw, ah);
+        var entPx = entCtx.getImageData(0, 0, aw, ah).data;
+        for (var i = 0; i < total; i++) {
+          if (dm[i]) {
+            var pi = i * 4;
+            var ea = entPx[pi + 3];
+            if (ea > 10) {
+              layer.push({ idx: i, r: entPx[pi], g: entPx[pi + 1], b: entPx[pi + 2], e: eid });
+            } else {
+              layer.push({ idx: i, r: hdBuf.data[i].r, g: hdBuf.data[i].g, b: hdBuf.data[i].b, e: eid });
+            }
+          }
+        }
+      } else {
+        for (var i = 0; i < total; i++) {
+          if (dm[i]) {
+            layer.push({ idx: i, r: hdBuf.data[i].r, g: hdBuf.data[i].g, b: hdBuf.data[i].b, e: eid });
+          }
+        }
+      }
+      hdBuf.entityLayers[eid] = layer;
+    }
+    hdBuf.data._entityLayers = hdBuf.entityLayers;
+
+    // Set background snapshot from bg-only pixels (without entities)
+    if (bgPixels) {
+      for (var i = 0; i < total; i++) {
+        var p = hdBuf.data[i];
+        p._br = bgPixels[i * 4];
+        p._bg = bgPixels[i * 4 + 1];
+        p._bb = bgPixels[i * 4 + 2];
+        p._be = 'bg';
+      }
+    } else {
+      hdBuf.snapshotBackground();
+    }
+
+    return hdBuf;
+  }
+
+  // --- HD Renderer (half-res buffer → full-res canvas via upscale) ---
+  var hdRenderer = null;
+
+  function createHDRenderer(fullW, fullH) {
+    var aw = Math.ceil(fullW / HD_SCALE);
+    var ah = Math.ceil(fullH / HD_SCALE);
+    // Offscreen canvas at buffer resolution for putImageData
+    var offCanvas = document.createElement('canvas');
+    offCanvas.width = aw;
+    offCanvas.height = ah;
+    var offCtx = offCanvas.getContext('2d');
+    var offImgData = offCtx.createImageData(aw, ah);
+
+    return {
+      canvas: canvas,
+      buf: null,
+      render: function() {
+        var b = this.buf;
+        if (!b) return;
+        var out = offImgData.data;
+        var n = aw * ah;
+        for (var i = 0; i < n; i++) {
+          var p = b.data[i];
+          out[i * 4]     = p.r;
+          out[i * 4 + 1] = p.g;
+          out[i * 4 + 2] = p.b;
+          out[i * 4 + 3] = 255;
+        }
+        offCtx.putImageData(offImgData, 0, 0);
+        // Upscale to main canvas
+        var mainCtx = canvas.getContext('2d');
+        mainCtx.imageSmoothingEnabled = true;
+        mainCtx.drawImage(offCanvas, 0, 0, fullW, fullH);
+      }
+    };
+  }
+
+  // Track entity draw order for the current scene
+  var scene_entity_order = [];
+
+  // --- HD scene rendering: draw images directly on canvas ---
+  function renderSceneHD(scene) {
+    var ctx = canvas.getContext('2d');
+
+    // Switch canvas from pixel-art to HD mode
+    canvas.classList.remove('pixel-art');
+    canvas.style.imageRendering = 'auto';
+
+    // Reset entity data for new scene
+    hdEntityData = {};
+    window.hdEntityData = hdEntityData;
+    scene_entity_order = (scene.entity_urls || []).map(function(e) { return e.id; });
+
+    var bgImg = new Image();
+    bgImg.onload = function() {
+      // Adapt canvas to image dimensions
+      var w = bgImg.width, h = bgImg.height;
+      canvas.width = w;
+      canvas.height = h;
+      ctx.imageSmoothingEnabled = true;
+      ctx.drawImage(bgImg, 0, 0);
+
+      // Capture bg-only pixels BEFORE drawing entities (for animation background snapshot)
+      var bgOnlyPixels = captureBgPixels(w, h);
+
+      // Overlay entity images (all same size as background, just superpose)
+      var entities = scene.entity_urls || [];
+      if (entities.length === 0) {
+        setupHDAnimations(w, h, bgOnlyPixels);
+        return;
+      }
+
+      // Load all entity images, then draw in order + compute contours
+      var images = new Array(entities.length);
+      var loaded = 0;
+      entities.forEach(function(ent, idx) {
+        var entImg = new Image();
+        entImg.onload = function() {
+          images[idx] = entImg;
+          // Precompute contour data from the raw entity image
+          computeEntityContour(ent.id, entImg, w, h);
+          loaded++;
+          if (loaded === entities.length) {
+            for (var i = 0; i < entities.length; i++) {
+              var ed = hdEntityData[entities[i].id];
+              ctx.drawImage(ed && ed.cleanCanvas ? ed.cleanCanvas : images[i], 0, 0);
+            }
+            // Build pixel buffer + animation runner for HD
+            setupHDAnimations(w, h, bgOnlyPixels);
+          }
+        };
+        entImg.onerror = function() {
+          console.warn('[renderSceneHD] Failed to load entity', ent.id, ent.url);
+          loaded++;
+          if (loaded === entities.length) {
+            for (var i = 0; i < entities.length; i++) {
+              var ed = hdEntityData[entities[i].id];
+              ctx.drawImage(ed && ed.cleanCanvas ? ed.cleanCanvas : images[i], 0, 0);
+            }
+            setupHDAnimations(w, h, bgOnlyPixels);
+          }
+        };
+        entImg.src = ent.url;
+      });
+    };
+    bgImg.onerror = function() {
+      console.error('[renderSceneHD] Failed to load background', scene.background_url);
+    };
+    bgImg.src = scene.background_url;
+  }
+
+  function setupHDAnimations(w, h, bgPixels) {
+    var aw = Math.ceil(w / HD_SCALE);
+    var ah = Math.ceil(h / HD_SCALE);
+    var hdBuf = buildHDPixelBuffer(w, h, bgPixels);
+    hdRenderer = createHDRenderer(w, h);
+    hdRenderer.buf = hdBuf;
+
+    // Rewire the animation runner to use HD buffer + renderer + 24fps
+    buf = hdBuf;
+    renderer = hdRenderer;
+    animRunner.buf = hdBuf;
+    animRunner.renderer = hdRenderer;
+    animRunner.frameInterval = 1000 / 24; // 24fps
+    window.animRunner = animRunner;
+
+    console.log('[HD] Animation buffer ready:', aw + 'x' + ah,
+      '(downscaled from ' + w + 'x' + h + ')',
+      'entities:', Object.keys(hdEntityData).join(', '));
+  }
+
+  // --- Test: play all 20 animations sequentially ---
+  var ALL_TEMPLATES = [
+    'spotlight', 'nametag', 'reveal', 'stamp',
+    'color_pop', 'emanation', 'flashback', 'timelapse',
+    'motion_lines', 'anticipation',
+    'magnetism', 'repel', 'causal_push',
+    'sequential_glow', 'disintegration', 'ghost_outline',
+    'speech_bubble', 'thought_bubble', 'alert', 'interjection'
+  ];
+  var SINGLE_ENTITY = [
+    'spotlight', 'nametag', 'stamp', 'color_pop', 'reveal',
+    'emanation', 'motion_lines', 'anticipation',
+    'disintegration', 'ghost_outline', 'speech_bubble', 'thought_bubble', 'alert', 'interjection'
+  ];
+  var TWO_ENTITY = ['magnetism', 'repel', 'causal_push'];
+  var SCENE_WIDE = ['timelapse', 'flashback'];
+  var MULTI_ENTITY = ['sequential_glow'];
+
+  var stopPlayAll = false;
+
+  window.playAllAnimations = async function() {
+    if (!animRunner || !animRunner.buf) {
+      console.error('Animation buffer not ready');
+      return;
+    }
+    var entities = scene_entity_order;
+    var entityA = entities[0] || '';
+    var entityB = entities.length > 1 ? entities[1] : entities[0] || '';
+    stopPlayAll = false;
+
+    console.log('--- Playing all 20 animations ---');
+    for (var i = 0; i < ALL_TEMPLATES.length; i++) {
+      if (stopPlayAll) { console.log('Stopped by user'); break; }
+      var name = ALL_TEMPLATES[i];
+      var params = {};
+
+      if (SINGLE_ENTITY.indexOf(name) >= 0) params.entityPrefix = entityA;
+      if (TWO_ENTITY.indexOf(name) >= 0) {
+        params.entityPrefixA = entityA;
+        params.entityPrefixB = entityB;
+      }
+      if (MULTI_ENTITY.indexOf(name) >= 0) params.entityPrefixes = entities;
+      if (SCENE_WIDE.indexOf(name) >= 0) params.isIndoor = false;
+      if (name === 'emanation') params.particleType = 'sparkle';
+      if (name === 'motion_lines') params.direction = 'right';
+      if (name === 'speech_bubble' || name === 'thought_bubble') params.text = 'Hello!';
+      if (name === 'interjection') params.word = 'Wow!';
+
+      var spec = { template: name, params: params };
+      console.log((i + 1) + '/20: ' + name);
+      try {
+        await animRunner.play(spec);
+      } catch (err) {
+        console.error(name + ' error:', err);
+      }
+      if (!stopPlayAll) await new Promise(function(r) { setTimeout(r, 500); });
+    }
+    console.log('--- All animations complete ---');
+  };
+
+  window.stopAnimations = function() {
+    stopPlayAll = true;
+    animRunner.stopLoop();
+  };
 
   // --- Handle WS messages ---
   function handleAnimation(msg) {

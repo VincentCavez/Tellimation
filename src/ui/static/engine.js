@@ -408,6 +408,7 @@ class Renderer {
     // Display canvas is SOURCE resolution; each art pixel = K×K block
     canvas.width = SOURCE_W;
     canvas.height = SOURCE_H;
+    canvas.classList.add('pixel-art');
     canvas.style.imageRendering = 'pixelated';
     canvas.style.imageRendering = 'crisp-edges';
 

@@ -69,13 +69,13 @@ AnimationTemplates.register('nametag', function(params) {
   // Extract entity type from prefix: "cat_01" → "CAT", "big_tree_01" → "BIG TREE"
   var entityType = prefix.replace(/_\d+$/, '').replace(/_/g, ' ').toUpperCase();
   // Pre-compute text width: each char is (_FONT_W + _FONT_SPACING) * scale, minus trailing space
-  var textScale = 1;
+  var textScale = 3;
   var charW = (_FONT_W + _FONT_SPACING) * textScale;
   var textW = entityType.length * charW - _FONT_SPACING;
   var textH = _FONT_H * textScale;
 
-  var labelPadX = 6, labelPadY = 5;
-  var labelW = Math.max(40, textW + labelPadX * 2);
+  var labelPadX = 18, labelPadY = 15;
+  var labelW = Math.max(120, textW + labelPadX * 2);
   var labelH = textH + labelPadY * 2;
 
   return function animate(buf, PW, PH, t) {
@@ -92,7 +92,7 @@ AnimationTemplates.register('nametag', function(params) {
     var holeOnLeft = offsetRight; // hole on the side facing the entity
 
     // Tag position: static, offset to the side, vertically at entity center
-    var tagGap = 8;
+    var tagGap = 24;
     var tagCenterY = Math.max(labelH / 2 + 2, Math.min(bounds.cy, PH - labelH / 2 - 2));
     var tagX; // top-left corner X of the tag
     if (offsetRight) {
@@ -103,7 +103,7 @@ AnimationTemplates.register('nametag', function(params) {
     var tagY = Math.round(tagCenterY - labelH / 2); // top-left corner Y
 
     // Hole: circle INSIDE the tag, next to the border, at mid-height
-    var holeRadius = 1;
+    var holeRadius = 3;
     var holeCenterLy = Math.round(labelH / 2); // local Y in tag coords
     var holeCenterLx = holeOnLeft ? (1 + holeRadius + 1) : (labelW - 2 - holeRadius); // 1px inside border
     var holeScreenX = tagX + holeCenterLx;
@@ -162,7 +162,7 @@ AnimationTemplates.register('nametag', function(params) {
         // Round corners: diagonal notch at each corner (Manhattan distance < 3)
         var cxDist = Math.min(lx, labelW - 1 - lx);
         var cyDist = Math.min(ly, labelH - 1 - ly);
-        if (cxDist + cyDist < 3) continue;
+        if (cxDist + cyDist < 9) continue;
 
         var di = drawY * PW + drawX;
         var isBorder = (ly === 0 || ly === labelH - 1 || lx === 0 || lx === labelW - 1);
@@ -232,7 +232,7 @@ AnimationTemplates.register('nametag', function(params) {
 // Phase 3 (0.833→1.0): crack lines radiate from all around the entity contour, then fade.
 AnimationTemplates.register('stamp', function(params) {
   var prefix = params.entityPrefix || '';
-  var maxLift = params.liftPixels || 22;
+  var maxLift = params.liftPixels || 44;
   var crackCount = params.crackCount != null ? params.crackCount : 12;
   // Diagonal direction: up-right (negative dy, positive dx)
   var liftDY = -maxLift;
@@ -335,12 +335,12 @@ AnimationTemplates.register('stamp', function(params) {
     }
     // Without layerData: prog===0 relies on buf.restore() which shows composite correctly
 
-    // ── Phase 3: cracks radiating from all around the entity contour ──
-    if (t > SNAP_END) {
+    // ── Phase 3: cracks (disabled for now) ──
+    if (false && t > SNAP_END) {
       var crackT = (t - SNAP_END) / (1 - SNAP_END); // 0→1
       var crackGrow = Math.min(1, crackT / 0.6);
       var crackFade = crackT < 0.6 ? 1.0 : 1.0 - (crackT - 0.6) / 0.4;
-      var maxCrackLen = 10;
+      var maxCrackLen = 20;
 
       // Cracks evenly spaced around the entity contour.
       // Ray-cast from center outward to find the actual entity edge per direction.
@@ -365,18 +365,39 @@ AnimationTemplates.register('stamp', function(params) {
           }
         }
         if (!foundEntity) continue; // no entity in this direction, skip crack
-        // Crack extends outward from the actual contour pixel
-        var crackLen = maxCrackLen - (ci % 3);
+        // Crack extends outward — thick and irregular
+        var crackLen = maxCrackLen - (ci % 5) * 2;
         var len = Math.round(crackLen * crackGrow);
-        var zig = (ci % 2 === 0) ? 1 : -1;
+        // Pseudo-random zigzag pattern per crack
+        var _cr = ci * 7919 + 1;
+        var zigDir = (ci % 2 === 0) ? 1 : -1;
+        var curX = cox, curY = coy;
         for (var cl = 1; cl <= len; cl++) {
-          var zOff = (cl % 3 === 0) ? zig : 0;
-          var cpx = Math.round(cox + cosA * cl + sinA * zOff);
-          var cpy = Math.round(coy + sinA * cl - cosA * zOff);
-          if (cpx >= 0 && cpx < PW && cpy >= 0 && cpy < PH) {
-            var cidx = cpy * PW + cpx;
-            var cv = Math.round(30 * crackFade);
-            buf[cidx].r = cv; buf[cidx].g = cv; buf[cidx].b = cv;
+          // Irregular zigzag: random deviation every 2-4 pixels
+          _cr = (_cr * 16807 + 3) % 2147483647;
+          var zigFreq = 2 + (_cr % 3);
+          var zOff = 0;
+          if (cl % zigFreq === 0) {
+            _cr = (_cr * 16807 + 3) % 2147483647;
+            zOff = zigDir * (1 + (_cr % 3));
+            _cr = (_cr * 16807 + 3) % 2147483647;
+            if (_cr % 3 === 0) zigDir = -zigDir; // occasionally flip direction
+          }
+          curX = Math.round(curX + cosA + sinA * zOff);
+          curY = Math.round(curY + sinA - cosA * zOff);
+          if (curX < 0 || curX >= PW || curY < 0 || curY >= PH) break;
+          // Draw thick crack (3-4px wide)
+          var cv = Math.round(30 * crackFade);
+          var thick = 1 + (cl % 3 === 0 ? 1 : 0); // varies 1-2px radius → 3-4px wide
+          for (var ty = -thick; ty <= thick; ty++) {
+            for (var tx = -thick; tx <= thick; tx++) {
+              if (tx * tx + ty * ty > thick * thick + 1) continue;
+              var cpx = curX + tx, cpy = curY + ty;
+              if (cpx >= 0 && cpx < PW && cpy >= 0 && cpy < PH) {
+                var cidx = cpy * PW + cpx;
+                buf[cidx].r = cv; buf[cidx].g = cv; buf[cidx].b = cv;
+              }
+            }
           }
         }
       }
@@ -471,6 +492,8 @@ AnimationTemplates.register('reveal', function(params) {
 // Sprite drawing function for emanation types
 function _drawEmanationSprite(buf, PW, PH, type, cx, cy, size, alpha) {
   if (alpha < 0.05) return;
+  // HD scale: all sprites ×3 with per-instance random variation
+  var hdSize = size * 3;
   var _blend = function(idx, r, g, b, a) {
     if (idx < 0 || idx >= buf.length) return;
     _blendPixel(buf, idx, r, g, b, a);
@@ -478,36 +501,62 @@ function _drawEmanationSprite(buf, PW, PH, type, cx, cy, size, alpha) {
   var px, py, idx;
 
   if (type === 'frost') {
-    // Icicle: tall narrow triangle pointing down, 4px wide × 12px tall at size=1
-    var iW = Math.round(4 * size), iH = Math.round(12 * size);
-    var half = Math.floor(iW / 2);
-    for (var dy = 0; dy < iH; dy++) {
-      // Width narrows from full at top to 1 at bottom
-      var rowHalf = Math.max(0, Math.round(half * (1 - dy / iH)));
-      for (var dx = -rowHalf; dx <= rowHalf; dx++) {
+    // Snowflake: 6-armed star with center dot
+    var arm = Math.round(5 * hdSize);
+    var thick = Math.max(1, Math.round(hdSize * 0.5));
+    // Center dot
+    for (var dy = -thick; dy <= thick; dy++) {
+      for (var dx = -thick; dx <= thick; dx++) {
+        if (dx * dx + dy * dy > (thick + 1) * (thick + 1)) continue;
         px = Math.round(cx + dx); py = Math.round(cy + dy);
-        if (px >= 0 && px < PW && py >= 0 && py < PH) {
-          idx = py * PW + px;
-          var bright = 1 - dy / iH * 0.3;  // lighter at tip
-          // Highlight pixel for reflet
-          var isReflet = (dx === -rowHalf + 1 && dy > 1 && dy < iH - 2);
-          if (isReflet) {
-            _blend(idx, 255, 255, 255, alpha * 0.8);
-          } else {
-            _blend(idx, Math.round(180 * bright), Math.round(220 * bright), 255, alpha);
+        if (px >= 0 && px < PW && py >= 0 && py < PH)
+          _blend(py * PW + px, 255, 255, 255, alpha);
+      }
+    }
+    // 6 arms at 60° intervals with small branches
+    for (var a = 0; a < 6; a++) {
+      var ang = a * Math.PI / 3;
+      var cosA = Math.cos(ang), sinA = Math.sin(ang);
+      for (var d = 1; d <= arm; d++) {
+        var armA = alpha * (1 - d / (arm + 1) * 0.4);
+        var ax = Math.round(cx + cosA * d), ay = Math.round(cy + sinA * d);
+        // Main arm pixel + thickness
+        for (var tw = -Math.max(0, thick - 1); tw <= Math.max(0, thick - 1); tw++) {
+          var tpx = ax + Math.round(-sinA * tw), tpy = ay + Math.round(cosA * tw);
+          if (tpx >= 0 && tpx < PW && tpy >= 0 && tpy < PH)
+            _blend(tpy * PW + tpx, 200, 230, 255, armA);
+        }
+        // Branch at ~40% and ~70% of arm length
+        if (d === Math.round(arm * 0.4) || d === Math.round(arm * 0.7)) {
+          var branchLen = Math.round((arm - d) * 0.6);
+          var brAng1 = ang + Math.PI / 6, brAng2 = ang - Math.PI / 6;
+          for (var bd = 1; bd <= branchLen; bd++) {
+            var ba = alpha * (1 - bd / (branchLen + 1) * 0.5);
+            var bx1 = Math.round(ax + Math.cos(brAng1) * bd);
+            var by1 = Math.round(ay + Math.sin(brAng1) * bd);
+            var bx2 = Math.round(ax + Math.cos(brAng2) * bd);
+            var by2 = Math.round(ay + Math.sin(brAng2) * bd);
+            if (bx1 >= 0 && bx1 < PW && by1 >= 0 && by1 < PH)
+              _blend(by1 * PW + bx1, 180, 220, 255, ba);
+            if (bx2 >= 0 && bx2 < PW && by2 >= 0 && by2 < PH)
+              _blend(by2 * PW + bx2, 180, 220, 255, ba);
           }
         }
       }
     }
   } else if (type === 'steam') {
-    // Vapor streak: wavy vertical column rising, 3px wide × 10px tall
-    var sH = Math.round(10 * size), sW = Math.round(3 * size);
+    // Tall wispy vapor column — gentle wide undulation
+    var sH = Math.round(18 * hdSize), sW = Math.round(3 * hdSize);
     for (var dy = 0; dy < sH; dy++) {
-      var waveOff = Math.round(Math.sin(dy * 0.8 + cx * 0.5) * 1.5 * size);
-      var rowAlpha = alpha * (1 - dy / sH * 0.6);  // fade toward top
-      for (var dx = 0; dx < sW; dx++) {
-        px = Math.round(cx + dx - sW / 2 + waveOff);
-        py = Math.round(cy - dy);  // rises upward
+      // Slow gentle wave (low frequency)
+      var waveOff = Math.round(Math.sin(dy * 0.15 + cx * 0.3) * 2.5 * hdSize);
+      // Width tapers toward top
+      var taper = 1 - dy / sH * 0.5;
+      var rowW = Math.max(1, Math.round(sW * taper));
+      var rowAlpha = alpha * (1 - dy / sH * 0.7);
+      for (var dx = 0; dx < rowW; dx++) {
+        px = Math.round(cx + dx - rowW / 2 + waveOff);
+        py = Math.round(cy - dy);
         if (px >= 0 && px < PW && py >= 0 && py < PH) {
           idx = py * PW + px;
           _blend(idx, 240, 240, 245, rowAlpha);
@@ -515,13 +564,10 @@ function _drawEmanationSprite(buf, PW, PH, type, cx, cy, size, alpha) {
       }
     }
   } else if (type === 'sparkle') {
-    // 4-pointed star: center + 4 cardinal arms + 4 diagonal stubs
-    var arm = Math.round(3 * size);
-    var diagArm = Math.round(2 * size);
-    // Center pixel
+    var arm = Math.round(5 * hdSize);
+    var diagArm = Math.round(3.5 * hdSize);
     px = Math.round(cx); py = Math.round(cy);
     if (px >= 0 && px < PW && py >= 0 && py < PH) _blend(py * PW + px, 255, 255, 255, alpha);
-    // Cardinal arms
     for (var d = 1; d <= arm; d++) {
       var armA = alpha * (1 - d / (arm + 1));
       var offsets = [[d, 0], [-d, 0], [0, d], [0, -d]];
@@ -530,7 +576,6 @@ function _drawEmanationSprite(buf, PW, PH, type, cx, cy, size, alpha) {
         if (px >= 0 && px < PW && py >= 0 && py < PH) _blend(py * PW + px, 255, 255, 180, armA);
       }
     }
-    // Diagonal stubs
     for (var d = 1; d <= diagArm; d++) {
       var diagA = alpha * (1 - d / (diagArm + 1)) * 0.6;
       var diags = [[d, d], [-d, d], [d, -d], [-d, -d]];
@@ -540,23 +585,68 @@ function _drawEmanationSprite(buf, PW, PH, type, cx, cy, size, alpha) {
       }
     }
   } else if (type === 'dust') {
-    // Dust cloud: fuzzy circle with noise — denser and larger
-    var rad = Math.round(4 * size);
-    for (var dy = -rad; dy <= rad; dy++) {
-      for (var dx = -rad; dx <= rad; dx++) {
-        var dist2 = dx * dx + dy * dy;
-        if (dist2 > rad * rad) continue;
-        // Pseudo-random skip for dusty look (skip 1/8 instead of 1/4)
-        if (((dx * 7 + dy * 13 + Math.round(cx)) & 7) === 0) continue;
-        var dist = Math.sqrt(dist2);
-        var falloff = 1 - dist / rad;
-        px = Math.round(cx + dx); py = Math.round(cy + dy);
-        if (px >= 0 && px < PW && py >= 0 && py < PH) {
-          idx = py * PW + px;
-          var cr = 180 + ((dx * 3 + dy * 7) & 15);
-          var cg = 165 + ((dx * 5 + dy * 11) & 15);
-          var cb = 130 + ((dx * 9 + dy * 3) & 15);
-          _blend(idx, cr, cg, cb, alpha * falloff);
+    // Small falling particles in varied brown tones
+    var numDots = Math.round(5 + hdSize * 2);
+    var spread = Math.round(3 * hdSize);
+    var _ds = Math.round(cx * 31 + cy * 17);
+    for (var di = 0; di < numDots; di++) {
+      _ds = (_ds * 16807 + 13) % 2147483647;
+      var ddx = (_ds % (spread * 2 + 1)) - spread;
+      _ds = (_ds * 16807 + 13) % 2147483647;
+      var ddy = (_ds % (spread * 2 + 1)) - spread;
+      _ds = (_ds * 16807 + 13) % 2147483647;
+      var dotR = 1 + (_ds % 2); // 1-2px radius
+      // Varied brown tones
+      _ds = (_ds * 16807 + 13) % 2147483647;
+      var brownIdx = _ds % 6;
+      var browns = [
+        [160, 120, 70],  // sandy
+        [130, 90, 50],   // medium brown
+        [100, 70, 40],   // dark brown
+        [180, 140, 90],  // light tan
+        [110, 80, 45],   // earth
+        [150, 105, 60],  // warm brown
+      ];
+      var bc = browns[brownIdx];
+      px = Math.round(cx + ddx); py = Math.round(cy + ddy);
+      for (var ry = -dotR; ry <= dotR; ry++) {
+        for (var rx = -dotR; rx <= dotR; rx++) {
+          if (rx * rx + ry * ry > dotR * dotR) continue;
+          var dpx = px + rx, dpy = py + ry;
+          if (dpx >= 0 && dpx < PW && dpy >= 0 && dpy < PH) {
+            _blend(dpy * PW + dpx, bc[0], bc[1], bc[2], alpha * 0.8);
+          }
+        }
+      }
+    }
+  } else if (type === 'heart') {
+    // Single heart — used standalone (not via emanation)
+    var heartMap = [
+      [0,1,1,0,1,1,0],
+      [1,1,1,1,1,1,1],
+      [1,1,1,1,1,1,1],
+      [0,1,1,1,1,1,0],
+      [0,0,1,1,1,0,0],
+      [0,0,0,1,0,0,0]
+    ];
+    var hScale = Math.max(2, Math.round(hdSize));
+    for (var hy = 0; hy < 6; hy++) {
+      for (var hx = 0; hx < 7; hx++) {
+        if (!heartMap[hy][hx]) continue;
+        for (var sy = 0; sy < hScale; sy++) {
+          for (var sx = 0; sx < hScale; sx++) {
+            px = Math.round(cx - 3 * hScale + hx * hScale + sx);
+            py = Math.round(cy - 3 * hScale + hy * hScale + sy);
+            if (px >= 0 && px < PW && py >= 0 && py < PH) {
+              idx = py * PW + px;
+              var isCenter = (hy >= 1 && hy <= 3 && hx >= 2 && hx <= 4);
+              if (isCenter) {
+                _blend(idx, 255, 120, 150, alpha);
+              } else {
+                _blend(idx, 230, 60, 100, alpha);
+              }
+            }
+          }
         }
       }
     }
@@ -570,7 +660,7 @@ function _drawEmanationSprite(buf, PW, PH, type, cx, cy, size, alpha) {
       [0,0,1,1,1,0,0],
       [0,0,0,1,0,0,0]
     ];
-    var hScale = Math.max(1, Math.round(size));
+    var hScale = Math.max(2, Math.round(hdSize));
     for (var hy = 0; hy < 6; hy++) {
       for (var hx = 0; hx < 7; hx++) {
         if (!heartMap[hy][hx]) continue;
@@ -580,7 +670,6 @@ function _drawEmanationSprite(buf, PW, PH, type, cx, cy, size, alpha) {
             py = Math.round(cy - 3 * hScale + hy * hScale + sy);
             if (px >= 0 && px < PW && py >= 0 && py < PH) {
               idx = py * PW + px;
-              // Lighter center, deeper edges
               var isCenter = (hy >= 1 && hy <= 3 && hx >= 2 && hx <= 4);
               if (isCenter) {
                 _blend(idx, 255, 120, 150, alpha);
@@ -593,8 +682,6 @@ function _drawEmanationSprite(buf, PW, PH, type, cx, cy, size, alpha) {
       }
     }
   } else if (type === 'anger') {
-    // Manga anger mark 💢: 4 L-shaped corners pointing INWARD, forming a + shape
-    // TL=┘ TR=└ BL=┐ BR=┌, each 2px thick, gap at center
     var angerMap = [
       [0,0,0,1,0,1,0,0,0],
       [0,0,0,1,0,1,0,0,0],
@@ -606,7 +693,7 @@ function _drawEmanationSprite(buf, PW, PH, type, cx, cy, size, alpha) {
       [0,0,0,1,0,1,0,0,0],
       [0,0,0,1,0,1,0,0,0],
     ];
-    var aScale = Math.max(1, Math.round(size));
+    var aScale = Math.max(2, Math.round(hdSize));
     var aW = 9, aH = 9;
     for (var ay = 0; ay < aH; ay++) {
       for (var ax = 0; ax < aW; ax++) {
@@ -624,7 +711,6 @@ function _drawEmanationSprite(buf, PW, PH, type, cx, cy, size, alpha) {
       }
     }
   } else if (type === 'fear') {
-    // Sweat droplet: teardrop shape, pointed top, round bottom
     var dropMap = [
       [0,0,1,0,0],
       [0,1,1,1,0],
@@ -634,7 +720,7 @@ function _drawEmanationSprite(buf, PW, PH, type, cx, cy, size, alpha) {
       [1,1,1,1,1],
       [0,1,1,1,0],
     ];
-    var fScale = Math.max(1, Math.round(size));
+    var fScale = Math.max(2, Math.round(hdSize));
     for (var fy = 0; fy < 7; fy++) {
       for (var fx = 0; fx < 5; fx++) {
         if (!dropMap[fy][fx]) continue;
@@ -644,7 +730,6 @@ function _drawEmanationSprite(buf, PW, PH, type, cx, cy, size, alpha) {
             py = Math.round(cy - 3 * fScale + fy * fScale + sy);
             if (px >= 0 && px < PW && py >= 0 && py < PH) {
               idx = py * PW + px;
-              // White highlight at top-left, blue body
               var isHighlight = (fy <= 1 && fx <= 2) || (fy === 2 && fx === 1);
               if (isHighlight) {
                 _blend(idx, 200, 230, 255, alpha);
@@ -662,26 +747,29 @@ function _drawEmanationSprite(buf, PW, PH, type, cx, cy, size, alpha) {
 AnimationTemplates.register('emanation', function(params) {
   var prefix = params.entityPrefix || '';
   var pType = params.particleType || 'steam';
-  var totalSprites = _clamp(params.particleCount || 18, 8, 30);
+  var defaultCount = (pType === 'dust') ? 30 : 18;
+  var totalSprites = _clamp(params.particleCount || defaultCount, 8, 40);
 
   // Stronger tints per type — applied to entity base color during animation
   var tints = {
-    steam:   { r: 50, g: -25, b: -50 },
-    frost:   { r: -50, g: 0, b: 70 },
-    sparkle: { r: 40, g: 40, b: 25 },
-    dust:    { r: -25, g: -25, b: -40 },
-    hearts:  { r: 50, g: -15, b: 15 },
-    anger:   { r: 60, g: -20, b: -20 },
-    fear:    { r: 40, g: 40, b: 50 },
+    steam:   { r: 80, g: -40, b: -80 },
+    frost:   { r: -80, g: 0, b: 110 },
+    sparkle: { r: 60, g: 60, b: 40 },
+    dust:    { r: -40, g: -40, b: -60 },
+    heart:   { r: 80, g: -25, b: 25 },
+    hearts:  { r: 80, g: -25, b: 25 },
+    anger:   { r: 100, g: -35, b: -35 },
+    fear:    { r: 60, g: 60, b: 80 },
   };
   var tint = tints[pType] || tints.steam;
 
   // Movement configs per type
   var moveConfigs = {
     steam:   { vy: -18, vx: 0, vxJitter: 6, vyJitter: 3, gravity: 0, sway: 1.5 },
-    frost:   { vy: 10, vx: 0, vxJitter: 3, vyJitter: 2, gravity: 5, sway: 1.0 },
+    frost:   { vy: 8, vx: 0, vxJitter: 5, vyJitter: 2, gravity: 2, sway: 1.5 },
     sparkle: { vy: 0, vx: 0, vxJitter: 2, vyJitter: 2, gravity: 0, sway: 0 },
-    dust:    { vy: 6, vx: 2, vxJitter: 4, vyJitter: 2, gravity: 3, sway: 0.8 },
+    dust:    { vy: 12, vx: 0, vxJitter: 2, vyJitter: 3, gravity: 4, sway: 0.3 },
+    heart:   { vy: -12, vx: 0, vxJitter: 5, vyJitter: 2, gravity: 0, sway: 2.0 },
     hearts:  { vy: -12, vx: 0, vxJitter: 5, vyJitter: 2, gravity: 0, sway: 2.0 },
     anger:   { vy: 0, vx: 0, vxJitter: 1, vyJitter: 1, gravity: 0, sway: 0 },
     fear:    { vy: 15, vx: 0, vxJitter: 3, vyJitter: 3, gravity: 8, sway: 0.5 },
@@ -701,11 +789,21 @@ AnimationTemplates.register('emanation', function(params) {
     var waveTime = w / waves * 0.7;  // waves spawn from t=0 to t=0.7
     for (var s = 0; s < perWave && sprites.length < totalSprites; s++) {
       var sizeVar = 0.7 + _rand() * 0.6;  // 0.7 to 1.3
+      // sideType: 0=top, 1=right, 2=bottom, 3=left, 4=over (on top of entity)
+      var spSideType;
+      if (pType === 'dust') {
+        spSideType = 0; // dust: always spawn from top
+      } else {
+        // Mix of edge (0-3) and over-entity (4) spawns
+        var st = _rand();
+        spSideType = st < 0.4 ? 4 : Math.floor(_rand() * 4); // 40% over entity
+      }
       sprites.push({
         spawnT: waveTime + _rand() * 0.08,  // slight jitter within wave
         // spawn position will be set on first use (needs entity bounds)
         side: _rand(),       // 0-1 for position along contour
-        sideType: Math.floor(_rand() * 4),  // 0=top, 1=right, 2=bottom, 3=left
+        side2: _rand(),      // 0-1 for Y position (used by sideType=4)
+        sideType: spSideType,
         vx: mc.vx + ((_rand() - 0.5) * 2) * mc.vxJitter,
         vy: mc.vy + ((_rand() - 0.5) * 2) * mc.vyJitter,
         size: sizeVar,
@@ -750,17 +848,21 @@ AnimationTemplates.register('emanation', function(params) {
           sp.x = bounds.x2 + 2; sp.y = bounds.y1 + sp.side * bh;
         } else if (sp.sideType === 2) {
           sp.x = bounds.x1 + sp.side * bw; sp.y = bounds.y2 + 2;
-        } else {
+        } else if (sp.sideType === 3) {
           sp.x = bounds.x1 - 2; sp.y = bounds.y1 + sp.side * bh;
+        } else {
+          // Over entity: random position within bounding box
+          sp.x = bounds.x1 + sp.side * bw;
+          sp.y = bounds.y1 + sp.side2 * bh;
         }
         sp.initialized = true;
       }
 
-      // Update position
+      // Update position (scale velocity by 3 for HD)
       var dt = 1 / 60;
-      sp.x += sp.vx * dt;
-      sp.y += sp.vy * dt;
-      sp.vy += mc.gravity * dt;
+      sp.x += sp.vx * 3 * dt;
+      sp.y += sp.vy * 3 * dt;
+      sp.vy += mc.gravity * 3 * dt;
       // Lateral sway
       if (mc.sway > 0) {
         sp.x += Math.sin(age * 8 + sp.side * 10) * mc.sway * dt * 15;
@@ -940,9 +1042,9 @@ AnimationTemplates.register('timelapse', function(params) {
 AnimationTemplates.register('motion_lines', function(params) {
   var prefix = params.entityPrefix || '';
   var dir = params.direction || 'right';   // 'left', 'right', 'any'
-  var lineLen = _clamp(params.lineLength || 20, 10, 30);
-  var amp = _clamp(params.amplitude || 10, 5, 15);
-  var MAX_LINES = 60;
+  var lineLen = _clamp(params.lineLength || 90, 50, 150);
+  var amp = _clamp(params.amplitude || 50, 25, 75);
+  var MAX_LINES = 80;
 
   // Streak colors: alternating grey shades
   var streakColors = [
@@ -964,7 +1066,7 @@ AnimationTemplates.register('motion_lines', function(params) {
     _sv = (_sv * 16807 + 31) % 2147483647;
     var lenMult = 0.5 + (_sv % 1000) / 1000 * 1.0;  // 0.5× to 1.5× length
     _sv = (_sv * 16807 + 31) % 2147483647;
-    var thin = (_sv % 3 === 0);                      // ~1/3 are 1px thin lines
+    var thin = (_sv % 5 === 0);                      // ~1/5 are 1px thin lines
     _sv = (_sv * 16807 + 31) % 2147483647;
     var alphaScale = thin ? (0.4 + (_sv % 1000) / 1000 * 0.3) : 1.0;
     streakVariation.push({ gap: gap, lenMult: lenMult, thin: thin, alphaScale: alphaScale });
@@ -1194,13 +1296,17 @@ AnimationTemplates.register('anticipation', function(params) {
     // dist = |px - cx| / halfW  (0 = on axis, 1 = at extremity)
     // mirrorX = 2*cx - px  (horizontal mirror)
     //
-    // Go phase (t: 0→0.5): pixel slides from px toward mirrorX.
-    //   Extremity (dist=1) starts at t=0; axis (dist=0) starts at t=0.25.
-    //   All pixels arrive at mirrorX at t=0.5.
+    // Go phase (t: 0→0.333): pixel slides from px toward mirrorX.
+    //   Extremity (dist=1) starts at t=0; axis (dist=0) starts at t=0.083.
+    //   All pixels arrive at mirrorX at t=0.333.
     //
-    // Return phase (t: 0.5→1.0): pixel slides back from mirrorX to px.
-    //   Same stagger: extremity starts at t=0.5, axis at t=0.75.
+    // Hold phase (t: 0.333→0.667): entity stays mirrored.
+    //
+    // Return phase (t: 0.667→1.0): pixel slides back from mirrorX to px.
+    //   Same stagger: extremity starts at t=0.667, axis at t=0.75.
     //   All pixels back at px at t=1.0.
+    var FLIP_END = 0.333;
+    var HOLD_END = 0.667;
     var drawSource = layerData || [];
     var useLayers = !!layerData;
     if (!useLayers) drawSource = indices;
@@ -1219,12 +1325,17 @@ AnimationTemplates.register('anticipation', function(params) {
       var mirrorX = 2 * cx - px;
       var newX;
 
-      if (t <= 0.5) {
-        var tStart = (1 - dist) * 0.25;
-        var p = _clamp((t - tStart) / (0.5 - tStart), 0, 1);
+      if (t <= FLIP_END) {
+        // Flip: staggered from extremity to axis
+        var tStart = (1 - dist) * 0.083;
+        var p = _clamp((t - tStart) / (FLIP_END - tStart), 0, 1);
         newX = px + (mirrorX - px) * p;
+      } else if (t <= HOLD_END) {
+        // Hold mirrored
+        newX = mirrorX;
       } else {
-        var tStart2 = 0.5 + (1 - dist) * 0.25;
+        // Return: staggered from extremity to axis
+        var tStart2 = HOLD_END + (1 - dist) * 0.083;
         var p2 = _clamp((t - tStart2) / (1.0 - tStart2), 0, 1);
         newX = mirrorX + (px - mirrorX) * p2;
       }
@@ -1388,7 +1499,7 @@ AnimationTemplates.register('causal_push', function(params) {
       }
       starAlpha = Math.max(0, Math.min(1, starAlpha));
 
-      _drawStarBurst(buf, PW, PH, ipx, ipy, starAlpha, 6, 4);
+      _drawStarBurst(buf, PW, PH, ipx, ipy, starAlpha, 30, 20);
     }
   };
 }, 1500);
@@ -1398,10 +1509,13 @@ AnimationTemplates.register('sequential_glow', function(params) {
   var prefixes = params.entityPrefixes || [params.entityPrefix || ''];
   var n = prefixes.length;
 
+  var loops = 2; // number of full cycles through all entities
+
   return function animate(buf, PW, PH, t) {
-    // Determine which entity is currently glowing
-    var activeIdx = Math.min(Math.floor(t * n), n - 1);
-    var phaseT = (t * n) % 1; // 0-1 within current entity's window
+    // Two full loops: remap t so we cycle through all entities twice
+    var loopT = (t * loops) % 1; // 0-1 within current loop
+    var activeIdx = Math.min(Math.floor(loopT * n), n - 1);
+    var phaseT = (loopT * n) % 1; // 0-1 within current entity's window
     var glow = 0.5 + 0.5 * Math.sin(phaseT * Math.PI);
 
     for (var i = 0; i < buf.length; i++) {
@@ -1420,7 +1534,7 @@ AnimationTemplates.register('sequential_glow', function(params) {
 
       if (isActive) {
         // Glow the active entity
-        var boost = 1 + 0.3 * glow;
+        var boost = 1 + 0.5 * glow;
         p.r = Math.min(255, Math.round(p._r * boost));
         p.g = Math.min(255, Math.round(p._g * boost));
         p.b = Math.min(255, Math.round(p._b * boost));
@@ -1513,12 +1627,77 @@ AnimationTemplates.register('disintegration', function(params) {
 // Dark flat puddle at an empty spot + big "?" with black outline. Scaffolds absence.
 AnimationTemplates.register('ghost_outline', function(params) {
   var prefix = params.entityPrefix || '';
+  // ghostImageUrl: URL to the entity asset from another scene (full-size RGBA PNG)
+  var ghostImageUrl = params.ghostImageUrl || '';
 
   var cachedPuddleCx = null, cachedPuddleY = null;
   var cachedRx = 0, cachedRy = 0;
   var cachedEdgeOffsets = null;
 
+  // Ghost silhouette data (loaded from image)
+  var ghostLoading = false, ghostReady = false;
+  var ghostContour = null; // [{x, y}] relative to ghost bounding box
+  var ghostMask = null;    // [{x, y}] all opaque pixels
+  var ghostW = 0, ghostH = 0;
+  var ghostScale = 1;
+
+  function loadGhostImage() {
+    if (ghostLoading || !ghostImageUrl) return;
+    ghostLoading = true;
+    var img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = function() {
+      var off = document.createElement('canvas');
+      off.width = img.width; off.height = img.height;
+      var ctx = off.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      var data = ctx.getImageData(0, 0, img.width, img.height).data;
+
+      // Find bounding box of opaque pixels
+      var x1 = img.width, y1 = img.height, x2 = 0, y2 = 0;
+      for (var y = 0; y < img.height; y++) {
+        for (var x = 0; x < img.width; x++) {
+          var a = data[(y * img.width + x) * 4 + 3];
+          if (a > 30) {
+            if (x < x1) x1 = x; if (x > x2) x2 = x;
+            if (y < y1) y1 = y; if (y > y2) y2 = y;
+          }
+        }
+      }
+      if (x2 <= x1) { ghostLoading = false; return; }
+
+      ghostW = x2 - x1 + 1;
+      ghostH = y2 - y1 + 1;
+
+      // Build mask (opaque pixels) and contour (edge pixels)
+      ghostMask = [];
+      ghostContour = [];
+      for (var y = y1; y <= y2; y++) {
+        for (var x = x1; x <= x2; x++) {
+          var a = data[(y * img.width + x) * 4 + 3];
+          if (a > 30) {
+            ghostMask.push({ x: x - x1, y: y - y1 });
+            // Check if it's an edge pixel (has a transparent neighbor)
+            var isEdge = false;
+            var dirs = [[-1,0],[1,0],[0,-1],[0,1]];
+            for (var d = 0; d < 4; d++) {
+              var nx = x + dirs[d][0], ny = y + dirs[d][1];
+              if (nx < 0 || nx >= img.width || ny < 0 || ny >= img.height) { isEdge = true; break; }
+              if (data[(ny * img.width + nx) * 4 + 3] <= 30) { isEdge = true; break; }
+            }
+            if (isEdge) ghostContour.push({ x: x - x1, y: y - y1 });
+          }
+        }
+      }
+      ghostReady = true;
+    };
+    img.src = ghostImageUrl;
+  }
+
   return function animate(buf, PW, PH, t) {
+    // Start loading ghost image on first frame
+    if (ghostImageUrl && !ghostLoading && !ghostReady) loadGhostImage();
+
     if (cachedPuddleCx === null) {
       var bounds = _computeEntityBounds(buf, PW, prefix);
       var ew = bounds.x2 - bounds.x1 + 1;
@@ -1528,14 +1707,12 @@ AnimationTemplates.register('ghost_outline', function(params) {
 
       // Find an empty ground-level spot (not overlapping any entity)
       var groundY = bounds.y2;
-      var testH = 10; // vertical strip to test for emptiness
+      var testH = 10;
       var bestCx = null;
-      // Try offsets: ±1.0×ew, ±1.5×ew, ±2.0×ew
       var offsets = [1.0, -1.0, 1.5, -1.5, 2.0, -2.0, 0.7, -0.7];
       for (var oi = 0; oi < offsets.length; oi++) {
         var testCx = Math.round(bounds.cx + offsets[oi] * ew);
         if (testCx - cachedRx < 0 || testCx + cachedRx >= PW) continue;
-        // Check if this column is empty of entity pixels
         var occupied = false;
         for (var ty = Math.max(0, groundY - testH); ty <= Math.min(PH - 1, groundY + cachedRy); ty++) {
           for (var tx = testCx - 5; tx <= testCx + 5; tx++) {
@@ -1549,7 +1726,6 @@ AnimationTemplates.register('ghost_outline', function(params) {
         }
         if (!occupied) { bestCx = testCx; break; }
       }
-      // Fallback: offset 1.5× entity width to the right (or left if off-screen)
       if (bestCx === null) {
         bestCx = bounds.cx + Math.round(ew * 1.5);
         if (bestCx + cachedRx >= PW) bestCx = bounds.cx - Math.round(ew * 1.5);
@@ -1557,11 +1733,23 @@ AnimationTemplates.register('ghost_outline', function(params) {
       cachedPuddleCx = _clamp(bestCx, cachedRx, PW - cachedRx - 1);
       cachedPuddleY = groundY;
 
-      // Edge wobble offsets
       cachedEdgeOffsets = [];
       for (var row = 0; row < cachedRy * 2 + 1; row++) {
         cachedEdgeOffsets.push(Math.random() * Math.PI * 2);
       }
+
+      // Scale ghost to match buffer resolution vs source image (1:1 natural size)
+      if (ghostReady && ghostH > 0) {
+        ghostScale = PW / 1376;  // source images are 1376×768
+      }
+    }
+
+    // Recompute ghost scale if it loaded after first frame
+    if (ghostReady && ghostScale === 1 && ghostH > 0) {
+      var bounds2 = _computeEntityBounds(buf, PW, prefix);
+      var eh2 = bounds2.y2 - bounds2.y1 + 1;
+      var ew2 = bounds2.x2 - bounds2.x1 + 1;
+      ghostScale = PW / 1376;
     }
 
     var cx = cachedPuddleCx;
@@ -1578,9 +1766,9 @@ AnimationTemplates.register('ghost_outline', function(params) {
     shapeAlpha = Math.max(0, Math.min(1, shapeAlpha));
     if (shapeAlpha < 0.01) return;
 
-    var gc = params.puddleColor || [60, 65, 85]; // dark blue-grey
+    var gc = params.puddleColor || [60, 65, 85];
 
-    // Draw flat puddle: scan-line filled ellipse with wobbling edge
+    // Draw flat puddle
     for (var dy = -ry; dy <= ry; dy++) {
       var py = puddleY + dy;
       if (py < 0 || py >= PH) continue;
@@ -1603,66 +1791,89 @@ AnimationTemplates.register('ghost_outline', function(params) {
       }
     }
 
-    // Draw big "?" with black outline (13×19 bitmap, thick strokes)
+    // Draw ghost silhouette (or fallback "?" if no image)
     if (shapeAlpha > 0.15) {
-      var qAlpha = Math.min(1, (shapeAlpha - 0.15) / 0.25);
-      // "?" bitmap 13 wide × 19 tall
-      var qMark = [
-        0,0,0,1,1,1,1,1,1,1,0,0,0,
-        0,0,1,1,1,1,1,1,1,1,1,0,0,
-        0,1,1,1,0,0,0,0,0,1,1,1,0,
-        1,1,1,0,0,0,0,0,0,0,1,1,1,
-        1,1,1,0,0,0,0,0,0,0,1,1,1,
-        1,1,0,0,0,0,0,0,0,0,1,1,1,
-        0,0,0,0,0,0,0,0,0,1,1,1,0,
-        0,0,0,0,0,0,0,0,1,1,1,0,0,
-        0,0,0,0,0,0,0,1,1,1,0,0,0,
-        0,0,0,0,0,0,1,1,1,0,0,0,0,
-        0,0,0,0,0,1,1,1,0,0,0,0,0,
-        0,0,0,0,0,1,1,1,0,0,0,0,0,
-        0,0,0,0,0,1,1,1,0,0,0,0,0,
-        0,0,0,0,0,1,1,1,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,0,0,0,0,0,
-        0,0,0,0,0,1,1,1,0,0,0,0,0,
-        0,0,0,0,0,1,1,1,0,0,0,0,0,
-        0,0,0,0,0,0,0,0,0,0,0,0,0
-      ];
-      var qW = 13, qH = 20;
-      // Gentle float: slow sinusoidal drift in all directions
-      var floatX = Math.round(Math.sin(t * Math.PI * 2.3) * 2 + Math.cos(t * Math.PI * 1.7) * 1);
-      var floatY = Math.round(Math.sin(t * Math.PI * 1.9 + 1.2) * 2 + Math.cos(t * Math.PI * 2.7) * 1);
-      var qx0 = cx - Math.floor(qW / 2) + floatX;
-      var qy0 = puddleY - ry - qH - 3 + floatY;
-      var qa = qAlpha * shapeAlpha;
-      // Pass 1: black outline (draw 8-neighbors of each "?" pixel)
-      // Note: neighbors outside the bitmap bounds are still drawn on screen
-      var dirs = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
-      for (var qy = 0; qy < qH; qy++) {
-        for (var qx = 0; qx < qW; qx++) {
-          if (!qMark[qy * qW + qx]) continue;
-          for (var d = 0; d < 8; d++) {
-            var nx = qx + dirs[d][0], ny = qy + dirs[d][1];
-            // Skip only if the neighbor is itself a fill pixel (inside bitmap bounds)
-            var isInsideBitmap = nx >= 0 && nx < qW && ny >= 0 && ny < qH;
-            if (isInsideBitmap && qMark[ny * qW + nx]) continue;
-            var sx = qx0 + nx, sy = qy0 + ny;
-            if (sx >= 0 && sx < PW && sy >= 0 && sy < PH) {
-              var si = sy * PW + sx;
-              _blendPixel(buf, si, 0, 0, 0, qa);
+      var qa = Math.min(1, (shapeAlpha - 0.15) / 0.25) * shapeAlpha;
+
+      // Gentle float
+      var floatX = Math.round(Math.sin(t * Math.PI * 2.3) * 3 + Math.cos(t * Math.PI * 1.7) * 2);
+      var floatY = Math.round(Math.sin(t * Math.PI * 1.9 + 1.2) * 3 + Math.cos(t * Math.PI * 2.7) * 2);
+
+      if (ghostReady && ghostContour) {
+        // Draw ghost entity silhouette — semi-transparent fill + bright contour
+        var gw = Math.round(ghostW * ghostScale);
+        var gh = Math.round(ghostH * ghostScale);
+        var gx0 = cx - Math.round(gw / 2) + floatX;
+        var gy0 = puddleY - ry - gh - 6 + floatY;
+
+        // Semi-transparent fill (ghostly)
+        for (var mi = 0; mi < ghostMask.length; mi++) {
+          var mx = gx0 + Math.round(ghostMask[mi].x * ghostScale);
+          var my = gy0 + Math.round(ghostMask[mi].y * ghostScale);
+          if (mx >= 0 && mx < PW && my >= 0 && my < PH) {
+            var mpi = my * PW + mx;
+            _blendPixel(buf, mpi, 40, 50, 70, qa * 0.45);
+          }
+        }
+
+        // Bright contour outline
+        for (var ci = 0; ci < ghostContour.length; ci++) {
+          var ex = gx0 + Math.round(ghostContour[ci].x * ghostScale);
+          var ey = gy0 + Math.round(ghostContour[ci].y * ghostScale);
+          if (ex >= 0 && ex < PW && ey >= 0 && ey < PH) {
+            var epi = ey * PW + ex;
+            _blendPixel(buf, epi, 160, 180, 210, qa * 0.85);
+          }
+        }
+      } else {
+        // Fallback: "?" bitmap (13×20) if no ghost image
+        var qMark = [
+          0,0,0,1,1,1,1,1,1,1,0,0,0,
+          0,0,1,1,1,1,1,1,1,1,1,0,0,
+          0,1,1,1,0,0,0,0,0,1,1,1,0,
+          1,1,1,0,0,0,0,0,0,0,1,1,1,
+          1,1,1,0,0,0,0,0,0,0,1,1,1,
+          1,1,0,0,0,0,0,0,0,0,1,1,1,
+          0,0,0,0,0,0,0,0,0,1,1,1,0,
+          0,0,0,0,0,0,0,0,1,1,1,0,0,
+          0,0,0,0,0,0,0,1,1,1,0,0,0,
+          0,0,0,0,0,0,1,1,1,0,0,0,0,
+          0,0,0,0,0,1,1,1,0,0,0,0,0,
+          0,0,0,0,0,1,1,1,0,0,0,0,0,
+          0,0,0,0,0,1,1,1,0,0,0,0,0,
+          0,0,0,0,0,1,1,1,0,0,0,0,0,
+          0,0,0,0,0,0,0,0,0,0,0,0,0,
+          0,0,0,0,0,0,0,0,0,0,0,0,0,
+          0,0,0,0,0,0,0,0,0,0,0,0,0,
+          0,0,0,0,0,1,1,1,0,0,0,0,0,
+          0,0,0,0,0,1,1,1,0,0,0,0,0,
+          0,0,0,0,0,0,0,0,0,0,0,0,0
+        ];
+        var qW = 13, qH = 20;
+        var qx0 = cx - Math.floor(qW / 2) + floatX;
+        var qy0 = puddleY - ry - qH - 3 + floatY;
+        var dirs = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+        for (var qy = 0; qy < qH; qy++) {
+          for (var qx = 0; qx < qW; qx++) {
+            if (!qMark[qy * qW + qx]) continue;
+            for (var d = 0; d < 8; d++) {
+              var nx = qx + dirs[d][0], ny = qy + dirs[d][1];
+              var isInsideBitmap = nx >= 0 && nx < qW && ny >= 0 && ny < qH;
+              if (isInsideBitmap && qMark[ny * qW + nx]) continue;
+              var sx = qx0 + nx, sy = qy0 + ny;
+              if (sx >= 0 && sx < PW && sy >= 0 && sy < PH) {
+                _blendPixel(buf, sy * PW + sx, 0, 0, 0, qa);
+              }
             }
           }
         }
-      }
-      // Pass 2: white fill
-      for (var qy = 0; qy < qH; qy++) {
-        for (var qx = 0; qx < qW; qx++) {
-          if (!qMark[qy * qW + qx]) continue;
-          var sx = qx0 + qx, sy = qy0 + qy;
-          if (sx >= 0 && sx < PW && sy >= 0 && sy < PH) {
-            var si = sy * PW + sx;
-            _blendPixel(buf, si, 255, 255, 220, qa);
+        for (var qy = 0; qy < qH; qy++) {
+          for (var qx = 0; qx < qW; qx++) {
+            if (!qMark[qy * qW + qx]) continue;
+            var sx = qx0 + qx, sy = qy0 + qy;
+            if (sx >= 0 && sx < PW && sy >= 0 && sy < PH) {
+              _blendPixel(buf, sy * PW + sx, 255, 255, 220, qa);
+            }
           }
         }
       }
@@ -1779,8 +1990,8 @@ AnimationTemplates.register('magnetism', function(params) {
       var cosA = Math.cos(angleA), sinA = Math.sin(angleA);
       var cosB = Math.cos(angleB), sinB = Math.sin(angleB);
 
-      // Draw rotated magnets using reverse-mapping (no holes) at 2x scale with black outline
-      var mgScale = 2;
+      // Draw rotated magnets using reverse-mapping (no holes) at 4x scale with black outline
+      var mgScale = 4;
       var halfExt = Math.ceil(Math.sqrt(MGW * MGW + MGH * MGH) * mgScale / 2) + 3;
       var cardinals = [[0,-1],[0,1],[-1,0],[1,0]];
       for (var ent = 0; ent < 2; ent++) {
@@ -1855,36 +2066,51 @@ AnimationTemplates.register('repel', function(params) {
     var ndx = cachedNdx, ndy = cachedNdy;
     var dxA = 0, dyA = 0, dxB = 0, dyB = 0;
 
-    if (t < 0.20) {
-      // Attract — ease-in, close the contour gap over 300ms
-      var attract = t / 0.20;
-      attract = attract * attract; // ease-in (slow start, accelerate)
+    // Repel distance: 2× the original distance from center to entity
+    // (distance from midpoint to entity center + gap/2, doubled)
+    var distAB = Math.sqrt(
+      (boundsA.cx - boundsB.cx) * (boundsA.cx - boundsB.cx) +
+      (boundsA.cy - boundsB.cy) * (boundsA.cy - boundsB.cy)
+    );
+    var repelDist = distAB;  // push each entity by the full AB distance away
+
+    // Phase 1 (0→0.333): Approach — linear, like magnetism (1s)
+    // Phase 2 (0.333→0.5): Contact + propulsion (0.5s)
+    // Phase 3 (0.5→0.667): Hold far apart (0.5s)
+    // Phase 4 (0.667→1.0): Return (1s)
+    var APPROACH_END = 0.333;
+    var PROPEL_END = 0.5;
+    var HOLD_END = 0.667;
+
+    if (t < APPROACH_END) {
+      // Approach — linear, close the contour gap
+      var attract = t / APPROACH_END;
       dxA = Math.round(cachedGap / 2 * attract * ndx);
       dyA = Math.round(cachedGap / 2 * attract * ndy);
       dxB = Math.round(-cachedGap / 2 * attract * ndx);
       dyB = Math.round(-cachedGap / 2 * attract * ndy);
-    } else if (t < 0.50) {
-      // Push apart — ease-out, separate over 450ms
-      var progress = (t - 0.20) / 0.30;
-      progress = 1 - (1 - progress) * (1 - progress); // ease-out (fast start, decelerate)
-      dxA = Math.round(-repelPx / 2 * progress * ndx);
-      dyA = Math.round(-repelPx / 2 * progress * ndy);
-      dxB = Math.round(repelPx / 2 * progress * ndx);
-      dyB = Math.round(repelPx / 2 * progress * ndy);
-    } else if (t < 0.70) {
-      // Hold apart
-      dxA = Math.round(-repelPx / 2 * ndx);
-      dyA = Math.round(-repelPx / 2 * ndy);
-      dxB = Math.round(repelPx / 2 * ndx);
-      dyB = Math.round(repelPx / 2 * ndy);
+    } else if (t < PROPEL_END) {
+      // Propulsion — ease-out, fast push to 2× original distance
+      var progress = (t - APPROACH_END) / (PROPEL_END - APPROACH_END);
+      progress = 1 - (1 - progress) * (1 - progress); // ease-out
+      dxA = Math.round(-repelDist / 2 * progress * ndx);
+      dyA = Math.round(-repelDist / 2 * progress * ndy);
+      dxB = Math.round(repelDist / 2 * progress * ndx);
+      dyB = Math.round(repelDist / 2 * progress * ndy);
+    } else if (t < HOLD_END) {
+      // Hold far apart
+      dxA = Math.round(-repelDist / 2 * ndx);
+      dyA = Math.round(-repelDist / 2 * ndy);
+      dxB = Math.round(repelDist / 2 * ndx);
+      dyB = Math.round(repelDist / 2 * ndy);
     } else {
-      // Drift back — ease-in-out
-      var release = (t - 0.70) / 0.30;
-      release = release * release * (3 - 2 * release); // smoothstep
-      dxA = Math.round(-repelPx / 2 * (1 - release) * ndx);
-      dyA = Math.round(-repelPx / 2 * (1 - release) * ndy);
-      dxB = Math.round(repelPx / 2 * (1 - release) * ndx);
-      dyB = Math.round(repelPx / 2 * (1 - release) * ndy);
+      // Return — smoothstep
+      var release = (t - HOLD_END) / (1.0 - HOLD_END);
+      release = release * release * (3 - 2 * release);
+      dxA = Math.round(-repelDist / 2 * (1 - release) * ndx);
+      dyA = Math.round(-repelDist / 2 * (1 - release) * ndy);
+      dxB = Math.round(repelDist / 2 * (1 - release) * ndx);
+      dyB = Math.round(repelDist / 2 * (1 - release) * ndy);
     }
 
     _blankEntityPixels(buf, pixelsA);
@@ -1893,7 +2119,7 @@ AnimationTemplates.register('repel', function(params) {
     _redrawEntityPixels(buf, PW, PH, pixelsB, dxB, dyB);
 
     // ── Bonk effect at contour collision point ──
-    var bonkStart = 0.16, bonkPeak = 0.22, bonkEnd = 0.42;
+    var bonkStart = 0.30, bonkPeak = 0.36, bonkEnd = 0.50;
     if (t >= bonkStart && t <= bonkEnd) {
       var bonkAlpha;
       if (t < bonkPeak) {
@@ -1907,20 +2133,24 @@ AnimationTemplates.register('repel', function(params) {
       var ipx = cachedImpactX + dxB;
       var ipy = cachedImpactY + dyB;
 
-      _drawStarBurst(buf, PW, PH, ipx, ipy, bonkAlpha, 4, 3);
+      _drawStarBurst(buf, PW, PH, ipx, ipy, bonkAlpha, 40, 28);
 
       // Expanding impact ring
       var ringProgress = _clamp((t - bonkStart) / (bonkEnd - bonkStart), 0, 1);
-      var ringRadius = 2 + ringProgress * 6;  // expands 2px -> 8px
+      var ringRadius = 10 + ringProgress * 35;  // expands 10px -> 45px
       var ringAlpha = bonkAlpha * 0.7;
+      var ringThick = 3;
       var ringSteps = Math.max(16, Math.ceil(ringRadius * 6));
       for (var s = 0; s < ringSteps; s++) {
         var angle = (s / ringSteps) * Math.PI * 2;
-        var rx = Math.round(ipx + Math.cos(angle) * ringRadius);
-        var ry = Math.round(ipy + Math.sin(angle) * ringRadius);
-        if (rx >= 0 && rx < PW && ry >= 0 && ry < PH) {
-          var ri = ry * PW + rx;
-          _blendPixel(buf, ri, 255, 220, 80, ringAlpha);
+        var cosAngle = Math.cos(angle), sinAngle = Math.sin(angle);
+        for (var rt = -ringThick; rt <= ringThick; rt++) {
+          var rx = Math.round(ipx + cosAngle * (ringRadius + rt));
+          var ry = Math.round(ipy + sinAngle * (ringRadius + rt));
+          if (rx >= 0 && rx < PW && ry >= 0 && ry < PH) {
+            var ri = ry * PW + rx;
+            _blendPixel(buf, ri, 255, 220, 80, ringAlpha);
+          }
         }
       }
     }
@@ -1958,8 +2188,8 @@ AnimationTemplates.register('speech_bubble', function(params) {
     }
 
     // Ellipse half-radii and horn dimensions
-    var rx = 18, ry = 11;
-    var hornH = 9, hornHalfW = 4, gap = 2;
+    var rx = 54, ry = 33;
+    var hornH = 27, hornHalfW = 12, gap = 6;
 
     var hornTipX = rayCX;
     var hornTipY = entityTopY - gap;
@@ -2033,16 +2263,17 @@ AnimationTemplates.register('speech_bubble', function(params) {
       }
     }
 
-    // 4. Draw text — render each character as 3×3 black squares, centered in ellipse
+    // 4. Draw text — render each character as 9×9 black squares, centered in ellipse
     var charCount = bubbleText.length;
-    var charSpacing = 5;
-    var totalTextW = charCount * charSpacing - (charSpacing - 3);
+    var charSpacing = 15;
+    var dotSize = 9;
+    var totalTextW = charCount * charSpacing - (charSpacing - dotSize);
     var textStartX = bubbleCX - Math.floor(totalTextW / 2);
-    var dotTopY = bubbleCY - 1;
+    var dotTopY = bubbleCY - Math.floor(dotSize / 2);
     for (var di = 0; di < charCount; di++) {
       var dcx = textStartX + di * charSpacing;
-      for (var ddy = 0; ddy < 3; ddy++) {
-        for (var ddx = 0; ddx < 3; ddx++) {
+      for (var ddy = 0; ddy < dotSize; ddy++) {
+        for (var ddx = 0; ddx < dotSize; ddx++) {
           var dpx = dcx + ddx, dpy = dotTopY + ddy;
           if (dpx >= 0 && dpx < PW && dpy >= 0 && dpy < PH) {
             var dpi = dpy * PW + dpx;
@@ -2062,14 +2293,14 @@ AnimationTemplates.register('thought_bubble', function(params) {
   var bubbleText = params.bubbleText || '...';
   // Cloud shape = union of overlapping circles
   var CC = [
-    { dx:  0,  dy:  2, r: 10 },  // main body
-    { dx: -8,  dy: -5, r:  7 },  // top-left bump
-    { dx:  0,  dy: -9, r:  7 },  // top-center bump
-    { dx:  8,  dy: -5, r:  7 },  // top-right bump
-    { dx:-13,  dy:  2, r:  5 },  // left side
-    { dx: 13,  dy:  2, r:  5 },  // right side
+    { dx:  0,  dy:  6, r: 30 },  // main body
+    { dx:-24,  dy:-15, r: 21 },  // top-left bump
+    { dx:  0,  dy:-27, r: 21 },  // top-center bump
+    { dx: 24,  dy:-15, r: 21 },  // top-right bump
+    { dx:-39,  dy:  6, r: 15 },  // left side
+    { dx: 39,  dy:  6, r: 15 },  // right side
   ];
-  var CLOUD_BOTTOM_DY = 12; // distance from cloud center to bottom
+  var CLOUD_BOTTOM_DY = 36; // distance from cloud center to bottom
 
   function inCloud(px, py, bcx, bcy, extra) {
     for (var ci = 0; ci < CC.length; ci++) {
@@ -2100,15 +2331,15 @@ AnimationTemplates.register('thought_bubble', function(params) {
       } else if (foundTop) { break; }
     }
 
-    var gap = 12;
+    var gap = 36;
     var bcx = rayCX;
     var bcy = (entityTopY - gap) - CLOUD_BOTTOM_DY;
-    bcx = Math.max(19, Math.min(PW - 19, bcx));
-    if (bcy < 17) bcy = 17;
+    bcx = Math.max(57, Math.min(PW - 57, bcx));
+    if (bcy < 51) bcy = 51;
 
     // 1. Cloud border (black) — fill outer shape
-    var sxMin = Math.max(0, bcx - 20), sxMax = Math.min(PW - 1, bcx + 20);
-    var syMin = Math.max(0, bcy - 17), syMax = Math.min(PH - 1, bcy + 14);
+    var sxMin = Math.max(0, bcx - 60), sxMax = Math.min(PW - 1, bcx + 60);
+    var syMin = Math.max(0, bcy - 51), syMax = Math.min(PH - 1, bcy + 42);
     for (var sy = syMin; sy <= syMax; sy++) {
       for (var sx = sxMin; sx <= sxMax; sx++) {
         if (inCloud(sx, sy, bcx, bcy, 1)) {
@@ -2130,8 +2361,8 @@ AnimationTemplates.register('thought_bubble', function(params) {
 
     // 3. Trail circles just below cloud, touching each other, not reaching entity
     var cloudBottomY = bcy + CLOUD_BOTTOM_DY;
-    var tr1 = 2, tr2 = 1;
-    var tc1y = cloudBottomY + 1 + tr1;   // 1px gap from cloud outer border
+    var tr1 = 6, tr2 = 3;
+    var tc1y = cloudBottomY + 3 + tr1;   // 3px gap from cloud outer border
     var tc2y = tc1y + tr1 + tr2;          // touching circle 1
     var trailCircles = [{cx: bcx, cy: tc1y, r: tr1}, {cx: bcx, cy: tc2y, r: tr2}];
     for (var ti = 0; ti < trailCircles.length; ti++) {
@@ -2162,16 +2393,17 @@ AnimationTemplates.register('thought_bubble', function(params) {
       }
     }
 
-    // 4. Draw text — render each character as 3×3 black squares inside cloud
+    // 4. Draw text — render each character as 9×9 black squares inside cloud
     var charCount = bubbleText.length;
-    var charSpacing = 5;
-    var totalTextW = charCount * charSpacing - (charSpacing - 3);
+    var charSpacing = 15;
+    var dotSize = 9;
+    var totalTextW = charCount * charSpacing - (charSpacing - dotSize);
     var textStartX = bcx - Math.floor(totalTextW / 2);
-    var dotTopY = bcy - 1;
+    var dotTopY = bcy - Math.floor(dotSize / 2);
     for (var di = 0; di < charCount; di++) {
       var dcx = textStartX + di * charSpacing;
-      for (var ddy = 0; ddy < 3; ddy++) {
-        for (var ddx = 0; ddx < 3; ddx++) {
+      for (var ddy = 0; ddy < dotSize; ddy++) {
+        for (var ddx = 0; ddx < dotSize; ddx++) {
           var dpx = dcx + ddx, dpy = dotTopY + ddy;
           if (dpx >= 0 && dpx < PW && dpy >= 0 && dpy < PH) {
             var dpi = dpy * PW + dpx;
@@ -2217,7 +2449,8 @@ AnimationTemplates.register('alert', function(params) {
     0,0,0,0,0,
   ];
   var eW = 5, eH = 20;
-  var spacing = 5; // px gap between marks
+  var alertScale = 3;
+  var spacing = 15; // px gap between marks
 
   return function animate(buf, PW, PH, t) {
     var env = _easeEnvelope(t, 0.15, 0.2);
@@ -2227,39 +2460,50 @@ AnimationTemplates.register('alert', function(params) {
     var bounds = _computeEntityBounds(buf, PW, prefix);
     if (bounds.x2 < 0) return;
 
-    // marks centered above entity
-    var totalW = eW * markCount + spacing * (markCount - 1);
+    // marks centered above entity (scaled 3×)
+    var sW = eW * alertScale, sH = eH * alertScale;
+    var totalW = sW * markCount + spacing * (markCount - 1);
     var x0 = Math.round(bounds.cx - totalW / 2);
-    var y0 = Math.max(2, bounds.y1 - eH - 4);
+    var y0 = Math.max(2, bounds.y1 - sH - 12);
 
     for (var mi = 0; mi < markCount; mi++) {
-      var mx0 = x0 + mi * (eW + spacing);
+      var mx0 = x0 + mi * (sW + spacing);
 
-      // Pass 1: 2px black outer outline
+      // Pass 1: 6px black outer outline
       for (var ry = 0; ry < eH; ry++) {
         for (var rx = 0; rx < eW; rx++) {
           if (!eMark[ry * eW + rx]) continue;
-          for (var oy = -2; oy <= 2; oy++) {
-            for (var ox = -2; ox <= 2; ox++) {
-              var px = mx0 + rx + ox, py = y0 + ry + oy;
-              if (px < 0 || px >= PW || py < 0 || py >= PH) continue;
-              var pi = py * PW + px;
-              _blendPixel(buf, pi, 0, 0, 0, alpha);
+          for (var sy = 0; sy < alertScale; sy++) {
+            for (var sx = 0; sx < alertScale; sx++) {
+              var bx = mx0 + rx * alertScale + sx, by = y0 + ry * alertScale + sy;
+              for (var oy = -6; oy <= 6; oy++) {
+                for (var ox = -6; ox <= 6; ox++) {
+                  var px = bx + ox, py = by + oy;
+                  if (px < 0 || px >= PW || py < 0 || py >= PH) continue;
+                  var pi = py * PW + px;
+                  _blendPixel(buf, pi, 0, 0, 0, alpha);
+                }
+              }
             }
           }
         }
       }
 
-      // Pass 2: 1px red outline
+      // Pass 2: 3px red outline
       for (var ry = 0; ry < eH; ry++) {
         for (var rx = 0; rx < eW; rx++) {
           if (!eMark[ry * eW + rx]) continue;
-          for (var oy = -1; oy <= 1; oy++) {
-            for (var ox = -1; ox <= 1; ox++) {
-              var px = mx0 + rx + ox, py = y0 + ry + oy;
-              if (px < 0 || px >= PW || py < 0 || py >= PH) continue;
-              var pi = py * PW + px;
-              _blendPixel(buf, pi, 210, 40, 20, alpha);
+          for (var sy = 0; sy < alertScale; sy++) {
+            for (var sx = 0; sx < alertScale; sx++) {
+              var bx = mx0 + rx * alertScale + sx, by = y0 + ry * alertScale + sy;
+              for (var oy = -3; oy <= 3; oy++) {
+                for (var ox = -3; ox <= 3; ox++) {
+                  var px = bx + ox, py = by + oy;
+                  if (px < 0 || px >= PW || py < 0 || py >= PH) continue;
+                  var pi = py * PW + px;
+                  _blendPixel(buf, pi, 210, 40, 20, alpha);
+                }
+              }
             }
           }
         }
@@ -2269,10 +2513,14 @@ AnimationTemplates.register('alert', function(params) {
       for (var ry = 0; ry < eH; ry++) {
         for (var rx = 0; rx < eW; rx++) {
           if (!eMark[ry * eW + rx]) continue;
-          var px = mx0 + rx, py = y0 + ry;
-          if (px < 0 || px >= PW || py < 0 || py >= PH) continue;
-          var pi = py * PW + px;
-          _blendPixel(buf, pi, color[0], color[1], color[2], alpha);
+          for (var sy = 0; sy < alertScale; sy++) {
+            for (var sx = 0; sx < alertScale; sx++) {
+              var px = mx0 + rx * alertScale + sx, py = y0 + ry * alertScale + sy;
+              if (px < 0 || px >= PW || py < 0 || py >= PH) continue;
+              var pi = py * PW + px;
+              _blendPixel(buf, pi, color[0], color[1], color[2], alpha);
+            }
+          }
         }
       }
     }
@@ -2290,128 +2538,178 @@ AnimationTemplates.register('alert', function(params) {
 }, 1200);
 
 // ── D4: Interjection ──
-// Comic-style starburst bubble (elliptical body + radiating spikes).
+// Comic-style burst bubble inspired by classic manga/comic "WOW" effects.
+// Irregular jagged shape with 3 layers: black outline → yellow border → white fill.
 // The ONLY animation that displays text from the child's speech.
-// Positioned above entity if entityPrefix is given, otherwise finds free space.
 AnimationTemplates.register('interjection', function(params) {
   var prefix = params.entityPrefix || '';
   var word = params.word || '???';
-  var numSpikes = 12;
-  var spikeH = 8;  // recomputed proportionally on first animate call
 
-  var cachedBCX = null, cachedBCY, cachedRX, cachedRY;
-
-  function findFreeSpot(buf, PW, PH, rrx, rry) {
-    var pad = spikeH + 3;
-    var candidates = [
-      { x: Math.round(PW / 2),    y: rry + pad },
-      { x: Math.round(PW * 0.25), y: rry + pad },
-      { x: Math.round(PW * 0.75), y: rry + pad },
-      { x: Math.round(PW * 0.15), y: rry + pad },
-      { x: Math.round(PW * 0.85), y: rry + pad },
-    ];
-    for (var ci = 0; ci < candidates.length; ci++) {
-      var cx = _clamp(candidates[ci].x, rrx + pad, PW - rrx - pad);
-      var cy = candidates[ci].y;
-      var occupied = false;
-      for (var ty = cy - rry - pad; ty <= cy + rry + pad && !occupied; ty++) {
-        for (var tx = cx - rrx - pad; tx <= cx + rrx + pad && !occupied; tx++) {
-          if (tx < 0 || tx >= PW || ty < 0 || ty >= PH) continue;
-          var e = buf[ty * PW + tx].e;
-          if (e && e !== '' && e !== 'bg' && !e.startsWith('bg')) occupied = true;
-        }
-      }
-      if (!occupied) return { x: cx, y: cy };
-    }
-    return { x: Math.round(PW / 2), y: rry + spikeH + 3 };
+  // Pre-generate irregular spike pattern (pseudo-random but deterministic)
+  var NUM_SPIKES = 18;
+  var spikeHeights = [];
+  var _rng = 31415;
+  for (var si = 0; si < NUM_SPIKES; si++) {
+    _rng = (_rng * 16807 + 7) % 2147483647;
+    // Alternating big/small with randomness for organic feel
+    var base = (si % 2 === 0) ? 1.0 : 0.45;
+    var jitter = (_rng % 1000) / 1000 * 0.4 - 0.2;
+    spikeHeights.push(_clamp(base + jitter, 0.25, 1.0));
   }
+
+  var cachedBCX = null, cachedBCY, cachedRX, cachedRY, cachedSpikeH;
 
   return function animate(buf, PW, PH, t) {
     var env = _easeEnvelope(t, 0.1, 0.25);
     if (env < 0.01) return;
     var alpha = env;
+    // Pop-in scale effect
+    var scale = env < 1 ? Math.min(1.0, env * 1.15) : 1.0;
 
     if (cachedBCX === null) {
       var displayText = word.toUpperCase();
-      var textW = displayText.length * (_FONT_W + _FONT_SPACING) - _FONT_SPACING;
-      cachedRX = Math.max(22, Math.round((textW + 12) / 2));
-      cachedRY = Math.round(cachedRX * 0.6);
-      spikeH = Math.max(6, Math.round(cachedRX * 0.35));  // proportional to ellipse size
-      var pad = spikeH + 3;
+      var textScale = 3;
+      var textW = displayText.length * (_FONT_W + _FONT_SPACING) * textScale - _FONT_SPACING;
+      cachedRX = Math.max(80, Math.round((textW + 50) / 2));
+      cachedRY = Math.round(cachedRX * 0.55);
+      cachedSpikeH = Math.max(25, Math.round(cachedRX * 0.4));
+      var pad = cachedSpikeH + 8;
       var placed = false;
 
       if (prefix && prefix !== 'none') {
         var bounds = _computeEntityBounds(buf, PW, prefix);
         if (bounds.x2 >= 0) {
           cachedBCX = _clamp(Math.round(bounds.cx), cachedRX + pad, PW - cachedRX - pad);
-          // Place center so starburst bottom is 2px above entity top.
-          // No lower-bound clamp — canvas clips anything above y=0 naturally.
-          cachedBCY = bounds.y1 - cachedRY - spikeH - 2;
+          cachedBCY = bounds.y1 - cachedRY - cachedSpikeH - 6;
           placed = true;
         }
       }
       if (!placed) {
-        var spot = findFreeSpot(buf, PW, PH, cachedRX, cachedRY);
-        cachedBCX = spot.x; cachedBCY = spot.y;
+        cachedBCX = Math.round(PW / 2);
+        cachedBCY = Math.round(cachedRY + cachedSpikeH + 10);
       }
     }
 
     var bcx = cachedBCX, bcy = cachedBCY;
-    var rrx = cachedRX, rry = cachedRY;
+    var rrx = Math.round(cachedRX * scale), rry = Math.round(cachedRY * scale);
+    var spikeH = Math.round(cachedSpikeH * scale);
 
-    // Inner ellipse radius in direction `angle`
-    function rInner(cosA, sinA) {
+    // Inner ellipse radius at angle
+    function rInner(angle) {
+      var cosA = Math.cos(angle), sinA = Math.sin(angle);
       var d = Math.sqrt((rry * cosA) * (rry * cosA) + (rrx * sinA) * (rrx * sinA));
       return d > 0.001 ? (rrx * rry / d) : rrx;
     }
 
-    // Max starburst radius in direction `angle` (inner ellipse + spike)
-    function rMax(angle) {
-      var cosA = Math.cos(angle), sinA = Math.sin(angle);
-      var ri = rInner(cosA, sinA);
-      var phase = ((angle * numSpikes / (2 * Math.PI)) % 1 + 1) % 1;
-      var lin = Math.max(0, 1 - Math.abs(phase - 0.5) * 2);
-      var profile = lin * lin * lin;  // concave sides (cube makes edges hollow)
-      return ri + spikeH * profile;
+    // Comic burst radius: irregular spikes with smooth interpolation
+    function rBurst(angle) {
+      var ri = rInner(angle);
+      // Map angle to spike index with smooth cubic interpolation
+      var norm = ((angle / (2 * Math.PI)) % 1 + 1) % 1;
+      var fi = norm * NUM_SPIKES;
+      var i0 = Math.floor(fi) % NUM_SPIKES;
+      var i1 = (i0 + 1) % NUM_SPIKES;
+      var frac = fi - Math.floor(fi);
+      // Smoothstep for organic transitions between spikes
+      var smooth = frac * frac * (3 - 2 * frac);
+      var h = spikeHeights[i0] * (1 - smooth) + spikeHeights[i1] * smooth;
+      // Spike profile: sharp peaks with concave valleys
+      var phase = frac;
+      var pointy = Math.max(0, 1 - Math.abs(phase - 0.5) * 2);
+      var profile = pointy * pointy;  // quadratic for sharp peaks
+      return ri + spikeH * h * profile;
     }
 
-    var pad = spikeH + 3;
+    var pad = spikeH + 10;
     var sx0 = Math.max(0, bcx - rrx - pad);
     var sx1 = Math.min(PW - 1, bcx + rrx + pad);
     var sy0 = Math.max(0, bcy - rry - pad);
     var sy1 = Math.min(PH - 1, bcy + rry + pad);
 
-    // Single pass: yellow inside starburst, black 2px outline outside
+    var BLACK_W = 5;  // black outline thickness
+    var YELLOW_W = 8; // yellow border thickness
+
+    // 3-layer rendering: black outline → yellow border → white fill
     for (var sy = sy0; sy <= sy1; sy++) {
       for (var sx = sx0; sx <= sx1; sx++) {
         var dx = sx - bcx, dy = sy - bcy;
         var r = Math.sqrt(dx * dx + dy * dy);
         var angle = Math.atan2(dy, dx);
-        var rm = rMax(angle);
+        var rm = rBurst(angle);
         var pi = sy * PW + sx;
-        if (r <= rm) {
-          _blendPixel(buf, pi, 255, 210, 20, alpha);
-        } else if (r <= rm + 2) {
-          _blendPixel(buf, pi, 0, 0, 0, alpha);
+
+        if (r <= rm + BLACK_W) {
+          if (r <= rm - YELLOW_W) {
+            // White fill
+            _blendPixel(buf, pi, 255, 255, 255, alpha);
+          } else if (r <= rm) {
+            // Yellow border
+            _blendPixel(buf, pi, 255, 210, 20, alpha);
+          } else {
+            // Black outline
+            _blendPixel(buf, pi, 0, 0, 0, alpha);
+          }
         }
       }
     }
 
-    // Draw text centered, then re-blend with alpha so it fades identically to the bubble
+    // Draw text centered in the burst (scaled 3× for HD)
     var displayText = word.toUpperCase();
-    var textW = displayText.length * (_FONT_W + _FONT_SPACING) - _FONT_SPACING;
+    var textScale = 3;
+    var charW = (_FONT_W + _FONT_SPACING) * textScale;
+    var textW = displayText.length * charW - _FONT_SPACING;
+    var textH = _FONT_H * textScale;
     var ttx = Math.round(bcx - textW / 2);
-    var tty = Math.round(bcy - _FONT_H / 2);
-    drawText(buf, PW, PH, displayText, ttx, tty, 30, 20, 10, 'temp.interjection');
-    for (var rty = Math.max(0, tty - 1); rty <= Math.min(PH - 1, tty + 7); rty++) {
-      for (var rtx = Math.max(0, ttx - 1); rtx <= Math.min(PW - 1, ttx + textW + 1); rtx++) {
-        var rpi = rty * PW + rtx;
-        if (buf[rpi].e === 'temp.interjection') {
-          buf[rpi].r = Math.round(buf[rpi]._r * (1 - alpha) + 30 * alpha);
-          buf[rpi].g = Math.round(buf[rpi]._g * (1 - alpha) + 20 * alpha);
-          buf[rpi].b = Math.round(buf[rpi]._b * (1 - alpha) + 10 * alpha);
+    var tty = Math.round(bcy - textH / 2);
+
+    // Black text outline (2px offset in all directions)
+    var outlineOffsets = [[-2,0],[2,0],[0,-2],[0,2],[-2,-2],[2,-2],[-2,2],[2,2]];
+    for (var oi = 0; oi < outlineOffsets.length; oi++) {
+      var ox = outlineOffsets[oi][0], oy = outlineOffsets[oi][1];
+      var cx2 = ttx + ox;
+      for (var ci = 0; ci < displayText.length; ci++) {
+        var ch = displayText[ci];
+        var glyph = _PIXEL_FONT[ch];
+        if (!glyph) { cx2 += charW; continue; }
+        for (var gy = 0; gy < _FONT_H; gy++) {
+          for (var gx = 0; gx < _FONT_W; gx++) {
+            if (!glyph[gy * _FONT_W + gx]) continue;
+            for (var sy2 = 0; sy2 < textScale; sy2++) {
+              for (var sx2 = 0; sx2 < textScale; sx2++) {
+                var drawX = cx2 + gx * textScale + sx2;
+                var drawY = tty + oy + gy * textScale + sy2;
+                if (drawX >= 0 && drawX < PW && drawY >= 0 && drawY < PH) {
+                  _blendPixel(buf, drawY * PW + drawX, 0, 0, 0, alpha);
+                }
+              }
+            }
+          }
+        }
+        cx2 += charW;
+      }
+    }
+
+    // Yellow/orange text fill
+    var cx2 = ttx;
+    for (var ci = 0; ci < displayText.length; ci++) {
+      var ch = displayText[ci];
+      var glyph = _PIXEL_FONT[ch];
+      if (!glyph) { cx2 += charW; continue; }
+      for (var gy = 0; gy < _FONT_H; gy++) {
+        for (var gx = 0; gx < _FONT_W; gx++) {
+          if (!glyph[gy * _FONT_W + gx]) continue;
+          for (var sy2 = 0; sy2 < textScale; sy2++) {
+            for (var sx2 = 0; sx2 < textScale; sx2++) {
+              var drawX = cx2 + gx * textScale + sx2;
+              var drawY = tty + gy * textScale + sy2;
+              if (drawX >= 0 && drawX < PW && drawY >= 0 && drawY < PH) {
+                _blendPixel(buf, drawY * PW + drawX, 240, 190, 30, alpha);
+              }
+            }
+          }
         }
       }
+      cx2 += charW;
     }
   };
 }, 1500);
