@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tellimations — HD Animation Test (Story B, Scene 4)</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      background: #1a1a2e;
+      color: #e0e0e0;
+      font-family: monospace;
+      margin: 0;
+      padding: 1.5rem;
+    }
+    h1 { color: #66ccff; margin: 0 0 0.5rem; font-size: 1.4rem; }
+    h2 { color: #88ddaa; margin: 1.2rem 0 0.4rem; font-size: 1rem; }
+    canvas {
+      border: 2px solid #444;
+      display: block;
+      margin-bottom: 0.8rem;
+      max-width: 100%;
+      height: auto;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 0.4rem;
+    }
+    .config-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      margin-bottom: 0.8rem;
+      align-items: center;
+    }
+    .config-row label {
+      font-size: 0.8rem;
+      color: #aaa;
+    }
+    button {
+      background: #2a2a4e;
+      color: #e0e0e0;
+      border: 1px solid #555;
+      padding: 0.35rem 0.7rem;
+      font-family: monospace;
+      font-size: 0.85rem;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    button:hover { background: #3a3a6e; }
+    button:disabled { opacity: 0.4; cursor: not-allowed; }
+    button.active { background: #4a6a4a; border-color: #88ddaa; }
+    button.stop-btn { background: #4a2020; }
+    button.stop-btn:hover { background: #6a3030; }
+    button.play-all { background: #2a4a2a; }
+    button.play-all:hover { background: #3a5a3a; }
+
+    select, input[type="text"] {
+      background: #2a2a4e;
+      color: #e0e0e0;
+      border: 1px solid #555;
+      padding: 0.3rem 0.5rem;
+      font-family: monospace;
+      font-size: 0.8rem;
+      border-radius: 4px;
+    }
+    input[type="text"] { width: 120px; }
+
+    #status {
+      padding: 0.4rem 0.8rem;
+      margin-bottom: 0.5rem;
+      border-radius: 4px;
+      font-weight: bold;
+      font-size: 0.85rem;
+    }
+    .status-idle { background: #1a3a1a; color: #4caf50; }
+    .status-playing { background: #3a3a1a; color: #ffcc00; }
+    .status-loading { background: #1a1a3a; color: #66ccff; }
+
+    .family-label {
+      color: #888;
+      font-size: 0.75rem;
+      width: 100%;
+      margin-top: 0.3rem;
+    }
+
+    #log {
+      background: #0d0d1a;
+      padding: 0.8rem;
+      border-radius: 4px;
+      max-height: 260px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      font-size: 0.8rem;
+      margin-top: 0.8rem;
+    }
+    .log-ok   { color: #4caf50; }
+    .log-info { color: #66ccff; }
+    .log-warn { color: #ffaa33; }
+    .log-err  { color: #ff5555; }
+  </style>
+</head>
+<body>
+
+<h1>HD Animation Test — Story B Scene 4 (The Trick)</h1>
+
+<canvas id="scene"></canvas>
+<div id="status" class="status-loading">Loading scene...</div>
+
+<h2>Target</h2>
+<div class="config-row">
+  <label>Entity A:
+    <select id="targetA">
+      <option value="boy">boy</option>
+      <option value="monkey">monkey</option>
+      <option value="banana">banana</option>
+      <option value="mother">mother</option>
+    </select>
+  </label>
+  <label>Entity B:
+    <select id="targetB">
+      <option value="monkey">monkey</option>
+      <option value="boy">boy</option>
+      <option value="banana">banana</option>
+      <option value="mother">mother</option>
+    </select>
+  </label>
+</div>
+<div class="config-row">
+  <label>Text: <input type="text" id="cfgText" value="Hello!" /></label>
+  <label>Word: <input type="text" id="cfgWord" value="Wow!" /></label>
+  <label>Particles:
+    <select id="cfgParticle">
+      <option value="sparkle">sparkle</option>
+      <option value="steam">steam</option>
+      <option value="frost">frost</option>
+      <option value="dust">dust</option>
+      <option value="heart">heart</option>
+      <option value="hearts">hearts</option>
+      <option value="anger">anger</option>
+      <option value="fear">fear</option>
+    </select>
+  </label>
+  <label>Ghost URL:
+    <select id="cfgGhost">
+      <option value="">none</option>
+      <option value="/study-assets/B/assets/withoutbg-scene_3_bag.png">bag (scene 3)</option>
+      <option value="/study-assets/B/assets/withoutbg-scene_1_monkey.png">monkey (scene 1)</option>
+      <option value="/study-assets/B/assets/withoutbg-scene_2_mother.png">mother (scene 2)</option>
+      <option value="/study-assets/B/assets/withoutbg-scene_1_boy.png">boy (scene 1)</option>
+    </select>
+  </label>
+  <label>Direction:
+    <select id="cfgDir">
+      <option value="right">right</option>
+      <option value="left">left</option>
+      <option value="up">up</option>
+      <option value="down">down</option>
+    </select>
+  </label>
+</div>
+
+<!-- Animation buttons by family -->
+<div class="family-label">I — Identity</div>
+<div class="controls">
+  <button onclick="playT('spotlight')">spotlight</button>
+  <button onclick="playT('nametag')">nametag</button>
+</div>
+
+<div class="family-label">S — Space</div>
+<div class="controls">
+  <button onclick="playT('reveal')">reveal</button>
+  <button onclick="playT('stamp')">stamp</button>
+</div>
+
+<div class="family-label">P — Property</div>
+<div class="controls">
+  <button onclick="playT('color_pop')">color_pop</button>
+  <button onclick="playT('emanation')">emanation</button>
+</div>
+
+<div class="family-label">T — Time</div>
+<div class="controls">
+  <button onclick="playT('flashback')">flashback</button>
+  <button onclick="playT('timelapse')">timelapse</button>
+</div>
+
+<div class="family-label">A — Action</div>
+<div class="controls">
+  <button onclick="playT('motion_lines')">motion_lines</button>
+  <button onclick="playT('anticipation')">anticipation</button>
+</div>
+
+<div class="family-label">R — Relation (uses A + B)</div>
+<div class="controls">
+  <button onclick="playT('magnetism')">magnetism</button>
+  <button onclick="playT('repel')">repel</button>
+  <button onclick="playT('causal_push')">causal_push</button>
+</div>
+
+<div class="family-label">C — Continuity</div>
+<div class="controls">
+  <button onclick="playT('sequential_glow')">sequential_glow</button>
+  <button onclick="playT('disintegration')">disintegration</button>
+  <button onclick="playT('ghost_outline')">ghost_outline</button>
+</div>
+
+<div class="family-label">D — Discourse</div>
+<div class="controls">
+  <button onclick="playT('speech_bubble')">speech_bubble</button>
+  <button onclick="playT('thought_bubble')">thought_bubble</button>
+  <button onclick="playT('alert')">alert</button>
+  <button onclick="playT('interjection')">interjection</button>
+</div>
+
+<h2>Controls</h2>
+<div class="controls">
+  <button class="play-all" onclick="playAll()">Play All Sequentially</button>
+  <button class="stop-btn" onclick="stopAnim()">Stop</button>
+  <button onclick="reloadScene()">Reload Scene</button>
+</div>
+<div id="log"></div>
+
+<script src="engine.js"></script>
+<script src="animation_helpers.js"></script>
+<script src="animations.js"></script>
+<script src="animation_templates.js"></script>
+<script>
+// ═══════════════════════════════════════════════════════════════════
+// Config
+// ═══════════════════════════════════════════════════════════════════
+
+var STORY = 'B';
+var SCENE = 4;
+var HD_SCALE = 1;
+var ENTITY_LIST = ['boy', 'monkey', 'banana', 'mother'];
+
+var canvas = document.getElementById('scene');
+var logEl = document.getElementById('log');
+var statusEl = document.getElementById('status');
+
+// These will be set after HD scene loads
+var buf = null;
+var renderer = null;
+var runner = null;
+var hdEntityData = {};
+window.hdEntityData = hdEntityData;
+var scene_entity_order = [];
+var _stopPlayAll = false;
+
+// ── Logging ──
+
+function log(msg, cls) {
+  cls = cls || 'log-info';
+  var line = document.createElement('div');
+  line.className = cls;
+  line.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg;
+  logEl.prepend(line);
+}
+
+function updateStatus(text) {
+  if (text) {
+    statusEl.textContent = text;
+    statusEl.className = 'status-playing';
+  } else if (runner && runner.isPlaying) {
+    statusEl.className = 'status-playing';
+  } else {
+    statusEl.textContent = 'Idle';
+    statusEl.className = 'status-idle';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// HD Scene Loading (adapted from study_story.js)
+// ═══════════════════════════════════════════════════════════════════
+
+function computeEntityContour(entityId, img, w, h) {
+  var off = document.createElement('canvas');
+  off.width = w;
+  off.height = h;
+  var offCtx = off.getContext('2d');
+  offCtx.drawImage(img, 0, 0);
+  var imgData = offCtx.getImageData(0, 0, w, h);
+  var px = imgData.data;
+  var total = w * h;
+
+  var mask = new Uint8Array(total);
+  var x1 = w, y1 = h, x2 = -1, y2 = -1;
+  for (var i = 0; i < total; i++) {
+    var a = px[i * 4 + 3];
+    if (a <= 10) continue; // fully transparent
+    var r = px[i * 4], g = px[i * 4 + 1], b = px[i * 4 + 2];
+    // Remove white halo: semi-transparent white-ish pixels from bg removal
+    if (a < 200 && r > 200 && g > 200 && b > 200) {
+      px[i * 4 + 3] = 0; // make fully transparent
+      continue;
+    }
+    mask[i] = 1;
+    var mx = i % w, my = (i - mx) / w;
+    if (mx < x1) x1 = mx;
+    if (mx > x2) x2 = mx;
+    if (my < y1) y1 = my;
+    if (my > y2) y2 = my;
+  }
+
+  var contour = [];
+  for (var i = 0; i < total; i++) {
+    if (!mask[i]) continue;
+    var cx = i % w, cy = (i - cx) / w;
+    if ((cx > 0     && !mask[i - 1]) ||
+        (cx < w - 1 && !mask[i + 1]) ||
+        (cy > 0     && !mask[i - w]) ||
+        (cy < h - 1 && !mask[i + w])) {
+      contour.push({ x: cx, y: cy, idx: i });
+    }
+  }
+
+  var maxDist = 20;
+  var distField = new Uint8Array(total);
+  distField.fill(255);
+  for (var i = 0; i < total; i++) {
+    if (mask[i]) distField[i] = 0;
+  }
+  var queue = [];
+  for (var c = 0; c < contour.length; c++) {
+    var ci = contour[c].idx;
+    var cx = ci % w, cy = (ci - cx) / w;
+    if (cx > 0     && distField[ci - 1] === 255) { distField[ci - 1] = 1; queue.push(ci - 1); }
+    if (cx < w - 1 && distField[ci + 1] === 255) { distField[ci + 1] = 1; queue.push(ci + 1); }
+    if (cy > 0     && distField[ci - w] === 255) { distField[ci - w] = 1; queue.push(ci - w); }
+    if (cy < h - 1 && distField[ci + w] === 255) { distField[ci + w] = 1; queue.push(ci + w); }
+  }
+  var dist = 1;
+  while (queue.length > 0 && dist < maxDist) {
+    dist++;
+    var next = [];
+    for (var q = 0; q < queue.length; q++) {
+      var ci = queue[q];
+      var cx = ci % w, cy = (ci - cx) / w;
+      if (cx > 0     && distField[ci - 1] === 255) { distField[ci - 1] = dist; next.push(ci - 1); }
+      if (cx < w - 1 && distField[ci + 1] === 255) { distField[ci + 1] = dist; next.push(ci + 1); }
+      if (cy > 0     && distField[ci - w] === 255) { distField[ci - w] = dist; next.push(ci - w); }
+      if (cy < h - 1 && distField[ci + w] === 255) { distField[ci + w] = dist; next.push(ci + w); }
+    }
+    queue = next;
+  }
+
+  // Write back cleaned image (white halo pixels zeroed out)
+  offCtx.putImageData(imgData, 0, 0);
+
+  hdEntityData[entityId] = {
+    mask: mask,
+    contour: contour,
+    bounds: { x1: x1, y1: y1, x2: x2, y2: y2 },
+    distField: distField,
+    width: w,
+    height: h,
+    cleanCanvas: off,
+  };
+}
+
+function captureBgPixels(fullW, fullH) {
+  var aw = Math.ceil(fullW / HD_SCALE);
+  var ah = Math.ceil(fullH / HD_SCALE);
+  var off = document.createElement('canvas');
+  off.width = aw;
+  off.height = ah;
+  var offCtx = off.getContext('2d');
+  offCtx.imageSmoothingEnabled = true;
+  offCtx.drawImage(canvas, 0, 0, aw, ah);
+  return offCtx.getImageData(0, 0, aw, ah).data;
+}
+
+function buildHDPixelBuffer(fullW, fullH, bgPixels) {
+  var aw = Math.ceil(fullW / HD_SCALE);
+  var ah = Math.ceil(fullH / HD_SCALE);
+
+  var off = document.createElement('canvas');
+  off.width = aw;
+  off.height = ah;
+  var offCtx = off.getContext('2d');
+  offCtx.imageSmoothingEnabled = true;
+  offCtx.drawImage(canvas, 0, 0, aw, ah);
+  var imgData = offCtx.getImageData(0, 0, aw, ah);
+  var px = imgData.data;
+  var total = aw * ah;
+
+  var hdBuf = new PixelBuffer(aw, ah);
+
+  for (var i = 0; i < total; i++) {
+    var p = hdBuf.data[i];
+    p.r = px[i * 4];
+    p.g = px[i * 4 + 1];
+    p.b = px[i * 4 + 2];
+    p.e = 'bg';
+  }
+
+  var entityIds = scene_entity_order;
+  var downMasks = {};
+  for (var ei = 0; ei < entityIds.length; ei++) {
+    var eid = entityIds[ei];
+    var ed = hdEntityData[eid];
+    if (!ed) continue;
+    var dm = new Uint8Array(total);
+    for (var y = 0; y < ah; y++) {
+      for (var x = 0; x < aw; x++) {
+        var sx = x * HD_SCALE, sy = y * HD_SCALE;
+        var hit = false;
+        for (var dy = 0; dy < HD_SCALE && !hit; dy++) {
+          for (var dx = 0; dx < HD_SCALE && !hit; dx++) {
+            var fi = (sy + dy) * fullW + (sx + dx);
+            if (fi < ed.mask.length && ed.mask[fi]) hit = true;
+          }
+        }
+        if (hit) {
+          var di = y * aw + x;
+          dm[di] = 1;
+          hdBuf.data[di].e = eid;
+        }
+      }
+    }
+    downMasks[eid] = dm;
+  }
+
+  // Distance fields
+  hdBuf.distFields = {};
+  for (var eid in downMasks) {
+    var mask = downMasks[eid];
+    var field = new Uint8Array(total);
+    field.fill(255);
+    for (var i = 0; i < total; i++) { if (mask[i]) field[i] = 0; }
+    var edgeQueue = [];
+    for (var i = 0; i < total; i++) {
+      if (field[i] !== 0) continue;
+      var cx = i % aw, cy = (i - cx) / aw;
+      if ((cx > 0      && field[i - 1]  !== 0) ||
+          (cx < aw - 1 && field[i + 1]  !== 0) ||
+          (cy > 0      && field[i - aw] !== 0) ||
+          (cy < ah - 1 && field[i + aw] !== 0)) {
+        edgeQueue.push(i);
+      }
+    }
+    var queue = [];
+    for (var q = 0; q < edgeQueue.length; q++) {
+      var ci = edgeQueue[q], cx = ci % aw, cy = (ci - cx) / aw;
+      if (cx > 0      && field[ci - 1]  === 255) { field[ci - 1]  = 1; queue.push(ci - 1); }
+      if (cx < aw - 1 && field[ci + 1]  === 255) { field[ci + 1]  = 1; queue.push(ci + 1); }
+      if (cy > 0      && field[ci - aw] === 255) { field[ci - aw] = 1; queue.push(ci - aw); }
+      if (cy < ah - 1 && field[ci + aw] === 255) { field[ci + aw] = 1; queue.push(ci + aw); }
+    }
+    var dist = 1, maxDist = 20;
+    while (queue.length > 0 && dist < maxDist) {
+      dist++;
+      var next = [];
+      for (var q = 0; q < queue.length; q++) {
+        var ci = queue[q], cx = ci % aw, cy = (ci - cx) / aw;
+        if (cx > 0      && field[ci - 1]  === 255) { field[ci - 1]  = dist; next.push(ci - 1); }
+        if (cx < aw - 1 && field[ci + 1]  === 255) { field[ci + 1]  = dist; next.push(ci + 1); }
+        if (cy > 0      && field[ci - aw] === 255) { field[ci - aw] = dist; next.push(ci - aw); }
+        if (cy < ah - 1 && field[ci + aw] === 255) { field[ci + aw] = dist; next.push(ci + aw); }
+      }
+      queue = next;
+    }
+    hdBuf.distFields[eid] = field;
+  }
+  hdBuf.data._distFields = hdBuf.distFields;
+
+  // Entity layers — use each entity's own image (not the composited canvas)
+  // so that overlapping pixels get the correct per-entity colors
+  for (var ei = 0; ei < entityIds.length; ei++) {
+    var eid = entityIds[ei];
+    var dm = downMasks[eid];
+    var ed = hdEntityData[eid];
+    if (!dm || !ed) continue;
+    // Downscale the entity's individual canvas to get its true colors
+    var entOff = document.createElement('canvas');
+    entOff.width = aw; entOff.height = ah;
+    var entCtx = entOff.getContext('2d');
+    entCtx.imageSmoothingEnabled = true;
+    entCtx.drawImage(ed.cleanCanvas, 0, 0, aw, ah);
+    var entPx = entCtx.getImageData(0, 0, aw, ah).data;
+    var layer = [];
+    for (var i = 0; i < total; i++) {
+      if (dm[i]) {
+        var pi = i * 4;
+        // Use entity's own colors (not composited), fall back to composited if alpha=0
+        var er = entPx[pi], eg = entPx[pi + 1], eb = entPx[pi + 2], ea = entPx[pi + 3];
+        if (ea > 10) {
+          layer.push({ idx: i, r: er, g: eg, b: eb, e: eid });
+        } else {
+          layer.push({ idx: i, r: hdBuf.data[i].r, g: hdBuf.data[i].g, b: hdBuf.data[i].b, e: eid });
+        }
+      }
+    }
+    hdBuf.entityLayers[eid] = layer;
+  }
+  hdBuf.data._entityLayers = hdBuf.entityLayers;
+
+  // Set background snapshot from bg-only pixels (without entities)
+  if (bgPixels) {
+    for (var i = 0; i < total; i++) {
+      var p = hdBuf.data[i];
+      p._br = bgPixels[i * 4];
+      p._bg = bgPixels[i * 4 + 1];
+      p._bb = bgPixels[i * 4 + 2];
+      p._be = 'bg';
+    }
+  } else {
+    hdBuf.snapshotBackground();
+  }
+
+  return hdBuf;
+}
+
+function createHDRenderer(fullW, fullH) {
+  var aw = Math.ceil(fullW / HD_SCALE);
+  var ah = Math.ceil(fullH / HD_SCALE);
+  var offCanvas = document.createElement('canvas');
+  offCanvas.width = aw;
+  offCanvas.height = ah;
+  var offCtx = offCanvas.getContext('2d');
+  var offImgData = offCtx.createImageData(aw, ah);
+
+  return {
+    canvas: canvas,
+    buf: null,
+    render: function() {
+      var b = this.buf;
+      if (!b) return;
+      var out = offImgData.data;
+      var n = aw * ah;
+      for (var i = 0; i < n; i++) {
+        var p = b.data[i];
+        out[i * 4]     = p.r;
+        out[i * 4 + 1] = p.g;
+        out[i * 4 + 2] = p.b;
+        out[i * 4 + 3] = 255;
+      }
+      offCtx.putImageData(offImgData, 0, 0);
+      var mainCtx = canvas.getContext('2d');
+      mainCtx.imageSmoothingEnabled = true;
+      mainCtx.drawImage(offCanvas, 0, 0, fullW, fullH);
+    }
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// Load Scene
+// ═══════════════════════════════════════════════════════════════════
+
+function loadScene() {
+  statusEl.textContent = 'Loading scene...';
+  statusEl.className = 'status-loading';
+  hdEntityData = {};
+  window.hdEntityData = hdEntityData;
+
+  fetch('/api/study/scene?story=' + STORY + '&scene=' + SCENE)
+    .then(function(resp) {
+      if (!resp.ok) throw new Error('Failed to load scene');
+      return resp.json();
+    })
+    .then(function(scene) {
+      log('Scene loaded: ' + scene.title + ' (format: ' + scene.format + ')');
+      scene_entity_order = (scene.entity_urls || []).map(function(e) { return e.id; });
+      renderSceneHD(scene);
+    })
+    .catch(function(err) {
+      log('ERROR: ' + err.message, 'log-err');
+      statusEl.textContent = 'Error loading scene';
+    });
+}
+
+function renderSceneHD(scene) {
+  var ctx = canvas.getContext('2d');
+
+  var bgImg = new Image();
+  bgImg.onload = function() {
+    var w = bgImg.width, h = bgImg.height;
+    canvas.width = w;
+    canvas.height = h;
+    ctx.imageSmoothingEnabled = true;
+    ctx.drawImage(bgImg, 0, 0);
+
+    // Capture bg-only pixels BEFORE drawing entities (for animation background snapshot)
+    var bgOnlyPixels = captureBgPixels(w, h);
+
+    var entities = scene.entity_urls || [];
+    if (entities.length === 0) {
+      setupAnimations(w, h, bgOnlyPixels);
+      return;
+    }
+
+    var images = new Array(entities.length);
+    var loaded = 0;
+    entities.forEach(function(ent, idx) {
+      var entImg = new Image();
+      entImg.onload = function() {
+        images[idx] = entImg;
+        computeEntityContour(ent.id, entImg, w, h);
+        log('Entity loaded: ' + ent.id + ' (contour: ' + hdEntityData[ent.id].contour.length + ' px)');
+        loaded++;
+        if (loaded === entities.length) {
+          for (var i = 0; i < entities.length; i++) {
+            var ed = hdEntityData[entities[i].id];
+            ctx.drawImage(ed && ed.cleanCanvas ? ed.cleanCanvas : images[i], 0, 0);
+          }
+          setupAnimations(w, h, bgOnlyPixels);
+        }
+      };
+      entImg.onerror = function() {
+        log('Failed to load entity: ' + ent.id, 'log-err');
+        loaded++;
+        if (loaded === entities.length) {
+          for (var i = 0; i < entities.length; i++) {
+            var ed = hdEntityData[entities[i].id];
+            ctx.drawImage(ed && ed.cleanCanvas ? ed.cleanCanvas : images[i], 0, 0);
+          }
+          setupAnimations(w, h, bgOnlyPixels);
+        }
+      };
+      entImg.src = ent.url;
+    });
+  };
+  bgImg.onerror = function() {
+    log('Failed to load background', 'log-err');
+  };
+  bgImg.src = scene.background_url;
+}
+
+function setupAnimations(w, h, bgPixels) {
+  var aw = Math.ceil(w / HD_SCALE);
+  var ah = Math.ceil(h / HD_SCALE);
+  buf = buildHDPixelBuffer(w, h, bgPixels);
+  renderer = createHDRenderer(w, h);
+  renderer.buf = buf;
+  runner = new AnimationRunner(buf, renderer);
+  runner.frameInterval = 1000 / 24;
+
+  log('Animation buffer ready: ' + aw + 'x' + ah +
+    ' (downscaled from ' + w + 'x' + h + ')', 'log-ok');
+  log('Entities: ' + scene_entity_order.join(', '), 'log-ok');
+  updateStatus();
+}
+
+function reloadScene() {
+  if (runner) runner.stop();
+  _stopPlayAll = true;
+  loadScene();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// Template Configuration
+// ═══════════════════════════════════════════════════════════════════
+
+var TEMPLATE_ORDER = [
+  'spotlight', 'nametag',
+  'reveal', 'stamp',
+  'color_pop', 'emanation',
+  'flashback', 'timelapse',
+  'motion_lines', 'anticipation',
+  'magnetism', 'repel', 'causal_push',
+  'sequential_glow', 'disintegration', 'ghost_outline',
+  'speech_bubble', 'thought_bubble', 'alert', 'interjection'
+];
+
+var TEMPLATE_CONFIG = {
+  spotlight:     { duration: 3000 },
+  nametag:       { duration: 3000 },
+  stamp:         { duration: 3000 },
+  color_pop:     { duration: 3000 },
+  reveal:        { duration: 3000 },
+  emanation:     { duration: 3000, useParticle: true },
+  flashback:     { duration: 3000 },
+  ghost_outline: { duration: 3000, useGhost: true },
+  disintegration:{ duration: 3000 },
+  alert:         { duration: 3000 },
+  motion_lines:  { duration: 3000, useDirection: true },
+  anticipation:  { duration: 3000, useDirection: true, dirParam: 'lurchDirection' },
+
+  causal_push: { duration: 3000, twoEntity: true },
+  magnetism:   { duration: 3000, twoEntity: true },
+  repel:       { duration: 3000, twoEntity: true },
+
+  sequential_glow: { duration: 3000, allEntities: true },
+
+  timelapse: { duration: 3000, sceneWide: true },
+
+  speech_bubble:  { duration: 3000, useText: true },
+  thought_bubble: { duration: 3000, useText: true },
+  interjection:   { duration: 3000, useWord: true },
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// Play
+// ═══════════════════════════════════════════════════════════════════
+
+function buildSpec(templateName) {
+  var cfg = TEMPLATE_CONFIG[templateName];
+  if (!cfg) { log('Unknown template: ' + templateName, 'log-err'); return null; }
+
+  var targetA = document.getElementById('targetA').value;
+  var targetB = document.getElementById('targetB').value;
+  var text = document.getElementById('cfgText').value || '...';
+  var word = document.getElementById('cfgWord').value || '???';
+  var particle = document.getElementById('cfgParticle').value;
+  var direction = document.getElementById('cfgDir').value;
+
+  var params = {};
+
+  if (cfg.twoEntity) {
+    params.entityPrefixA = targetA;
+    params.entityPrefixB = targetB;
+  } else if (cfg.allEntities) {
+    params.entityPrefixes = ENTITY_LIST.slice();
+  } else if (!cfg.sceneWide) {
+    params.entityPrefix = targetA;
+  }
+
+  if (cfg.useParticle) params.particleType = particle;
+  if (cfg.useDirection) {
+    var dirKey = cfg.dirParam || 'direction';
+    params[dirKey] = direction;
+  }
+  if (cfg.useText) params.text = text;
+  if (cfg.useWord) params.word = word;
+  if (cfg.useGhost) {
+    var ghostUrl = document.getElementById('cfgGhost').value;
+    if (ghostUrl) params.ghostImageUrl = ghostUrl;
+  }
+
+  return { template: templateName, params: params, duration_ms: cfg.duration };
+}
+
+async function playT(templateName) {
+  if (!runner) { log('Not ready yet', 'log-warn'); return; }
+  var spec = buildSpec(templateName);
+  if (!spec) return;
+
+  var cfg = TEMPLATE_CONFIG[templateName];
+  var targetDesc = cfg.twoEntity
+    ? spec.params.entityPrefixA + ' -> ' + spec.params.entityPrefixB
+    : cfg.allEntities ? ENTITY_LIST.join(', ')
+    : cfg.sceneWide ? '(whole scene)'
+    : spec.params.entityPrefix;
+
+  log('Playing ' + templateName + ' on ' + targetDesc + ' (' + spec.duration_ms + 'ms)...');
+  updateStatus('Playing: ' + templateName + ' on ' + targetDesc);
+
+  await runner.play(spec);
+  updateStatus();
+  log(templateName + ' done.', 'log-ok');
+}
+
+async function playAll() {
+  if (!runner) { log('Not ready yet', 'log-warn'); return; }
+  _stopPlayAll = false;
+  log('--- Playing all ' + TEMPLATE_ORDER.length + ' templates ---', 'log-info');
+
+  for (var i = 0; i < TEMPLATE_ORDER.length; i++) {
+    if (_stopPlayAll) { log('Stopped.', 'log-warn'); break; }
+    var name = TEMPLATE_ORDER[i];
+    var spec = buildSpec(name);
+    if (!spec) continue;
+
+    log('  [' + (i + 1) + '/' + TEMPLATE_ORDER.length + '] ' + name + '...');
+    updateStatus('[' + (i + 1) + '/' + TEMPLATE_ORDER.length + '] ' + name);
+
+    await runner.play(spec);
+
+    if (i < TEMPLATE_ORDER.length - 1 && !_stopPlayAll) {
+      await new Promise(function(r) { setTimeout(r, 3000); });
+    }
+  }
+
+  updateStatus();
+  log('=== All animations complete ===', 'log-ok');
+}
+
+function stopAnim() {
+  _stopPlayAll = true;
+  if (runner) runner.stop();
+  updateStatus();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// Init
+// ═══════════════════════════════════════════════════════════════════
+
+loadScene();
+</script>
+
+</body>
+</html>

@@ -596,31 +596,45 @@ function _isEntity(entityId, prefix) {
 }
 
 function _drawStarBurst(buf, PW, PH, cx, cy, alpha, cardLen, diagLen) {
-  // Core 3x3
-  for (var dy = -1; dy <= 1; dy++) {
-    for (var dx = -1; dx <= 1; dx++) {
+  // Thickness: scale with spike length for HD visibility
+  var thick = Math.max(1, Math.round(cardLen / 6));
+  // Core filled circle
+  var coreR = Math.max(2, thick + 1);
+  for (var dy = -coreR; dy <= coreR; dy++) {
+    for (var dx = -coreR; dx <= coreR; dx++) {
+      if (dx * dx + dy * dy > coreR * coreR) continue;
       var sx = cx + dx, sy = cy + dy;
       if (sx >= 0 && sx < PW && sy >= 0 && sy < PH)
         _blendPixel(buf, sy * PW + sx, 255, 255, 180, alpha);
     }
   }
-  // Cardinal spikes
+  // Cardinal spikes (thick)
   var cards = [[1,0],[-1,0],[0,1],[0,-1]];
   for (var c = 0; c < 4; c++)
     for (var d = 2; d <= cardLen; d++) {
       var sa = alpha * (1 - (d - 1) / cardLen);
-      var sx = cx + cards[c][0] * d, sy = cy + cards[c][1] * d;
-      if (sx >= 0 && sx < PW && sy >= 0 && sy < PH)
-        _blendPixel(buf, sy * PW + sx, 255, 255, 120, sa);
+      var perpX = cards[c][1], perpY = cards[c][0];
+      for (var w = -thick; w <= thick; w++) {
+        var sx = cx + cards[c][0] * d + perpX * w;
+        var sy = cy + cards[c][1] * d + perpY * w;
+        if (sx >= 0 && sx < PW && sy >= 0 && sy < PH)
+          _blendPixel(buf, sy * PW + sx, 255, 255, 120, sa);
+      }
     }
-  // Diagonal spikes
+  // Diagonal spikes (thick)
   var diags = [[1,1],[-1,1],[1,-1],[-1,-1]];
   for (var c = 0; c < 4; c++)
     for (var d = 2; d <= diagLen; d++) {
       var sa = alpha * (1 - (d - 1) / diagLen);
-      var sx = cx + diags[c][0] * d, sy = cy + diags[c][1] * d;
-      if (sx >= 0 && sx < PW && sy >= 0 && sy < PH)
-        _blendPixel(buf, sy * PW + sx, 255, 230, 80, sa);
+      for (var wy = -thick; wy <= thick; wy++) {
+        for (var wx = -thick; wx <= thick; wx++) {
+          if (wx * wx + wy * wy > thick * thick + 1) continue;
+          var sx = cx + diags[c][0] * d + wx;
+          var sy = cy + diags[c][1] * d + wy;
+          if (sx >= 0 && sx < PW && sy >= 0 && sy < PH)
+            _blendPixel(buf, sy * PW + sx, 255, 230, 80, sa);
+        }
+      }
     }
 }
 

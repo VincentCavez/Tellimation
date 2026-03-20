@@ -59,7 +59,17 @@
 
           // Thumbnail or placeholder
           var wrapper;
-          if (storyData && storyData.sprite_code && Object.keys(storyData.sprite_code).length > 0) {
+          if (storyData && storyData.format === 'hd' && storyData.thumbnail_url) {
+            wrapper = document.createElement('div');
+            wrapper.className = 'thumbnail-card thumbnail-decorative';
+            var img = document.createElement('img');
+            img.src = storyData.thumbnail_url;
+            img.style.width = '100%';
+            img.style.height = 'auto';
+            img.style.display = 'block';
+            img.style.borderRadius = '8px';
+            wrapper.appendChild(img);
+          } else if (storyData && storyData.sprite_code && Object.keys(storyData.sprite_code).length > 0) {
             wrapper = ScenePicker.createThumbnailCard(storyData);
             wrapper.classList.add('thumbnail-decorative');
           } else {

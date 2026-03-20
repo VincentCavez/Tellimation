@@ -76,6 +76,7 @@ class AnimationRunner {
 
   /**
    * Core animation loop — plays a pre-compiled animate function.
+   * Respects this.frameInterval (ms) for framerate limiting (0 = every rAF).
    */
   _playFunction(animFn, durationMs) {
     if (this.isPlaying) {
@@ -88,9 +89,18 @@ class AnimationRunner {
       this.buf.snapshot();
       this.isPlaying = true;
       const startTime = performance.now();
+      const frameInterval = this.frameInterval || 0;
+      let lastFrameTime = 0;
 
       const tick = (now) => {
         if (!this.isPlaying) return;
+
+        // Framerate limiting
+        if (frameInterval > 0 && now - lastFrameTime < frameInterval) {
+          this._rafId = requestAnimationFrame(tick);
+          return;
+        }
+        lastFrameTime = now;
 
         const elapsed = now - startTime;
         const t = Math.min(elapsed / durationMs, 1);

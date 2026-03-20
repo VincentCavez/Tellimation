@@ -156,6 +156,15 @@ def _save_simulation_cache(scene: dict) -> None:
 app = FastAPI(title="Tellimations")
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
+# Serve HD study images from data/study_gen/
+_study_assets_dir = _find_data_dir()
+if _study_assets_dir and (_study_assets_dir / "study_gen").is_dir():
+    app.mount(
+        "/study-assets",
+        StaticFiles(directory=str(_study_assets_dir / "study_gen")),
+        name="study-assets",
+    )
+
 
 # ---------------------------------------------------------------------------
 # HTML page routes
@@ -312,7 +321,68 @@ def _parse_study_order(order: List[str]) -> tuple:
 
 
 def _load_study_scene(data_dir: Path, story_meta: Dict[str, Any], scene_num: int) -> Optional[Dict[str, Any]]:
-    """Load a single study scene from disk."""
+    """Load a single study scene from disk.
+
+    Supports two formats:
+    1. Legacy JSON (scene_X.json with sprite_code) from scene_dir
+    2. HD images (hd/ + assets/) from image_dir, with metadata from story_def
+    """
+    # --- Try HD image format first (image_dir) ---
+    image_dir_rel = story_meta.get("image_dir", "")
+    if image_dir_rel:
+        image_dir = data_dir.parent / image_dir_rel
+        bg_path = image_dir / "hd" / f"scene_{scene_num}_bg.png"
+        if bg_path.exists():
+            # Derive the story key from the image_dir (last component, e.g. "A")
+            story_key = Path(image_dir_rel).name
+
+            # Load metadata from story definition JSON
+            scene_meta: Dict[str, Any] = {}
+            story_def_rel = story_meta.get("story_def", "")
+            if story_def_rel:
+                story_def_path = data_dir.parent / story_def_rel
+                if story_def_path.exists():
+                    try:
+                        story_def = json.loads(story_def_path.read_text())
+                        scenes = story_def.get("scenes", [])
+                        if 0 < scene_num <= len(scenes):
+                            scene_meta = scenes[scene_num - 1]
+                    except (json.JSONDecodeError, OSError):
+                        pass
+
+            # Collect entity asset images for this scene
+            asset_dir = image_dir / "assets"
+            entity_map: Dict[str, str] = {}
+            if asset_dir.is_dir():
+                pattern = f"withoutbg-scene_{scene_num}_*.png"
+                for f in asset_dir.glob(pattern):
+                    # Extract entity name: withoutbg-scene_1_boy.png -> boy
+                    parts = f.stem.split("_", 2)  # withoutbg-scene, 1, boy
+                    entity_id = parts[2] if len(parts) > 2 else f.stem
+                    entity_map[entity_id] = f"/study-assets/{story_key}/assets/{f.name}"
+
+            # Order entities according to entities_in_scene (draw order / z-order)
+            ordered_ids = scene_meta.get("entities_in_scene", [])
+            entity_urls = []
+            for eid in ordered_ids:
+                if eid in entity_map:
+                    entity_urls.append({"id": eid, "url": entity_map.pop(eid)})
+            # Append any remaining assets not listed in entities_in_scene
+            for eid, url in sorted(entity_map.items()):
+                entity_urls.append({"id": eid, "url": url})
+
+            return {
+                "format": "hd",
+                "background_url": f"/study-assets/{story_key}/hd/scene_{scene_num}_bg.png",
+                "entity_urls": entity_urls,
+                "narrative_text": scene_meta.get("full_scene_prompt", ""),
+                "misl_targets": scene_meta.get("misl_targets", {}),
+                "entities_in_scene": scene_meta.get("entities_in_scene", []),
+                "scene_number": scene_num,
+                "title": scene_meta.get("title", ""),
+            }
+
+    # --- Fallback: legacy JSON scene ---
     scene_dir = story_meta.get("scene_dir", "")
     if not scene_dir:
         return None
@@ -352,7 +422,14 @@ async def study_assignment(participant: int):
         if data_dir:
             full_scene = _load_study_scene(data_dir, story_meta, 1)
             if full_scene:
-                scene_data["sprite_code"] = full_scene.get("sprite_code", {})
+                if full_scene.get("format") == "hd":
+                    scene_data["format"] = "hd"
+                    # Use full scene image (with entities) for thumbnail
+                    image_dir_rel = story_meta.get("image_dir", "")
+                    story_key = Path(image_dir_rel).name if image_dir_rel else label
+                    scene_data["thumbnail_url"] = f"/study-assets/{story_key}/hd/scene_1_full.png"
+                else:
+                    scene_data["sprite_code"] = full_scene.get("sprite_code", {})
         stories[label] = scene_data
 
     # Load training scenes
