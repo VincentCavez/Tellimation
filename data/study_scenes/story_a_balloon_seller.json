@@ -1,0 +1,147 @@
+{
+  "story_id": "A",
+  "title": "The Balloon Seller",
+  "characters": {
+    "boy": "a shy boy with round glasses",
+    "seller": "a tall balloon seller with a striped hat",
+    "bird": "a tiny white bird",
+    "balloon": "a big yellow balloon with a string"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Gift",
+      "background_prompt": "A busy park on a sunny day with a wooden bench, green trees, a path, and people in the distance. No one sitting on the bench. No animals.",
+      "full_scene_prompt": "A busy park on a sunny day. A shy boy with round glasses sits alone on a wooden bench. A tall balloon seller with a striped hat walks by, holding many colorful balloons. He is giving the boy a big yellow balloon. The boy smiles. Green trees and paths in the background.",
+      "entities_in_scene": ["boy", "seller", "balloon"],
+      "key_objects": ["park bench", "colorful balloons", "big yellow balloon"],
+      "misl_targets": {
+        "macro": {
+          "CH": ["shy boy with round glasses", "tall balloon seller with striped hat"],
+          "S": ["pretty park","sunny day"],
+          "IE": null,
+          "IR": ["boy is shy", "boy smiles"],
+          "P": null,
+          "A": ["sits on bench", "walks by", "gives balloon"],
+          "CO": null
+        },
+        "micro": {
+          "ENP": ["round glasses", "tall balloon seller", "striped hat", "colorful balloons", "big yellow balloon"],
+          "ADV": ["alone"],
+          "SC": [],
+          "CC": [],
+          "M": [],
+          "L": []
+        }
+      }
+    },
+    {
+      "scene_number": 2,
+      "title": "The Walk",
+      "background_prompt": "A path along a lake in a park, trees on one side, calm water on the other. Sunny day. No people, no animals.",
+      "full_scene_prompt": "A path along a lake in a park. A shy boy with round glasses walks proudly, holding a big yellow balloon by its string tightly. A tiny white bird has landed on the balloon and is pecking at it. The boy shoos the bird gently with his other hand. Calm lake and trees in the background.",
+      "entities_in_scene": ["boy", "bird", "balloon"],
+      "key_objects": ["yellow balloon", "balloon string", "lake", "path"],
+      "misl_targets": {
+        "macro": {
+          "CH": ["boy", "tiny white bird"],
+          "S": ["path along the lake"],
+          "IE": null,
+          "IR": null,
+          "P": null,
+          "A": ["walks along path", "bird lands on balloon", "bird pecks at balloon", "boy shoos the bird"],
+          "CO": null
+        },
+        "micro": {
+          "ENP": ["balloon string", "tiny white bird"],
+          "ADV": ["proudly", "tightly", "gently"],
+          "SC": [],
+          "CC": ["and"],
+          "M": [],
+          "L": []
+        }
+      }
+    },
+    {
+      "scene_number": 3,
+      "title": "The Pop",
+      "background_prompt": "A wooden bridge over water in a park. Calm water below, trees on both sides. Sunny day. No people, no animals.",
+      "full_scene_prompt": "A wooden bridge over water. A shy boy with round glasses leans over the edge of the bridge, looking sad. Yellow pieces of a popped balloon fall into the water below. A tiny white bird flies away from the bridge. The boy's face is sad.",
+      "entities_in_scene": ["boy", "bird", "balloon"],
+      "key_objects": ["wooden bridge", "yellow balloon pieces", "water"],
+      "misl_targets": {
+        "macro": {
+          "CH": ["boy", "bird"],
+          "S": ["wooden bridge"],
+          "IE": ["balloon pops"],
+          "IR": ["boy's face turns sad"],
+          "P": null,
+          "A": ["bird pecks", "balloon pops", "pieces fall into water", "boy leans over edge"],
+          "CO": null
+        },
+        "micro": {
+          "ENP": ["loud bang", "yellow pieces", "edge of the bridge"],
+          "ADV": ["below", "away"],
+          "SC": ["when the bird pecks"],
+          "CC": [],
+          "M": [],
+          "L": []
+        }
+      }
+    },
+    {
+      "scene_number": 4,
+      "title": "The Search",
+      "background_prompt": "A windy hilltop in a park, grass blowing, a park entrance with a gate visible in the distance below. Emptier area of the park. No people, no animals.",
+      "full_scene_prompt": "A windy hilltop in a park. A shy boy with round glasses walks sadly down the hill, looking around. In the distance near the park entrance, a tall balloon seller with a striped hat is visible holding balloons. The boy is running toward him but the wind is blowing him back. Grass blowing in the wind.",
+      "entities_in_scene": ["boy", "seller"],
+      "key_objects": ["hilltop", "park entrance", "wind"],
+      "misl_targets": {
+        "macro": {
+          "CH": ["boy", "balloon seller"],
+          "S": ["windy hilltop"],
+          "IE": null,
+          "IR": ["sad", "determined"],
+          "P": ["decides to find the seller"],
+          "A": ["walks up hill", "looking for seller", "spots striped hat", "runs toward him"],
+          "CO": null
+        },
+        "micro": {
+          "ENP": ["striped hat", "park entrance"],
+          "ADV": ["sadly", "in the distance"],
+          "SC": ["but the wind pushes him back"],
+          "CC": [],
+          "M": ["wants to find him"],
+          "L": []
+        }
+      }
+    },
+    {
+      "scene_number": 5,
+      "title": "The New Balloon",
+      "background_prompt": "A park bench under a tree, same as scene 1. Sunny day, a branch visible above the bench. No people, no animals.",
+      "full_scene_prompt": "A park bench under a tree. A tall balloon seller with a striped hat gives a beautiful red balloon to a shy boy with round glasses. The boy holds it with both hands, smiling. A tiny white bird watches from a branch above, staying away. Sunny day, same park as the beginning.",
+      "entities_in_scene": ["boy", "seller", "bird", "balloon"],
+      "key_objects": ["strong red balloon", "park bench", "branch"],
+      "misl_targets": {
+        "macro": {
+          "CH": ["boy", "seller", "bird"],
+          "S": ["park bench"],
+          "IE": null,
+          "IR": ["happy"],
+          "P": null,
+          "A": ["seller sees boy and waves", "gives new balloon", "boy holds with both hands", "bird watches", "boy sits on bench"],
+          "CO": ["boy gets a new balloon"]
+        },
+        "micro": {
+          "ENP": ["beautiful red balloon", "both hands", "white bird", "branch"],
+          "ADV": ["again"],
+          "SC": ["but stays away"],
+          "CC": ["and"],
+          "M": [],
+          "L": []
+        }
+      }
+    }
+  ]
+}

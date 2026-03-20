@@ -1,0 +1,146 @@
+{
+  "story_id": "B",
+  "title": "The Market Mix-Up",
+  "characters": {
+    "boy": "a boy with a blue cap",
+    "mother": "his mother with a big bag",
+    "monkey": "a sneaky brown monkey"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Errand",
+      "background_prompt": "A colorful outdoor market with stalls, fruit displays, crates, and bright awnings. Busy atmosphere. No people, no animals.",
+      "full_scene_prompt": "A colorful outdoor market. A boy in a blue cap walks with his mother who carries a big bag. She is giving him a list. A sneaky brown monkey sits nearby, watching them. Bright stalls with fruit and awnings in the background.",
+      "entities_in_scene": ["boy", "mother", "monkey"],
+      "key_objects": ["big bag", "list", "crate", "market stalls"],
+      "misl_targets": {
+        "macro": {
+          "CH": ["boy with blue cap", "mother with big bag", "sneaky brown monkey"],
+          "S": ["colorful outdoor market","day"],
+          "IE": null,
+          "IR": null,
+          "P": null,
+          "A": ["walks through market", "carries bag", "gives list to boy"],
+          "CO": null
+        },
+        "micro": {
+          "ENP": ["blue cap", "colorful outdoor market", "big bag", "sneaky brown monkey", "list of fruits"],
+          "ADV": [],
+          "SC": [],
+          "CC": ["and"],
+          "M": [],
+          "L": []
+        }
+      }
+    },
+    {
+      "scene_number": 2,
+      "title": "The Theft",
+      "background_prompt": "A fruit stand in an outdoor market with piles of mangoes and other fruits. A pole and a narrow lane visible behind the stalls. No people, no animals.",
+      "full_scene_prompt": "A fruit stand in a market. A boy in a blue cap reaches for mangoes. A sneaky brown monkey swings down from a crate, grabbing the big bag from the mother, and climbs quickly up a pole into a narrow lane behind the stalls. The boy looks surprised.",
+      "entities_in_scene": ["boy", "monkey", "mother", "bag"],
+      "key_objects": ["fruit stand", "mangoes", "big bag", "pole", "narrow lane"],
+      "misl_targets": {
+        "macro": {
+          "CH": ["boy", "monkey", "mother"],
+          "S": ["fruit stand","day"],
+          "IE": ["monkey steals the bag"],
+          "IR": ["surprise"],
+          "P": null,
+          "A": ["boy picks mangoes", "monkey swings down", "monkey grabs bag", "climbs up pole"],
+          "CO": null
+        },
+        "micro": {
+          "ENP": ["fruit stand", "mangoes"],
+          "ADV": ["down", "quickly", "up"],
+          "SC": ["to pick some mangoes"],
+          "CC": ["and"],
+          "M": [],
+          "L": []
+        }
+      }
+    },
+    {
+      "scene_number": 3,
+      "title": "The Chase",
+      "background_prompt": "A narrow lane behind market stalls, full of stacked boxes and hanging cloths. A low rooftop is visible at the end. No people, no animals.",
+      "full_scene_prompt": "A narrow lane behind market stalls. A boy in a blue cap chases the monkey. Boxes and hanging cloths crowd the lane. A sneaky brown monkey sits on a low rooftop holding a big bag. The boy's mother catches up behind him, out of breath.",
+      "entities_in_scene": ["boy", "mother", "monkey", "bag"],
+      "key_objects": ["boxes", "hanging cloths", "rooftop", "big bag"],
+      "misl_targets": {
+        "macro": {
+          "CH": ["boy", "mother", "monkey"],
+          "S": ["narrow lane", "rooftop"],
+          "IE": null,
+          "IR": ["frustrated", "out of breath"],
+          "P": ["chases the monkey"],
+          "A": ["boy runs after monkey", "monkey climbs onto rooftop", "mother catches up"],
+          "CO": null
+        },
+        "micro": {
+          "ENP": ["narrow lane", "hanging cloths", "low rooftop"],
+          "ADV": ["fast"],
+          "SC": ["because the monkey is too fast"],
+          "CC": ["but"],
+          "M": [],
+          "L": []
+        }
+      }
+    },
+    {
+      "scene_number": 4,
+      "title": "The Trick",
+      "background_prompt": "The same narrow lane, with a barrel on the ground below the low rooftop. No people, no animals.",
+      "full_scene_prompt": "A narrow lane. The boy's mother places a banana on a barrel below a low rooftop. A sneaky brown monkey is climbing slowly down from the rooftop, reaching for the banana. The big bag is falling from the monkey's hand. The boy in the blue cap watches from behind his mother.",
+      "entities_in_scene": ["boy", "mother", "monkey"],
+      "key_objects": ["banana", "barrel", "big bag", "rooftop"],
+      "misl_targets": {
+        "macro": {
+          "CH": ["boy", "mother", "monkey"],
+          "S": null,
+          "IE": null,
+          "IR": null,
+          "P": ["mother has an idea to trick the monkey"],
+          "A": ["takes banana from pocket", "places on barrel", "monkey sees banana", "monkey climbs down slowly", "drops bag", "grabs banana with both hands"],
+          "CO": null
+        },
+        "micro": {
+          "ENP": ["banana", "barrel", "both hands"],
+          "ADV": ["slowly", "below"],
+          "SC": ["to grab the banana"],
+          "CC": [],
+          "M": ["has an idea"],
+          "L": []
+        }
+      }
+    },
+    {
+      "scene_number": 5,
+      "title": "The Recovery",
+      "background_prompt": "A colorful outdoor market, same as scene 1. Fruit stand visible, bright stalls. No people, no animals.",
+      "full_scene_prompt": "A colorful outdoor market. A boy in a blue cap holds a big bag, smiling. His mother laughs beside him. They stand at a fruit stand. In the background, a sneaky brown monkey sits on a crate eating a banana, watching them. Bright stalls and awnings.",
+      "entities_in_scene": ["boy", "mother", "monkey"],
+      "key_objects": ["big bag", "fruit stand", "banana"],
+      "misl_targets": {
+        "macro": {
+          "CH": ["boy", "mother", "monkey"],
+          "S": ["back to market"],
+          "IE": null,
+          "IR": ["mother laughs", "relief"],
+          "P": null,
+          "A": ["boy picks up bag", "monkey eats banana", "mother laughs", "walk back to fruit stand", "monkey watches them leave"],
+          "CO": ["bag recovered, everything still inside"]
+        },
+        "micro": {
+          "ENP": ["fruit stand"],
+          "ADV": ["quickly", "still"],
+          "SC": ["while the monkey eats"],
+          "CC": ["and"],
+          "M": [],
+          "L": []
+        }
+      }
+    }
+  ]
+}
