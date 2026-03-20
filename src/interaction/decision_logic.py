@@ -67,9 +67,11 @@ def process_assessment(
             accepted=False,
             correction_triggered=True,
         ))
+        # Pick only the first (highest-priority) correction
+        best_correction = corrections[0]
         return "correct", {
-            "factual_errors": [e.model_dump() for e in response.factual_errors],
-            "discrepancies": [d.model_dump() for d in response.discrepancies],
+            "factual_errors": [e.model_dump() for e in response.factual_errors[:1]],
+            "discrepancies": [best_correction.model_dump()],
         }
 
     # Utterance accepted — add to story
@@ -97,9 +99,11 @@ def process_assessment(
         for d in suggestions:
             for misl_el in d.misl_elements:
                 misl_difficulty_profile.record_suggestion(misl_el)
+        # Pick only the first (highest-priority) suggestion
+        best_suggestion = suggestions[0]
         return "accept_and_guide", {
-            "misl_opportunities": [o.model_dump() for o in response.misl_opportunities],
-            "discrepancies": [d.model_dump() for d in response.discrepancies],
+            "misl_opportunities": [o.model_dump() for o in response.misl_opportunities[:1]],
+            "discrepancies": [best_suggestion.model_dump()],
         }
 
     # No errors, no opportunities (or max reached) — scene done

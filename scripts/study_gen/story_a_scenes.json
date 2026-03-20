@@ -1,0 +1,52 @@
+{
+  "story_id": "A",
+  "title": "The Runaway Wagon",
+  "characters": {
+    "boy": "A boy with curly brown hair, wearing an orange-and-blue striped t-shirt, blue jeans, red sneakers, and a blue-and-green backpack. Warm smile. Clean children's illustration style, side view.",
+    "grandmother": "An elderly grandmother with grey hair in a bun, wearing a sage green apron over a cream floral dress, grey stockings. Warm smile, soft cotton texture. Clean children's illustration style, side view.",
+    "dog": "A small brown dog with floppy ears, warm light brown fur with a darker brown belly. Friendly and energetic. Clean children's illustration style, side view.",
+    "wagon": "A bright red wooden wagon with four black wheels. The wagon has a pull handle at the front. Sturdy, child-sized, with a flat open bed. Clean children's illustration style, side view."
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Baking",
+      "background_prompt": "A warm, sun-drenched kitchen interior in a cozy cottage. The walls are painted a soft creamy yellow with warm terracotta tiles on the floor. A large wooden counter sits in the center-left area. Wooden shelves with colorful jars and bowls line the back wall. A window with white lace curtains lets in bright afternoon sunlight, casting warm golden rays across the room. The atmosphere is inviting and homey, with soft warm lighting throughout. No people, no animals, no characters, no objects on surfaces.",
+      "full_scene_prompt": "A warm, sun-drenched kitchen interior. A boy with curly brown hair wearing an orange-and-blue striped t-shirt, blue jeans, and red sneakers stands beside an elderly grandmother in a sage green apron. They are placing fresh golden-brown cookies onto a bright red wagon near a wooden table. A small brown dog with floppy ears watches from under the oak table. Afternoon sunlight streams through a window with white lace curtains. Warm, cozy atmosphere with terracotta tiles and creamy yellow walls. Clean children's illustration style, flat side-view like a 2D storybook. Warm and friendly, suitable for ages 7-11.",
+      "entities_in_scene": ["boy", "grandmother", "dog", "wagon"],
+      "key_objects": ["red wagon", "fresh cookies", "wooden table"]
+    },
+    {
+      "scene_number": 2,
+      "title": "The Escape",
+      "background_prompt": "Front porch of a cozy house with wooden steps leading down to a steep residential street. The porch has a warm brown wooden railing and a welcome mat. The street slopes steeply downhill with sidewalks on both sides and small houses with colorful doors lining the road. Warm afternoon light casts long shadows. Trees with green leaves dot the street. No people, no animals, no characters.",
+      "full_scene_prompt": "Front porch of a cozy house. An elderly grandmother with grey hair in a bun, wearing a sage green apron over a cream floral dress, stands on the porch looking very surprised, hands raised to her face. A boy with curly brown hair wearing an orange-and-blue striped t-shirt, blue jeans, and red sneakers watches from the porch with wide eyes. A bright red wagon rolls quickly down the steep street with golden cookies bouncing on it. A small brown dog with floppy ears is near the wagon on the street. Warm afternoon light. Clean children's illustration style, flat side-view like a 2D storybook. Warm and friendly, suitable for ages 7-11.",
+      "entities_in_scene": ["boy", "grandmother", "dog", "wagon"],
+      "key_objects": ["red wagon", "cookies", "steep street"]
+    },
+    {
+      "scene_number": 3,
+      "title": "The Chase",
+      "background_prompt": "A steep residential street with a wide sidewalk. A colorful flower stand with buckets of bright flowers sits on the right side of the street. Lampposts and small shop fronts line the road. Warm afternoon sunlight. In the far background, a house porch is visible at the top of the hill. No people, no animals, no characters.",
+      "full_scene_prompt": "A steep residential street. A boy with curly brown hair wearing an orange-and-blue striped t-shirt, blue jeans, and red sneakers runs energetically down the street chasing a bright red wagon that rolls ahead of him. A small brown dog with floppy ears runs beside the boy, mouth open barking. The wagon swerves past a man carrying stacked cardboard boxes near a colorful flower stand. In the far background, an elderly grandmother with grey hair in a bun, wearing a sage green apron over a cream floral dress, calls from a house porch at the top of the hill. Clean children's illustration style, flat side-view like a 2D storybook. Warm and friendly, suitable for ages 7-11.",
+      "entities_in_scene": ["boy", "grandmother", "dog", "wagon"],
+      "key_objects": ["red wagon", "flower stand", "boxes"]
+    },
+    {
+      "scene_number": 4,
+      "title": "The Crash",
+      "background_prompt": "A charming market square with a round stone fountain in the center. Cobblestone ground with a warm grey and brown pattern. Small colorful shop fronts with striped awnings line the edges of the square. Potted plants and wooden barrels decorate the shop entries. Warm late afternoon light. No people, no animals, no characters.",
+      "full_scene_prompt": "A charming market square. A bright red wagon has crashed into a round stone fountain, slightly dented. Golden cookies are scattered across the wet cobblestone ground around the fountain. A boy with curly brown hair wearing an orange-and-blue striped t-shirt, blue jeans, and red sneakers stands nearby, bent over catching his breath with a tired expression. A small brown dog with floppy ears sits beside the boy looking at the scattered cookies. A shopkeeper woman with a white apron comes out of a shop door, looking at the mess with surprise. Clean children's illustration style, flat side-view like a 2D storybook. Warm and friendly, suitable for ages 7-11.",
+      "entities_in_scene": ["boy", "dog", "wagon"],
+      "key_objects": ["red wagon", "fountain", "scattered cookies", "shopkeeper"]
+    },
+    {
+      "scene_number": 5,
+      "title": "The Fix",
+      "background_prompt": "A gentle hill with a residential street going upward. Small cozy houses with colorful doors and flower boxes line both sides of the road. Trees with green leaves provide shade. Warm golden late afternoon light with the sun low in the sky, casting a warm orange glow. No people, no animals, no characters.",
+      "full_scene_prompt": "A gentle hill with a residential street. A boy with curly brown hair wearing an orange-and-blue striped t-shirt, blue jeans, and red sneakers pulls a slightly dented bright red wagon up the hill with one hand, carrying a brown paper bag of pastries in the other arm. A small brown dog with floppy ears trots happily beside him. At the top of the hill, an elderly grandmother with grey hair in a bun, wearing a sage green apron over a cream floral dress, stands on a house porch, smiling warmly with open arms. Warm golden late afternoon light with an orange glow. Clean children's illustration style, flat side-view like a 2D storybook. Warm and friendly, suitable for ages 7-11.",
+      "entities_in_scene": ["boy", "grandmother", "dog", "wagon"],
+      "key_objects": ["dented red wagon", "bag of pastries"]
+    }
+  ]
+}
