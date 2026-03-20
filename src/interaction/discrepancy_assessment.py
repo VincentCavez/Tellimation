@@ -30,6 +30,7 @@ from src.models.assessment import (
 )
 from src.models.scene import SceneManifest
 from src.models.student_profile import MISLDifficultyProfile
+from src.narration.transcription import transcribe_audio
 from src.generation.prompts.assessment_prompt import (
     CORRECTION_SYSTEM_PROMPT,
     CORRECTION_USER_PROMPT_TEMPLATE,
@@ -264,13 +265,20 @@ async def assess_utterance(
     misl_already_suggested: List[str],
     misl_difficulty_profile: MISLDifficultyProfile,
     character_names: Optional[Dict[str, str]] = None,
+    audio_bytes: Optional[bytes] = None,
+    narration_history: Optional[List[str]] = None,
+    narrative_text: str = "",
 ) -> AssessmentResponse:
     """Two-pass assessment of a child's utterance.
+
+    If audio_bytes is provided, transcription is performed first using
+    Gemini 3 Flash, then the text is assessed.
 
     Pass 1: Detect factual errors (corrections).
     Pass 2: Identify MISL scaffolding opportunities (enrichment).
 
     Results are merged into a single AssessmentResponse with:
+    - transcription: the transcribed text (from audio or utterance_text)
     - discrepancies: unified list, corrections first then suggestions
     - factual_errors: backward-compatible list from Pass 1
     - misl_opportunities: backward-compatible list from Pass 2
@@ -279,15 +287,31 @@ async def assess_utterance(
     Args:
         api_key: Gemini API key.
         manifest: The current scene's manifest.
-        utterance_text: The transcribed child utterance.
+        utterance_text: The transcribed child utterance (used if no audio_bytes).
         story_so_far: List of accepted utterance texts in this scene.
         misl_already_suggested: MISL dimensions already prompted this scene.
         misl_difficulty_profile: Persistent MISL difficulty data.
         character_names: Map of entity_id → child-given name.
+        audio_bytes: Raw audio bytes; if provided, transcription is done here.
+        narration_history: Previous utterance transcriptions (for transcription context).
+        narrative_text: Scene narrative text (for transcription context).
 
     Returns:
-        AssessmentResponse with two-pass results.
+        AssessmentResponse with two-pass results including transcription.
     """
+    # --- Step 0: Transcription (if audio provided) ---
+    if audio_bytes is not None:
+        utterance_text = await transcribe_audio(
+            api_key=api_key,
+            audio_bytes=audio_bytes,
+            narration_history=narration_history,
+            narrative_text=narrative_text,
+        )
+        logger.info("\033[92m[TRANSCRIPTION]\033[0m %s", utterance_text)
+
+    if not utterance_text:
+        return AssessmentResponse(transcription="")
+
     # --- Pass 1: Correction ---
     try:
         corrections = await assess_corrections(
@@ -340,6 +364,7 @@ async def assess_utterance(
     acceptable = len(corrections) == 0
 
     result = AssessmentResponse(
+        transcription=utterance_text,
         factual_errors=factual_errors,
         misl_opportunities=misl_opportunities,
         discrepancies=discrepancies,

@@ -668,6 +668,9 @@ async def generate_invocation_array(
                     parameter_overrides={},
                 ))
 
+    # Hard cap: max 2 animations per invocation array
+    sequence = sequence[:2]
+
     result = InvocationArray(sequence=sequence)
     logger.info("[invocation] Generated invocation array with %d animations",
                 len(sequence))

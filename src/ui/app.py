@@ -1167,28 +1167,6 @@ async def _send_initial_guidance(
 # Study audio handling
 # ---------------------------------------------------------------------------
 
-async def _transcribe_study_audio(api_key: str, audio_bytes: bytes) -> str:
-    """Bare transcription for study mode — no storytelling context at all."""
-    audio_part = types.Part.from_bytes(data=audio_bytes, mime_type="audio/webm")
-    client = genai.Client(api_key=api_key)
-    response = await client.aio.models.generate_content(
-        model="gemini-2.0-flash",
-        contents=[
-            audio_part,
-            types.Part.from_text(text=(
-                "Transcribe EXACTLY what is said in this audio. "
-                "Include hesitations (um, uh). "
-                "If the audio is silent or unclear, return an empty string. "
-                "Return ONLY the transcription text, nothing else."
-            )),
-        ],
-        config=types.GenerateContentConfig(
-            temperature=1.0,
-        ),
-    )
-    return (response.text or "").strip()
-
-
 async def _handle_study_audio(
     session: SessionState,
     audio_bytes: bytes,
@@ -1196,51 +1174,43 @@ async def _handle_study_audio(
 ) -> None:
     """Study mode audio handler.
 
-    Step 1: Pure transcription (no narrative context to prevent hallucination).
-    Step 2 (animated only): feed transcription into assessment + animation pipeline.
+    Transcription + assessment are done together inside assess_utterance().
+    Animated condition: also runs animation pipeline.
     """
-    # 1. Pure transcription — no storytelling context, no history
+    if not session.current_manifest or not session.current_scene_log:
+        return
+
     try:
-        transcription = await _transcribe_study_audio(session.api_key, audio_bytes)
-    except Exception:
-        logger.exception("[study] Transcription failed")
-        return
+        story_so_far = get_accepted_utterances(session.current_scene_log)
+        misl_already = get_misl_dimensions_suggested(session.current_scene_log)
 
-    # Send pure transcription to client
-    await ws.send_json({
-        "type": "transcription",
-        "text": transcription,
-    })
+        assessment = await assess_utterance(
+            api_key=session.api_key,
+            manifest=session.current_manifest,
+            utterance_text="",
+            story_so_far=story_so_far,
+            misl_already_suggested=misl_already,
+            misl_difficulty_profile=session.student_profile.misl_difficulty_profile,
+            character_names=session.character_names,
+            audio_bytes=audio_bytes,
+            narration_history=session.narration_history,
+            narrative_text="",  # study mode: no narrative context
+        )
 
-    if not transcription:
-        return
+        transcription = assessment.transcription
+        if not transcription:
+            return
 
-    session.narration_history.append(transcription)
+        session.narration_history.append(transcription)
+        session.conversation_history.append({
+            "role": "child",
+            "text": transcription,
+        })
+        session.student_profile.total_utterances += 1
 
-    # 2. For animated condition: run assessment + animation pipeline
-    is_animated = getattr(session, "study_animations_enabled", False)
-    if is_animated and session.current_manifest and session.current_scene_log:
-        try:
-            # Feed the already-obtained transcription into the assessment pipeline
-            session.conversation_history.append({
-                "role": "child",
-                "text": transcription,
-            })
-            session.student_profile.total_utterances += 1
-
-            story_so_far = get_accepted_utterances(session.current_scene_log)
-            misl_already = get_misl_dimensions_suggested(session.current_scene_log)
-
-            assessment = await assess_utterance(
-                api_key=session.api_key,
-                manifest=session.current_manifest,
-                utterance_text=transcription,
-                story_so_far=story_so_far,
-                misl_already_suggested=misl_already,
-                misl_difficulty_profile=session.student_profile.misl_difficulty_profile,
-                character_names=session.character_names,
-            )
-
+        # For animated condition: run animation pipeline
+        is_animated = getattr(session, "study_animations_enabled", False)
+        if is_animated:
             action, action_data = process_assessment(
                 utterance_text=transcription,
                 response=assessment,
@@ -1261,12 +1231,10 @@ async def _handle_study_audio(
             if action == "correct" and discrepancies:
                 await execute_invocation_array(session, ws, discrepancies)
             elif action == "accept_and_guide" and discrepancies:
-                suggestion_discs = [d for d in discrepancies if d.pass_type == "suggestion"]
-                if suggestion_discs:
-                    await execute_invocation_array(session, ws, suggestion_discs)
+                await execute_invocation_array(session, ws, discrepancies)
 
-        except Exception:
-            logger.exception("[study] Assessment/animation failed")
+    except Exception:
+        logger.exception("[study] Assessment/animation failed")
 
 
 # ---------------------------------------------------------------------------
@@ -1287,20 +1255,47 @@ async def _handle_audio(
 
     Pipeline:
       0. Check pending animation outcome from previous utterance
-      1. transcribe_audio → text
-      2. assess_utterance → two-pass (correction + enrichment) → discrepancies
-      3. process_assessment → deterministic action
-      4. generate_invocation_array → structured animation sequence
-      5. execute_invocation_array → play animations with delays
+      1. assess_utterance (includes transcription + two-pass assessment)
+      2. process_assessment → deterministic action
+      3. generate_invocation_array → structured animation sequence
+      4. execute_invocation_array → play animations with delays
     """
     if session.current_manifest is None or session.current_scene_log is None:
         await ws.send_json({"type": "error", "message": "No active scene"})
         return
 
     try:
-        # 1. Transcribe audio
-        transcription = await transcribe_audio(
+        # ── Special phases: naming / ending choice need only transcription ──
+        if session.naming_phase or session.awaiting_ending_choice:
+            transcription = await transcribe_audio(
+                api_key=session.api_key,
+                audio_bytes=audio_bytes,
+                narration_history=session.narration_history,
+                narrative_text=(
+                    session.current_scene.get("narrative_text", "")
+                    if session.current_scene else ""
+                ),
+            )
+            if not transcription:
+                return
+            if session.naming_phase:
+                await _handle_naming(session, ws, transcription)
+            else:
+                await _handle_ending_choice(session, ws, transcription)
+            return
+
+        # 1. Assess utterance (transcription + correction + enrichment)
+        story_so_far = get_accepted_utterances(session.current_scene_log)
+        misl_already = get_misl_dimensions_suggested(session.current_scene_log)
+
+        assessment = await assess_utterance(
             api_key=session.api_key,
+            manifest=session.current_manifest,
+            utterance_text="",
+            story_so_far=story_so_far,
+            misl_already_suggested=misl_already,
+            misl_difficulty_profile=session.student_profile.misl_difficulty_profile,
+            character_names=session.character_names,
             audio_bytes=audio_bytes,
             narration_history=session.narration_history,
             narrative_text=(
@@ -1309,23 +1304,8 @@ async def _handle_audio(
             ),
         )
 
-        # Send transcription to client
-        await ws.send_json({
-            "type": "transcription",
-            "text": transcription,
-        })
-
+        transcription = assessment.transcription
         if not transcription:
-            return
-
-        # ── Naming phase: first utterance is the character's name ──
-        if session.naming_phase:
-            await _handle_naming(session, ws, transcription)
-            return
-
-        # ── Ending choice phase: child responds to "imagine an ending?" ──
-        if session.awaiting_ending_choice:
-            await _handle_ending_choice(session, ws, transcription)
             return
 
         # Add child utterance to conversation + narration history
@@ -1345,19 +1325,24 @@ async def _handle_audio(
                 save_student_profile(session.participant_id, session.student_profile)
                 return
 
-        # 2. Assess utterance against manifest + MISL
-        story_so_far = get_accepted_utterances(session.current_scene_log)
-        misl_already = get_misl_dimensions_suggested(session.current_scene_log)
-
-        assessment = await assess_utterance(
-            api_key=session.api_key,
-            manifest=session.current_manifest,
-            utterance_text=transcription,
-            story_so_far=story_so_far,
-            misl_already_suggested=misl_already,
-            misl_difficulty_profile=session.student_profile.misl_difficulty_profile,
-            character_names=session.character_names,
-        )
+        # ── Console log: assessment results ──
+        if assessment.factual_errors:
+            for fe in assessment.factual_errors:
+                logger.info(
+                    "\033[91m[FACTUAL ERROR]\033[0m fragment=%r  ref=%s  explanation=%s",
+                    fe.utterance_fragment if hasattr(fe, "utterance_fragment") else "?",
+                    fe.manifest_ref if hasattr(fe, "manifest_ref") else "?",
+                    fe.explanation if hasattr(fe, "explanation") else "?",
+                )
+        if assessment.discrepancies:
+            for disc in assessment.discrepancies:
+                tag = "\033[91m[CORRECTION]\033[0m" if disc.pass_type == "correction" else "\033[93m[SUGGESTION]\033[0m"
+                logger.info(
+                    "%s type=%s  targets=%s  misl=%s  desc=%s",
+                    tag, disc.type,
+                    disc.target_entities, disc.misl_elements,
+                    disc.description,
+                )
 
         # 3. Deterministic decision
         action, action_data = process_assessment(
@@ -1366,6 +1351,8 @@ async def _handle_audio(
             scene_log=session.current_scene_log,
             misl_difficulty_profile=session.student_profile.misl_difficulty_profile,
         )
+
+        logger.info("\033[96m[DECISION]\033[0m action=%s", action)
 
         # 4. Execute action
         # Extract discrepancies for the new invocation array pipeline

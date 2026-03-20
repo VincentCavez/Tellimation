@@ -64,10 +64,6 @@
     var msg = JSON.parse(event.data);
 
     switch (msg.type) {
-      case 'transcription':
-        handleTranscription(msg);
-        break;
-
       case 'animation':
         handleAnimation(msg);
         break;
@@ -95,11 +91,11 @@
     console.log('[study_story] WebSocket closed');
   };
 
-  // --- Narration client init (PTT recording + transcription only) ---
+  // --- Narration client init (PTT recording only) ---
   NarrationClient.init(
     ws,
-    document.getElementById('transcription-box'),
-    document.getElementById('transcription-feedback'),
+    null,
+    null,
     document.getElementById('ptt-hint')
   );
 
@@ -207,16 +203,6 @@
   }
 
   // --- Handle WS messages ---
-  function handleTranscription(msg) {
-    var el = document.getElementById('transcription-feedback');
-    if (el) el.textContent = msg.text || '';
-    var box = document.getElementById('transcription-box');
-    if (box) {
-      box.classList.remove('recording');
-      box.classList.add('visible');
-    }
-  }
-
   function handleAnimation(msg) {
     if (!isAnimated) return;
     if (msg.template) {

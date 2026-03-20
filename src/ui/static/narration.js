@@ -100,9 +100,9 @@ var NarrationClient = (function() {
     }
 
     // Update UI
-    transcriptionBox.classList.add('recording');
-    feedbackEl.textContent = '\uD83D\uDD34 Recording...';
-    pttHintEl.style.visibility = 'hidden';
+    if (transcriptionBox) transcriptionBox.classList.add('recording');
+    if (feedbackEl) feedbackEl.textContent = '\uD83D\uDD34 Recording...';
+    if (pttHintEl) pttHintEl.style.visibility = 'hidden';
 
     // Start MediaRecorder
     try {
@@ -133,9 +133,9 @@ var NarrationClient = (function() {
     mediaRecorder.stop();
 
     // Update UI
-    transcriptionBox.classList.remove('recording');
-    feedbackEl.textContent = '';
-    pttHintEl.style.visibility = '';
+    if (transcriptionBox) transcriptionBox.classList.remove('recording');
+    if (feedbackEl) feedbackEl.textContent = '';
+    if (pttHintEl) pttHintEl.style.visibility = '';
   }
 
   function sendAudio(blob) {
