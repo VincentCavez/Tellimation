@@ -273,10 +273,6 @@
         var msg = JSON.parse(event.data);
 
         switch (msg.type) {
-          case 'transcription':
-            handleTranscription(msg);
-            break;
-
           case 'animation':
             handleAnimation(msg);
             break;
@@ -332,19 +328,7 @@
             break;
 
           case 'correction_text':
-            // Display factual error correction text (after animation completes)
-            if (msg.guidance_text) {
-              feedbackEl.textContent = msg.guidance_text;
-              feedbackEl.style.opacity = 1;
-            }
-            break;
-
           case 'guidance_text':
-            // Display MISL guidance text (after animation completes)
-            if (msg.guidance_text) {
-              feedbackEl.textContent = msg.guidance_text;
-              feedbackEl.style.opacity = 1;
-            }
             break;
 
           case 'error':
@@ -352,13 +336,6 @@
             break;
         }
       };
-
-      // -- Transcription feedback --
-      var feedbackEl = document.getElementById('transcription-feedback');
-
-      function handleTranscription(msg) {
-        feedbackEl.textContent = msg.transcription || '';
-      }
 
       // -- Temp sprite handlers --
       function handleAddTempSprite(msg) {
@@ -438,14 +415,11 @@
       var canvasWrapper = document.querySelector('.scene-canvas-wrapper');
       var branchPicker = document.getElementById('branch-picker');
       var branchThumbnails = document.getElementById('branch-thumbnails');
-      var transcriptionBox = document.getElementById('transcription-box');
       var pttHint = document.getElementById('ptt-hint');
 
       function handleSceneTransitioning() {
         // Hide push-to-talk UI
-        transcriptionBox.style.display = 'none';
         pttHint.style.display = 'none';
-        feedbackEl.textContent = '';
         // Show spinning border around the canvas
         canvasWrapper.classList.add('scene-loading');
       }
@@ -461,13 +435,11 @@
         // Render the new scene
         renderScene(scene);
         // Show PTT again
-        transcriptionBox.style.display = '';
         pttHint.style.display = '';
       }
 
       function handleSceneComplete() {
         // Disable push-to-talk
-        transcriptionBox.style.display = 'none';
         pttHint.style.display = 'none';
         // Show branch picker with loading state
         branchPicker.style.display = '';
@@ -482,7 +454,6 @@
 
       function handleStoryComplete() {
         // Disable push-to-talk
-        transcriptionBox.style.display = 'none';
         pttHint.style.display = 'none';
         // Show story complete message instead of branch picker
         branchPicker.style.display = '';
@@ -495,15 +466,12 @@
 
       function handleEndingChoicePrompt() {
         // PTT stays visible so the child can respond
-        transcriptionBox.style.display = '';
         pttHint.style.display = '';
         pttHint.textContent = 'Hold Space to tell your ending — or say "keep going"';
-        feedbackEl.textContent = '';
       }
 
       function handleStoryEnded() {
         // Hide PTT
-        transcriptionBox.style.display = 'none';
         pttHint.style.display = 'none';
         // Show "The End!" in branch picker area
         branchPicker.style.display = '';
@@ -534,9 +502,7 @@
         var scene = currentBranches[index];
         // Hide branch picker, show PTT
         branchPicker.style.display = 'none';
-        transcriptionBox.style.display = '';
         pttHint.style.display = '';
-        feedbackEl.textContent = '';
         // Update scene number
         sceneNumber++;
         document.getElementById('scene-num').textContent = sceneNumber;
@@ -552,5 +518,5 @@
 
       // -- Push-to-talk (narration.js handles MediaRecorder + space bar) --
       var pttHintEl = document.getElementById('ptt-hint');
-      NarrationClient.init(ws, transcriptionBox, feedbackEl, pttHintEl);
+      NarrationClient.init(ws, null, null, pttHintEl);
     })();

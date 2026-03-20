@@ -36,6 +36,7 @@ class Discrepancy(BaseModel):
 
 class AssessmentResponse(BaseModel):
     """Structured output from the two-pass Gemini assessment."""
+    transcription: str = ""
     factual_errors: List[FactualError] = Field(default_factory=list)
     misl_opportunities: List[MISLOpportunity] = Field(default_factory=list)
     discrepancies: List[Discrepancy] = Field(default_factory=list)

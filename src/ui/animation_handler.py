@@ -106,6 +106,31 @@ async def _send_animation_message(
 ) -> None:
     """Send animation message(s) to client based on the decision mode."""
     mode = decision["mode"]
+    logger.info(
+        "\033[95m[ANIMATION]\033[0m mode=%s  id=%s  target=%s  misl=%s  duration=%dms",
+        mode,
+        decision.get("animation_id", "?"),
+        target_id,
+        misl_element,
+        decision.get("duration_ms", 0),
+    )
+    if mode == "sequence":
+        for j, step in enumerate(decision.get("steps", [])):
+            logger.info(
+                "\033[95m[ANIMATION]   step %d:\033[0m id=%s  template=%s  duration=%dms",
+                j, step.get("animation_id", "?"),
+                step.get("template", "?"),
+                step.get("duration_ms", 0),
+            )
+    elif mode == "custom_code":
+        code_preview = (decision.get("code", "")[:120] + "...") if len(decision.get("code", "")) > 120 else decision.get("code", "")
+        logger.info("\033[95m[ANIMATION]   code:\033[0m %s", code_preview)
+    elif mode in ("use_default", "adjust_params"):
+        logger.info(
+            "\033[95m[ANIMATION]   template:\033[0m %s  params=%s",
+            decision.get("template", "?"),
+            decision.get("params", {}),
+        )
 
     if mode in ("use_default", "adjust_params"):
         msg: Dict[str, Any] = {
@@ -347,6 +372,13 @@ async def execute_invocation_array(
         # Delay between animations (except after the last one)
         if i < len(invocation.sequence) - 1:
             await asyncio.sleep(_INTER_ANIMATION_DELAY_MS / 1000)
+
+    # ── Console log: full invocation array ──
+    logger.info(
+        "\033[95m[INVOCATION ARRAY]\033[0m %d animation(s): %s",
+        len(invocation.sequence),
+        [(inv.animation_id, inv.targets) for inv in invocation.sequence],
+    )
 
     # Send the invocation array structure to the client for reference
     await ws.send_json({
