@@ -187,6 +187,14 @@ if _study_assets_dir and (_study_assets_dir / "study_gen").is_dir():
         name="study-assets",
     )
 
+# Serve oral instruction audio files
+if _study_assets_dir and (_study_assets_dir / "oral_instructions").is_dir():
+    app.mount(
+        "/oral-instructions",
+        StaticFiles(directory=str(_study_assets_dir / "oral_instructions")),
+        name="oral-instructions",
+    )
+
 
 # ---------------------------------------------------------------------------
 # HTML page routes
@@ -311,6 +319,25 @@ def _load_study_config() -> None:
             _STUDY_STORIES = json.loads(path.read_text())
         else:
             _STUDY_STORIES = {}
+
+
+@app.get("/api/study/instructions")
+async def study_instructions():
+    """Return written instruction paragraphs and oral audio URLs."""
+    data_dir = _find_data_dir()
+    paragraphs = []
+    if data_dir:
+        txt_path = data_dir / "written_instructions.txt"
+        if txt_path.exists():
+            text = txt_path.read_text().strip()
+            paragraphs = [p.strip() for p in text.split("\n\n") if p.strip()]
+    audio_files = [
+        "/oral-instructions/1_1_intro.wav",
+        "/oral-instructions/1_2_pictures.wav",
+        "/oral-instructions/1_3_next.wav",
+        "/oral-instructions/1_4_practice.wav",
+    ]
+    return JSONResponse(content={"paragraphs": paragraphs, "audio": audio_files})
 
 
 @app.post("/api/study/validate")

@@ -151,6 +151,199 @@
     }
   }
 
+  // ── Instruction system ──
+  var instrShown = sessionStorage.getItem('instructions_shown') === 'true';
+  var instrParagraphs = [];
+  var instrAudio = [];
+  var instrIndex = 0;
+  var currentAudio = null;
+
+  var wordTimers = [];
+
+  function clearWordTimers() {
+    for (var i = 0; i < wordTimers.length; i++) clearTimeout(wordTimers[i]);
+    wordTimers = [];
+  }
+
+  var totalCharCount = 0; // total chars across all 4 instructions
+  var totalAudioDuration = 0; // total audio duration across all 4 instructions
+  var audioDurations = []; // per-instruction audio durations
+  var durationsLoaded = 0;
+
+  function computeCharRate() {
+    if (totalAudioDuration > 0 && totalCharCount > 0) {
+      return totalAudioDuration / totalCharCount; // seconds per character
+    }
+    return 0.05; // fallback: 50ms per char
+  }
+
+  function revealWords(slot, instrIdx) {
+    clearWordTimers();
+    var spans = slot.querySelectorAll('.instr-word');
+    if (spans.length === 0) return;
+    var secPerChar = computeCharRate();
+    var elapsed = 0;
+    for (var i = 0; i < spans.length; i++) {
+      var charLen = Math.max(1, spans[i].textContent.trim().length);
+      (function(s, delay) {
+        wordTimers.push(setTimeout(function() { s.classList.add('visible'); }, delay));
+      })(spans[i], elapsed * 1000);
+      elapsed += charLen * secPerChar;
+    }
+  }
+
+  function showInstruction(idx) {
+    var slotId = 'instr-slot-' + idx;
+    var slot = document.getElementById(slotId);
+    if (!slot || idx >= instrParagraphs.length) return;
+
+    // Build word spans
+    var words = instrParagraphs[idx].split(/\s+/);
+    slot.innerHTML = '';
+    for (var i = 0; i < words.length; i++) {
+      var span = document.createElement('span');
+      span.className = 'instr-word';
+      span.textContent = words[i] + ' ';
+      slot.appendChild(span);
+    }
+    slot.style.display = 'block';
+
+    // Show parent panel
+    if (idx < 2) {
+      document.getElementById('instruction-left').style.display = 'flex';
+    } else {
+      document.getElementById('instruction-right').style.display = 'flex';
+    }
+
+    // Play audio and sync word reveal
+    playInstructionAudio(idx, slot);
+  }
+
+  function playInstructionAudio(idx, slot) {
+    if (currentAudio) { currentAudio.pause(); currentAudio = null; }
+    clearWordTimers();
+    if (idx < instrAudio.length) {
+      currentAudio = new Audio(instrAudio[idx]);
+      currentAudio.addEventListener('canplaythrough', function() {
+        revealWords(slot, idx);
+      }, { once: true });
+      if (currentAudio.readyState >= 4) {
+        revealWords(slot, idx);
+      }
+      currentAudio.play().catch(function() {
+        var spans = slot.querySelectorAll('.instr-word');
+        for (var i = 0; i < spans.length; i++) spans[i].classList.add('visible');
+      });
+    }
+  }
+
+  function replayCurrentInstruction() {
+    var slotId = 'instr-slot-' + instrIndex;
+    var slot = document.getElementById(slotId);
+    if (!slot) return;
+    // Reset word visibility
+    var spans = slot.querySelectorAll('.instr-word');
+    for (var i = 0; i < spans.length; i++) spans[i].classList.remove('visible');
+    playInstructionAudio(instrIndex, slot);
+  }
+
+  function initInstructions() {
+    if (instrShown) return;
+
+    fetch('/api/study/instructions')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        instrParagraphs = data.paragraphs.slice(0, 4);
+        instrAudio = data.audio.slice(0, 4);
+        if (instrParagraphs.length === 0) return;
+
+        // Compute total char count across all instructions
+        totalCharCount = 0;
+        for (var pi = 0; pi < instrParagraphs.length; pi++) {
+          totalCharCount += instrParagraphs[pi].replace(/\s+/g, '').length;
+        }
+
+        // Preload all audio to get durations, then start
+        var pending = instrAudio.length;
+        audioDurations = new Array(instrAudio.length);
+        for (var ai = 0; ai < instrAudio.length; ai++) {
+          (function(index) {
+            var a = new Audio(instrAudio[index]);
+            a.addEventListener('loadedmetadata', function() {
+              audioDurations[index] = a.duration;
+              totalAudioDuration += a.duration;
+              pending--;
+              if (pending === 0) startInstructions();
+            });
+            // Fallback timeout
+            setTimeout(function() {
+              if (!audioDurations[index]) {
+                audioDurations[index] = 5;
+                totalAudioDuration += 5;
+                pending--;
+                if (pending === 0) startInstructions();
+              }
+            }, 3000);
+          })(ai);
+        }
+
+        function startInstructions() {
+        // Show first instruction
+        showInstruction(0);
+        instrIndex = 0;
+
+        // Hide right panel buttons until we get there
+        var rightBtnRow = document.querySelector('#instruction-right .instruction-btn-row');
+        if (rightBtnRow) rightBtnRow.style.display = 'none';
+
+        updateNextButton();
+
+        // Next buttons (one per panel)
+        var nextBtns = document.querySelectorAll('.btn-next-panel');
+        for (var ni = 0; ni < nextBtns.length; ni++) {
+          nextBtns[ni].addEventListener('click', function() {
+            instrIndex++;
+            if (instrIndex < instrParagraphs.length) {
+              showInstruction(instrIndex);
+              updateNextButton();
+              // When moving to right panel, hide left buttons, show right buttons
+              if (instrIndex === 2) {
+                var leftBtnRow = document.querySelector('#instruction-left .instruction-btn-row');
+                if (leftBtnRow) leftBtnRow.style.display = 'none';
+                if (rightBtnRow) rightBtnRow.style.display = 'flex';
+              }
+            } else {
+              // All done, hide right buttons
+              if (rightBtnRow) rightBtnRow.style.display = 'none';
+              sessionStorage.setItem('instructions_shown', 'true');
+            }
+          });
+        }
+
+        // Replay buttons
+        var replayBtns = document.querySelectorAll('.btn-replay-panel');
+        for (var ri = 0; ri < replayBtns.length; ri++) {
+          replayBtns[ri].addEventListener('click', function() {
+            replayCurrentInstruction();
+          });
+        }
+        } // end startInstructions
+      });
+  }
+
+  function updateNextButton() {
+    var btns = document.querySelectorAll('.btn-next-panel');
+    for (var i = 0; i < btns.length; i++) {
+      if (instrIndex >= instrParagraphs.length - 1) {
+        btns[i].textContent = 'Got it!';
+      } else {
+        btns[i].textContent = 'Next';
+      }
+    }
+  }
+
+  initInstructions();
+
   // Training button
   document.getElementById('btn-training').addEventListener('click', function() {
     window.location.href = '/study/story?story=training&animated=true&scenes=2&name=Training';
