@@ -4,7 +4,9 @@
   "category": "Relation",
   "mode": "both",
   "scaffolding_intent": "Two elements push apart like same-polarity magnets, scaffolding incorrect grouping or contrastive conjunctions",
-  "misl_elements": ["CC"],
+  "misl_elements": [
+    "CC"
+  ],
   "target_type": "entities",
   "parameters": [
     {
@@ -17,10 +19,15 @@
     {
       "name": "repelPixels",
       "type": "int",
-      "range": [5, 40],
+      "range": [
+        5,
+        40
+      ],
       "default": 20,
       "description": "Maximum repulsion distance in pixels"
     }
   ],
-  "code_template": "repel({target}, {entityPrefixB}, {repelPixels})"
+  "code_template": "repel({target}, {entityPrefixB}, {repelPixels})",
+  "correction_intent": "Child incorrectly grouped entities together",
+  "suggestion_intent": "Child hasn't distinguished between entities that are different"
 }

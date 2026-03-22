@@ -4,23 +4,34 @@
   "category": "Property",
   "mode": "both",
   "scaffolding_intent": "Desaturates everything except the target to emphasize its visual attributes, scaffolding color adjectives and descriptive noun phrases",
-  "misl_elements": ["ENP", "ADV"],
+  "misl_elements": [
+    "ENP",
+    "ADV"
+  ],
   "target_type": "entity",
   "parameters": [
     {
       "name": "desaturationStrength",
       "type": "float",
-      "range": [0, 1],
+      "range": [
+        0,
+        1
+      ],
       "default": 0.8,
       "description": "How much non-target pixels are desaturated"
     },
     {
       "name": "cycleCount",
       "type": "int",
-      "range": [1, 4],
+      "range": [
+        1,
+        4
+      ],
       "default": 2,
       "description": "Number of full hue-rotation cycles"
     }
   ],
-  "code_template": "color_pop({target}, {desaturationStrength}, {cycleCount})"
+  "code_template": "color_pop({target}, {desaturationStrength}, {cycleCount})",
+  "correction_intent": "Child described an incorrect property of an entity",
+  "suggestion_intent": "Child hasn't described the properties of an entity"
 }

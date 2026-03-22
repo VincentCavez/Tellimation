@@ -4,16 +4,24 @@
   "category": "Time",
   "mode": "both",
   "scaffolding_intent": "Plays a day-night cycle effect signaling temporal progression, scaffolding setting and tense",
-  "misl_elements": ["S", "T"],
+  "misl_elements": [
+    "S",
+    "T"
+  ],
   "target_type": "scene",
   "parameters": [
     {
       "name": "isIndoor",
       "type": "bool",
-      "range": [false, true],
+      "range": [
+        false,
+        true
+      ],
       "default": false,
       "description": "Indoor scenes use warm lighting shift instead of sky gradient"
     }
   ],
-  "code_template": "timelapse({target}, {isIndoor})"
+  "code_template": "timelapse({target}, {isIndoor})",
+  "correction_intent": "Child used the wrong tense instead of future tense",
+  "suggestion_intent": "Child hasn't referenced what could happen in the future"
 }

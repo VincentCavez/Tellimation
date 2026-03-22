@@ -1,19 +1,27 @@
 {
   "id": "A2",
-  "name": "Anticipation",
+  "name": "Flip",
   "category": "Action",
   "mode": "both",
   "scaffolding_intent": "Entity compresses and lurches forward then freezes mid-motion, scaffolding missing or uncompleted action verbs",
-  "misl_elements": ["A", "IE"],
+  "misl_elements": [
+    "A",
+    "IE"
+  ],
   "target_type": "entity",
   "parameters": [
     {
       "name": "speed",
       "type": "float",
-      "range": [0.5, 2.0],
+      "range": [
+        0.5,
+        2.0
+      ],
       "default": 1.0,
       "description": "Speed multiplier for the flip animation"
     }
   ],
-  "code_template": "anticipation({target}, {speed})"
+  "code_template": "anticipation({target}, {speed})",
+  "correction_intent": "Child described an incorrect or incomplete action",
+  "suggestion_intent": "Child hasn't described an action happening in the scene"
 }

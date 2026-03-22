@@ -3,24 +3,32 @@
   "name": "Disintegration",
   "category": "Count",
   "mode": "correction",
-  "scaffolding_intent": "Entity pixelates progressively then dissolves into particles, scaffolding excess — this entity should not be mentioned",
+  "scaffolding_intent": "Entity pixelates progressively then dissolves into particles, scaffolding excess \u2014 this entity should not be mentioned",
   "misl_elements": [],
   "target_type": "entity",
   "parameters": [
     {
       "name": "driftAmount",
       "type": "float",
-      "range": [0, 1],
+      "range": [
+        0,
+        1
+      ],
       "default": 0.3,
       "description": "Horizontal scatter range (fraction of entity width)"
     },
     {
       "name": "fallSpeed",
       "type": "float",
-      "range": [0.5, 2.0],
+      "range": [
+        0.5,
+        2.0
+      ],
       "default": 1.0,
       "description": "Vertical fall speed multiplier"
     }
   ],
-  "code_template": "disintegration({target}, {driftAmount}, {fallSpeed})"
+  "code_template": "disintegration({target}, {driftAmount}, {fallSpeed})",
+  "correction_intent": "Child over-mentioned an entity",
+  "suggestion_intent": null
 }

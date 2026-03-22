@@ -4,7 +4,11 @@
   "category": "Discourse",
   "mode": "suggestion",
   "scaffolding_intent": "Displays a pixelated thought bubble above the character, scaffolding internal response, plan, and mental verbs",
-  "misl_elements": ["IR", "P", "M"],
+  "misl_elements": [
+    "IR",
+    "P",
+    "M"
+  ],
   "target_type": "entity",
   "parameters": [
     {
@@ -15,5 +19,7 @@
       "description": "Text to display inside the thought bubble"
     }
   ],
-  "code_template": "thought_bubble({target}, {bubbleText})"
+  "code_template": "thought_bubble({target}, {bubbleText})",
+  "correction_intent": "Child attributed an incorrect thought to a character",
+  "suggestion_intent": "Child hasn't described what a character might be thinking"
 }
