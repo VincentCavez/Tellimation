@@ -134,8 +134,8 @@ a { color: var(--teal); text-decoration: none; }
   border-radius: 14px;
 }
 .login-logo .t1 { color: var(--red); }
-.login-logo .t2 { color: var(--yellow); }
-.login-logo .t3 { color: var(--teal); }
+.login-logo .t2 { color: var(--teal); }
+.login-logo .t3 { color: var(--yellow); }
 
 
 
