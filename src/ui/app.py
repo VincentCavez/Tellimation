@@ -102,19 +102,41 @@ def _apply_scene_to_session(
 ) -> None:
     """Hydrate session state from a scene dict (no WS interaction)."""
     session.current_scene = scene
-    session.current_manifest = SceneManifest.model_validate(scene["manifest"])
+
+    manifest_data = scene.get("manifest", {})
+
+    # For HD scenes, manifest is the full scene_meta from the story def JSON.
+    # Build a SceneManifest from it (needs scene_id + entities at minimum).
+    scene_id = manifest_data.get("scene_id", f"scene_{scene.get('scene_number', 1)}")
+    if "scene_id" not in manifest_data:
+        manifest_data["scene_id"] = scene_id
+
+    # Ensure entities list exists for SceneManifest validation
+    if "entities" not in manifest_data:
+        entities_in_scene = manifest_data.get("entities_in_scene", scene.get("entities_in_scene", []))
+        characters = scene.get("characters", {})
+        manifest_data["entities"] = [
+            {
+                "id": eid,
+                "type": eid,
+                "name": characters.get(eid),
+                "position": {"x": 0.5, "y": 0.5},
+            }
+            for eid in entities_in_scene
+        ]
+
+    session.current_manifest = SceneManifest.model_validate(manifest_data)
     session.reset_scene_state()
 
-    # Initialize per-scene assessment log
     session.current_scene_log = SceneLog(
-        scene_id=scene["manifest"].get("scene_id", ""),
-        scene_manifest=scene["manifest"],
+        scene_id=scene_id,
+        scene_manifest=manifest_data,
     )
 
     session.story_state.add_scene(
-        scene_id=scene["manifest"]["scene_id"],
+        scene_id=scene_id,
         narrative_text=scene.get("narrative_text", ""),
-        manifest=scene["manifest"],
+        manifest=manifest_data,
         sprite_code=scene.get("sprite_code"),
     )
 
@@ -293,14 +315,14 @@ def _load_study_config() -> None:
 
 @app.post("/api/study/validate")
 async def study_validate(request: Request):
-    """Validate a study participant number (1-12)."""
+    """Validate a study participant number (1-8)."""
     body = await request.json()
     num = body.get("number")
     try:
         num = int(num)
     except (TypeError, ValueError):
         return JSONResponse(status_code=400, content={"valid": False})
-    if 1 <= num <= 12:
+    if 1 <= num <= 8:
         return JSONResponse(content={"valid": True})
     return JSONResponse(status_code=400, content={"valid": False})
 
@@ -338,12 +360,14 @@ def _load_study_scene(data_dir: Path, story_meta: Dict[str, Any], scene_num: int
 
             # Load metadata from story definition JSON
             scene_meta: Dict[str, Any] = {}
+            characters: Dict[str, str] = {}
             story_def_rel = story_meta.get("story_def", "")
             if story_def_rel:
                 story_def_path = data_dir.parent / story_def_rel
                 if story_def_path.exists():
                     try:
                         story_def = json.loads(story_def_path.read_text())
+                        characters = story_def.get("characters", {})
                         scenes = story_def.get("scenes", [])
                         if 0 < scene_num <= len(scenes):
                             scene_meta = scenes[scene_num - 1]
@@ -376,10 +400,9 @@ def _load_study_scene(data_dir: Path, story_meta: Dict[str, Any], scene_num: int
                 "background_url": f"/study-assets/{story_key}/hd/scene_{scene_num}_bg.png",
                 "entity_urls": entity_urls,
                 "narrative_text": scene_meta.get("full_scene_prompt", ""),
-                "misl_targets": scene_meta.get("misl_targets", {}),
-                "entities_in_scene": scene_meta.get("entities_in_scene", []),
+                "manifest": scene_meta,
+                "characters": characters,
                 "scene_number": scene_num,
-                "title": scene_meta.get("title", ""),
             }
 
     # --- Fallback: legacy JSON scene ---
@@ -1271,7 +1294,8 @@ async def _handle_study_audio(
             character_names=session.character_names,
             audio_bytes=audio_bytes,
             narration_history=session.narration_history,
-            narrative_text="",  # study mode: no narrative context
+            narrative_text="",
+            scene_data=session.current_scene.get("manifest") if session.current_scene else None,
         )
 
         transcription = assessment.transcription
