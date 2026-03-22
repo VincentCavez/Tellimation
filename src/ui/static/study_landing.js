@@ -77,8 +77,8 @@
             var img = document.createElement('img');
             img.src = storyData.thumbnail_url;
             img.style.width = '100%';
-            img.style.height = 'auto';
-            img.style.display = 'block';
+            img.style.height = '100%';
+            img.style.objectFit = 'cover';
             img.style.borderRadius = '8px';
             wrapper.appendChild(img);
           } else if (storyData && storyData.sprite_code && Object.keys(storyData.sprite_code).length > 0) {
