@@ -99,6 +99,11 @@ var NarrationClient = (function() {
       window.animRunner.stopLoop();
     }
 
+    // Notify server that child interrupted (new utterance cancels pending animation)
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ type: 'interrupt' }));
+    }
+
     // Update UI
     if (transcriptionBox) transcriptionBox.classList.add('recording');
     if (feedbackEl) feedbackEl.textContent = '\uD83D\uDD34 Recording...';

@@ -12,7 +12,7 @@
 function _collectEntityPixels(buf, PW, prefix) {
   var pixels = [];
   for (var i = 0; i < buf.length; i++) {
-    if (buf[i].e === prefix || buf[i].e.startsWith(prefix + '.')) {
+    if (_isEntity(buf[i].e, prefix)) {
       pixels.push({
         i: i,
         x: i % PW,
@@ -50,7 +50,7 @@ function _redrawEntityPixels(buf, PW, PH, pixels, dx, dy) {
 function _computeEntityBounds(buf, PW, prefix) {
   var x1 = Infinity, y1 = Infinity, x2 = -1, y2 = -1;
   for (var i = 0; i < buf.length; i++) {
-    if (buf[i].e === prefix || buf[i].e.startsWith(prefix + '.')) {
+    if (_isEntity(buf[i].e, prefix)) {
       var x = i % PW, y = Math.floor(i / PW);
       if (x < x1) x1 = x;
       if (x > x2) x2 = x;
@@ -591,7 +591,46 @@ function _blendPixel(buf, idx, r, g, b, alpha) {
   buf[idx].b = Math.min(255, Math.round(buf[idx].b * (1 - alpha) + b * alpha));
 }
 
+function _getDistField(buf, prefix) {
+  if (!buf._distFields) return null;
+  if (prefix.indexOf('|') < 0) return buf._distFields[prefix] || null;
+  // Combine: take min distance across all entities
+  var parts = prefix.split('|');
+  var first = null;
+  for (var pi = 0; pi < parts.length; pi++) {
+    var df = buf._distFields[parts[pi]];
+    if (!df) continue;
+    if (!first) { first = new Uint8Array(df); continue; }
+    for (var k = 0; k < df.length; k++) {
+      if (df[k] < first[k]) first[k] = df[k];
+    }
+  }
+  return first;
+}
+
+function _getEntityLayer(buf, prefix) {
+  if (!buf._entityLayers) return null;
+  if (prefix.indexOf('|') < 0) return buf._entityLayers[prefix] || null;
+  // Combine all entity layers
+  var parts = prefix.split('|');
+  var combined = [];
+  for (var pi = 0; pi < parts.length; pi++) {
+    var layer = buf._entityLayers[parts[pi]];
+    if (layer) {
+      for (var k = 0; k < layer.length; k++) combined.push(layer[k]);
+    }
+  }
+  return combined.length > 0 ? combined : null;
+}
+
 function _isEntity(entityId, prefix) {
+  if (prefix.indexOf('|') >= 0) {
+    var parts = prefix.split('|');
+    for (var pi = 0; pi < parts.length; pi++) {
+      if (entityId === parts[pi] || entityId.startsWith(parts[pi] + '.')) return true;
+    }
+    return false;
+  }
   return entityId === prefix || entityId.startsWith(prefix + '.');
 }
 

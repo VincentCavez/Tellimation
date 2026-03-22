@@ -24,7 +24,7 @@ AnimationTemplates.register('spotlight', function(params) {
     var dim = 1 - dimStrength * env;
 
     // Get pre-computed distance field for this entity
-    var df = buf._distFields && buf._distFields[prefix];
+    var df = _getDistField(buf, prefix);
     var haloSize = Math.round(5 + (maxHaloSize - 5) * env * pulse);
     var hr = haloColor[0], hg = haloColor[1], hb = haloColor[2];
     var haloAlphaMax = 0.7 * env * pulse;
@@ -248,7 +248,7 @@ AnimationTemplates.register('stamp', function(params) {
     // Only visible pixels (owned in flat buffer) go into indices for drawing.
     var minX = PW, maxX = 0, minY = PH, maxY = 0;
     var indices = [];
-    var layerData = buf._entityLayers && buf._entityLayers[prefix];
+    var layerData = _getEntityLayer(buf, prefix);
     if (layerData && layerData.length > 0) {
       for (var k = 0; k < layerData.length; k++) {
         var li = layerData[k];
@@ -1257,7 +1257,7 @@ AnimationTemplates.register('anticipation', function(params) {
     // Use entity layer for complete bounds (includes covered pixels).
     var minX = PW, maxX = 0, minY = PH, maxY = 0;
     var indices = [];
-    var layerData = buf._entityLayers && buf._entityLayers[prefix];
+    var layerData = _getEntityLayer(buf, prefix);
     if (layerData && layerData.length > 0) {
       for (var k = 0; k < layerData.length; k++) {
         var li = layerData[k];
