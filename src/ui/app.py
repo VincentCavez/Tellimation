@@ -53,7 +53,8 @@ from google import genai
 from google.genai import types
 
 from src.models.assessment import Discrepancy
-from src.interaction.tellimation import generate_tellimation
+from src.interaction.tellimation import _select_animation_for_discrepancy, generate_tellimation
+from config.misl import ANIMATION_ID_TO_TEMPLATE
 from src.ui.animation_handler import _send_animation_message, execute_animation, execute_invocation_array, send_voice
 
 logging.basicConfig(
@@ -648,6 +649,8 @@ async def study_websocket_endpoint(websocket: WebSocket):
     # Store animation flag on session for use in audio handler
     session.study_animations_enabled = is_animated  # type: ignore[attr-defined]
     session.study_story_key = story_key  # type: ignore[attr-defined]
+    session.study_pending_transcription = ""  # type: ignore[attr-defined]
+    session.study_interrupted = False  # type: ignore[attr-defined]
     ws = _WebSocketAdapter(websocket)
 
     try:
@@ -668,6 +671,14 @@ async def study_websocket_endpoint(websocket: WebSocket):
                 scene = data.get("scene")
                 if scene:
                     await _hydrate_scene(session, scene, ws)
+                # Reset pending transcription on new scene
+                session.study_pending_transcription = ""
+                session.study_interrupted = False
+
+            elif msg_type == "interrupt":
+                # Child started speaking again — mark current animation as interrupted
+                session.study_interrupted = True
+                await ws.send_json({"type": "study_log", "tag": "INTERRUPTED", "text": "New utterance, cancelling pending animation"})
 
             elif msg_type == "entity_moved":
                 await _handle_entity_moved(session, data)
@@ -1346,6 +1357,29 @@ async def _handle_study_audio(
         if not transcription:
             return
 
+        # If previous utterance was interrupted, concatenate and re-assess
+        was_interrupted = session.study_interrupted and session.study_pending_transcription
+        if was_interrupted:
+            transcription = session.study_pending_transcription + " " + transcription
+            session.study_interrupted = False
+
+            # Re-assess the concatenated text
+            assessment = await assess_utterance(
+                api_key=session.api_key,
+                manifest=session.current_manifest,
+                utterance_text=transcription,
+                story_so_far=story_so_far,
+                misl_already_suggested=misl_already,
+                misl_difficulty_profile=misl_profile,
+                character_names=session.character_names,
+                narration_history=session.narration_history,
+                narrative_text="",
+                scene_data=session.current_scene.get("manifest") if session.current_scene else None,
+            )
+
+        # Store current transcription for potential concatenation
+        session.study_pending_transcription = transcription
+
         # Send transcription to client
         await ws.send_json({"type": "study_log", "tag": "TRANSCRIPTION", "text": transcription})
 
@@ -1380,19 +1414,7 @@ async def _handle_study_audio(
                 misl_difficulty_profile=session.student_profile.misl_difficulty_profile,
             )
 
-            if action == "correct":
-                await ws.send_json({"type": "study_log", "tag": "CORRECTION", "text": f"action={action}"})
-            elif action in ("accept_and_guide", "accept"):
-                if action_data and "discrepancies" in action_data:
-                    chosen = []
-                    for d in action_data["discrepancies"]:
-                        if isinstance(d, dict):
-                            chosen.append({"desc": d.get("description", ""), "targets": d.get("target_entities", [])})
-                        elif hasattr(d, "description"):
-                            chosen.append({"desc": d.description, "targets": d.target_entities})
-                    await ws.send_json({"type": "study_log", "tag": "SUGGESTION", "text": str(chosen)})
-
-            # Extract discrepancies for animation — only the FIRST one (chosen suggestion/correction)
+            # Extract the FIRST discrepancy only (chosen correction or suggestion)
             chosen_disc: Optional[Discrepancy] = None
             if action_data and "discrepancies" in action_data:
                 for d in action_data["discrepancies"]:
@@ -1402,33 +1424,39 @@ async def _handle_study_audio(
                         chosen_disc = d
                     break  # only the first
 
-            # Execute ONE animation on all targets simultaneously
-            if chosen_disc and action in ("correct", "accept_and_guide"):
+            if chosen_disc and action in ("correct", "accept_and_guide", "accept"):
                 targets = chosen_disc.target_entities or []
-                misl_element = chosen_disc.misl_elements[0] if chosen_disc.misl_elements else "character"
+                # Deterministic animation selection (no LLM)
+                animation_id = _select_animation_for_discrepancy(chosen_disc, session.student_profile)
+                if not animation_id:
+                    animation_id = "I1_spotlight"  # fallback
+                template = ANIMATION_ID_TO_TEMPLATE.get(animation_id, "spotlight")
 
-                # Generate animation decision once (for the first target)
-                first_target = targets[0] if targets else ""
-                if first_target:
-                    decision = await generate_tellimation(
-                        api_key=session.api_key,
-                        sprite_code=(
-                            session.current_scene.get("sprite_code", {})
-                            if session.current_scene else {}
-                        ),
-                        manifest=session.current_manifest,
-                        student_profile=session.student_profile,
-                        target_id=first_target,
-                        misl_element=misl_element,
-                    )
+                # For reveal (S1) with no targets → use ALL scene entities
+                if animation_id == "S1_reveal" and not targets:
+                    scene_data = session.current_scene.get("manifest") if session.current_scene else None
+                    if scene_data and "entities_in_scene" in scene_data:
+                        targets = scene_data["entities_in_scene"]
 
-                    # Send the SAME animation for ALL targets simultaneously
-                    for target_id in targets:
-                        decision_copy = dict(decision)
-                        if decision_copy["mode"] in ("use_default", "adjust_params"):
-                            decision_copy["params"] = dict(decision.get("params", {}))
-                            decision_copy["params"]["entityPrefix"] = target_id
-                        await _send_animation_message(ws, decision_copy, target_id, misl_element)
+                # Log with rationale + animation
+                tag = "CORRECTION" if action == "correct" else "SUGGESTION"
+                await ws.send_json({"type": "study_log", "tag": tag, "text": str({
+                    "rationale": chosen_disc.description,
+                    "targets": targets,
+                    "animation": animation_id,
+                })})
+
+                # Send ONE animation with combined prefix for all targets
+                combined_prefix = "|".join(targets) if targets else ""
+                if combined_prefix:
+                    decision = {
+                        "mode": "use_default",
+                        "animation_id": animation_id,
+                        "template": template,
+                        "params": {"entityPrefix": combined_prefix},
+                        "duration_ms": 3000,
+                    }
+                    await _send_animation_message(ws, decision, combined_prefix, chosen_disc.misl_elements[0] if chosen_disc.misl_elements else "character")
 
     except Exception:
         logger.exception("[study] Assessment/animation failed")
