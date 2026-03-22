@@ -1,0 +1,1750 @@
+{
+  "participant": "",
+  "type": "training",
+  "scenes": {
+    "training_scene_1": [
+      {
+        "event": "transcription",
+        "text": "There is a boy and a woman.",
+        "was_interrupted": "",
+        "timestamp": "2026-03-22T16:07:24.636998+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "dog",
+              "box"
+            ],
+            "rationale": "The child mentioned the boy and the woman, but missed the small dog hiding under the table and the big red box they are using."
+          },
+          {
+            "animation_id": "S1",
+            "targets": [],
+            "rationale": "The child hasn't described the setting yet, like the warm, cozy kitchen or the sunny afternoon light coming through the window."
+          },
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The child identified the characters but didn't describe what they are doing, such as placing the fresh cookies into the box."
+          },
+          {
+            "animation_id": "P1",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The child could add more detail to the characters, like mentioning the boy's curly hair or the grandmother's green apron."
+          },
+          {
+            "animation_id": "P2_great",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The child hasn't mentioned how the characters might be feeling while they bake together, like feeling happy or proud of their cookies."
+          }
+        ],
+        "timestamp": "2026-03-22T16:07:24.637984+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "A boy and a woman",
+        "was_interrupted": "",
+        "timestamp": "2026-03-22T16:08:52.942887+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "dog",
+              "box"
+            ],
+            "rationale": "The child mentioned the boy and the woman but missed the small dog and the red box which are key parts of the scene."
+          },
+          {
+            "animation_id": "S1",
+            "targets": [],
+            "rationale": "The child hasn't mentioned that the story is taking place in a cozy kitchen."
+          },
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The child identified the characters but didn't describe what they are doing, like putting cookies in the box."
+          },
+          {
+            "animation_id": "P1",
+            "targets": [
+              "boy",
+              "grandmother",
+              "box"
+            ],
+            "rationale": "The child could use more descriptive words, like 'curly hair' for the boy, 'green apron' for the woman, or 'red' for the box."
+          },
+          {
+            "animation_id": "P2_great",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The child hasn't expressed how the characters might be feeling while baking cookies together."
+          }
+        ],
+        "timestamp": "2026-03-22T16:08:52.943470+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "a boy and a woman",
+        "was_interrupted": "",
+        "timestamp": "2026-03-22T16:10:12.143854+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "dog",
+              "box"
+            ],
+            "rationale": "The child mentioned the people but missed the little dog watching from under the table and the red box they are using."
+          },
+          {
+            "animation_id": "S1",
+            "targets": [],
+            "rationale": "The child hasn't mentioned that the story is taking place in a warm, cozy kitchen."
+          },
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The child identified the characters but didn't describe that they are busy placing fresh cookies into a box."
+          },
+          {
+            "animation_id": "P1",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The child could enrich the description by mentioning the boy's curly hair or the woman's green apron."
+          },
+          {
+            "animation_id": "P2_great",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The child could describe the happy or proud feelings of the characters as they finish their baking."
+          }
+        ],
+        "timestamp": "2026-03-22T16:10:12.144438+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "I1_spotlight",
+        "targets": [
+          "dog",
+          "box"
+        ],
+        "rationale": "The child mentioned the people but missed the little dog watching from under the table and the red box they are using.",
+        "pass_type": "suggestion",
+        "timestamp": "2026-03-22T16:10:12.145265+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "A boy and a woman",
+        "was_interrupted": "",
+        "timestamp": "2026-03-22T16:11:04.602535+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "dog"
+            ],
+            "rationale": "The child mentioned the people but missed the small dog watching from under the table."
+          },
+          {
+            "animation_id": "P1",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The child could describe what the characters are wearing or their features, like the boy's curly hair or the grandmother's green apron."
+          },
+          {
+            "animation_id": "S1",
+            "targets": [],
+            "rationale": "The child hasn't described the cozy kitchen setting or the sunny afternoon light."
+          },
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The child mentioned the characters but didn't describe that they are currently placing cookies into a box."
+          },
+          {
+            "animation_id": "P2_great",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The child hasn't mentioned how the characters feel about baking fresh cookies together."
+          }
+        ],
+        "timestamp": "2026-03-22T16:11:04.603207+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "I1_spotlight",
+        "targets": [
+          "dog"
+        ],
+        "rationale": "The child mentioned the people but missed the small dog watching from under the table.",
+        "pass_type": "suggestion",
+        "timestamp": "2026-03-22T16:11:04.604031+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "A boy and a woman And the dog.",
+        "was_interrupted": "A boy and a woman",
+        "timestamp": "2026-03-22T16:11:18.218466+00:00"
+      },
+      {
+        "event": "corrections",
+        "items": [
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "It looks like you started to tell me what the boy and the grandmother are doing with the cookies, but you didn't quite finish your thought!"
+          }
+        ],
+        "timestamp": "2026-03-22T16:11:18.221147+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "S1",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The child mentioned the characters but didn't describe the cozy kitchen setting where they are baking."
+          },
+          {
+            "animation_id": "P1",
+            "targets": [
+              "boy",
+              "grandmother",
+              "dog"
+            ],
+            "rationale": "The child listed the characters but didn't include descriptive details like the boy's curly hair, the green apron, or the dog being small and brown."
+          },
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy",
+              "grandmother",
+              "box"
+            ],
+            "rationale": "The child hasn't mentioned the main action of the scene, which is the boy and his grandmother putting the cookies into the red box."
+          },
+          {
+            "animation_id": "I2",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The child could give the boy and the woman names to make the story feel more personal."
+          },
+          {
+            "animation_id": "P2_great",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The child hasn't expressed how the characters might be feeling while baking together in the warm kitchen."
+          }
+        ],
+        "timestamp": "2026-03-22T16:11:18.222489+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "A2_flip",
+        "targets": [
+          "boy",
+          "grandmother"
+        ],
+        "rationale": "It looks like you started to tell me what the boy and the grandmother are doing with the cookies, but you didn't quite finish your thought!",
+        "pass_type": "correction",
+        "timestamp": "2026-03-22T16:11:18.224145+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "A boy and a woman And the dog. the boy and the woman and a dog are in a kitchen",
+        "was_interrupted": "A boy and a woman And the dog.",
+        "timestamp": "2026-03-22T16:11:35.012535+00:00"
+      },
+      {
+        "event": "corrections",
+        "items": [
+          {
+            "animation_id": "D4",
+            "targets": [
+              "boy",
+              "grandmother",
+              "dog"
+            ],
+            "rationale": "It looks like you started your thought over! You said 'A boy and a woman and the dog' and then repeated it to finish your sentence."
+          }
+        ],
+        "timestamp": "2026-03-22T16:11:35.013979+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "P1",
+            "targets": [
+              "boy",
+              "grandmother",
+              "dog",
+              "box"
+            ],
+            "rationale": "The child mentioned the characters but didn't describe any of their specific details, like the boy's curly hair, the grandmother's green apron, or the big red box."
+          },
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy",
+              "grandmother",
+              "box"
+            ],
+            "rationale": "The child noted who is in the kitchen but hasn't yet described the main action of putting the fresh cookies into the red box."
+          },
+          {
+            "animation_id": "S1",
+            "targets": [],
+            "rationale": "While the kitchen is mentioned, the child could enrich the setting by describing the warm, cozy atmosphere or the sunlight coming through the window."
+          },
+          {
+            "animation_id": "I2",
+            "targets": [
+              "boy",
+              "grandmother",
+              "dog"
+            ],
+            "rationale": "Giving the characters names, like naming the dog or the boy, would help make the story feel more personal and engaging."
+          },
+          {
+            "animation_id": "P2_great",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The child hasn't mentioned how the characters feel about baking cookies together, which is a great chance to express joy or pride."
+          }
+        ],
+        "timestamp": "2026-03-22T16:11:35.014880+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "D4_interjection",
+        "targets": [
+          "boy",
+          "grandmother",
+          "dog"
+        ],
+        "rationale": "It looks like you started your thought over! You said 'A boy and a woman and the dog' and then repeated it to finish your sentence.",
+        "pass_type": "correction",
+        "timestamp": "2026-03-22T16:11:35.016521+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "A boy and a woman And the dog. the boy and the woman and a dog are in a kitchen the inside kitchen",
+        "was_interrupted": "A boy and a woman And the dog. the boy and the woman and a dog are in a kitchen",
+        "timestamp": "2026-03-22T16:11:49.937740+00:00"
+      },
+      {
+        "event": "corrections",
+        "items": [
+          {
+            "animation_id": "D4",
+            "targets": [
+              "boy",
+              "grandmother",
+              "dog"
+            ],
+            "rationale": "It looks like you repeated some words! You can just say 'The boy, the woman, and the dog are in the kitchen' to make your story flow beautifully."
+          }
+        ],
+        "timestamp": "2026-03-22T16:11:49.939370+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "box"
+            ],
+            "rationale": "The child mentioned the people and the dog, but hasn't yet noticed the big red box on the table."
+          },
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The child described who is in the kitchen but hasn't mentioned that they are busy packing fresh cookies."
+          },
+          {
+            "animation_id": "P1",
+            "targets": [
+              "grandmother",
+              "dog"
+            ],
+            "rationale": "The child could add more detail by describing the grandmother's green apron or the dog's small size and brown fur."
+          },
+          {
+            "animation_id": "S1",
+            "targets": [],
+            "rationale": "The child mentioned the kitchen, but could enrich the setting by describing the warm afternoon light or the jars on the shelves."
+          },
+          {
+            "animation_id": "P2_great",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The child hasn't expressed how the characters might feel while baking together, such as being happy or proud of their cookies."
+          }
+        ],
+        "timestamp": "2026-03-22T16:11:49.940368+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "D4_interjection",
+        "targets": [
+          "boy",
+          "grandmother",
+          "dog"
+        ],
+        "rationale": "It looks like you repeated some words! You can just say 'The boy, the woman, and the dog are in the kitchen' to make your story flow beautifully.",
+        "pass_type": "correction",
+        "timestamp": "2026-03-22T16:11:49.942017+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "A boy and a woman And the dog. the boy and the woman and a dog are in a kitchen the inside kitchen The boy, the woman, and the dog are in the kitchen.",
+        "was_interrupted": "A boy and a woman And the dog. the boy and the woman and a dog are in a kitchen the inside kitchen",
+        "timestamp": "2026-03-22T16:12:17.205539+00:00"
+      },
+      {
+        "event": "corrections",
+        "items": [
+          {
+            "animation_id": "C2",
+            "targets": [
+              "boy",
+              "grandmother",
+              "dog"
+            ],
+            "rationale": "It sounds like you're saying the same thing a few times! You've already mentioned the boy, the woman, and the dog."
+          },
+          {
+            "animation_id": "D4",
+            "targets": [
+              "boy",
+              "grandmother",
+              "dog"
+            ],
+            "rationale": "The middle of that sentence sounded a little bit mixed up, but I can still tell what you mean!"
+          }
+        ],
+        "timestamp": "2026-03-22T16:12:17.206017+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "P1",
+            "targets": [
+              "boy",
+              "grandmother",
+              "dog",
+              "box"
+            ],
+            "rationale": "The child mentioned the characters but didn't describe what they look like, such as the boy's curly hair, the grandmother's green apron, or the dog's brown fur."
+          },
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The child noted where the characters are but hasn't described the action of them putting cookies into the red box."
+          },
+          {
+            "animation_id": "P2_great",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The child could describe how the characters feel while they are baking together in the cozy kitchen."
+          },
+          {
+            "animation_id": "I2",
+            "targets": [
+              "boy",
+              "grandmother",
+              "dog"
+            ],
+            "rationale": "The child used general labels like 'boy' and 'woman'; giving them specific names would make the story feel more personal."
+          },
+          {
+            "animation_id": "S1",
+            "targets": [],
+            "rationale": "While the kitchen was mentioned, the child could add more detail about the setting, like the sunny afternoon light or the wooden table."
+          }
+        ],
+        "timestamp": "2026-03-22T16:12:17.206375+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "C2_disintegration",
+        "targets": [
+          "boy",
+          "grandmother",
+          "dog"
+        ],
+        "rationale": "It sounds like you're saying the same thing a few times! You've already mentioned the boy, the woman, and the dog.",
+        "pass_type": "correction",
+        "timestamp": "2026-03-22T16:12:17.206934+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "A boy and a woman And the dog. the boy and the woman and a dog are in a kitchen the inside kitchen The boy, the woman, and the dog are in the kitchen. They are making cookies.",
+        "was_interrupted": "A boy and a woman And the dog. the boy and the woman and a dog are in a kitchen the inside kitchen The boy, the woman, and the dog are in the kitchen.",
+        "timestamp": "2026-03-22T16:13:09.355102+00:00"
+      },
+      {
+        "event": "corrections",
+        "items": [
+          {
+            "animation_id": "D4",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "The story started with a little stumble in the sentence, but it's okay! We can say it smoothly all at once."
+          }
+        ],
+        "timestamp": "2026-03-22T16:13:09.356521+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "P1",
+            "targets": [
+              "boy",
+              "grandmother",
+              "dog",
+              "box"
+            ],
+            "rationale": "The child listed the characters but didn't describe them. They could add details like the boy's curly hair, the grandmother's green apron, or the red box."
+          },
+          {
+            "animation_id": "I2",
+            "targets": [
+              "boy",
+              "grandmother",
+              "dog"
+            ],
+            "rationale": "The child used general labels for the characters. Giving the boy, the grandmother, or the dog specific names would make the story more personal."
+          },
+          {
+            "animation_id": "P2_great",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The child described the action of making cookies but didn't mention how the characters feel about their baking project."
+          },
+          {
+            "animation_id": "S1",
+            "targets": [],
+            "rationale": "The child mentioned they are in a kitchen, but they could describe the setting further, like the warm afternoon light or the cozy wooden table."
+          },
+          {
+            "animation_id": "D1",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The characters are working together, which is a great chance to include some dialogue about what they are saying to each other."
+          }
+        ],
+        "timestamp": "2026-03-22T16:13:09.357687+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "D4_interjection",
+        "targets": [
+          "boy"
+        ],
+        "rationale": "The story started with a little stumble in the sentence, but it's okay! We can say it smoothly all at once.",
+        "pass_type": "correction",
+        "timestamp": "2026-03-22T16:13:09.358834+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "uh a boy a woman and a doggy",
+        "was_interrupted": "",
+        "timestamp": "2026-03-22T16:17:47.754251+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "S1",
+            "targets": [],
+            "rationale": "The child mentioned the characters but didn't describe the cozy kitchen or the sunny day coming through the window."
+          },
+          {
+            "animation_id": "P1",
+            "targets": [
+              "boy",
+              "grandmother",
+              "dog"
+            ],
+            "rationale": "The child listed the characters but could add more detail, like the boy's curly hair, the grandmother's green apron, or the dog's brown fur."
+          },
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The child named the characters but hasn't described that they are busy putting fresh cookies into the red box."
+          },
+          {
+            "animation_id": "S2",
+            "targets": [
+              "dog"
+            ],
+            "rationale": "The child could specify that the little dog is watching them from right under the table."
+          },
+          {
+            "animation_id": "I1",
+            "targets": [
+              "box"
+            ],
+            "rationale": "The child hasn't mentioned the big red box that the characters are using for their cookies."
+          }
+        ],
+        "timestamp": "2026-03-22T16:17:47.755495+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "S1_reveal",
+        "targets": [
+          "boy",
+          "grandmother",
+          "dog",
+          "box"
+        ],
+        "rationale": "The child mentioned the characters but didn't describe the cozy kitchen or the sunny day coming through the window.",
+        "pass_type": "suggestion",
+        "timestamp": "2026-03-22T16:17:47.757087+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "uh a boy a woman and a doggy They are in the kitchen.",
+        "was_interrupted": "uh a boy a woman and a doggy",
+        "timestamp": "2026-03-22T16:18:21.650855+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "P1",
+            "targets": [
+              "boy",
+              "grandmother",
+              "dog",
+              "box"
+            ],
+            "rationale": "The child listed the characters but didn't use any descriptive words like 'curly hair', 'green apron', or 'brown' to make the story more vivid."
+          },
+          {
+            "animation_id": "I2",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "Giving the boy and the woman special names would help make them feel like real characters in a story."
+          },
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy",
+              "grandmother",
+              "box"
+            ],
+            "rationale": "The child mentioned where they are, but hasn't described what they are doing, like putting the fresh cookies into the red box."
+          },
+          {
+            "animation_id": "P2_great",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "Sharing how the characters feel about baking together or how they feel about the cookies would add more depth to the scene."
+          },
+          {
+            "animation_id": "S2",
+            "targets": [
+              "dog"
+            ],
+            "rationale": "The child could specify exactly where the dog is, like 'under the wooden table', to help show the layout of the kitchen."
+          }
+        ],
+        "timestamp": "2026-03-22T16:18:21.652987+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "P1_color_pop",
+        "targets": [
+          "boy",
+          "grandmother",
+          "dog",
+          "box"
+        ],
+        "rationale": "The child listed the characters but didn't use any descriptive words like 'curly hair', 'green apron', or 'brown' to make the story more vivid.",
+        "pass_type": "suggestion",
+        "timestamp": "2026-03-22T16:18:21.655424+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "There is a bu... there is a bunny on the screen.",
+        "was_interrupted": "",
+        "timestamp": "2026-03-22T16:19:02.158956+00:00"
+      },
+      {
+        "event": "corrections",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "dog"
+            ],
+            "rationale": "Oh! You mentioned a bunny, but I see a small brown dog in the kitchen instead."
+          }
+        ],
+        "timestamp": "2026-03-22T16:19:02.160423+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "boy",
+              "grandmother",
+              "dog"
+            ],
+            "rationale": "The story has some important friends like a boy with curly hair, a grandmother, and a little dog who haven't been mentioned yet."
+          },
+          {
+            "animation_id": "S1",
+            "targets": [],
+            "rationale": "Setting the scene in this cozy kitchen would help us know where the adventure is taking place."
+          },
+          {
+            "animation_id": "P1",
+            "targets": [
+              "box"
+            ],
+            "rationale": "Adding more details, like the bright red color of the cookie box, makes the story come to life."
+          },
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "Describing what the boy and his grandmother are doing with the cookies would add a lot of action to the scene."
+          },
+          {
+            "animation_id": "P2_great",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The characters might be feeling very happy or proud while they are baking together."
+          }
+        ],
+        "timestamp": "2026-03-22T16:19:02.162565+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "I1_spotlight",
+        "targets": [
+          "dog"
+        ],
+        "rationale": "Oh! You mentioned a bunny, but I see a small brown dog in the kitchen instead.",
+        "pass_type": "correction",
+        "timestamp": "2026-03-22T16:19:02.166901+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "There is a boy, woman, and a dog.",
+        "was_interrupted": "",
+        "timestamp": "2026-03-22T16:19:54.020090+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "S1",
+            "targets": [],
+            "rationale": "The story could mention that everyone is together in the cozy kitchen."
+          },
+          {
+            "animation_id": "P1",
+            "targets": [
+              "boy",
+              "grandmother",
+              "dog"
+            ],
+            "rationale": "Adding details like the boy's curly hair or the dog's brown fur would make the description more vivid."
+          },
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "Describing how the boy and the grandmother are putting the fresh cookies into the box would show what is happening in the scene."
+          },
+          {
+            "animation_id": "I1",
+            "targets": [
+              "box"
+            ],
+            "rationale": "Mentioning the big red box on the table would help include all the important things in the kitchen."
+          },
+          {
+            "animation_id": "P2_great",
+            "targets": [
+              "grandmother",
+              "boy"
+            ],
+            "rationale": "Sharing how happy or proud the characters feel about their baking would help us understand their emotions."
+          }
+        ],
+        "timestamp": "2026-03-22T16:19:54.023034+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "S1_reveal",
+        "targets": [
+          "boy",
+          "grandmother",
+          "dog",
+          "box"
+        ],
+        "rationale": "The story could mention that everyone is together in the cozy kitchen.",
+        "pass_type": "suggestion",
+        "timestamp": "2026-03-22T16:19:54.025765+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "There is a boy, woman, and a dog. The rabbit is in the kitchen.",
+        "was_interrupted": "There is a boy, woman, and a dog.",
+        "timestamp": "2026-03-22T16:20:07.939338+00:00"
+      },
+      {
+        "event": "corrections",
+        "items": [
+          {
+            "animation_id": "C3",
+            "targets": [
+              "dog"
+            ],
+            "rationale": "Oh, look closer! I don't see a rabbit here, but there is a cute little brown dog in the kitchen."
+          }
+        ],
+        "timestamp": "2026-03-22T16:20:07.941680+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "I2",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The characters don't have names yet. Giving the boy and the grandmother names would make the story feel more personal."
+          },
+          {
+            "animation_id": "P1",
+            "targets": [
+              "boy",
+              "grandmother",
+              "dog"
+            ],
+            "rationale": "The child mentioned the characters but didn't use many describing words. They could describe the boy's curly hair, the grandmother's green apron, or the dog's brown fur."
+          },
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy",
+              "grandmother",
+              "box"
+            ],
+            "rationale": "The characters are just standing there in the description. Mentioning that they are putting cookies into the red box would add action to the scene."
+          },
+          {
+            "animation_id": "P2_great",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The child hasn't mentioned how the characters feel. Baking cookies together usually makes people feel happy or proud."
+          },
+          {
+            "animation_id": "D2",
+            "targets": [
+              "dog"
+            ],
+            "rationale": "The dog is watching from under the table. Describing what the dog might be thinking about those cookies would add a fun detail."
+          }
+        ],
+        "timestamp": "2026-03-22T16:20:07.943216+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "C3_ghost_outline",
+        "targets": [
+          "dog"
+        ],
+        "rationale": "Oh, look closer! I don't see a rabbit here, but there is a cute little brown dog in the kitchen.",
+        "pass_type": "correction",
+        "timestamp": "2026-03-22T16:20:07.944865+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "A boy and his grandmother are in a kitchen.",
+        "was_interrupted": "",
+        "timestamp": "2026-03-22T16:24:26.157632+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "dog",
+              "box"
+            ],
+            "rationale": "The child mentioned the boy and grandmother but hasn't yet noticed the little dog hiding under the table or the big red box they are using."
+          },
+          {
+            "animation_id": "P1",
+            "targets": [
+              "boy",
+              "grandmother",
+              "box"
+            ],
+            "rationale": "The child could add more detail by describing the boy's curly hair, the grandmother's green apron, or the bright red color of the box."
+          },
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy",
+              "grandmother",
+              "box"
+            ],
+            "rationale": "The characters are currently just 'in' the kitchen; the child could describe the specific action of them putting fresh cookies into the box."
+          },
+          {
+            "animation_id": "S2",
+            "targets": [
+              "dog"
+            ],
+            "rationale": "The child could specify where the characters are in the room, such as the dog being 'under the table'."
+          },
+          {
+            "animation_id": "I2",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "To make the story more personal, the child could give the boy or the grandmother a special name."
+          }
+        ],
+        "timestamp": "2026-03-22T16:24:26.159732+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "I1_spotlight",
+        "targets": [
+          "dog",
+          "box"
+        ],
+        "rationale": "The child mentioned the boy and grandmother but hasn't yet noticed the little dog hiding under the table or the big red box they are using.",
+        "pass_type": "suggestion",
+        "timestamp": "2026-03-22T16:24:26.162571+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "A boy and his grandmother are in a kitchen. they are putting cookies in a box and there is a dog",
+        "was_interrupted": "A boy and his grandmother are in a kitchen.",
+        "timestamp": "2026-03-22T16:24:43.673079+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "P1",
+            "targets": [
+              "boy",
+              "grandmother",
+              "dog",
+              "box"
+            ],
+            "rationale": "The child mentioned the characters and objects but omitted the specific descriptive details provided in the scene, such as the boy's curly hair, the grandmother's green apron, the dog being small and brown, or the box being red."
+          },
+          {
+            "animation_id": "S2",
+            "targets": [
+              "dog"
+            ],
+            "rationale": "The child noted the presence of the dog but did not specify its location, which is specifically described as being under the table."
+          },
+          {
+            "animation_id": "I2",
+            "targets": [
+              "boy",
+              "grandmother",
+              "dog"
+            ],
+            "rationale": "The child used general labels for the characters; providing them with proper names would elevate the narrative quality."
+          },
+          {
+            "animation_id": "P2_great",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The child described the activity but did not include any internal response or emotional state, such as how the characters feel about baking cookies together."
+          },
+          {
+            "animation_id": "D1",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The child described the scene's actions but did not include any dialogue between the grandson and grandmother."
+          }
+        ],
+        "timestamp": "2026-03-22T16:24:43.675525+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "P1_color_pop",
+        "targets": [
+          "boy",
+          "grandmother",
+          "dog",
+          "box"
+        ],
+        "rationale": "The child mentioned the characters and objects but omitted the specific descriptive details provided in the scene, such as the boy's curly hair, the grandmother's green apron, the dog being small and brown, or the box being red.",
+        "pass_type": "suggestion",
+        "timestamp": "2026-03-22T16:24:43.679812+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "a boy and his grandmother",
+        "was_interrupted": "",
+        "timestamp": "2026-03-22T16:25:11.866718+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "S1",
+            "targets": [],
+            "rationale": "The boy and his grandmother are in a very cozy place! You could describe where they are baking."
+          },
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "It looks like they are busy with something! You could tell me what they are doing with the cookies."
+          },
+          {
+            "animation_id": "I1",
+            "targets": [
+              "dog"
+            ],
+            "rationale": "There is a furry little friend watching from under the table! Don't forget to mention the dog."
+          },
+          {
+            "animation_id": "P1",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "You can add more detail by describing the boy's curly hair or the grandmother's colorful apron."
+          },
+          {
+            "animation_id": "I2",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "To make your story even more special, you could give the boy and his grandmother their own names."
+          }
+        ],
+        "timestamp": "2026-03-22T16:25:11.867889+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "S1_reveal",
+        "targets": [
+          "boy",
+          "grandmother",
+          "dog",
+          "box"
+        ],
+        "rationale": "The boy and his grandmother are in a very cozy place! You could describe where they are baking.",
+        "pass_type": "suggestion",
+        "timestamp": "2026-03-22T16:25:11.869253+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "a boy and his grandmother",
+        "was_interrupted": "",
+        "timestamp": "2026-03-22T16:25:48.130913+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "S1",
+            "targets": [],
+            "rationale": "The boy and his grandmother are in a very cozy place. Could you describe where they are baking?"
+          },
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "It looks like they are busy with something on the table! What are the boy and his grandmother doing?"
+          },
+          {
+            "animation_id": "I1",
+            "targets": [
+              "dog"
+            ],
+            "rationale": "There is a furry little friend watching from under the table. Can you tell me about the dog?"
+          },
+          {
+            "animation_id": "P1",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "You found the characters! What do they look like? You could mention the boy's curly hair or the grandmother's apron."
+          },
+          {
+            "animation_id": "I2",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "To make your story even more special, you could give the boy and his grandmother names!"
+          }
+        ],
+        "timestamp": "2026-03-22T16:25:48.132297+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "S1_reveal",
+        "targets": [
+          "boy",
+          "grandmother",
+          "dog",
+          "box"
+        ],
+        "rationale": "The boy and his grandmother are in a very cozy place. Could you describe where they are baking?",
+        "pass_type": "suggestion",
+        "timestamp": "2026-03-22T16:25:48.133865+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "a boy and his grandmother they're in the kitchen",
+        "was_interrupted": "a boy and his grandmother",
+        "timestamp": "2026-03-22T16:26:03.168581+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "dog"
+            ],
+            "rationale": "The child mentioned the boy and grandmother, but the small dog watching from under the table is a key character present in the scene that hasn't been introduced yet."
+          },
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy",
+              "grandmother",
+              "box"
+            ],
+            "rationale": "The child established the characters and setting, but hasn't described the main action of the scene, which is placing the fresh cookies into the red box."
+          },
+          {
+            "animation_id": "P1",
+            "targets": [
+              "boy",
+              "grandmother",
+              "box"
+            ],
+            "rationale": "The child used simple nouns; adding details like the boy's curly hair, the grandmother's green apron, or the red color of the box would enrich the description."
+          },
+          {
+            "animation_id": "I2",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "To move beyond general labels, the child could give the boy or the grandmother specific names to make the story more personal."
+          },
+          {
+            "animation_id": "P2_great",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The scene has a warm, cozy atmosphere; describing how happy or proud the characters feel about their baking would add an internal emotional layer to the story."
+          }
+        ],
+        "timestamp": "2026-03-22T16:26:03.169724+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "I1_spotlight",
+        "targets": [
+          "dog"
+        ],
+        "rationale": "The child mentioned the boy and grandmother, but the small dog watching from under the table is a key character present in the scene that hasn't been introduced yet.",
+        "pass_type": "suggestion",
+        "timestamp": "2026-03-22T16:26:03.172785+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "a boy and his grandmother they're in the kitchen um there is a dog",
+        "was_interrupted": "a boy and his grandmother they're in the kitchen",
+        "timestamp": "2026-03-22T16:26:17.299011+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "P1",
+            "targets": [
+              "boy",
+              "grandmother",
+              "dog",
+              "box"
+            ],
+            "rationale": "The child mentioned the characters but didn't use descriptive details like the boy's curly hair, the grandmother's green apron, the dog's color, or the red box."
+          },
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The characters are actively putting fresh cookies into a box, but the child only described their presence in the kitchen."
+          },
+          {
+            "animation_id": "I2",
+            "targets": [
+              "boy",
+              "grandmother",
+              "dog"
+            ],
+            "rationale": "The child could make the story more personal by giving names to the boy, the grandmother, or the dog."
+          },
+          {
+            "animation_id": "S2",
+            "targets": [
+              "dog"
+            ],
+            "rationale": "The child mentioned the dog is there, but didn't specify that it is watching from under the table."
+          },
+          {
+            "animation_id": "P2_great",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "Baking cookies is a fun activity; the child could describe how happy or proud the characters feel about their treats."
+          }
+        ],
+        "timestamp": "2026-03-22T16:26:17.302581+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "P1_color_pop",
+        "targets": [
+          "boy",
+          "grandmother",
+          "dog",
+          "box"
+        ],
+        "rationale": "The child mentioned the characters but didn't use descriptive details like the boy's curly hair, the grandmother's green apron, the dog's color, or the red box.",
+        "pass_type": "suggestion",
+        "timestamp": "2026-03-22T16:26:17.306046+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "a boy and his grandmother they're in the kitchen um there is a dog the doggy is brown and the boy is wearing a sweater",
+        "was_interrupted": "a boy and his grandmother they're in the kitchen um there is a dog",
+        "timestamp": "2026-03-22T16:26:40.668489+00:00"
+      },
+      {
+        "event": "corrections",
+        "items": [
+          {
+            "animation_id": "P1",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "It looks like you're talking about the boy's clothes, but he isn't wearing a sweater in this scene."
+          }
+        ],
+        "timestamp": "2026-03-22T16:26:40.669449+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy",
+              "grandmother",
+              "box"
+            ],
+            "rationale": "The boy and his grandmother are busy in the kitchen, but you haven't mentioned what they are doing with the cookies and the red box yet."
+          },
+          {
+            "animation_id": "I2",
+            "targets": [
+              "boy",
+              "grandmother",
+              "dog"
+            ],
+            "rationale": "Giving the characters and the little dog names would make your story feel even more special."
+          },
+          {
+            "animation_id": "P2_great",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "Baking cookies is such a fun activity! You could describe how the boy or his grandmother are feeling as they work together."
+          },
+          {
+            "animation_id": "D1",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "I wonder what the boy and his grandmother are saying to each other while they fill the box with cookies."
+          },
+          {
+            "animation_id": "S1",
+            "targets": [],
+            "rationale": "You mentioned they are in the kitchen; you could add more detail about the sunny afternoon light or the jars on the shelves."
+          }
+        ],
+        "timestamp": "2026-03-22T16:26:40.670306+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "P1_color_pop",
+        "targets": [
+          "boy"
+        ],
+        "rationale": "It looks like you're talking about the boy's clothes, but he isn't wearing a sweater in this scene.",
+        "pass_type": "correction",
+        "timestamp": "2026-03-22T16:26:40.671810+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "a boy and his grandmother they're in the kitchen um there is a dog the doggy is brown and the boy is wearing a sweater The boy is wearing a green sweater and brown pants.",
+        "was_interrupted": "a boy and his grandmother they're in the kitchen um there is a dog the doggy is brown and the boy is wearing a sweater",
+        "timestamp": "2026-03-22T16:27:00.214848+00:00"
+      },
+      {
+        "event": "corrections",
+        "items": [
+          {
+            "animation_id": "P1",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "It looks like the boy has curly hair, but he isn't wearing a green sweater and brown pants in this scene."
+          },
+          {
+            "animation_id": "I1",
+            "targets": [
+              "grandmother"
+            ],
+            "rationale": "Actually, the grandmother is the one wearing the green apron, not the boy!"
+          }
+        ],
+        "timestamp": "2026-03-22T16:27:00.222067+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "box"
+            ],
+            "rationale": "The boy and his grandmother are holding a big red box, but it hasn't been mentioned yet."
+          },
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy",
+              "grandmother",
+              "box"
+            ],
+            "rationale": "The boy and his grandmother are busy doing something together with the cookies and the box."
+          },
+          {
+            "animation_id": "P2_great",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "Baking together is a very happy activity; we could describe how the characters are feeling."
+          },
+          {
+            "animation_id": "I2",
+            "targets": [
+              "boy",
+              "grandmother",
+              "dog"
+            ],
+            "rationale": "The story would feel more personal if the boy, his grandmother, or even the dog had their own special names."
+          },
+          {
+            "animation_id": "D1",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The characters are right next to each other and might be talking about the delicious cookies they are packing."
+          }
+        ],
+        "timestamp": "2026-03-22T16:27:00.224768+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "P1_color_pop",
+        "targets": [
+          "boy"
+        ],
+        "rationale": "It looks like the boy has curly hair, but he isn't wearing a green sweater and brown pants in this scene.",
+        "pass_type": "correction",
+        "timestamp": "2026-03-22T16:27:00.231972+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "uh a boy and a girl are on the beach",
+        "was_interrupted": "",
+        "timestamp": "2026-03-22T16:27:20.071299+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "crab"
+            ],
+            "rationale": "The child mentioned the boy and girl but missed the large crab, which is a key character interacting with the sandcastle."
+          },
+          {
+            "animation_id": "P1",
+            "targets": [
+              "boy",
+              "girl"
+            ],
+            "rationale": "The child used simple labels; describing the girl's sun hat or the boy's green swim shorts would enrich the character descriptions."
+          },
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy",
+              "girl",
+              "crab"
+            ],
+            "rationale": "The child described the location but not the actions, such as the girl carrying water or the crab digging into the tower."
+          },
+          {
+            "animation_id": "S2",
+            "targets": [
+              "boy",
+              "girl"
+            ],
+            "rationale": "Adding more detail about where they are, like being near the tall sandcastle or the tide pools, would make the setting clearer."
+          },
+          {
+            "animation_id": "D2",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "Since the boy doesn't see the crab yet, describing what he might be thinking or focusing on would add depth to the story."
+          }
+        ],
+        "timestamp": "2026-03-22T16:27:20.072476+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "I1_spotlight",
+        "targets": [
+          "crab"
+        ],
+        "rationale": "The child mentioned the boy and girl but missed the large crab, which is a key character interacting with the sandcastle.",
+        "pass_type": "suggestion",
+        "timestamp": "2026-03-22T16:27:20.075736+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "uh a boy and a girl are on the beach There is a crab.",
+        "was_interrupted": "uh a boy and a girl are on the beach",
+        "timestamp": "2026-03-22T16:27:32.984487+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "P1",
+            "targets": [
+              "boy",
+              "girl",
+              "crab"
+            ],
+            "rationale": "The child mentioned the characters but didn't describe them. They could add details like the boy's green shorts, the girl's sun hat, or the crab's large gray shell."
+          },
+          {
+            "animation_id": "A1",
+            "targets": [
+              "girl",
+              "crab"
+            ],
+            "rationale": "The child stated the characters are there but didn't mention what they are doing. They could describe the girl walking with her bucket or the crab digging into the sandcastle."
+          },
+          {
+            "animation_id": "S2",
+            "targets": [
+              "boy",
+              "crab"
+            ],
+            "rationale": "The child could be more specific about where the characters are on the beach, such as the boy kneeling by the tall sandcastle or the crab coming out of the tide pools."
+          },
+          {
+            "animation_id": "I2",
+            "targets": [
+              "boy",
+              "girl"
+            ],
+            "rationale": "The child used general labels for the characters. Giving the boy and girl specific names would make the story feel more personal."
+          },
+          {
+            "animation_id": "D3",
+            "targets": [
+              "crab",
+              "boy"
+            ],
+            "rationale": "There is a sneaky event happening! The child could mention that the crab is digging into the castle while the boy isn't looking."
+          }
+        ],
+        "timestamp": "2026-03-22T16:27:32.987137+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "P1_color_pop",
+        "targets": [
+          "boy",
+          "girl",
+          "crab"
+        ],
+        "rationale": "The child mentioned the characters but didn't describe them. They could add details like the boy's green shorts, the girl's sun hat, or the crab's large gray shell.",
+        "pass_type": "suggestion",
+        "timestamp": "2026-03-22T16:27:32.991925+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "uh a boy and a girl are on the beach There is a crab. The boy is wearing shorts and the girl has a hat.",
+        "was_interrupted": "uh a boy and a girl are on the beach There is a crab.",
+        "timestamp": "2026-03-22T16:27:53.862970+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "S2",
+            "targets": [
+              "boy",
+              "tall sandcastle"
+            ],
+            "rationale": "The child mentioned the boy and the beach, but adding that he is kneeling right next to his tall sandcastle would help set the scene."
+          },
+          {
+            "animation_id": "A2",
+            "targets": [
+              "crab",
+              "girl"
+            ],
+            "rationale": "While the characters are introduced, describing their actions—like the girl walking with her bucket or the crab digging—would make the story more active."
+          },
+          {
+            "animation_id": "P1",
+            "targets": [
+              "crab"
+            ],
+            "rationale": "The child identified the crab; adding that it is a 'large gray' crab would provide more descriptive detail."
+          },
+          {
+            "animation_id": "D3",
+            "targets": [
+              "crab",
+              "boy"
+            ],
+            "rationale": "There is a great opportunity to mention the 'initiating event'—the boy doesn't realize the crab is digging into his sandcastle tower!"
+          },
+          {
+            "animation_id": "I2",
+            "targets": [
+              "boy",
+              "girl"
+            ],
+            "rationale": "The characters are currently just 'a boy' and 'a girl'; giving them names would make them feel more like real people in the story."
+          }
+        ],
+        "timestamp": "2026-03-22T16:27:53.864654+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "S2_stamp",
+        "targets": [
+          "boy",
+          "tall sandcastle"
+        ],
+        "rationale": "The child mentioned the boy and the beach, but adding that he is kneeling right next to his tall sandcastle would help set the scene.",
+        "pass_type": "suggestion",
+        "timestamp": "2026-03-22T16:27:53.866693+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "a boy and a woman",
+        "was_interrupted": "",
+        "timestamp": "2026-03-22T16:30:44.810797+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "dog"
+            ],
+            "rationale": "The child mentioned the boy and the woman but missed the little dog watching from under the table."
+          },
+          {
+            "animation_id": "S1",
+            "targets": [
+              "boy",
+              "grandmother",
+              "dog",
+              "box"
+            ],
+            "rationale": "The child could describe the cozy kitchen setting or the warm afternoon light to help set the scene."
+          },
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The child hasn't mentioned that the characters are busy putting fresh cookies into the red box."
+          },
+          {
+            "animation_id": "P1",
+            "targets": [
+              "grandmother"
+            ],
+            "rationale": "The child could describe the grandmother's green apron or the boy's curly hair to make the characters more vivid."
+          },
+          {
+            "animation_id": "P2_great",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The child could express how happy or proud the characters feel while they are baking together."
+          }
+        ],
+        "timestamp": "2026-03-22T16:30:44.812006+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "I1_spotlight",
+        "targets": [
+          "dog"
+        ],
+        "rationale": "The child mentioned the boy and the woman but missed the little dog watching from under the table.",
+        "pass_type": "suggestion",
+        "timestamp": "2026-03-22T16:30:44.813807+00:00"
+      }
+    ]
+  }
+}

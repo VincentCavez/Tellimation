@@ -1493,7 +1493,7 @@ async def _handle_study_audio(
                         targets = scene_data["entities_in_scene"]
 
                 # Log with rationale + animation
-                tag = "CORRECTION" if action == "correct" else "SUGGESTION"
+                tag = "CORRECTION" if assessment.factual_errors else "SUGGESTION"
                 await ws.send_json({"type": "study_log", "tag": tag, "text": str({
                     "rationale": chosen_disc.description,
                     "targets": targets,

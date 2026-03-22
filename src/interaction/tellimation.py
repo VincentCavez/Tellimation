@@ -18,7 +18,9 @@ Fallback: if LLM generation fails, returns Mode A with the first eligible templa
 from __future__ import annotations
 
 import asyncio
+import json
 import logging
+from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from google import genai
