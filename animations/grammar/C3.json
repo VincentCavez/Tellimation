@@ -3,17 +3,26 @@
   "name": "Ghost Outline",
   "category": "Count",
   "mode": "correction",
-  "scaffolding_intent": "Displays an amorphous shape with a question mark that dissolves, scaffolding absence — something is missing from the narration",
+  "scaffolding_intent": "Displays an amorphous shape with a question mark that dissolves, scaffolding absence \u2014 something is missing from the narration",
   "misl_elements": [],
   "target_type": "entity",
   "parameters": [
     {
       "name": "puddleColor",
       "type": "rgb",
-      "range": [0, 255],
-      "default": [60, 65, 85],
+      "range": [
+        0,
+        255
+      ],
+      "default": [
+        60,
+        65,
+        85
+      ],
       "description": "Color of the dark puddle shape"
     }
   ],
-  "code_template": "ghost_outline({target}, {puddleColor})"
+  "code_template": "ghost_outline({target}, {puddleColor})",
+  "correction_intent": "Child incorrectly referenced an entity absent from the scene",
+  "suggestion_intent": "Child hasn't referenced an entity absent from the scene that is relevant to the story"
 }

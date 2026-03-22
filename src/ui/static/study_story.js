@@ -637,14 +637,14 @@
   var ALL_TEMPLATES = [
     'spotlight', 'nametag', 'reveal', 'stamp',
     'color_pop', 'emanation', 'flashback', 'timelapse',
-    'motion_lines', 'anticipation',
+    'motion_lines', 'flip',
     'magnetism', 'repel', 'causal_push',
     'sequential_glow', 'disintegration', 'ghost_outline',
     'speech_bubble', 'thought_bubble', 'alert', 'interjection'
   ];
   var SINGLE_ENTITY = [
     'spotlight', 'nametag', 'stamp', 'color_pop', 'reveal',
-    'emanation', 'motion_lines', 'anticipation',
+    'emanation', 'motion_lines', 'flip',
     'disintegration', 'ghost_outline', 'speech_bubble', 'thought_bubble', 'alert', 'interjection'
   ];
   var TWO_ENTITY = ['magnetism', 'repel', 'causal_push'];

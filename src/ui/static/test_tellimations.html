@@ -175,7 +175,7 @@
     <div class="family-label">A — Action</div>
     <div class="controls">
       <button onclick="playT('motion_lines')">motion_lines</button>
-      <button onclick="playT('anticipation')">anticipation</button>
+      <button onclick="playT('flip')">flip</button>
     </div>
 
     <div class="family-label">R — Relation (uses A + B)</div>
@@ -379,7 +379,7 @@ var TEMPLATE_ORDER = [
   'reveal', 'settle',
   'color_pop', 'emanation',
   'flashback', 'timelapse',
-  'motion_lines', 'anticipation',
+  'motion_lines', 'flip',
   'magnetism', 'repel', 'causal_push',
   'bonk', 'sequential_glow', 'ghost_outline',
   'speech_bubble', 'thought_bubble', 'alert', 'interjection'
@@ -397,7 +397,7 @@ var TEMPLATE_CONFIG = {
   ghost_outline: { duration: 1500 },
   alert:         { duration: 1200 },
   motion_lines:  { duration: 1200, useDirection: true },
-  anticipation:  { duration: 1500, useDirection: true, dirParam: 'lurchDirection' },
+  flip:  { duration: 1500, useDirection: true, dirParam: 'lurchDirection' },
 
   // Two-entity
   causal_push: { duration: 1500, twoEntity: true },

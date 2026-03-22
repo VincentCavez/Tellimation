@@ -3,17 +3,24 @@
   "name": "Reveal",
   "category": "Space",
   "mode": "both",
-  "scaffolding_intent": "Makes an occluding layer semi-transparent to show hidden elements, scaffolding spatial relationships the child missed",
-  "misl_elements": ["S"],
+  "scaffolding_intent": "Makes an occluding layer semi-transparent to show hidden elements, drawing attention to missed or incorrect descriptions",
+  "misl_elements": [
+    "S"
+  ],
   "target_type": "entity",
   "parameters": [
     {
       "name": "revealAlpha",
       "type": "float",
-      "range": [0.3, 0.9],
+      "range": [
+        0.3,
+        0.9
+      ],
       "default": 0.6,
       "description": "Transparency level of occluding layer"
     }
   ],
-  "code_template": "reveal({target}, {revealAlpha})"
+  "code_template": "reveal({target}, {revealAlpha})",
+  "correction_intent": "Child described an incorrect hidden element or setting",
+  "suggestion_intent": "Child hasn't described the setting"
 }

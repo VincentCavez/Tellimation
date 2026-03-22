@@ -1246,7 +1246,7 @@ AnimationTemplates.register('motion_lines', function(params) {
 // ── A2: Anticipation ──
 // Entity compresses slightly, lurches forward, then freezes mid-motion.
 // Like a momentum that was interrupted. Scaffolds missing/uncompleted action verbs.
-AnimationTemplates.register('anticipation', function(params) {
+AnimationTemplates.register('flip', function(params) {
   var prefix = params.entityPrefix || '';
   var speed = params.speed != null ? params.speed : 1.0;
 

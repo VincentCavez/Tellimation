@@ -54,7 +54,7 @@ MAX_RETRIES = 2
 # Default durations per template (matching JS registration)
 _DEFAULT_DURATIONS: Dict[str, int] = {
     "spotlight": 3000, "nametag": 2000, "color_pop": 3000, "emanation": 2500,
-    "motion_lines": 2000, "anticipation": 2000, "reveal": 2500, "stamp": 3000,
+    "motion_lines": 2000, "flip": 2000, "reveal": 2500, "stamp": 3000,
     "flashback": 3000, "timelapse": 4000, "magnetism": 2500, "repel": 2000,
     "causal_push": 2000, "sequential_glow": 3000, "disintegration": 2000,
     "ghost_outline": 2500, "speech_bubble": 1500, "thought_bubble": 1500,
@@ -528,40 +528,101 @@ def _select_animation_for_discrepancy(
     category = discrepancy.type
     is_correction = discrepancy.pass_type == "correction"
     has_targets = bool(discrepancy.target_entities)
+    desc_lower = discrepancy.description.lower()
 
-    # Identity: naming → nametag, mention → spotlight
-    _naming_keywords = ("name", "call", "named", "calling", "nom")
-    _is_naming = not is_correction and any(
-        kw in discrepancy.description.lower() for kw in _naming_keywords
-    )
+    # ═══════════════════════════════════════════
+    # CORRECTIONS (child said something wrong)
+    # ═══════════════════════════════════════════
+    if is_correction:
+        if category == "Identity":
+            return "I1_spotlight"  # wrong entity mentioned
+        if category == "Property":
+            # Over-mention → disintegration, wrong property → color_pop
+            _over_kw = ("over-mention", "too many times", "already said", "too much")
+            if any(kw in desc_lower for kw in _over_kw):
+                return "C2_disintegration"
+            return "P1_color_pop"
+        if category == "Emotion":
+            return "P2_emanation"  # incorrect emotion
+        if category == "Action":
+            return "A2_flip"  # incorrect/incomplete action
+        if category == "Relation":
+            return "R2_repel"  # incorrect grouping
+        if category == "Causality":
+            return "R3_causal_push"  # incorrect causality
+        if category == "Discourse":
+            _grammar_kw = ("grammar", "tense", "verb form", "conjugat", "plural", "singular", "syntax")
+            _thought_kw = ("think", "thought", "wonder", "feel", "believe", "imagine")
+            if any(kw in desc_lower for kw in _grammar_kw):
+                return "D4_interjection"  # grammar error
+            if any(kw in desc_lower for kw in _thought_kw):
+                return "D2_thought_bubble"  # incorrect thought
+            _event_kw = ("event", "happen", "notice", "react", "surprise", "respond")
+            if any(kw in desc_lower for kw in _event_kw):
+                return "D3_alert"  # incorrect event
+            return "D1_speech_bubble"  # incorrect dialogue
+        if category == "Space":
+            return "C3_ghost_outline"  # incorrect ref to absent entity
+        if category == "Time":
+            _future_kw = ("future", "will", "going to", "next", "later")
+            if any(kw in desc_lower for kw in _future_kw):
+                return "T2_timelapse"  # wrong tense, should be future
+            return "T1_flashback"  # wrong tense, should be past
+        if category == "Count":
+            return "C1_sequential_glow"  # ambiguous reference
+        return "I1_spotlight"  # fallback
 
-    # Deterministic mapping
-    mapping = {
-        "Identity": "I2_nametag" if _is_naming else "I1_spotlight",
-        "Property": "P1_color_pop",
-        "Action": "A1_motion_line",
-        "Time": "T1_flashback",
-        "Relation": "R1_magnetism",
-        "Count": "C1_sequential_glow",
-        "Discourse": "D1_speech_bubble",
-    }
-
+    # ═══════════════════════════════════════════
+    # SUGGESTIONS (child didn't mention something)
+    # ═══════════════════════════════════════════
+    if category == "Identity":
+        _naming_kw = ("name", "call", "named", "calling", "nom")
+        if any(kw in desc_lower for kw in _naming_kw):
+            return "I2_nametag"  # suggest naming
+        return "I1_spotlight"  # suggest mentioning
+    if category == "Property":
+        return "P1_color_pop"  # lack of property description
+    if category == "Emotion":
+        return "P2_emanation"  # lack of emotion
+    if category == "Action":
+        _motion_kw = ("move", "run", "walk", "fly", "jump", "go", "chase", "rush")
+        if any(kw in desc_lower for kw in _motion_kw):
+            return "A1_motion_line"  # suggest motion action
+        return "A2_flip"  # lack of action
+    if category == "Relation":
+        _repel_kw = ("group", "distinct", "separate", "apart", "different", "confus")
+        if any(kw in desc_lower for kw in _repel_kw):
+            return "R2_repel"  # lack of distinction
+        return "R1_magnetism"  # lack of relation
+    if category == "Causality":
+        return "R3_causal_push"  # lack of causality
+    if category == "Discourse":
+        _thought_kw = ("think", "thought", "wonder", "feel", "believe", "imagine")
+        _event_kw = ("event", "happen", "notice", "react", "surprise", "respond")
+        if any(kw in desc_lower for kw in _thought_kw):
+            return "D2_thought_bubble"  # lack of thoughts
+        if any(kw in desc_lower for kw in _event_kw):
+            return "D3_alert"  # lack of events
+        return "D1_speech_bubble"
     if category == "Space":
-        # Setting-level (no specific entity or MISL=setting) → reveal all
+        _absent_kw = ("absent", "not in", "missing from", "not here", "not present", "gone")
+        if any(kw in desc_lower for kw in _absent_kw):
+            return "C3_ghost_outline"  # lack of ref to absent entity
         misl_codes = discrepancy.misl_elements or []
         is_setting = "S" in misl_codes or "setting" in misl_codes
         if is_setting and not has_targets:
-            return "S1_reveal"
-        # Object/location near specific entity → stamp
-        return "S2_stamp"
+            return "S1_reveal"  # lack of setting description
+        return "S2_stamp"  # lack of spatial detail
+    if category == "Time":
+        _future_kw = ("future", "will", "going to", "next", "later", "could happen")
+        if any(kw in desc_lower for kw in _future_kw):
+            return "T2_timelapse"  # lack of future reference
+        return "T1_flashback"  # lack of past reference
+    if category == "Count":
+        return "C1_sequential_glow"
 
-    if category == "Discourse":
-        # Correction → interjection (D4), suggestion → speech_bubble (D1)
-        if is_correction:
-            return "D4_interjection"
-        return "D1_speech_bubble"
-
-    return mapping.get(category, "I1_spotlight")
+    # Fallback
+    return "I1_spotlight"
 
 
 async def generate_invocation_array(
