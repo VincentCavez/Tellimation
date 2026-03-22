@@ -1,7 +1,7 @@
 {
   "story_id": "B",
   "title": "The Market Mix-Up",
-  "characters": {
+  "entities": {
     "boy": "a boy with a blue cap",
     "mother": "his mother with a big bag",
     "monkey": "a sneaky brown monkey"

@@ -1,32 +1,33 @@
 {
   "story_id": "D",
   "title": "The Runaway Train",
-  "characters": {
+  "entities": {
     "conductor": "a train conductor with a tall blue hat",
-    "girl": "a girl with red pigtails",
-    "goose": "a large white goose"
+    "train": "a small colorful train",
+    "goose": "a large white goose",
+    "tractor": "a green tractor"
   },
   "scenes": [
     {
       "scene_number": 1,
       "title": "The Station",
-      "background_prompt": "A small country train station with a wooden platform, a wooden bench, a flower box with colorful flowers, train tracks leading into the distance. Sunny day. No people, no animals.",
-      "full_scene_prompt": "A small country train station. A small colorful train sits on the tracks with steam puffing from the engine. A train conductor with a tall blue hat stands on the wooden platform checking his watch. A girl with red pigtails waves from the window of the passenger car. Wooden bench and flower box on the platform. Sunny day.",
-      "entities_in_scene": ["conductor", "girl"],
-      "key_objects": ["colorful train", "platform", "wooden bench", "flower box"],
+      "background_prompt": "A small country train station with a wooden platform, a wooden bench, a food stand with colorful sandwiches, train tracks leading into the distance. Sunny day. No people, no animals.",
+      "full_scene_prompt": "A small country train station. A small colorful train sits on the tracks with steam puffing from the engine. A train conductor with a sandwich and a tall blue hat stands on the wooden platform checking his watch. Wooden bench and flower box on the platform. Sunny day.",
+      "entities_in_scene": ["conductor", "train"],
+      "key_objects": ["platform", "wooden bench", "food stand"],
       "misl_targets": {
         "macro": {
-          "CH": ["train conductor with tall blue hat", "girl with red pigtails"],
+          "CH": ["train conductor with a sandwich and a tall blue hat", "small colorful train"],
           "S": ["country train station", "platform"],
           "IE": null,
           "IR": null,
           "P": null,
-          "A": ["checks his watch", "waves from window", "steam puffs from engine"],
+          "A": ["checks his watch", "steam puffs from engine"],
           "CO": null
         },
         "micro": {
-          "ENP": ["tall blue hat", "red pigtails", "small colorful train", "wooden bench", "flower box"],
-          "ADV": ["only"],
+          "ENP": ["tall blue hat", "small colorful train", "wooden bench", "food stand"],
+          "ADV": [],
           "SC": [],
           "CC": ["and"],
           "M": [],
@@ -38,21 +39,21 @@
       "scene_number": 2,
       "title": "The Escape",
       "background_prompt": "A train station platform with a small food stand. Train tracks stretch away from the station. Sunny day. No people, no animals, no train.",
-      "full_scene_prompt": "A train station platform. A train conductor with a tall blue hat has dropped a sandwich on the ground and runs along the tracks after a small colorful train that is moving away. A girl with red pigtails looks shocked from the passenger car window, holding onto the window. The train is pulling away fast. A small food stand is visible on the platform behind the conductor.",
-      "entities_in_scene": ["conductor", "girl"],
-      "key_objects": ["train", "sandwich", "food stand", "tracks"],
+      "full_scene_prompt": "A train station platform. A train conductor with a tall blue hat has dropped a sandwich on the ground and runs along the tracks after a small colorful train that is moving away on its own. The train is pulling away fast. A small food stand is visible on the platform behind the conductor.",
+      "entities_in_scene": ["conductor", "train"],
+      "key_objects": ["sandwich", "food stand", "tracks"],
       "misl_targets": {
         "macro": {
-          "CH": ["conductor", "girl"],
+          "CH": ["conductor", "train"],
           "S": null,
           "IE": ["train leaves without the conductor"],
-          "IR": ["girl is shocked", "conductor is panicked"],
+          "IR": ["conductor is panicked"],
           "P": null,
-          "A": ["steps off train", "train starts moving on its own", "girl holds onto window", "conductor drops sandwich", "runs after train"],
+          "A": ["conductor steps off train", "train starts moving on its own", "conductor drops sandwich", "runs after train"],
           "CO": null
         },
         "micro": {
-          "ENP": ["window", "sandwich", "food stand"],
+          "ENP": ["sandwich", "food stand"],
           "ADV": ["on its own", "already"],
           "SC": ["while he is away", "because it is too fast"],
           "CC": ["but"],
@@ -65,12 +66,12 @@
       "scene_number": 3,
       "title": "The Farm Crossing",
       "background_prompt": "Countryside landscape with green fields on both sides of train tracks. A farm crossing with a wooden gate. A side track branches off to the right toward a river. Sunny day. No people, no animals, no train.",
-      "full_scene_prompt": "Countryside with green fields. A small colorful train speeds along the tracks toward a farm crossing. A large white goose stands in the middle of the tracks at the crossing, flapping its wings. The train is turning quickly onto a side track to the right, bumping and shaking. A girl with red pigtails holds on tightly inside the passenger car. Green fields and a wooden gate at the crossing.",
-      "entities_in_scene": ["girl", "goose"],
-      "key_objects": ["train", "farm crossing", "wooden gate", "side track", "green fields"],
+      "full_scene_prompt": "Countryside with green fields. A small colorful train speeds along the tracks toward a farm crossing. A large white goose stands in the middle of the tracks at the crossing, flapping its wings. The train is turning quickly onto a side track to the right, bumping and shaking. Green fields and a wooden gate at the crossing.",
+      "entities_in_scene": ["train", "goose"],
+      "key_objects": ["farm crossing", "wooden gate", "side track", "green fields"],
       "misl_targets": {
         "macro": {
-          "CH": ["girl", "large white goose"],
+          "CH": ["train", "large white goose"],
           "S": ["countryside", "green fields", "farm crossing"],
           "IE": null,
           "IR": null,
@@ -92,22 +93,22 @@
       "scene_number": 4,
       "title": "The Mud",
       "background_prompt": "A muddy riverbank where train tracks end abruptly. Thick brown mud along the bank, a slow river in the background. Tall grass on the sides. No people, no animals, no train.",
-      "full_scene_prompt": "A muddy riverbank. A small colorful train has slid off the end of the tracks and is sinking into thick brown mud, tilted to one side. Its wheels are partially in the mud. A girl with red pigtails climbs carefully out of the passenger car. A large white goose walks over, honking at the stuck train. Tall grass and a slow river in the background.",
-      "entities_in_scene": ["girl", "goose"],
-      "key_objects": ["train", "thick brown mud", "tracks", "river"],
+      "full_scene_prompt": "A muddy riverbank. A small colorful train has slid off the end of the tracks and is sinking into thick brown mud, tilted to one side. Its wheels are partially in the mud. A large white goose walks over, honking at the stuck train. Tall grass and a slow river in the background.",
+      "entities_in_scene": ["train", "goose"],
+      "key_objects": ["thick brown mud", "tracks", "river"],
       "misl_targets": {
         "macro": {
-          "CH": ["girl", "goose"],
+          "CH": ["train", "goose"],
           "S": ["muddy riverbank"],
           "IE": null,
-          "IR": ["girl is worried"],
+          "IR": null,
           "P": null,
-          "A": ["train slides off rails", "sinks into mud", "wheels spin", "girl climbs out carefully", "goose walks over", "goose honks at stuck train"],
+          "A": ["train slides off rails", "sinks into mud", "wheels spin", "goose walks over", "goose honks at stuck train"],
           "CO": ["train is stuck"]
         },
         "micro": {
-          "ENP": ["muddy riverbank", "thick brown mud", "side track", "passenger car", "stuck train"],
-          "ADV": ["carefully", "off"],
+          "ENP": ["muddy riverbank", "thick brown mud", "stuck train"],
+          "ADV": ["off"],
           "SC": ["because the wheels just spin"],
           "CC": ["but"],
           "M": [],
@@ -119,17 +120,17 @@
       "scene_number": 5,
       "title": "The Rescue",
       "background_prompt": "A muddy riverbank with train tracks visible nearby, leading back toward the countryside. A dirt path connects to the tracks. Sunny late afternoon. No people, no animals, no train.",
-      "full_scene_prompt": "A muddy riverbank. A big green tractor is pulling a small colorful train out of the mud with a heavy rope tied to its front. A train conductor with a tall blue hat stands nearby, out of breath, shaking his head but laughing. A girl with red pigtails smiles with relief from beside the train. A farmer sits on the tractor. A large white goose watches from a safe distance in the grass. Late afternoon light.",
-      "entities_in_scene": ["conductor", "girl", "goose"],
-      "key_objects": ["train", "big green tractor", "heavy rope", "mud"],
+      "full_scene_prompt": "A muddy riverbank. A big green tractor is pulling a small colorful train out of the mud with a heavy rope tied to its front. A train conductor with a tall blue hat stands nearby, out of breath, shaking his head but laughing. A farmer sits on the tractor. A large white goose watches from a safe distance in the grass. Late afternoon light.",
+      "entities_in_scene": ["conductor", "train", "goose", "tractor"],
+      "key_objects": ["big green tractor", "heavy rope", "mud"],
       "misl_targets": {
         "macro": {
-          "CH": ["conductor", "girl", "goose", "farmer"],
+          "CH": ["conductor", "train", "goose", "farmer"],
           "S": null,
           "IE": null,
-          "IR": ["girl smiles with relief", "conductor laughs"],
+          "IR": ["conductor laughs"],
           "P": ["get tractor to pull train out"],
-          "A": ["conductor arrives", "tie rope to train", "tractor pulls train out", "girl smiles", "goose watches", "conductor shakes head", "conductor laughs"],
+          "A": ["conductor arrives", "tie rope to train", "tractor pulls train out", "goose watches", "conductor shakes head", "conductor laughs"],
           "CO": ["train rescued, back on tracks"]
         },
         "micro": {

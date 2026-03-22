@@ -37,7 +37,19 @@
       var trainingRendered = 0;
       if (data.training_scenes) {
         data.training_scenes.forEach(function(scene) {
-          if (scene.sprite_code && Object.keys(scene.sprite_code).length > 0) {
+          if (scene.thumbnail_url) {
+            var card = document.createElement('div');
+            card.className = 'thumbnail-card thumbnail-decorative';
+            var img = document.createElement('img');
+            img.src = scene.thumbnail_url;
+            img.alt = scene.name || 'Training';
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.objectFit = 'cover';
+            img.style.borderRadius = '8px';
+            card.appendChild(img);
+            trainingContainer.appendChild(card);
+          } else if (scene.sprite_code && Object.keys(scene.sprite_code).length > 0) {
             var card = ScenePicker.createThumbnailCard(scene);
             card.classList.add('thumbnail-decorative');
             trainingContainer.appendChild(card);

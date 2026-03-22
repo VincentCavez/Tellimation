@@ -47,6 +47,7 @@ logger = logging.getLogger("gen_ui")
 # ---------------------------------------------------------------------------
 
 STORIES_DIR = PROJECT_ROOT / "data" / "study_scenes"
+TRAINING_DIR = PROJECT_ROOT / "data" / "training"
 OUTPUT_BASE = PROJECT_ROOT / "data" / "study_gen"
 API_DELAY = 2.0
 
@@ -55,6 +56,8 @@ STORY_FILES = {
     "B": "story_b_market_mixup.json",
     "C": "story_c_night_garden.json",
     "D": "story_d_runaway_train.json",
+    "T1": ("training", "training_1.json"),
+    "T2": ("training", "training_2.json"),
 }
 
 # ---------------------------------------------------------------------------
@@ -114,10 +117,10 @@ Create a complete scene illustration with all characters and objects.
 """
 
 CHARACTER_REF_PROMPT = """\
-Create an illustration of the following character on a SOLID WHITE background. \
+Create an illustration of the following entity on a SOLID WHITE background. \
 The white must be perfectly uniform — no gradients, no shading, no variation.
 
-## Character
+## Entity
 {character_description}
 
 ## Art Style — MUST FOLLOW EXACTLY
@@ -125,12 +128,15 @@ The white must be perfectly uniform — no gradients, no shading, no variation.
 
 ## Additional Rules
 - **Side view** (like a 2D storybook): flat side profile.
-- **The character should fill most of the image** — center it, leave only a small \
+- **The entity should fill most of the image** — center it, leave only a small \
   margin of white around it.
-- **Show the full body** of the character from head to feet.
-- **Detailed**: clearly distinct body parts (head, body, limbs).
+- If the entity is a person or animal, show the full body from head to feet \
+  with clearly distinct body parts.
+- If the entity is an object (box, table, wagon, etc.), draw it realistically \
+  as an inanimate object. **NO ANTHROPOMORPHISM**: objects must NOT have faces, \
+  eyes, mouths, arms, legs, or any human/animal features. A box is just a box.
 - **NO other elements**: no ground, no shadow, no text, no decorations. \
-  ONLY the character on solid white.
+  ONLY the entity on solid white.
 - **NO text, labels, or writing of any kind.**
 """
 
@@ -223,9 +229,21 @@ state: Dict[str, Any] = {
 
 
 def load_story(key: str) -> Dict[str, Any]:
-    path = STORIES_DIR / STORY_FILES[key]
+    entry = STORY_FILES[key]
+    if isinstance(entry, tuple):
+        subdir, fname = entry
+        if subdir == "training":
+            path = TRAINING_DIR / fname
+        else:
+            path = STORIES_DIR / fname
+    else:
+        path = STORIES_DIR / entry
     with open(path) as f:
-        return json.load(f)
+        data = json.load(f)
+    # Normalize: "entities" is the canonical key, map to "characters" for gen_ui compat
+    if "characters" not in data and "entities" in data:
+        data["characters"] = data["entities"]
+    return data
 
 
 HTML_TEMPLATE = """\
@@ -489,14 +507,12 @@ window.addEventListener('load', loadStory);
 @app.route("/")
 def index():
     stories = []
-    for key, fname in sorted(STORY_FILES.items()):
-        path = STORIES_DIR / fname
-        if path.exists():
-            with open(path) as f:
-                d = json.load(f)
+    for key in sorted(STORY_FILES.keys()):
+        try:
+            d = load_story(key)
             stories.append((key, d["title"]))
-        else:
-            stories.append((key, f"({fname} not found)"))
+        except Exception:
+            stories.append((key, f"(not found)"))
     return render_template_string(HTML_TEMPLATE, stories=stories, current_story=state.get("story_key", "A"))
 
 
@@ -600,11 +616,16 @@ async def _generate_scene_async(
             if hd_path.exists():
                 result["refs"].append({"name": char_name, "hd": str(hd_path)})
 
-    # Generate background
+    # Generate background (skip if already exists on disk, unless mode=bg_only or regen)
     bg_bytes: Optional[bytes] = None
     bg_hd_path = hd_dir / f"scene_{scene_num}_bg.png"
 
-    if gen_bg:
+    if bg_hd_path.exists() and mode != "bg_only":
+        # Reuse existing background
+        bg_bytes = bg_hd_path.read_bytes()
+        result["bg_hd"] = str(bg_hd_path)
+        logger.info("Reusing existing background: %s", bg_hd_path)
+    elif gen_bg:
         bg_prompt = BACKGROUND_PROMPT_PREFIX.format(scene_description=scene["background_prompt"], art_style=ART_STYLE)
         bg_bytes = await generate_image(bg_prompt, aspect_ratio="16:9", label=f"scene_{scene_num}_bg")
 
@@ -613,10 +634,6 @@ async def _generate_scene_async(
             result["bg_hd"] = str(bg_hd_path)
 
         await asyncio.sleep(API_DELAY)
-    elif bg_hd_path.exists():
-        # Load existing background for full scene ref
-        bg_bytes = bg_hd_path.read_bytes()
-        result["bg_hd"] = str(bg_hd_path)
 
     if not gen_full:
         # Return existing full scene path if available
