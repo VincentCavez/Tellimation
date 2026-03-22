@@ -1390,6 +1390,12 @@ async def _handle_study_audio(
         })
         session.student_profile.total_utterances += 1
 
+        # Log name assignments if detected
+        if assessment.name_assignments:
+            for na in assessment.name_assignments:
+                session.character_names[na["entity_id"]] = na["name"]
+            await ws.send_json({"type": "study_log", "tag": "NAMES", "text": str(assessment.name_assignments)})
+
         # Split discrepancies into corrections vs suggestions
         corrections = [d for d in assessment.discrepancies if d.pass_type == "correction"]
         suggestions = [d for d in assessment.discrepancies if d.pass_type == "suggestion"]

@@ -623,6 +623,32 @@ function _getEntityLayer(buf, prefix) {
   return combined.length > 0 ? combined : null;
 }
 
+/**
+ * Wrap a per-entity animation factory so that when prefix contains '|',
+ * it creates one instance per target and runs them all on each frame.
+ * Use for animations that draw overlays (bubbles, alerts) per entity.
+ */
+function _perTargetWrapper(factory) {
+  return function(params) {
+    var prefix = params.entityPrefix || '';
+    if (prefix.indexOf('|') < 0) return factory(params);
+    // Multi-target: create one animation per target
+    var parts = prefix.split('|');
+    var animators = [];
+    for (var i = 0; i < parts.length; i++) {
+      var p = {};
+      for (var k in params) p[k] = params[k];
+      p.entityPrefix = parts[i];
+      animators.push(factory(p));
+    }
+    return function(buf, PW, PH, t) {
+      for (var i = 0; i < animators.length; i++) {
+        animators[i](buf, PW, PH, t);
+      }
+    };
+  };
+}
+
 function _isEntity(entityId, prefix) {
   if (prefix.indexOf('|') >= 0) {
     var parts = prefix.split('|');

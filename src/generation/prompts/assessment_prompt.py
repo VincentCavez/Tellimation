@@ -205,6 +205,14 @@ Near-misses or creative interpretations are NOT errors.
 When the child refers to an entity by a name listed in the character names \
 section, treat it as a valid reference to that entity.
 
+IMPORTANT — Name assignment detection:
+If the child gives a proper name (e.g. "the boy is called Max", "Lucy the dog", \
+"this is grandma Rose") to any entity in the scene, this is NOT an error — it is \
+creative storytelling. Include the detected name assignments in the output under \
+"name_assignments". For animals, use context to determine which name belongs to \
+the animal vs. the humans (e.g. "Max and Buddy" where there is a boy and a dog \
+→ "Buddy" is most likely the dog's name).
+
 # Output JSON schema
 
 Return ONLY valid JSON (no markdown fences, no commentary):
@@ -217,6 +225,12 @@ Return ONLY valid JSON (no markdown fences, no commentary):
       "target_entities": ["<entity_id>", ...],
       "misl_elements": ["<MISL code>", ...],
       "description": "<brief, child-friendly explanation of the error>"
+    }
+  ],
+  "name_assignments": [
+    {
+      "entity_id": "<entity_id>",
+      "name": "<the proper name given by the child>"
     }
   ]
 }

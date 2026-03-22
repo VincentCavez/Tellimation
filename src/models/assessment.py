@@ -41,6 +41,7 @@ class AssessmentResponse(BaseModel):
     misl_opportunities: List[MISLOpportunity] = Field(default_factory=list)
     discrepancies: List[Discrepancy] = Field(default_factory=list)
     utterance_is_acceptable: bool = True
+    name_assignments: List[Dict[str, str]] = Field(default_factory=list)
 
 
 # ---------------------------------------------------------------------------

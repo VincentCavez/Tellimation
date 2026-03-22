@@ -59,7 +59,7 @@ AnimationTemplates.register('spotlight', function(params) {
 // ── I2: Nametag ──
 // Large beige nametag with entity type text, connected by an undulating
 // red string. The tag pivots slightly at the string attachment point.
-AnimationTemplates.register('nametag', function(params) {
+AnimationTemplates.register('nametag', _perTargetWrapper(function(params) {
   var prefix = params.entityPrefix || '';
   var bgColor = params.bgColor || [235, 215, 180]; // beige
   var borderColor = params.borderColor || [180, 155, 120]; // darker beige
@@ -224,7 +224,7 @@ AnimationTemplates.register('nametag', function(params) {
       cx2 += charW;
     }
   };
-}, 3000);
+}), 3000);
 
 // ── S2: Stamp ──
 // Phase 1 (0→0.667): entity lifts diagonally (up-right), black silhouette at original position.
@@ -2161,7 +2161,7 @@ AnimationTemplates.register('repel', function(params) {
 // ── D1: Speech Bubble ──
 // Elliptical speech bubble with black 1px border, a pointed horn toward the
 // entity's head, and "..." (three bold dots) centered inside.
-AnimationTemplates.register('speech_bubble', function(params) {
+AnimationTemplates.register('speech_bubble', _perTargetWrapper(function(params) {
   var prefix = params.entityPrefix || '';
   var bubbleText = params.bubbleText || '...';
 
@@ -2283,12 +2283,12 @@ AnimationTemplates.register('speech_bubble', function(params) {
       }
     }
   };
-}, 1500);
+}), 1500);
 
 // ── D2: Thought Bubble ──
 // Pixelated thought bubble (round, linked bubbles) with "..." or symbol.
 // Scaffolds Internal Response and Plan (mental_verbs).
-AnimationTemplates.register('thought_bubble', function(params) {
+AnimationTemplates.register('thought_bubble', _perTargetWrapper(function(params) {
   var prefix = params.entityPrefix || '';
   var bubbleText = params.bubbleText || '...';
   // Cloud shape = union of overlapping circles
@@ -2413,13 +2413,13 @@ AnimationTemplates.register('thought_bubble', function(params) {
       }
     }
   };
-}, 1500);
+}), 1500);
 
 // ── D3: Alert ──
 // "!" sprite above entity. Signals that an important event just happened
 // or that the entity is reacting to something.
 // Scaffolds Initiating Event (IE) and Internal Response (IR).
-AnimationTemplates.register('alert', function(params) {
+AnimationTemplates.register('alert', _perTargetWrapper(function(params) {
   var prefix = params.entityPrefix || '';
   var markCount = params.markCount != null ? Math.max(1, Math.min(3, params.markCount)) : 3;
   var color = params.color || [255, 220, 30];
@@ -2535,13 +2535,13 @@ AnimationTemplates.register('alert', function(params) {
       }
     }
   };
-}, 1200);
+}), 1200);
 
 // ── D4: Interjection ──
 // Comic-style burst bubble inspired by classic manga/comic "WOW" effects.
 // Irregular jagged shape with 3 layers: black outline → yellow border → white fill.
 // The ONLY animation that displays text from the child's speech.
-AnimationTemplates.register('interjection', function(params) {
+AnimationTemplates.register('interjection', _perTargetWrapper(function(params) {
   var prefix = params.entityPrefix || '';
   var word = params.word || '???';
 
@@ -2712,7 +2712,7 @@ AnimationTemplates.register('interjection', function(params) {
       cx2 += charW;
     }
   };
-}, 1500);
+}), 1500);
 
 
 // ═══════════════════════════════════════════════════════════════════
