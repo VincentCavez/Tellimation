@@ -25,7 +25,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.websockets import WebSocketState
 
@@ -202,9 +202,9 @@ if _study_assets_dir and (_study_assets_dir / "oral_instructions").is_dir():
 # HTML page routes
 # ---------------------------------------------------------------------------
 
-@app.get("/", response_class=HTMLResponse)
-async def login_page():
-    return (TEMPLATES_DIR / "login.html").read_text()
+@app.get("/", response_class=RedirectResponse)
+async def root_redirect():
+    return RedirectResponse(url="/study")
 
 
 @app.get("/selection", response_class=HTMLResponse)
