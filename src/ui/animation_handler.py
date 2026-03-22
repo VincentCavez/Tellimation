@@ -344,34 +344,33 @@ async def execute_invocation_array(
 
     first_decision = None
 
-    for i, item in enumerate(invocation.sequence):
-        target_id = item.targets[0] if item.targets else ""
-        if not target_id:
+    # Collect all (target, misl_element) pairs across all sequence items
+    all_animations = []
+    for item in invocation.sequence:
+        targets = item.targets if item.targets else []
+        if not targets:
             continue
 
-        # Determine MISL element from the animation ID
         misl_element = "character"
-        # Find the matching discrepancy for context
         for disc in discrepancies:
-            if disc.target_entities and disc.target_entities[0] == target_id:
+            if disc.target_entities and disc.target_entities[0] == targets[0]:
                 if disc.misl_elements:
                     misl_element = disc.misl_elements[0]
                 break
 
-        # Use execute_animation for each item to get full decision + tracking
+        for target_id in targets:
+            all_animations.append((target_id, misl_element))
+
+    # Fire ALL animations simultaneously — no sequencing
+    for target_id, misl_element in all_animations:
         decision = await execute_animation(
             session=session,
             ws=ws,
             target_id=target_id,
             misl_element=misl_element,
         )
-
-        if i == 0:
+        if first_decision is None:
             first_decision = decision
-
-        # Delay between animations (except after the last one)
-        if i < len(invocation.sequence) - 1:
-            await asyncio.sleep(_INTER_ANIMATION_DELAY_MS / 1000)
 
     # ── Console log: full invocation array ──
     logger.info(

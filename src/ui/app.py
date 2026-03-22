@@ -42,7 +42,7 @@ from src.interaction.discrepancy_assessment import assess_utterance
 from src.models.assessment import SceneLog
 from src.models.scene import SceneManifest
 from src.models.session_state import SessionState
-from src.models.student_profile import StudentProfile
+from src.models.student_profile import MISLDifficultyProfile, StudentProfile
 from src.narration.transcription import transcribe_audio
 from src.persistence import (
     save_scene,
@@ -53,7 +53,8 @@ from google import genai
 from google.genai import types
 
 from src.models.assessment import Discrepancy
-from src.ui.animation_handler import execute_animation, execute_invocation_array, send_voice
+from src.interaction.tellimation import generate_tellimation
+from src.ui.animation_handler import _send_animation_message, execute_animation, execute_invocation_array, send_voice
 
 logging.basicConfig(
     level=logging.INFO,
@@ -646,6 +647,7 @@ async def study_websocket_endpoint(websocket: WebSocket):
     session.awaiting_ending_choice = False  # Study: no ending choice
     # Store animation flag on session for use in audio handler
     session.study_animations_enabled = is_animated  # type: ignore[attr-defined]
+    session.study_story_key = story_key  # type: ignore[attr-defined]
     ws = _WebSocketAdapter(websocket)
 
     try:
@@ -1322,13 +1324,17 @@ async def _handle_study_audio(
         story_so_far = get_accepted_utterances(session.current_scene_log)
         misl_already = get_misl_dimensions_suggested(session.current_scene_log)
 
+        # Training: ignore student profile
+        is_training = getattr(session, "study_story_key", "").lower().startswith("training")
+        misl_profile = MISLDifficultyProfile() if is_training else session.student_profile.misl_difficulty_profile
+
         assessment = await assess_utterance(
             api_key=session.api_key,
             manifest=session.current_manifest,
             utterance_text="",
             story_so_far=story_so_far,
             misl_already_suggested=misl_already,
-            misl_difficulty_profile=session.student_profile.misl_difficulty_profile,
+            misl_difficulty_profile=misl_profile,
             character_names=session.character_names,
             audio_bytes=audio_bytes,
             narration_history=session.narration_history,
@@ -1340,12 +1346,29 @@ async def _handle_study_audio(
         if not transcription:
             return
 
+        # Send transcription to client
+        await ws.send_json({"type": "study_log", "tag": "TRANSCRIPTION", "text": transcription})
+
         session.narration_history.append(transcription)
         session.conversation_history.append({
             "role": "child",
             "text": transcription,
         })
         session.student_profile.total_utterances += 1
+
+        # Split discrepancies into corrections vs suggestions
+        corrections = [d for d in assessment.discrepancies if d.pass_type == "correction"]
+        suggestions = [d for d in assessment.discrepancies if d.pass_type == "suggestion"]
+
+        # Send mistakes
+        if corrections:
+            mistakes = [{"desc": d.description, "targets": d.target_entities} for d in corrections]
+            await ws.send_json({"type": "study_log", "tag": "MISTAKES", "text": str(mistakes)})
+
+        # Send available options (suggestions from enrichment)
+        if suggestions:
+            options = [{"desc": d.description, "targets": d.target_entities, "misl": d.misl_elements} for d in suggestions]
+            await ws.send_json({"type": "study_log", "tag": "OPTIONS", "text": str(options)})
 
         # For animated condition: run animation pipeline
         is_animated = getattr(session, "study_animations_enabled", False)
@@ -1357,20 +1380,55 @@ async def _handle_study_audio(
                 misl_difficulty_profile=session.student_profile.misl_difficulty_profile,
             )
 
-            # Extract discrepancies for animation
-            discrepancies: List[Discrepancy] = []
+            if action == "correct":
+                await ws.send_json({"type": "study_log", "tag": "CORRECTION", "text": f"action={action}"})
+            elif action in ("accept_and_guide", "accept"):
+                if action_data and "discrepancies" in action_data:
+                    chosen = []
+                    for d in action_data["discrepancies"]:
+                        if isinstance(d, dict):
+                            chosen.append({"desc": d.get("description", ""), "targets": d.get("target_entities", [])})
+                        elif hasattr(d, "description"):
+                            chosen.append({"desc": d.description, "targets": d.target_entities})
+                    await ws.send_json({"type": "study_log", "tag": "SUGGESTION", "text": str(chosen)})
+
+            # Extract discrepancies for animation — only the FIRST one (chosen suggestion/correction)
+            chosen_disc: Optional[Discrepancy] = None
             if action_data and "discrepancies" in action_data:
                 for d in action_data["discrepancies"]:
                     if isinstance(d, dict):
-                        discrepancies.append(Discrepancy(**d))
+                        chosen_disc = Discrepancy(**d)
                     elif isinstance(d, Discrepancy):
-                        discrepancies.append(d)
+                        chosen_disc = d
+                    break  # only the first
 
-            # Execute animations only (voice is blocked by send_voice guard)
-            if action == "correct" and discrepancies:
-                await execute_invocation_array(session, ws, discrepancies)
-            elif action == "accept_and_guide" and discrepancies:
-                await execute_invocation_array(session, ws, discrepancies)
+            # Execute ONE animation on all targets simultaneously
+            if chosen_disc and action in ("correct", "accept_and_guide"):
+                targets = chosen_disc.target_entities or []
+                misl_element = chosen_disc.misl_elements[0] if chosen_disc.misl_elements else "character"
+
+                # Generate animation decision once (for the first target)
+                first_target = targets[0] if targets else ""
+                if first_target:
+                    decision = await generate_tellimation(
+                        api_key=session.api_key,
+                        sprite_code=(
+                            session.current_scene.get("sprite_code", {})
+                            if session.current_scene else {}
+                        ),
+                        manifest=session.current_manifest,
+                        student_profile=session.student_profile,
+                        target_id=first_target,
+                        misl_element=misl_element,
+                    )
+
+                    # Send the SAME animation for ALL targets simultaneously
+                    for target_id in targets:
+                        decision_copy = dict(decision)
+                        if decision_copy["mode"] in ("use_default", "adjust_params"):
+                            decision_copy["params"] = dict(decision.get("params", {}))
+                            decision_copy["params"]["entityPrefix"] = target_id
+                        await _send_animation_message(ws, decision_copy, target_id, misl_element)
 
     except Exception:
         logger.exception("[study] Assessment/animation failed")
