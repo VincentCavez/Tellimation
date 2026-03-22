@@ -181,9 +181,20 @@ async def assess_corrections(
                     description=item.get("description", ""),
                 ))
 
+    # Extract name assignments (child giving names to entities)
+    name_assignments: List[Dict[str, str]] = []
+    raw_names = data.get("name_assignments", [])
+    if isinstance(raw_names, list):
+        for na in raw_names:
+            if isinstance(na, dict) and na.get("entity_id") and na.get("name"):
+                name_assignments.append({"entity_id": na["entity_id"], "name": na["name"]})
+
+    if name_assignments:
+        logger.info("[assessment:correction] Name assignments detected: %s", name_assignments)
+
     logger.info("[assessment:correction] Found %d correction discrepancies",
                 len(discrepancies))
-    return discrepancies
+    return discrepancies, name_assignments
 
 
 # ---------------------------------------------------------------------------
@@ -317,8 +328,9 @@ async def assess_utterance(
         return AssessmentResponse(transcription="")
 
     # --- Pass 1: Correction ---
+    name_assignments: List[Dict[str, str]] = []
     try:
-        corrections = await assess_corrections(
+        corrections, name_assignments = await assess_corrections(
             api_key=api_key,
             manifest=manifest,
             utterance_text=utterance_text,
@@ -329,6 +341,12 @@ async def assess_utterance(
     except Exception as exc:
         logger.error("[assessment] Correction pass failed: %s", exc)
         corrections = []
+
+    # Register detected name assignments
+    if name_assignments and character_names is not None:
+        for na in name_assignments:
+            character_names[na["entity_id"]] = na["name"]
+            logger.info("[assessment] Registered name: %s → %s", na["entity_id"], na["name"])
 
     # --- Pass 2: Enrichment ---
     try:
@@ -375,6 +393,7 @@ async def assess_utterance(
         misl_opportunities=misl_opportunities,
         discrepancies=discrepancies,
         utterance_is_acceptable=acceptable,
+        name_assignments=name_assignments,
     )
 
     logger.info(
