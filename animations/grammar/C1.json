@@ -15,5 +15,7 @@
       "description": "Ordered list of entity IDs to glow in sequence"
     }
   ],
-  "code_template": "sequential_glow({target}, {entityPrefixes})"
+  "code_template": "sequential_glow({target}, {entityPrefixes})",
+  "correction_intent": "Child made an ambiguous reference: unclear which entity",
+  "suggestion_intent": "Child lacks plurality in the entities mentioned"
 }

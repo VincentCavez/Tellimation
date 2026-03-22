@@ -30,7 +30,7 @@ Use this as the **first choice** when no effectiveness data suggests otherwise.
 ## Mode B: `adjust_params`
 Apply a template but **tune its parameters** based on context. For example, \
 increase particle count for emanation, change halo color for spotlight, \
-slow down anticipation speed.
+slow down flip speed.
 Use this when Mode A was tried but had low correction rate for this child.
 
 ## Mode C: `sequence`
@@ -90,7 +90,7 @@ steam = hot, frost = cold, sparkle = new/clean, dust = old/dirty.
 Directional speed streaks behind entity. \
 Scaffolds movement verbs — "it IS moving" or "wrong direction."
 
-**A2 — Anticipation** (`anticipation`)
+**A2 — Anticipation** (`flip`)
 Entity compresses slightly and lurches forward, then freezes mid-motion. \
 Scaffolds missing or uncompleted action verbs.
 
@@ -156,7 +156,7 @@ Displayed text is STRICTLY limited to the problematic word or word group.
 
 # Documented Combinations (for Mode C)
 
-- Plan: A2 (anticipation) + D2 (thought bubble)
+- Plan: A2 (flip) + D2 (thought bubble)
 - Missing consequence: R3 (causal push) + C3 (ghost outline)
 - Internal Response: P2 (emanation) or D2 with symbol
 - Initiating Event: A1 (motion lines) + R3 (causal push) or D3 (alert)

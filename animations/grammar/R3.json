@@ -4,7 +4,12 @@
   "category": "Relation",
   "mode": "both",
   "scaffolding_intent": "Element A rushes toward element B with an impact burst at collision, scaffolding causality and consequence",
-  "misl_elements": ["CC", "SC", "IE", "CO"],
+  "misl_elements": [
+    "CC",
+    "SC",
+    "IE",
+    "CO"
+  ],
   "target_type": "entities",
   "parameters": [
     {
@@ -17,10 +22,15 @@
     {
       "name": "knockPixels",
       "type": "int",
-      "range": [5, 30],
+      "range": [
+        5,
+        30
+      ],
       "default": 12,
       "description": "Knockback distance on impact"
     }
   ],
-  "code_template": "causal_push({target}, {entityPrefixB}, {knockPixels})"
+  "code_template": "causal_push({target}, {entityPrefixB}, {knockPixels})",
+  "correction_intent": "Child described an incorrect causal link between entities",
+  "suggestion_intent": "Child hasn't described the causal link between entities"
 }
