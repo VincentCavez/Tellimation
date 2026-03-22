@@ -317,6 +317,11 @@ Rules for ranking:
 3. Do NOT suggest dimensions already suggested in this scene.
 4. Do NOT re-flag elements already identified as errors in the correction pass.
 5. Each opportunity must be grounded in specific manifest elements.
+6. Be FLEXIBLE with descriptions: if the child described something that is \
+   approximately correct but uses different words (e.g. "brown coat" instead \
+   of "green scarf", "big dog" instead of "large dog"), do NOT flag this as \
+   a missing element. Accept any reasonable description that fits the scene, \
+   even if it does not match the manifest wording exactly.
 
 # Output JSON schema
 

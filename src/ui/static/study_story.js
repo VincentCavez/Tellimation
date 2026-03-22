@@ -81,6 +81,10 @@
       case 'scene_complete':
         break;
 
+      case 'study_log':
+        console.log('[' + msg.tag + '] ' + msg.text);
+        break;
+
       case 'error':
         console.error('[study_story] Server error:', msg.message);
         break;
@@ -88,7 +92,6 @@
   };
 
   ws.onclose = function() {
-    console.log('[study_story] WebSocket closed');
   };
 
   // --- Narration client init (PTT recording only) ---
@@ -100,17 +103,24 @@
   );
 
   // --- Scene loading ---
+  var _nextSceneTimer = null;
+
   function loadScene(sceneNum) {
     sceneNumEl.textContent = sceneNum;
 
-    // Show/hide buttons
-    if (sceneNum < sceneCount) {
-      btnNextScene.style.display = '';
-      btnFinish.style.display = 'none';
-    } else {
-      btnNextScene.style.display = 'none';
-      btnFinish.style.display = '';
-    }
+    // Clear any pending next-scene timer
+    if (_nextSceneTimer) { clearTimeout(_nextSceneTimer); _nextSceneTimer = null; }
+
+    // Hide buttons initially, show after 60s delay
+    btnNextScene.style.display = 'none';
+    btnFinish.style.display = 'none';
+    _nextSceneTimer = setTimeout(function() {
+      if (sceneNum < sceneCount) {
+        btnNextScene.style.display = '';
+      } else {
+        btnFinish.style.display = '';
+      }
+    }, 60000);
 
     fetch('/api/study/scene?story=' + encodeURIComponent(storyKey) + '&scene=' + sceneNum)
       .then(function(resp) {
