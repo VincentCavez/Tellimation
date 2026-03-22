@@ -1,0 +1,39 @@
+{
+  "story_id": "training_1",
+  "title": "Practice Story 1",
+  "entities": {
+    "boy": "a boy with curly hair",
+    "grandmother": "a grandmother wearing a green apron",
+    "dog": "a small brown dog",
+    "box": "a big red box"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Baking",
+      "background_prompt": "A warm cozy kitchen with a wooden table, shelves with jars, a window with afternoon light, tiled floor. No people, no animals.",
+      "full_scene_prompt": "A warm cozy kitchen. A boy with curly hair and a grandmother in a green apron stand by a wooden table placing fresh cookies in a red box. A small brown dog watches from under the table. Afternoon light through the window. Shelves with jars in the background.",
+      "entities_in_scene": ["boy", "grandmother", "dog", "box"],
+      "key_objects": ["fresh cookies", "red box"],
+      "misl_targets": {
+        "macro": {
+          "CH": ["boy with curly hair", "grandmother with green apron", "small brown dog"],
+          "S": ["warm kitchen", "sunny day"],
+          "IE": null,
+          "IR": null,
+          "P": null,
+          "A": ["placing cookies in a box", "dog watches from under the table"],
+          "CO": null
+        },
+        "micro": {
+          "ENP": ["curly hair", "green apron", "fresh cookies", "red box", "small brown dog", "wooden table"],
+          "ADV": [],
+          "SC": [],
+          "CC": ["and"],
+          "M": [],
+          "L": []
+        }
+      }
+    }
+  ]
+}

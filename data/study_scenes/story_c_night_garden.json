@@ -1,19 +1,20 @@
 {
   "story_id": "C",
   "title": "The Night Garden",
-  "characters": {
-    "girl": "a girl in striped pajamas with a small flashlight",
+  "entities": {
+    "girl": "a girl in striped pajamas",
     "sister": "her older sister with a green scarf",
-    "firefly": "a large glowing firefly"
+    "firefly": "a large glowing firefly",
+    "house": "a house with a pointy roof"
   },
   "scenes": [
     {
       "scene_number": 1,
       "title": "The Light",
-      "background_prompt": "A child's bedroom at night, a bed with pillows, a small table beside it, a window showing darkness outside with a faint glow. Cozy room, dim lighting. No people, no animals.",
-      "full_scene_prompt": "A child's bedroom at night. A girl in striped pajamas stands by the window, holding a small flashlight he grabbed from the small table next to his bed. A strange glow is visible through the window outside. His older sister with a green scarf stands at the door, having just followed her. Dim room, nighttime.",
+      "background_prompt": "A child's bedroom at night, a bed with pillows, a small table beside it. A strange glow is visible through the window outside. Cozy room, dim lighting. No people, no animals.",
+      "full_scene_prompt": "A child's bedroom at night. A girl in striped pajamas stands by the window, looking at something outside. Her older sister with a green scarf stands at the door, having just followed her. Dim room, nighttime.",
       "entities_in_scene": ["girl", "sister"],
-      "key_objects": ["bedroom window", "small flashlight", "small table", "strange glow"],
+      "key_objects": ["bedroom window", "outside", "small table", "strange glow"],
       "misl_targets": {
         "macro": {
           "CH": ["girl in striped pajamas", "older sister with green scarf"],
@@ -21,11 +22,11 @@
           "IE": ["strange glow through window"],
           "IR": null,
           "P": null,
-          "A": ["sees glow", "grabs flashlight", "sister hears her", "follows her down stairs"],
+          "A": ["sees glow", "looks outside", "sister hears her", "follows her down stairs"],
           "CO": null
         },
         "micro": {
-          "ENP": ["striped pajamas", "strange glow", "bedroom window", "small flashlight", "small table next to his bed", "green scarf"],
+          "ENP": ["striped pajamas", "strange glow", "bedroom window", "small table next to her bed", "green scarf"],
           "ADV": ["quietly"],
           "SC": [],
           "CC": [],
@@ -38,7 +39,7 @@
       "scene_number": 2,
       "title": "The Garden",
       "background_prompt": "A dark garden at night seen from a back door. Bushes, a path leading deeper into the garden, long shadows. Moonlight. No people, no animals.",
-      "full_scene_prompt": "A dark garden at night. A girl in striped pajamas shines a small flashlight ahead, making long shadows on the bushes. Her older sister with a green scarf stands beside her near the back door. A large glowing firefly floats just ahead of them on the path, moving toward the back of the garden. Moonlight, dark sky.",
+      "full_scene_prompt": "A dark garden at night. A girl in striped pajamas walks carefully ahead, making long shadows on the bushes. Her older sister with a green scarf stands beside her near the back door. A large glowing firefly floats just ahead of them on the path, moving toward the back of the garden. Moonlight, dark sky.",
       "entities_in_scene": ["girl", "sister", "firefly"],
       "key_objects": ["back door", "bushes", "long shadows", "garden path"],
       "misl_targets": {
@@ -91,26 +92,26 @@
     {
       "scene_number": 4,
       "title": "The Greenhouse",
-      "background_prompt": "Inside an old greenhouse at night, cracked glass walls, vines growing on the frame, strange plants with big leaves, soft golden light filling the air. No people, no animals.",
-      "full_scene_prompt": "Inside an old greenhouse at night. Dozens of glowing fireflies fill the air with soft golden light. A girl in striped pajamas holds out his hand, and one large glowing firefly has landed on it. Her older sister with a green scarf looks around in wonder. Cracked glass walls, vines, strange plants with big leaves growing everywhere.",
-      "entities_in_scene": ["girl", "sister", "firefly"],
+      "background_prompt": "Inside an old greenhouse at night, cracked glass walls, vines growing on the frame, strange plants with big leaves, soft golden light filling the air. Through the cracked glass, a house is visible in the distance with a light on in one window. No people, no animals.",
+      "full_scene_prompt": "Inside an old greenhouse at night. Dozens of glowing fireflies fill the air with soft golden light. Through the cracked glass walls, their house is visible in the distance with a light turned on in a window. Strange plants with big leaves grow everywhere. The children look amazed by all the beauty.",
+      "entities_in_scene": ["girl", "sister", "firefly", "house"],
       "key_objects": ["old greenhouse", "cracked glass walls", "vines", "strange plants", "big leaves"],
       "misl_targets": {
         "macro": {
-          "CH": ["girl", "sister", "fireflies"],
+          "CH": ["girl", "sister", "firefly", "house"],
           "S": ["old greenhouse"],
-          "IE": null,
-          "IR": null,
+          "IE": ["light turns on in house", "it is getting very late", "go back to the house"],
+          "IR": ["amazed by the fireflies","amazed by the beauty","amazed by the lights"],
           "P": null,
-          "A": ["push open gate", "find greenhouse", "fireflies fill the air", "firefly lands on girl's hand"],
+          "A": ["push open gate", "find greenhouse", "fireflies fill the air", "see house in distance", "light turns on"],
           "CO": null
         },
         "micro": {
-          "ENP": ["old greenhouse", "vines", "dozens of fireflies", "soft golden light", "cracked glass walls", "strange plants", "big leaves"],
+          "ENP": ["old greenhouse", "vines", "dozens of fireflies", "soft golden light", "cracked glass walls", "strange plants", "big leaves", "house in the distance"],
           "ADV": ["everywhere"],
-          "SC": [],
-          "CC": ["and"],
-          "M": [],
+          "SC": ["because it is getting very late"],
+          "CC": ["but"],
+          "M": ["amazed", "realize"],
           "L": []
         }
       }

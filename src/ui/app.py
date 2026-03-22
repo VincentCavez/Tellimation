@@ -114,7 +114,7 @@ def _apply_scene_to_session(
     # Ensure entities list exists for SceneManifest validation
     if "entities" not in manifest_data:
         entities_in_scene = manifest_data.get("entities_in_scene", scene.get("entities_in_scene", []))
-        characters = scene.get("characters", {})
+        characters = scene.get("entities", scene.get("characters", {}))
         manifest_data["entities"] = [
             {
                 "id": eid,
@@ -394,7 +394,7 @@ def _load_study_scene(data_dir: Path, story_meta: Dict[str, Any], scene_num: int
                 if story_def_path.exists():
                     try:
                         story_def = json.loads(story_def_path.read_text())
-                        characters = story_def.get("characters", {})
+                        characters = story_def.get("entities", story_def.get("characters", {}))
                         scenes = story_def.get("scenes", [])
                         if 0 < scene_num <= len(scenes):
                             scene_meta = scenes[scene_num - 1]
@@ -482,22 +482,23 @@ async def study_assignment(participant: int):
                     scene_data["sprite_code"] = full_scene.get("sprite_code", {})
         stories[label] = scene_data
 
-    # Load training scenes
+    # Load training scenes (HD format)
     training_scenes: List[Dict[str, Any]] = []
     training_config = stories_config.get("training", [])
-    for t_entry in training_config:
-        t_dir = t_entry.get("scene_dir", "")
-        t_file = t_entry.get("scene_file", "")
-        if data_dir and t_dir and t_file:
-            t_path = data_dir.parent / t_dir / t_file
-            if t_path.exists():
-                try:
-                    t_scene = json.loads(t_path.read_text())
-                    training_scenes.append({
-                        "sprite_code": t_scene.get("sprite_code", {}),
-                    })
-                except (json.JSONDecodeError, OSError) as exc:
-                    logger.warning("Failed to load training scene %s: %s", t_path, exc)
+    for idx, t_entry in enumerate(training_config):
+        image_dir_rel = t_entry.get("image_dir", "")
+        if data_dir and image_dir_rel:
+            image_dir = data_dir.parent / image_dir_rel
+            story_key = Path(image_dir_rel).name
+            full_path = image_dir / "hd" / "scene_1_full.png"
+            if full_path.exists():
+                training_scenes.append({
+                    "name": t_entry.get("name", f"Practice {idx+1}"),
+                    "thumbnail_url": f"/study-assets/{story_key}/hd/scene_1_full.png",
+                    "format": "hd",
+                })
+            else:
+                training_scenes.append({"name": t_entry.get("name", f"Practice {idx+1}")})
 
     return JSONResponse(content={
         "participant": participant,
@@ -517,8 +518,18 @@ async def study_scene(story: str, scene: int):
     """
     _load_study_config()
     stories_config = _STUDY_STORIES or {}
-    story_meta = stories_config.get(story.upper())
-    if not story_meta:
+    story_key = story.upper()
+    story_meta = stories_config.get(story_key) or stories_config.get(story.lower())
+
+    # Training: list of scene defs, indexed by scene number
+    if story.lower() == "training" and isinstance(story_meta, list):
+        if scene < 1 or scene > len(story_meta):
+            return JSONResponse(status_code=400, content={"error": f"Training scene {scene} out of range (1-{len(story_meta)})"})
+        story_meta = story_meta[scene - 1]
+        story_meta.setdefault("scene_count", 1)
+        scene = 1  # each training entry is a single scene
+
+    if not story_meta or not isinstance(story_meta, dict):
         return JSONResponse(status_code=404, content={"error": f"Unknown story {story}"})
 
     scene_count = story_meta.get("scene_count", 0)

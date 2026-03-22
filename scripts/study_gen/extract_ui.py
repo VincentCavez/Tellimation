@@ -45,6 +45,7 @@ logger = logging.getLogger("extract_ui")
 # ---------------------------------------------------------------------------
 
 STORIES_DIR = PROJECT_ROOT / "data" / "study_scenes"
+TRAINING_DIR = PROJECT_ROOT / "data" / "training"
 OUTPUT_BASE = PROJECT_ROOT / "data" / "study_gen"
 API_DELAY = 2.0
 
@@ -53,6 +54,8 @@ STORY_FILES = {
     "B": "story_b_market_mixup.json",
     "C": "story_c_night_garden.json",
     "D": "story_d_runaway_train.json",
+    "T1": "training_1.json",
+    "T2": "training_2.json",
 }
 
 # ---------------------------------------------------------------------------
@@ -179,7 +182,8 @@ state: Dict[str, Any] = {
 
 
 def load_story(key: str) -> Dict[str, Any]:
-    path = STORIES_DIR / STORY_FILES[key]
+    base_dir = TRAINING_DIR if key.startswith("T") else STORIES_DIR
+    path = base_dir / STORY_FILES[key]
     with open(path) as f:
         return json.load(f)
 
@@ -440,7 +444,7 @@ def api_load_story():
 
         # Build character list with checkbox state
         chars_info = []
-        for char_name, char_desc in data["characters"].items():
+        for char_name, char_desc in data.get("entities", data.get("characters", {})).items():
             chars_info.append({
                 "name": char_name,
                 "description": char_desc,
@@ -449,7 +453,7 @@ def api_load_story():
 
         # Check for existing extractions
         existing = []
-        for char_name in data["characters"]:
+        for char_name in data.get("entities", data.get("characters", {})):
             ext_path = extract_dir / f"scene_{sn}_{char_name}.png"
             if ext_path.exists():
                 existing.append({"name": char_name, "path": str(ext_path)})
@@ -479,7 +483,7 @@ def api_extract():
         return jsonify({"error": "No story loaded"})
 
     story_id = data["story_id"]
-    characters = data["characters"]
+    characters = data.get("entities", data.get("characters", {}))
 
     if char_name not in characters:
         return jsonify({"error": f"Unknown character: {char_name}"})
