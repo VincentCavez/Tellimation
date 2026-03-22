@@ -472,12 +472,17 @@ a { color: var(--teal); text-decoration: none; }
 
 /* Push-to-talk hint (below the box, italic) */
 .ptt-hint {
-  width: 100%;
-  max-width: 860px;
-  color: #555;
-  font-size: 0.85rem;
+  width: 60%;
+  background-color: #d8c4af;
+  color: #000;
+  font-size: 1.1rem;
   font-style: italic;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border-radius: 14px;
 }
 .ptt-hint kbd {
   display: inline-block;
@@ -719,12 +724,15 @@ a { color: var(--teal); text-decoration: none; }
 .study-controls-row {
   display: flex;
   align-items: stretch;
-  gap: 1rem;
+  position: relative;
   margin-top: 0.5rem;
+  width: 100%;
+  justify-content: center;
 }
 .study-controls-row .btn {
+  position: absolute;
+  right: 0;
   flex-shrink: 0;
-  align-self: center;
 }
 .study-story-slot {
   display: flex;
