@@ -80,9 +80,7 @@ def process_assessment(
         audio_path=audio_path,
     ))
 
-    under_limit = scene_log.misl_opportunities_given < MAX_MISL_OPPORTUNITIES_PER_SCENE
-
-    if has_suggestions and under_limit:
+    if has_suggestions:
         scene_log.misl_opportunities_given += 1
         scene_log.assessments.append(SceneAssessmentEntry(
             timestamp=time.time(),

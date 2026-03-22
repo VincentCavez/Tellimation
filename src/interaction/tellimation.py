@@ -512,60 +512,50 @@ def _select_animation_for_discrepancy(
     discrepancy: Discrepancy,
     student_profile: StudentProfile,
 ) -> Optional[str]:
-    """Select the best animation ID for a discrepancy using the grammar.
+    """Select the best animation ID for a discrepancy.
 
-    Returns the animation ID (e.g. "I1_spotlight") or None if no match.
+    Deterministic mapping based on category and context:
+    - Identity → spotlight (I1): highlight entity to prompt naming
+    - Property → color_pop (P1): emphasize visual attributes
+    - Action → motion_lines (A1): draw attention to what entity is doing
+    - Space (with entity targets) → stamp (S2): show where entity is
+    - Space (setting, no specific entity) → reveal (S1): reveal the whole scene
+    - Time → flashback (T1): temporal context
+    - Relation → magnetism (R1): show connection between entities
+    - Count → sequential_glow (C1): highlight entities for counting
+    - Discourse → speech_bubble (D1): prompt dialogue/internal response
     """
     category = discrepancy.type
-    mode = "correction" if discrepancy.pass_type == "correction" else "suggestion"
+    is_correction = discrepancy.pass_type == "correction"
+    has_targets = bool(discrepancy.target_entities)
 
-    # 1. Get animations matching category and mode from the grammar
-    category_anims = get_animations_by_category(category)
-    mode_anims = get_animations_by_mode(mode)
+    # Deterministic mapping
+    mapping = {
+        "Identity": "I1_spotlight",
+        "Property": "P1_color_pop",
+        "Action": "A1_motion_line",
+        "Time": "T1_flashback",
+        "Relation": "R1_magnetism",
+        "Count": "C1_sequential_glow",
+        "Discourse": "D1_speech_bubble",
+    }
 
-    # Intersection: animations matching both category and mode
-    mode_ids = {a.id for a in mode_anims}
-    candidates = [a for a in category_anims if a.id in mode_ids]
+    if category == "Space":
+        # Setting-level (no specific entity or MISL=setting) → reveal all
+        misl_codes = discrepancy.misl_elements or []
+        is_setting = "S" in misl_codes or "setting" in misl_codes
+        if is_setting and not has_targets:
+            return "S1_reveal"
+        # Object/location near specific entity → stamp
+        return "S2_stamp"
 
-    if not candidates:
-        # Fallback: try MISL_TO_ANIMATIONS mapping
-        for misl_el in discrepancy.misl_elements:
-            eligible = MISL_TO_ANIMATIONS.get(misl_el, [])
-            if eligible:
-                return eligible[0]
-        # Count animations as last resort for Count category
-        if category == "Count" and COUNT_ANIMATIONS:
-            return COUNT_ANIMATIONS[0]
-        return None
+    if category == "Discourse":
+        # Correction → interjection (D4), suggestion → speech_bubble (D1)
+        if is_correction:
+            return "D4_interjection"
+        return "D1_speech_bubble"
 
-    # 2. If multiple candidates, prefer ones that match MISL elements
-    if len(candidates) > 1 and discrepancy.misl_elements:
-        scored = []
-        for anim in candidates:
-            overlap = len(set(anim.misl_elements) & set(discrepancy.misl_elements))
-            scored.append((overlap, anim))
-        scored.sort(key=lambda x: x[0], reverse=True)
-        candidates = [s[1] for s in scored]
-
-    # 3. Check efficacy history to avoid ineffective animations
-    best = candidates[0]
-    for anim in candidates:
-        # Map grammar ID (e.g. "I1") to full animation ID (e.g. "I1_spotlight")
-        full_id = f"{anim.id}_{ANIMATION_ID_TO_TEMPLATE.get(f'{anim.id}_spotlight', anim.id)}"
-        # Find matching key in ANIMATION_ID_TO_TEMPLATE
-        for aid, tmpl in ANIMATION_ID_TO_TEMPLATE.items():
-            if aid.startswith(anim.id + "_"):
-                full_id = aid
-                break
-        best = anim
-        break  # Take first (best scoring) candidate
-
-    # Return full animation ID from ANIMATION_ID_TO_TEMPLATE
-    for aid in ANIMATION_ID_TO_TEMPLATE:
-        if aid.startswith(best.id + "_"):
-            return aid
-
-    return None
+    return mapping.get(category, "I1_spotlight")
 
 
 async def generate_invocation_array(
