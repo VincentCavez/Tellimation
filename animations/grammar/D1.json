@@ -15,6 +15,16 @@
       "range": [],
       "default": "...",
       "description": "Text to display inside the speech bubble"
+    },
+    {
+      "name": "scale",
+      "type": "float",
+      "range": [
+        1.0,
+        2.0
+      ],
+      "default": 1.0,
+      "description": "Size multiplier for the speech bubble"
     }
   ],
   "code_template": "speech_bubble({target}, {bubbleText})",

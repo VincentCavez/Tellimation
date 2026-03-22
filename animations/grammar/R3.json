@@ -23,11 +23,21 @@
       "name": "knockPixels",
       "type": "int",
       "range": [
-        5,
+        12,
         30
       ],
       "default": 12,
       "description": "Knockback distance on impact"
+    },
+    {
+      "name": "impactScale",
+      "type": "float",
+      "range": [
+        1.0,
+        3.0
+      ],
+      "default": 1.0,
+      "description": "Size multiplier for the impact star"
     }
   ],
   "code_template": "causal_push({target}, {entityPrefixB}, {knockPixels})",

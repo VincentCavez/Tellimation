@@ -145,9 +145,13 @@ AnimationTemplates.register('nametag', _perTargetWrapper(function(params) {
         var waveOff = waveAmp * Math.sin(progress * Math.PI * 2.5 + t * Math.PI * 4);
         var px = Math.round(holeScreenX + stringDx * progress + snx * waveOff);
         var py = Math.round(holeScreenY + stringDy * progress + sny * waveOff);
-        if (px >= 0 && px < PW && py >= 0 && py < PH) {
-          var si = py * PW + px;
-          _blendPixel(buf, si, stringColor[0], stringColor[1], stringColor[2], env);
+        for (var st = -1; st <= 1; st++) {
+          var spx = px + Math.round(snx * st);
+          var spy = py + Math.round(sny * st);
+          if (spx >= 0 && spx < PW && spy >= 0 && spy < PH) {
+            var si = spy * PW + spx;
+            _blendPixel(buf, si, stringColor[0], stringColor[1], stringColor[2], env);
+          }
         }
       }
     }

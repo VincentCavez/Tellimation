@@ -13,6 +13,16 @@
       "range": [],
       "default": [],
       "description": "Ordered list of entity IDs to glow in sequence"
+    },
+    {
+      "name": "glowBrightness",
+      "type": "float",
+      "range": [
+        1.0,
+        2.0
+      ],
+      "default": 1.0,
+      "description": "Brightness multiplier for the sequential glow"
     }
   ],
   "code_template": "sequential_glow({target}, {entityPrefixes})",

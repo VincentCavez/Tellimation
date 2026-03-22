@@ -11,7 +11,7 @@
   "parameters": [
     {
       "name": "bgColor",
-      "type": "rgb",
+      "type": "rgb_vary",
       "range": [
         0,
         255
@@ -25,7 +25,7 @@
     },
     {
       "name": "textColor",
-      "type": "rgb",
+      "type": "rgb_vary",
       "range": [
         0,
         255
@@ -39,7 +39,7 @@
     },
     {
       "name": "stringColor",
-      "type": "rgb",
+      "type": "rgb_vary",
       "range": [
         0,
         255
@@ -50,6 +50,16 @@
         180
       ],
       "description": "Connecting string color"
+    },
+    {
+      "name": "scale",
+      "type": "float",
+      "range": [
+        1.0,
+        2.0
+      ],
+      "default": 1.0,
+      "description": "Size multiplier for the nametag label"
     }
   ],
   "code_template": "nametag({target}, {bgColor}, {textColor}, {stringColor})",

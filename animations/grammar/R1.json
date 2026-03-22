@@ -15,6 +15,36 @@
       "range": [],
       "default": "",
       "description": "Entity ID of the second element (attracted toward)"
+    },
+    {
+      "name": "magnetScale",
+      "type": "float",
+      "range": [
+        1.0,
+        3.0
+      ],
+      "default": 1.0,
+      "description": "Size multiplier for the magnet sprites"
+    },
+    {
+      "name": "sparkleCount",
+      "type": "int",
+      "range": [
+        20,
+        40
+      ],
+      "default": 20,
+      "description": "Number of sparkle particles at the contact point"
+    },
+    {
+      "name": "sparkleRadius",
+      "type": "int",
+      "range": [
+        8,
+        30
+      ],
+      "default": 8,
+      "description": "Radius of the sparkle particle spread around the contact point"
     }
   ],
   "code_template": "magnetism({target}, {entityPrefixB})",
