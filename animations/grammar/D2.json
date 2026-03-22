@@ -17,6 +17,16 @@
       "range": [],
       "default": "...",
       "description": "Text to display inside the thought bubble"
+    },
+    {
+      "name": "scale",
+      "type": "float",
+      "range": [
+        1.0,
+        2.0
+      ],
+      "default": 1.0,
+      "description": "Size multiplier for the thought bubble"
     }
   ],
   "code_template": "thought_bubble({target}, {bubbleText})",

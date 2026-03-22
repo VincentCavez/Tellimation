@@ -530,99 +530,169 @@ def _select_animation_for_discrepancy(
     has_targets = bool(discrepancy.target_entities)
     desc_lower = discrepancy.description.lower()
 
-    # ═══════════════════════════════════════════
-    # CORRECTIONS (child said something wrong)
-    # ═══════════════════════════════════════════
-    if is_correction:
-        if category == "Identity":
-            return "I1_spotlight"  # wrong entity mentioned
-        if category == "Property":
-            # Over-mention → disintegration, wrong property → color_pop
-            _over_kw = ("over-mention", "too many times", "already said", "too much")
-            if any(kw in desc_lower for kw in _over_kw):
-                return "C2_disintegration"
-            return "P1_color_pop"
-        if category == "Emotion":
-            return "P2_emanation"  # incorrect emotion
-        if category == "Action":
-            return "A2_flip"  # incorrect/incomplete action
-        if category == "Relation":
-            return "R2_repel"  # incorrect grouping
-        if category == "Causality":
-            return "R3_causal_push"  # incorrect causality
-        if category == "Discourse":
-            _grammar_kw = ("grammar", "tense", "verb form", "conjugat", "plural", "singular", "syntax")
-            _thought_kw = ("think", "thought", "wonder", "feel", "believe", "imagine")
-            if any(kw in desc_lower for kw in _grammar_kw):
-                return "D4_interjection"  # grammar error
-            if any(kw in desc_lower for kw in _thought_kw):
-                return "D2_thought_bubble"  # incorrect thought
-            _event_kw = ("event", "happen", "notice", "react", "surprise", "respond")
-            if any(kw in desc_lower for kw in _event_kw):
-                return "D3_alert"  # incorrect event
-            return "D1_speech_bubble"  # incorrect dialogue
-        if category == "Space":
-            return "C3_ghost_outline"  # incorrect ref to absent entity
-        if category == "Time":
-            _future_kw = ("future", "will", "going to", "next", "later")
-            if any(kw in desc_lower for kw in _future_kw):
-                return "T2_timelapse"  # wrong tense, should be future
-            return "T1_flashback"  # wrong tense, should be past
-        if category == "Count":
-            return "C1_sequential_glow"  # ambiguous reference
-        return "I1_spotlight"  # fallback
+    # Use the animation_id provided by the LLM
+    _ID_TO_TEMPLATE = {
+        "I1": "I1_spotlight", "I2": "I2_nametag",
+        "P1": "P1_color_pop", "P2": "P2_emanation",
+        "A1": "A1_motion_line", "A2": "A2_flip",
+        "S1": "S1_reveal", "S2": "S2_stamp",
+        "T1": "T1_flashback", "T2": "T2_timelapse",
+        "R1": "R1_magnetism", "R2": "R2_repel", "R3": "R3_causal_push",
+        "C1": "C1_sequential_glow", "C2": "C2_disintegration", "C3": "C3_ghost_outline",
+        "D1": "D1_speech_bubble", "D2": "D2_thought_bubble", "D3": "D3_alert", "D4": "D4_interjection",
+    }
 
-    # ═══════════════════════════════════════════
-    # SUGGESTIONS (child didn't mention something)
-    # ═══════════════════════════════════════════
-    if category == "Identity":
-        _naming_kw = ("name", "call", "named", "calling", "nom")
-        if any(kw in desc_lower for kw in _naming_kw):
-            return "I2_nametag"  # suggest naming
-        return "I1_spotlight"  # suggest mentioning
-    if category == "Property":
-        return "P1_color_pop"  # lack of property description
-    if category == "Emotion":
-        return "P2_emanation"  # lack of emotion
-    if category == "Action":
-        _motion_kw = ("move", "run", "walk", "fly", "jump", "go", "chase", "rush")
-        if any(kw in desc_lower for kw in _motion_kw):
-            return "A1_motion_line"  # suggest motion action
-        return "A2_flip"  # lack of action
-    if category == "Relation":
-        _repel_kw = ("group", "distinct", "separate", "apart", "different", "confus")
-        if any(kw in desc_lower for kw in _repel_kw):
-            return "R2_repel"  # lack of distinction
-        return "R1_magnetism"  # lack of relation
-    if category == "Causality":
-        return "R3_causal_push"  # lack of causality
-    if category == "Discourse":
-        _thought_kw = ("think", "thought", "wonder", "feel", "believe", "imagine")
-        _event_kw = ("event", "happen", "notice", "react", "surprise", "respond")
-        if any(kw in desc_lower for kw in _thought_kw):
-            return "D2_thought_bubble"  # lack of thoughts
-        if any(kw in desc_lower for kw in _event_kw):
-            return "D3_alert"  # lack of events
-        return "D1_speech_bubble"
-    if category == "Space":
-        _absent_kw = ("absent", "not in", "missing from", "not here", "not present", "gone")
-        if any(kw in desc_lower for kw in _absent_kw):
-            return "C3_ghost_outline"  # lack of ref to absent entity
-        misl_codes = discrepancy.misl_elements or []
-        is_setting = "S" in misl_codes or "setting" in misl_codes
-        if is_setting and not has_targets:
-            return "S1_reveal"  # lack of setting description
-        return "S2_stamp"  # lack of spatial detail
-    if category == "Time":
-        _future_kw = ("future", "will", "going to", "next", "later", "could happen")
-        if any(kw in desc_lower for kw in _future_kw):
-            return "T2_timelapse"  # lack of future reference
-        return "T1_flashback"  # lack of past reference
-    if category == "Count":
-        return "C1_sequential_glow"
+    if discrepancy.animation_id:
+        aid = discrepancy.animation_id.upper()
+        # Handle P2 variants: P2_SHAME → P2_emanation (with particleType extracted)
+        if aid.startswith("P2_") and aid != "P2":
+            return "P2_emanation"
+        if aid in _ID_TO_TEMPLATE:
+            return _ID_TO_TEMPLATE[aid]
 
-    # Fallback
-    return "I1_spotlight"
+    # No animation_id → no animation
+    logger.warning("[tellimation] No animation_id for discrepancy: %s", discrepancy.description)
+    return None
+
+
+def select_discrepancy(
+    corrections: List[Discrepancy],
+    suggestions: List[Discrepancy],
+    study_log_entries: List[Dict[str, Any]],
+) -> Optional[Discrepancy]:
+    """Deterministic selection of which discrepancy to animate.
+
+    Priority: corrections over suggestions.
+    Within the list (ordered by severity/relevance from LLM):
+    - Pick the first item whose animation_id was NOT resolved last time.
+    - If all were resolved last time, pick the first item anyway.
+
+    Args:
+        corrections: correction discrepancies, ordered by severity (most severe first).
+        suggestions: suggestion discrepancies, ordered by relevance (most relevant first).
+        study_log_entries: flat list of all log entries for this participant
+            (from study_log.json or training_log.json).
+
+    Returns:
+        The chosen Discrepancy, or None if both lists are empty.
+    """
+    candidates = corrections if corrections else suggestions
+    if not candidates:
+        return None
+
+    # Build map: animation_id → last resolved status from logs
+    last_resolved: Dict[str, bool] = {}
+    for entry in study_log_entries:
+        if entry.get("event") == "resolution" and entry.get("animation_id"):
+            last_resolved[entry["animation_id"]] = entry.get("resolved", False)
+
+    # Try to find first candidate whose last resolution is NOT true
+    for disc in candidates:
+        aid = disc.animation_id
+        if aid is None:
+            continue
+        if aid not in last_resolved or not last_resolved[aid]:
+            # Never seen or last time was not resolved → pick this one
+            return disc
+
+    # All candidates were resolved last time → pick the first one
+    return candidates[0]
+
+
+def load_animation_params(
+    animation_id: str,
+    study_log_entries: List[Dict[str, Any]],
+) -> Dict[str, Any]:
+    """Load animation parameters from grammar JSON.
+
+    If the animation was played before and last resolution was False,
+    accentuate/vary parameters to make the animation more noticeable.
+    Otherwise, use defaults.
+
+    Args:
+        animation_id: e.g. "I1_spotlight" or "I1"
+        study_log_entries: flat list of all log entries for this participant.
+
+    Returns:
+        Dict of parameter overrides to pass to the animation.
+    """
+    import random
+
+    # Extract the short ID (e.g. "I1" from "I1_spotlight")
+    short_id = animation_id.split("_")[0].upper()
+
+    # Handle P2 variants: "P2_shame" → short_id="P2", variant="shame"
+    p2_variant = None
+    if short_id == "P2" and "_" in animation_id:
+        parts = animation_id.split("_", 1)
+        if len(parts) == 2 and parts[1].lower() in ("shame", "cold", "great", "love", "anger", "fear"):
+            p2_variant = parts[1].lower()
+
+    # Load grammar JSON
+    grammar_dir = Path(__file__).parent.parent.parent / "animations" / "grammar"
+    grammar_path = grammar_dir / f"{short_id}.json"
+    if not grammar_path.exists():
+        return {}
+
+    grammar = json.load(open(grammar_path))
+    parameters = grammar.get("parameters", [])
+    if not parameters:
+        return {}
+
+    # Check last resolution for this animation
+    last_resolved = None
+    for entry in study_log_entries:
+        if entry.get("event") == "resolution" and entry.get("animation_id") == short_id:
+            last_resolved = entry.get("resolved", False)
+
+    # Build param dict
+    params: Dict[str, Any] = {}
+
+    if last_resolved is None or last_resolved is True:
+        # First time or last time resolved → use defaults
+        for p in parameters:
+            params[p["name"]] = p["default"]
+        # Override particleType for P2 variants
+        if p2_variant:
+            params["particleType"] = p2_variant
+    else:
+        # Last time NOT resolved → accentuate parameters
+        for p in parameters:
+            default = p["default"]
+            prange = p.get("range", [])
+            ptype = p.get("type", "")
+
+            if ptype == "float" and isinstance(default, (int, float)) and len(prange) == 2:
+                lo, hi = prange
+                # Push 40% toward the max, add small random variation
+                accentuated = default + (hi - default) * 0.4
+                variation = (hi - lo) * 0.1 * (random.random() - 0.5)
+                params[p["name"]] = max(lo, min(hi, round(accentuated + variation, 3)))
+
+            elif ptype == "int" and isinstance(default, int) and len(prange) == 2:
+                lo, hi = prange
+                accentuated = default + (hi - default) * 0.4
+                variation = (hi - lo) * 0.1 * (random.random() - 0.5)
+                params[p["name"]] = max(lo, min(hi, round(accentuated + variation)))
+
+            elif ptype == "rgb_vary" and isinstance(default, list) and len(default) == 3:
+                # Vary each RGB channel by ±30
+                params[p["name"]] = [
+                    max(0, min(255, ch + random.randint(-30, 30)))
+                    for ch in default
+                ]
+
+            else:
+                # Non-numeric (rgb, string list, etc.) → use default
+                params[p["name"]] = default
+
+        logger.info("[tellimation] Accentuated params for %s: %s", animation_id, params)
+
+    # Override particleType for P2 variants
+    if p2_variant:
+        params["particleType"] = p2_variant
+
+    return params
 
 
 async def generate_invocation_array(
@@ -684,46 +754,14 @@ async def generate_invocation_array(
                     misl_element = code_to_key[code]
                     break
 
-        # Determine problematic segment for D4 interjection
-        problematic_segment = None
-        if disc.type == "Discourse" and disc.pass_type == "correction":
-            problematic_segment = disc.description
-
-        try:
-            decision = await generate_tellimation(
-                api_key=api_key,
-                sprite_code=sprite_code,
-                manifest=manifest,
-                student_profile=student_profile,
-                target_id=target_id,
-                misl_element=misl_element,
-                problematic_segment=problematic_segment,
-            )
-
-            # Build parameter overrides from the decision
-            param_overrides: Dict[str, Any] = {}
-            if decision["mode"] == "adjust_params":
-                param_overrides = decision.get("params", {})
-
+        # Use animation_id from the discrepancy (set by LLM)
+        aid = _select_animation_for_discrepancy(disc, student_profile)
+        if aid:
             sequence.append(AnimationInvocation(
-                animation_id=decision["animation_id"],
+                animation_id=aid,
                 targets=disc.target_entities,
-                parameter_overrides=param_overrides,
+                parameter_overrides={},
             ))
-
-        except Exception as exc:
-            logger.warning(
-                "[invocation] Failed to generate animation for %s: %s",
-                target_id, exc,
-            )
-            # Use fallback
-            fallback_aid = _select_animation_for_discrepancy(disc, student_profile)
-            if fallback_aid:
-                sequence.append(AnimationInvocation(
-                    animation_id=fallback_aid,
-                    targets=disc.target_entities,
-                    parameter_overrides={},
-                ))
 
     # Hard cap: max 2 animations per invocation array
     sequence = sequence[:2]

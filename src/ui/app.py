@@ -48,12 +48,14 @@ from src.persistence import (
     save_scene,
     save_student_profile,
     create_story,
+    append_study_log_entry,
+    load_study_log,
 )
 from google import genai
 from google.genai import types
 
 from src.models.assessment import Discrepancy
-from src.interaction.tellimation import _select_animation_for_discrepancy, generate_tellimation
+from src.interaction.tellimation import _select_animation_for_discrepancy, select_discrepancy, load_animation_params, generate_tellimation
 from config.misl import ANIMATION_ID_TO_TEMPLATE
 from src.ui.animation_handler import _send_animation_message, execute_animation, execute_invocation_array, send_voice
 
@@ -671,6 +673,16 @@ async def study_websocket_endpoint(websocket: WebSocket):
                 scene = data.get("scene")
                 if scene:
                     await _hydrate_scene(session, scene, ws)
+                    # Log scene change
+                    _pid = str(participant)
+                    _story_key = story_key
+                    _scene_num = scene.get("scene_number", 1)
+                    _is_training = _story_key.lower().startswith("training")
+                    append_study_log_entry(_pid, _is_training, _story_key, _scene_num, {
+                        "event": "scene_loaded",
+                        "story": _story_key,
+                        "scene": _scene_num,
+                    })
                 # Reset pending transcription on new scene
                 session.study_pending_transcription = ""
                 session.study_interrupted = False
@@ -1383,6 +1395,48 @@ async def _handle_study_audio(
         # Send transcription to client
         await ws.send_json({"type": "study_log", "tag": "TRANSCRIPTION", "text": transcription})
 
+        # --- Persist to study log ---
+        _pid = getattr(session, "session_id", "").replace("study_", "")
+        _story_key = getattr(session, "study_story_key", "")
+        _scene_num = session.current_scene.get("scene_number", 1) if session.current_scene else 1
+        _is_training = _story_key.lower().startswith("training")
+
+        # Log transcription
+        append_study_log_entry(_pid, _is_training, _story_key, _scene_num, {
+            "event": "transcription",
+            "text": transcription,
+            "was_interrupted": was_interrupted if 'was_interrupted' in dir() else False,
+        })
+
+        # Log resolution
+        if assessment.resolution:
+            append_study_log_entry(_pid, _is_training, _story_key, _scene_num, {
+                "event": "resolution",
+                "resolved": assessment.resolution.get("resolved", False),
+                "animation_id": assessment.resolution.get("animation_id"),
+                "pass_type": assessment.resolution.get("pass_type"),
+            })
+
+        # Log corrections
+        if [d for d in assessment.discrepancies if d.pass_type == "correction"]:
+            append_study_log_entry(_pid, _is_training, _story_key, _scene_num, {
+                "event": "corrections",
+                "items": [
+                    {"animation_id": d.animation_id, "targets": d.target_entities, "rationale": d.description}
+                    for d in assessment.discrepancies if d.pass_type == "correction"
+                ],
+            })
+
+        # Log suggestions
+        if [d for d in assessment.discrepancies if d.pass_type == "suggestion"]:
+            append_study_log_entry(_pid, _is_training, _story_key, _scene_num, {
+                "event": "suggestions",
+                "items": [
+                    {"animation_id": d.animation_id, "targets": d.target_entities, "rationale": d.description}
+                    for d in assessment.discrepancies if d.pass_type == "suggestion"
+                ],
+            })
+
         session.narration_history.append(transcription)
         session.conversation_history.append({
             "role": "child",
@@ -1413,29 +1467,23 @@ async def _handle_study_audio(
         # For animated condition: run animation pipeline
         is_animated = getattr(session, "study_animations_enabled", False)
         if is_animated:
-            action, action_data = process_assessment(
-                utterance_text=transcription,
-                response=assessment,
-                scene_log=session.current_scene_log,
-                misl_difficulty_profile=session.student_profile.misl_difficulty_profile,
-            )
+            # Load study log for deterministic selection
+            _log_data = load_study_log(_pid, _is_training)
+            _all_entries = []
+            for entries in _log_data.get("scenes", {}).values():
+                _all_entries.extend(entries)
 
-            # Extract the FIRST discrepancy only (chosen correction or suggestion)
-            chosen_disc: Optional[Discrepancy] = None
-            if action_data and "discrepancies" in action_data:
-                for d in action_data["discrepancies"]:
-                    if isinstance(d, dict):
-                        chosen_disc = Discrepancy(**d)
-                    elif isinstance(d, Discrepancy):
-                        chosen_disc = d
-                    break  # only the first
+            # Deterministic selection: corrections > suggestions, skip recently resolved
+            chosen_disc = select_discrepancy(corrections, suggestions, _all_entries)
 
-            if chosen_disc and action in ("correct", "accept_and_guide", "accept"):
+            if chosen_disc:
                 targets = chosen_disc.target_entities or []
-                # Deterministic animation selection (no LLM)
                 animation_id = _select_animation_for_discrepancy(chosen_disc, session.student_profile)
                 if not animation_id:
-                    animation_id = "I1_spotlight"  # fallback
+                    # No animation_id from LLM → skip
+                    chosen_disc = None
+
+            if chosen_disc and animation_id:
                 template = ANIMATION_ID_TO_TEMPLATE.get(animation_id, "spotlight")
 
                 # For reveal (S1) with no targets → use ALL scene entities
@@ -1452,14 +1500,27 @@ async def _handle_study_audio(
                     "animation": animation_id,
                 })})
 
+                # Log the chosen animation
+                append_study_log_entry(_pid, _is_training, _story_key, _scene_num, {
+                    "event": "animation_played",
+                    "animation_id": animation_id,
+                    "targets": targets,
+                    "rationale": chosen_disc.description,
+                    "pass_type": chosen_disc.pass_type,
+                })
+
+                # Load params from grammar JSON (accentuated if last resolution was False)
+                anim_params = load_animation_params(animation_id, _all_entries)
+
                 # Send ONE animation with combined prefix for all targets
                 combined_prefix = "|".join(targets) if targets else ""
                 if combined_prefix:
+                    anim_params["entityPrefix"] = combined_prefix
                     decision = {
                         "mode": "use_default",
                         "animation_id": animation_id,
                         "template": template,
-                        "params": {"entityPrefix": combined_prefix},
+                        "params": anim_params,
                         "duration_ms": 3000,
                     }
                     await _send_animation_message(ws, decision, combined_prefix, chosen_disc.misl_elements[0] if chosen_disc.misl_elements else "character")

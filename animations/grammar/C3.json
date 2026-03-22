@@ -20,6 +20,16 @@
         85
       ],
       "description": "Color of the dark puddle shape"
+    },
+    {
+      "name": "ghostOpacity",
+      "type": "float",
+      "range": [
+        0.45,
+        0.9
+      ],
+      "default": 0.45,
+      "description": "Opacity of the ghost outline entity"
     }
   ],
   "code_template": "ghost_outline({target}, {puddleColor})",

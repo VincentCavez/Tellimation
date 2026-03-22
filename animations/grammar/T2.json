@@ -19,6 +19,16 @@
       ],
       "default": false,
       "description": "Indoor scenes use warm lighting shift instead of sky gradient"
+    },
+    {
+      "name": "nightOpacity",
+      "type": "float",
+      "range": [
+        0.4,
+        0.8
+      ],
+      "default": 0.4,
+      "description": "Opacity of the night overlay darkening"
     }
   ],
   "code_template": "timelapse({target}, {isIndoor})",

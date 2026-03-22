@@ -25,8 +25,8 @@
       "name": "lineLength",
       "type": "int",
       "range": [
-        10,
-        30
+        20,
+        40
       ],
       "default": 20,
       "description": "Length of each motion line in pixels"
@@ -35,8 +35,8 @@
       "name": "amplitude",
       "type": "int",
       "range": [
-        5,
-        15
+        10,
+        25
       ],
       "default": 10,
       "description": "Vertical wave amplitude"

@@ -11,8 +11,8 @@
       "name": "driftAmount",
       "type": "float",
       "range": [
-        0,
-        1
+        0.3,
+        1.5
       ],
       "default": 0.3,
       "description": "Horizontal scatter range (fraction of entity width)"
@@ -21,8 +21,8 @@
       "name": "fallSpeed",
       "type": "float",
       "range": [
-        0.5,
-        2.0
+        1.0,
+        3.0
       ],
       "default": 1.0,
       "description": "Vertical fall speed multiplier"

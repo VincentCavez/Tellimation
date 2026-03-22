@@ -14,7 +14,7 @@
       "name": "desaturationStrength",
       "type": "float",
       "range": [
-        0,
+        0.8,
         1
       ],
       "default": 0.8,
@@ -24,7 +24,7 @@
       "name": "cycleCount",
       "type": "int",
       "range": [
-        1,
+        2,
         4
       ],
       "default": 2,

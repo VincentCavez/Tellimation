@@ -15,28 +15,36 @@
       "name": "particleType",
       "type": "enum",
       "range": [
-        "steam",
-        "frost",
-        "sparkle",
-        "hearts",
+        "shame",
+        "cold",
+        "great",
+        "love",
         "anger",
         "fear"
       ],
-      "default": "sparkle",
+      "default": "great",
       "description": "Type of emanation particle"
     },
     {
       "name": "particleCount",
       "type": "int",
       "range": [
-        8,
-        30
+        15,
+        35
       ],
       "default": 15,
       "description": "Number of particles emitted"
     }
   ],
   "code_template": "emanation({target}, {particleType}, {particleCount})",
-  "correction_intent": "Child described incorrect emotions of a character",
-  "suggestion_intent": "Child hasn't expressed the emotions of a character"
+  "correction_intent": "Child described incorrect emotions. Variants: P2_shame (embarrassment), P2_cold (discomfort), P2_great (joy/pride), P2_love (affection), P2_anger (frustration), P2_fear (anxiety). Return the specific variant, e.g. P2_anger",
+  "suggestion_intent": "Child hasn't expressed the emotions of a character. Variants: P2_shame (embarrassment), P2_cold (discomfort), P2_great (joy/pride), P2_love (affection), P2_anger (frustration), P2_fear (anxiety). Return the specific variant, e.g. P2_love",
+  "variants": {
+    "P2_shame": "Child feels ashamed, embarrassed, or guilty",
+    "P2_cold": "Child or entity feels cold, shivering, or uncomfortable",
+    "P2_great": "Child or entity feels happy, excited, proud, or amazed",
+    "P2_love": "Child or entity feels love, affection, or tenderness",
+    "P2_anger": "Child or entity feels angry, frustrated, or irritated",
+    "P2_fear": "Child or entity feels scared, worried, or anxious"
+  }
 }

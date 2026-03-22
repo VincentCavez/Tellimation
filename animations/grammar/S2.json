@@ -13,10 +13,10 @@
       "name": "liftPixels",
       "type": "int",
       "range": [
-        10,
-        30
+        20,
+        35
       ],
-      "default": 22,
+      "default": 20,
       "description": "How many pixels the entity lifts up"
     },
     {

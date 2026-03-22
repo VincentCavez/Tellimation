@@ -13,7 +13,7 @@
       "name": "dimStrength",
       "type": "float",
       "range": [
-        0,
+        0.7,
         1
       ],
       "default": 0.7,
@@ -23,7 +23,7 @@
       "name": "glowStrength",
       "type": "float",
       "range": [
-        0,
+        0.35,
         1
       ],
       "default": 0.35,
@@ -48,7 +48,7 @@
       "type": "int",
       "range": [
         5,
-        20
+        25
       ],
       "default": 14,
       "description": "Maximum halo radius in pixels"
