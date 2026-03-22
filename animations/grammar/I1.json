@@ -55,6 +55,6 @@
     }
   ],
   "code_template": "spotlight({target}, {dimStrength}, {glowStrength}, {haloColor}, {maxHaloSize})",
-  "correction_intent": "Child mentioned the wrong entity",
+  "correction_intent": "Child misidentified or confused an entity that IS present in the scene (e.g. said 'rabbit' when it's actually a 'dog', or said 'mom' when it's a 'grandmother'). The target should be the CORRECT entity in the scene that was misidentified.",
   "suggestion_intent": "Child hasn't mentioned an entity present in the scene"
 }
