@@ -229,6 +229,11 @@ class AnimationRunner {
     }
     this.renderer.render();
 
+    // Optional callback for full-res redraw after animation
+    if (typeof this.onAnimationFinish === 'function') {
+      this.onAnimationFinish();
+    }
+
     if (this._resolve) {
       const r = this._resolve;
       this._resolve = null;

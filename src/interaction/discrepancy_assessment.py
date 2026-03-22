@@ -146,6 +146,7 @@ async def assess_corrections(
     utterance_text: str,
     story_so_far: List[str],
     character_names: Optional[Dict[str, str]] = None,
+    scene_data: Optional[Dict[str, Any]] = None,
 ) -> List[Discrepancy]:
     """Pass 1: Detect factual errors in the child's utterance.
 
@@ -153,7 +154,8 @@ async def assess_corrections(
     """
     client = genai.Client(api_key=api_key)
 
-    manifest_json = json.dumps(manifest.model_dump(), indent=2)
+    # Use raw scene_data (full story def) when available for richer context
+    manifest_json = json.dumps(scene_data, indent=2) if scene_data else json.dumps(manifest.model_dump(), indent=2)
     story_text = _build_story_text(story_so_far)
     names_text = _build_names_text(manifest, character_names)
 
@@ -197,6 +199,7 @@ async def assess_enrichment(
     misl_difficulty_profile: MISLDifficultyProfile,
     character_names: Optional[Dict[str, str]] = None,
     correction_results: Optional[List[Discrepancy]] = None,
+    scene_data: Optional[Dict[str, Any]] = None,
 ) -> List[Discrepancy]:
     """Pass 2: Identify MISL enrichment opportunities.
 
@@ -204,7 +207,7 @@ async def assess_enrichment(
     """
     client = genai.Client(api_key=api_key)
 
-    manifest_json = json.dumps(manifest.model_dump(), indent=2)
+    manifest_json = json.dumps(scene_data, indent=2) if scene_data else json.dumps(manifest.model_dump(), indent=2)
     misl_taxonomy = _build_misl_taxonomy()
     story_text = _build_story_text(story_so_far)
     names_text = _build_names_text(manifest, character_names)
@@ -268,6 +271,7 @@ async def assess_utterance(
     audio_bytes: Optional[bytes] = None,
     narration_history: Optional[List[str]] = None,
     narrative_text: str = "",
+    scene_data: Optional[Dict[str, Any]] = None,
 ) -> AssessmentResponse:
     """Two-pass assessment of a child's utterance.
 
@@ -320,6 +324,7 @@ async def assess_utterance(
             utterance_text=utterance_text,
             story_so_far=story_so_far,
             character_names=character_names,
+            scene_data=scene_data,
         )
     except Exception as exc:
         logger.error("[assessment] Correction pass failed: %s", exc)
@@ -336,6 +341,7 @@ async def assess_utterance(
             misl_difficulty_profile=misl_difficulty_profile,
             character_names=character_names,
             correction_results=corrections,
+            scene_data=scene_data,
         )
     except Exception as exc:
         logger.error("[assessment] Enrichment pass failed: %s", exc)
