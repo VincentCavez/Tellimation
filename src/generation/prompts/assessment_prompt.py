@@ -174,25 +174,30 @@ elements, following the ranking rules (lower tier first, then difficulty profile
 CORRECTION_SYSTEM_PROMPT = """\
 You are the correction pass of the Tellimations assessment module, a \
 children's storytelling system (ages 7-11). A child is narrating a \
-pixel-art scene. You check their utterance for factual contradictions \
-with the scene.
+scene. You check their utterance for ALL mistakes — both grammatical \
+and narrative errors, taking into account the story context.
 
 # Your task
 
 Given:
-- The scene MANIFEST (entities, positions, properties, relations, actions)
+- The scene MANIFEST (entities, properties, relations, actions, key_objects)
 - The child's UTTERANCE (transcribed text)
 - The story so far (previously accepted utterances in this scene)
+- The animation CORRECTION INTENTS (each animation has a specific error type it corrects)
 
-You ONLY check for factual errors — contradictions between what the child \
-said and what is actually in the scene. Focus on:
+You must:
+1. **Identify ALL mistakes** in the utterance — grammatical errors (tense, \
+   conjugation, syntax, plural) AND narrative errors (wrong entity, wrong \
+   property, wrong action, wrong spatial relation, wrong count, wrong \
+   dialogue, wrong thought, wrong event, wrong causality, wrong grouping, \
+   over-mentioning, ambiguous reference, incorrect reference to absent entity).
 
-- **Wrong identity**: child mentions an entity that does not exist, or \
-  confuses one entity for another
-- **Wrong count**: child says "two cats" but there is only one
-- **Wrong properties**: child says "blue cat" but the cat is orange
-- **Wrong actions**: child says "the cat is sleeping" but the cat is running
-- **Wrong spatial relations**: child says "on the table" but entity is beside it
+2. **Map each mistake to its correction_intent** from the animation grammar. \
+   Each animation has a `correction_intent` field that describes what type \
+   of error it corrects. Match each mistake to the most fitting animation.
+
+3. **Return the list of errors in decreasing order of severity** (most \
+   severe first), with the animation ID.
 
 Be generous with vocabulary: "bunny" = "rabbit", "big" = "large", etc. \
 Only flag genuine contradictions, not imprecise but acceptable descriptions.
@@ -213,27 +218,32 @@ creative storytelling. Include the detected name assignments in the output under
 the animal vs. the humans (e.g. "Max and Buddy" where there is a boy and a dog \
 → "Buddy" is most likely the dog's name).
 
+# Animation correction intents
+
+Each animation ID maps to a specific type of error it is designed to correct:
+
+{correction_intents}
+
 # Output JSON schema
 
 Return ONLY valid JSON (no markdown fences, no commentary):
 
 ```
-{
+{{
   "discrepancies": [
-    {
-      "type": "<animation category: Identity | Count | Property | Action | Space>",
+    {{
+      "animation_id": "<animation ID, e.g. I1, D4, P1>",
       "target_entities": ["<entity_id>", ...],
-      "misl_elements": ["<MISL code>", ...],
-      "description": "<brief, child-friendly explanation of the error>"
-    }
+      "description": "<brief rationale explaining the error>"
+    }}
   ],
   "name_assignments": [
-    {
+    {{
       "entity_id": "<entity_id>",
       "name": "<the proper name given by the child>"
-    }
+    }}
   ]
-}
+}}
 ```
 
 IMPORTANT — target_entities must NEVER be empty. If the error concerns a \
@@ -242,20 +252,7 @@ target_entities to the entity most closely associated with that object \
 (e.g. if the child mentions a bench and the boy is sitting on it, \
 target_entities should be ["boy"]).
 
-If there are NO factual errors, return: {"discrepancies": []}
-
-Animation category mapping for errors:
-- Wrong identity → "Identity"
-- Wrong count → "Count"
-- Wrong properties (color, size, texture) → "Property"
-- Wrong actions or verbs → "Action"
-- Wrong spatial relations or positions → "Space"
-
-MISL element codes:
-- CH = Character, S = Setting, IE = Initiating Event, IR = Internal Response
-- P = Plan, A = Action, CO = Consequence
-- CC = Coordinating Conjunctions, SC = Subordinating Conjunctions
-- M = Mental Verbs, L = Linguistic Verbs, ADV = Adverbs
+If there are NO errors, return: {{"discrepancies": []}}
 - ENP = Elaborated Noun Phrases, G = Grammaticality, T = Tense
 
 # Language
@@ -266,7 +263,7 @@ any technical term.
 """
 
 CORRECTION_USER_PROMPT_TEMPLATE = """\
-Check the child's utterance for factual errors against the scene manifest.
+Check the child's utterance for ALL mistakes (grammatical and narrative).
 
 # Scene Manifest
 
@@ -288,10 +285,9 @@ Check the child's utterance for factual errors against the scene manifest.
 
 # Instructions
 
-1. Compare the utterance against the manifest for factual contradictions.
-2. For each error found, classify it by animation category (Identity, Count, \
-Property, Action, Space) and identify the target entities and MISL elements.
-3. Return structured JSON with the discrepancies list.
+1. Identify ALL mistakes in the utterance — grammatical AND narrative.
+2. Map each mistake to the animation whose correction_intent best matches.
+3. Return the list in decreasing order of severity, with the animation_id.
 """
 
 
@@ -302,75 +298,70 @@ Property, Action, Space) and identify the target entities and MISL elements.
 ENRICHMENT_SYSTEM_PROMPT = """\
 You are the enrichment pass of the Tellimations assessment module, a \
 children's storytelling system (ages 7-11). A child is narrating a \
-pixel-art scene. You identify MISL narrative dimensions the child could \
-produce given the scene but has not.
+scene. You identify narrative dimensions the child could produce \
+given the scene but has not.
 
 # Your task
 
 Given:
-- The scene MANIFEST (entities, positions, properties, relations, actions)
+- The scene MANIFEST (entities, properties, relations, actions, key_objects)
 - The MISL taxonomy (15 narrative dimensions organized by developmental tier)
 - The child's UTTERANCE (transcribed text)
 - The story so far (previously accepted utterances in this scene)
 - MISL dimensions already suggested in this scene (do NOT repeat these)
 - The child's MISL difficulty profile (which dimensions they struggle with)
-- Correction pass results (elements already flagged as errors — do NOT re-flag)
+- The animation SUGGESTION INTENTS (each animation has a specific enrichment it scaffolds)
 
-You identify scaffolding opportunities — MISL dimensions that are ABSENT \
-from the utterance but could be grounded in elements present in the manifest.
+You must:
+1. **Identify what is missing** from the utterance — narrative dimensions \
+   that are ABSENT but could be grounded in elements present in the manifest.
 
-Rules for ranking:
-1. Lower MISL developmental tier first:
-   - Tier 1 (foundational): character, setting, elaborated_noun_phrases
-   - Tier 2 (action/event): initiating_event, action, coordinating_conjunctions
-   - Tier 3 (internal): internal_response, plan, mental_verbs, adverbs
-   - Tier 4 (complex): consequence, subordinating_conjunctions, linguistic_verbs
-   - Tier 5 (meta): grammaticality, tense
-2. Within the same tier, prioritize dimensions flagged in the difficulty \
-   profile (high suggested-to-resolved ratio = the child struggles with it).
+2. **Map each missing element to its suggestion_intent** from the animation \
+   grammar. Each animation has a `suggestion_intent` field that describes \
+   what type of enrichment it scaffolds. Match each suggestion to the most \
+   fitting animation.
+
+3. **Return at most 5 suggestions, ordered by relevance to the scene** \
+   (most relevant first). Relevance = how naturally the suggestion fits \
+   what is happening in the scene and what the child has already said.
+
+Rules:
+1. Order by relevance to the scene, NOT by MISL tier.
+2. Use the child's difficulty profile as a secondary criterion: if two \
+   suggestions are equally relevant, prefer the dimension the child \
+   struggles with.
 3. Do NOT suggest dimensions already suggested in this scene.
-4. Do NOT re-flag elements already identified as errors in the correction pass.
-5. Each opportunity must be grounded in specific manifest elements.
-6. Be FLEXIBLE with descriptions: if the child described something that is \
+4. Each opportunity must be grounded in specific manifest elements.
+5. Be FLEXIBLE with descriptions: if the child described something that is \
    approximately correct but uses different words (e.g. "brown coat" instead \
    of "green scarf", "big dog" instead of "large dog"), do NOT flag this as \
    a missing element. Accept any reasonable description that fits the scene, \
    even if it does not match the manifest wording exactly.
+6. Maximum 5 suggestions.
+
+# Animation suggestion intents
+
+Each animation ID maps to a specific type of enrichment it is designed to scaffold:
+
+{suggestion_intents}
 
 # Output JSON schema
 
 Return ONLY valid JSON (no markdown fences, no commentary):
 
 ```
-{
+{{
   "discrepancies": [
-    {
-      "type": "<animation category: Identity | Property | Action | Space | Time | Relation | Discourse>",
+    {{
+      "animation_id": "<animation ID, e.g. I1, P1, S1>",
       "target_entities": ["<entity_id>", ...],
-      "misl_elements": ["<MISL code>", ...],
-      "description": "<how this dimension could be expressed using scene elements>"
-    }
+      "description": "<rationale: why this suggestion is relevant to the scene>"
+    }}
   ]
-}
+}}
 ```
 
-If there are NO enrichment opportunities, return: {"discrepancies": []}
-
-Animation category mapping for suggestions:
-- Character identification → "Identity"
-- Properties, adjectives, sensory → "Property"
-- Actions, verbs → "Action"
-- Setting, spatial → "Space"
-- Tense, temporal → "Time"
-- Conjunctions, causality → "Relation"
-- Dialogue, internal response, plan → "Discourse"
-
-MISL element codes:
-- CH = Character, S = Setting, IE = Initiating Event, IR = Internal Response
-- P = Plan, A = Action, CO = Consequence
-- CC = Coordinating Conjunctions, SC = Subordinating Conjunctions
-- M = Mental Verbs, L = Linguistic Verbs, ADV = Adverbs
-- ENP = Elaborated Noun Phrases, G = Grammaticality, T = Tense
+If there are NO enrichment opportunities, return: {{"discrepancies": []}}
 
 # Language
 
@@ -380,7 +371,7 @@ any technical term.
 """
 
 ENRICHMENT_USER_PROMPT_TEMPLATE = """\
-Identify MISL scaffolding opportunities in the child's utterance.
+Identify narrative enrichment opportunities in the child's utterance.
 
 # Scene Manifest
 
@@ -412,16 +403,11 @@ Identify MISL scaffolding opportunities in the child's utterance.
 
 {character_names}
 
-# Correction pass results (elements already flagged — do NOT re-flag)
-
-{correction_results}
-
 # Instructions
 
-1. Identify MISL dimensions absent from the utterance but groundable in \
-the manifest, following the tier ranking rules.
-2. Do NOT suggest dimensions already flagged as errors in the correction pass.
-3. For each suggestion, classify by animation category and identify target \
-entities and MISL elements.
-4. Return structured JSON with the discrepancies list.
+1. Identify narrative dimensions absent from the utterance but groundable \
+in the manifest.
+2. Map each to the animation whose suggestion_intent best matches.
+3. Order by MISL developmental tier (lower first), then difficulty profile.
+4. Return structured JSON with animation_id for each suggestion.
 """

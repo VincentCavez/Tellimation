@@ -16,6 +16,16 @@
       "range": [],
       "default": "?",
       "description": "Word or symbol displayed in the starburst"
+    },
+    {
+      "name": "scale",
+      "type": "float",
+      "range": [
+        1.0,
+        2.0
+      ],
+      "default": 1.0,
+      "description": "Size multiplier for the interjection starburst"
     }
   ],
   "code_template": "interjection({target}, {word})",

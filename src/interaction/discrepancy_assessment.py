@@ -16,6 +16,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+from pathlib import Path
 from typing import Dict, List, Optional
 
 from google import genai
@@ -140,6 +141,31 @@ async def _gemini_call(
 # Pass 1: Correction
 # ---------------------------------------------------------------------------
 
+def _load_correction_intents() -> str:
+    """Load correction_intent from all animation grammar JSONs."""
+    grammar_dir = Path(__file__).parent.parent.parent / "animations" / "grammar"
+    lines = []
+    for f in sorted(grammar_dir.glob("*.json")):
+        try:
+            d = json.load(open(f))
+            intent = d.get("correction_intent")
+            if intent:
+                lines.append(f"- {d['id']} ({d['name']}): {intent}")
+        except Exception:
+            pass
+    return "\n".join(lines) if lines else "(none)"
+
+
+_CORRECTION_INTENTS_TEXT: Optional[str] = None
+
+
+def _get_correction_intents() -> str:
+    global _CORRECTION_INTENTS_TEXT
+    if _CORRECTION_INTENTS_TEXT is None:
+        _CORRECTION_INTENTS_TEXT = _load_correction_intents()
+    return _CORRECTION_INTENTS_TEXT
+
+
 async def assess_corrections(
     api_key: str,
     manifest: SceneManifest,
@@ -148,9 +174,10 @@ async def assess_corrections(
     character_names: Optional[Dict[str, str]] = None,
     scene_data: Optional[Dict[str, Any]] = None,
 ) -> List[Discrepancy]:
-    """Pass 1: Detect factual errors in the child's utterance.
+    """Pass 1: Detect all mistakes (grammatical and narrative).
 
-    Returns a list of Discrepancy objects with pass_type="correction".
+    Returns a list of Discrepancy objects with pass_type="correction",
+    ordered by decreasing severity, with animation_id from grammar.
     """
     client = genai.Client(api_key=api_key)
 
@@ -159,6 +186,11 @@ async def assess_corrections(
     story_text = _build_story_text(story_so_far)
     names_text = _build_names_text(manifest, character_names)
 
+    # Inject correction intents into system prompt
+    system_prompt = CORRECTION_SYSTEM_PROMPT.format(
+        correction_intents=_get_correction_intents(),
+    )
+
     user_prompt = CORRECTION_USER_PROMPT_TEMPLATE.format(
         manifest_json=manifest_json,
         utterance_text=utterance_text,
@@ -166,7 +198,7 @@ async def assess_corrections(
         character_names=names_text,
     )
 
-    data = await _gemini_call(client, CORRECTION_SYSTEM_PROMPT, user_prompt)
+    data = await _gemini_call(client, system_prompt, user_prompt)
 
     discrepancies: List[Discrepancy] = []
     raw_items = data.get("discrepancies", [])
@@ -179,6 +211,7 @@ async def assess_corrections(
                     target_entities=item.get("target_entities", []),
                     misl_elements=item.get("misl_elements", []),
                     description=item.get("description", ""),
+                    animation_id=item.get("animation_id"),
                 ))
 
     # Extract name assignments (child giving names to entities)
@@ -201,6 +234,31 @@ async def assess_corrections(
 # Pass 2: Enrichment
 # ---------------------------------------------------------------------------
 
+def _load_suggestion_intents() -> str:
+    """Load suggestion_intent from all animation grammar JSONs."""
+    grammar_dir = Path(__file__).parent.parent.parent / "animations" / "grammar"
+    lines = []
+    for f in sorted(grammar_dir.glob("*.json")):
+        try:
+            d = json.load(open(f))
+            intent = d.get("suggestion_intent")
+            if intent:
+                lines.append(f"- {d['id']} ({d['name']}): {intent}")
+        except Exception:
+            pass
+    return "\n".join(lines) if lines else "(none)"
+
+
+_SUGGESTION_INTENTS_TEXT: Optional[str] = None
+
+
+def _get_suggestion_intents() -> str:
+    global _SUGGESTION_INTENTS_TEXT
+    if _SUGGESTION_INTENTS_TEXT is None:
+        _SUGGESTION_INTENTS_TEXT = _load_suggestion_intents()
+    return _SUGGESTION_INTENTS_TEXT
+
+
 async def assess_enrichment(
     api_key: str,
     manifest: SceneManifest,
@@ -212,9 +270,10 @@ async def assess_enrichment(
     correction_results: Optional[List[Discrepancy]] = None,
     scene_data: Optional[Dict[str, Any]] = None,
 ) -> List[Discrepancy]:
-    """Pass 2: Identify MISL enrichment opportunities.
+    """Pass 2: Identify enrichment opportunities.
 
-    Returns a list of Discrepancy objects with pass_type="suggestion".
+    Returns a list of Discrepancy objects with pass_type="suggestion",
+    each with an animation_id from the grammar.
     """
     client = genai.Client(api_key=api_key)
 
@@ -229,12 +288,10 @@ async def assess_enrichment(
     )
     difficulty_text = misl_difficulty_profile.to_prompt_context()
 
-    if correction_results:
-        correction_text = json.dumps(
-            [d.model_dump() for d in correction_results], indent=2
-        )
-    else:
-        correction_text = "(No errors found in correction pass.)"
+    # Inject suggestion intents into system prompt
+    system_prompt = ENRICHMENT_SYSTEM_PROMPT.format(
+        suggestion_intents=_get_suggestion_intents(),
+    )
 
     user_prompt = ENRICHMENT_USER_PROMPT_TEMPLATE.format(
         manifest_json=manifest_json,
@@ -244,10 +301,9 @@ async def assess_enrichment(
         misl_already_suggested=suggested_text,
         misl_difficulty_profile=difficulty_text,
         character_names=names_text,
-        correction_results=correction_text,
     )
 
-    data = await _gemini_call(client, ENRICHMENT_SYSTEM_PROMPT, user_prompt)
+    data = await _gemini_call(client, system_prompt, user_prompt)
 
     discrepancies: List[Discrepancy] = []
     raw_items = data.get("discrepancies", [])
@@ -260,6 +316,7 @@ async def assess_enrichment(
                     target_entities=item.get("target_entities", []),
                     misl_elements=item.get("misl_elements", []),
                     description=item.get("description", ""),
+                    animation_id=item.get("animation_id"),
                 ))
 
     logger.info("[assessment:enrichment] Found %d enrichment discrepancies",
@@ -270,6 +327,63 @@ async def assess_enrichment(
 # ---------------------------------------------------------------------------
 # Orchestrator: two-pass assess_utterance
 # ---------------------------------------------------------------------------
+
+async def assess_resolution(
+    api_key: str,
+    utterance_text: str,
+    previous_discrepancy: Optional[Discrepancy] = None,
+    scene_data: Optional[Dict[str, Any]] = None,
+) -> Optional[Dict[str, Any]]:
+    """Check if the child's new utterance resolves a previous correction/suggestion.
+
+    Returns {"resolved": True/False, "animation_id": "I1"} or None if no previous.
+    """
+    if not previous_discrepancy or not utterance_text:
+        return None
+
+    client = genai.Client(api_key=api_key)
+
+    scene_context = ""
+    if scene_data:
+        scene_context = f"\n\n# Scene context\n```json\n{json.dumps(scene_data, indent=2)}\n```"
+
+    system_prompt = (
+        "You check whether a child's new utterance addresses a previous "
+        "correction or suggestion about a scene they are narrating. "
+        "Return ONLY valid JSON:\n"
+        '{"resolved": true or false}\n'
+        "resolved=true means the child incorporated the feedback. "
+        "Be generous: if they made a reasonable attempt, count it as resolved."
+    )
+
+    user_prompt = (
+        f"Previous feedback (animation {previous_discrepancy.animation_id or 'unknown'}, "
+        f"type {previous_discrepancy.pass_type}):\n"
+        f'"{previous_discrepancy.description}"\n'
+        f"Targets: {previous_discrepancy.target_entities}"
+        f"{scene_context}\n\n"
+        f'Child\'s new utterance:\n"{utterance_text}"\n\n'
+        f"Did the child address the feedback?"
+    )
+
+    try:
+        data = await _gemini_call(client, system_prompt, user_prompt)
+        resolved = data.get("resolved", False)
+        logger.info(
+            "\033[93m[RESOLUTION]\033[0m %s (animation %s) → %s",
+            previous_discrepancy.pass_type,
+            previous_discrepancy.animation_id,
+            "resolved" if resolved else "not resolved",
+        )
+        return {
+            "resolved": resolved,
+            "animation_id": previous_discrepancy.animation_id,
+            "pass_type": previous_discrepancy.pass_type,
+        }
+    except Exception as exc:
+        logger.error("[assessment] Resolution check failed: %s", exc)
+        return None
+
 
 async def assess_utterance(
     api_key: str,
@@ -283,6 +397,7 @@ async def assess_utterance(
     narration_history: Optional[List[str]] = None,
     narrative_text: str = "",
     scene_data: Optional[Dict[str, Any]] = None,
+    previous_discrepancy: Optional[Discrepancy] = None,
 ) -> AssessmentResponse:
     """Two-pass assessment of a child's utterance.
 
@@ -327,20 +442,50 @@ async def assess_utterance(
     if not utterance_text:
         return AssessmentResponse(transcription="")
 
-    # --- Pass 1: Correction ---
-    name_assignments: List[Dict[str, str]] = []
-    try:
-        corrections, name_assignments = await assess_corrections(
+    # --- Run correction, enrichment, and resolution in parallel ---
+    async def _run_corrections():
+        try:
+            return await assess_corrections(
+                api_key=api_key,
+                manifest=manifest,
+                utterance_text=utterance_text,
+                story_so_far=story_so_far,
+                character_names=character_names,
+                scene_data=scene_data,
+            )
+        except Exception as exc:
+            logger.error("[assessment] Correction pass failed: %s", exc)
+            return [], []
+
+    async def _run_enrichment():
+        try:
+            return await assess_enrichment(
+                api_key=api_key,
+                manifest=manifest,
+                utterance_text=utterance_text,
+                story_so_far=story_so_far,
+                misl_already_suggested=misl_already_suggested,
+                misl_difficulty_profile=misl_difficulty_profile,
+                character_names=character_names,
+                correction_results=None,  # not available in parallel
+                scene_data=scene_data,
+            )
+        except Exception as exc:
+            logger.error("[assessment] Enrichment pass failed: %s", exc)
+            return []
+
+    async def _run_resolution():
+        return await assess_resolution(
             api_key=api_key,
-            manifest=manifest,
             utterance_text=utterance_text,
-            story_so_far=story_so_far,
-            character_names=character_names,
+            previous_discrepancy=previous_discrepancy,
             scene_data=scene_data,
         )
-    except Exception as exc:
-        logger.error("[assessment] Correction pass failed: %s", exc)
-        corrections = []
+
+    (corrections_result, suggestions, resolution_result) = await asyncio.gather(
+        _run_corrections(), _run_enrichment(), _run_resolution()
+    )
+    corrections, name_assignments = corrections_result
 
     # Register detected name assignments
     if name_assignments and character_names is not None:
@@ -348,22 +493,6 @@ async def assess_utterance(
             character_names[na["entity_id"]] = na["name"]
             logger.info("[assessment] Registered name: %s → %s", na["entity_id"], na["name"])
 
-    # --- Pass 2: Enrichment ---
-    try:
-        suggestions = await assess_enrichment(
-            api_key=api_key,
-            manifest=manifest,
-            utterance_text=utterance_text,
-            story_so_far=story_so_far,
-            misl_already_suggested=misl_already_suggested,
-            misl_difficulty_profile=misl_difficulty_profile,
-            character_names=character_names,
-            correction_results=corrections,
-            scene_data=scene_data,
-        )
-    except Exception as exc:
-        logger.error("[assessment] Enrichment pass failed: %s", exc)
-        suggestions = []
 
     # --- Merge into unified discrepancies list (corrections first) ---
     discrepancies = corrections + suggestions
@@ -394,6 +523,7 @@ async def assess_utterance(
         discrepancies=discrepancies,
         utterance_is_acceptable=acceptable,
         name_assignments=name_assignments,
+        resolution=resolution_result,
     )
 
     logger.info(

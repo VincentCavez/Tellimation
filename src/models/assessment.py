@@ -32,6 +32,7 @@ class Discrepancy(BaseModel):
     target_entities: List[str] = Field(default_factory=list)
     misl_elements: List[str] = Field(default_factory=list)
     description: str = ""
+    animation_id: Optional[str] = None  # e.g. "I1", "D4", "P1" — from grammar JSON
 
 
 class AssessmentResponse(BaseModel):
@@ -42,6 +43,7 @@ class AssessmentResponse(BaseModel):
     discrepancies: List[Discrepancy] = Field(default_factory=list)
     utterance_is_acceptable: bool = True
     name_assignments: List[Dict[str, str]] = Field(default_factory=list)
+    resolution: Optional[Dict[str, Any]] = None  # {"resolved": bool, "animation_id": str, "pass_type": str}
 
 
 # ---------------------------------------------------------------------------

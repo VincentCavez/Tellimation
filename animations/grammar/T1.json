@@ -13,7 +13,7 @@
       "name": "flickerIntensity",
       "type": "float",
       "range": [
-        0,
+        0.08,
         1
       ],
       "default": 0.08,
@@ -23,8 +23,8 @@
       "name": "scratchCount",
       "type": "int",
       "range": [
-        0,
-        5
+        3,
+        9
       ],
       "default": 3,
       "description": "Max number of vertical scratch lines per frame"

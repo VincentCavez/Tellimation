@@ -33,6 +33,16 @@
         30
       ],
       "description": "Fill color of the exclamation marks"
+    },
+    {
+      "name": "scale",
+      "type": "float",
+      "range": [
+        1.0,
+        2.0
+      ],
+      "default": 1.0,
+      "description": "Size multiplier for the alert marks"
     }
   ],
   "code_template": "alert({target}, {markCount}, {color})",

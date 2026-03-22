@@ -20,11 +20,21 @@
       "name": "repelPixels",
       "type": "int",
       "range": [
-        5,
+        20,
         40
       ],
       "default": 20,
       "description": "Maximum repulsion distance in pixels"
+    },
+    {
+      "name": "impactScale",
+      "type": "float",
+      "range": [
+        1.0,
+        3.0
+      ],
+      "default": 1.0,
+      "description": "Size multiplier for the impact star"
     }
   ],
   "code_template": "repel({target}, {entityPrefixB}, {repelPixels})",

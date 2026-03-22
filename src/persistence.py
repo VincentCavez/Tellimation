@@ -90,6 +90,54 @@ def save_student_profile(participant_id: str, profile: StudentProfile) -> None:
 
 
 # ---------------------------------------------------------------------------
+# Study session logging
+# ---------------------------------------------------------------------------
+
+def _study_log_path(participant_id: str, is_training: bool) -> Path:
+    """Return the path to the study log JSON for a participant."""
+    pdir = _participant_dir(participant_id)
+    filename = "training_log.json" if is_training else "study_log.json"
+    return pdir / filename
+
+
+def load_study_log(participant_id: str, is_training: bool) -> Dict:
+    """Load existing study log or return empty structure."""
+    path = _study_log_path(participant_id, is_training)
+    if path.exists():
+        try:
+            return json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+    return {"participant": participant_id, "type": "training" if is_training else "study", "scenes": {}}
+
+
+def append_study_log_entry(
+    participant_id: str,
+    is_training: bool,
+    story_key: str,
+    scene_number: int,
+    entry: Dict,
+) -> None:
+    """Append a timestamped entry to the study log for a given scene."""
+    from datetime import datetime, timezone
+
+    log = load_study_log(participant_id, is_training)
+    scene_key = f"{story_key}_scene_{scene_number}"
+
+    if scene_key not in log["scenes"]:
+        log["scenes"][scene_key] = []
+
+    entry["timestamp"] = datetime.now(timezone.utc).isoformat()
+    log["scenes"][scene_key].append(entry)
+
+    path = _study_log_path(participant_id, is_training)
+    path.write_text(
+        json.dumps(log, indent=2, ensure_ascii=False),
+        encoding="utf-8",
+    )
+
+
+# ---------------------------------------------------------------------------
 # Story management
 # ---------------------------------------------------------------------------
 
