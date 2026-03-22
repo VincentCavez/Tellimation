@@ -529,9 +529,15 @@ def _select_animation_for_discrepancy(
     is_correction = discrepancy.pass_type == "correction"
     has_targets = bool(discrepancy.target_entities)
 
+    # Identity: naming → nametag, mention → spotlight
+    _naming_keywords = ("name", "call", "named", "calling", "nom")
+    _is_naming = not is_correction and any(
+        kw in discrepancy.description.lower() for kw in _naming_keywords
+    )
+
     # Deterministic mapping
     mapping = {
-        "Identity": "I1_spotlight",
+        "Identity": "I2_nametag" if _is_naming else "I1_spotlight",
         "Property": "P1_color_pop",
         "Action": "A1_motion_line",
         "Time": "T1_flashback",
