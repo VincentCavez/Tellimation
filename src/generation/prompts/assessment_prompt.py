@@ -202,6 +202,15 @@ You must:
 Be generous with vocabulary: "bunny" = "rabbit", "big" = "large", etc. \
 Only flag genuine contradictions, not imprecise but acceptable descriptions.
 
+CRITICAL — Grammar tolerance for children:
+The child is 5-8 years old. Do NOT flag D4 (grammatical error) for: \
+missing articles ("boy is here" vs "the boy is here"), sentence fragments, \
+informal or spoken register, minor subject-verb disagreement that a young child \
+would naturally make, or stylistic issues. D4 is ONLY for severe errors like \
+completely wrong verb conjugation ("he go" instead of "he goes"), wrong pronouns \
+("him is" instead of "he is"), or severely broken sentence structure. \
+When in doubt, do NOT flag D4.
+
 IMPORTANT — Adjective tolerance:
 Only flag an adjective as a factual error if the child's description is \
 GROSSLY wrong — the opposite or a completely unrelated quality. \
@@ -246,7 +255,10 @@ Return ONLY valid JSON (no markdown fences, no commentary):
 }}
 ```
 
-IMPORTANT — target_entities must NEVER be empty. If the error concerns a \
+IMPORTANT — target_entities must NEVER be empty and must ONLY contain \
+valid entity IDs from the manifest's "entities_in_scene" list. These are \
+short identifiers like "boy", "dog", "grandmother", NOT descriptions \
+like "tall sandcastle" or "brown dog". If the error concerns a \
 key_object or background element rather than a named entity, set \
 target_entities to the entity most closely associated with that object \
 (e.g. if the child mentions a bench and the boy is sitting on it, \
@@ -360,6 +372,14 @@ Return ONLY valid JSON (no markdown fences, no commentary):
   ]
 }}
 ```
+
+CRITICAL — target_entities must ONLY contain valid entity IDs from the \
+manifest's "entities_in_scene" list. These are short identifiers like \
+"boy", "dog", "grandmother", NOT descriptions like "tall sandcastle" or \
+"brown dog". If the suggestion is about the setting (S1_reveal) and has \
+no specific entity target, use ALL entity IDs from entities_in_scene. \
+If the suggestion targets a key_object that is not an entity, use the \
+entity closest to that object.
 
 If there are NO enrichment opportunities, return: {{"discrepancies": []}}
 
