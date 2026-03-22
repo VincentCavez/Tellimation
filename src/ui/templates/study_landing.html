@@ -11,6 +11,24 @@
 <body>
   <div class="falling-pixels-bg" id="falling-pixels"></div>
 
+  <!-- Instruction overlays -->
+  <div id="instruction-left" class="instruction-panel instruction-left" style="display:none;">
+    <div id="instr-slot-0" class="instruction-slot"></div>
+    <div id="instr-slot-1" class="instruction-slot" style="display:none;"></div>
+    <div class="instruction-btn-row">
+      <button class="btn-instr btn-instr-blue btn-replay-panel" data-panel="left">Replay</button>
+      <button class="btn-instr btn-instr-green btn-next-panel" id="btn-next-instr">Next</button>
+    </div>
+  </div>
+  <div id="instruction-right" class="instruction-panel instruction-right" style="display:none;">
+    <div id="instr-slot-2" class="instruction-slot"></div>
+    <div id="instr-slot-3" class="instruction-slot" style="display:none;"></div>
+    <div class="instruction-btn-row">
+      <button class="btn-instr btn-instr-blue btn-replay-panel" data-panel="right">Replay</button>
+      <button class="btn-instr btn-instr-green btn-next-panel" id="btn-next-instr-right">Next</button>
+    </div>
+  </div>
+
   <div class="study-landing-container">
     <div class="login-logo">
       <span class="t2">Tell</span><span class="t3">imations</span>
