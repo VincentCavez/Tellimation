@@ -27,16 +27,6 @@ Return ONLY valid JSON (no markdown fences, no commentary):
 """
 
 TRANSCRIPTION_USER_PROMPT = """\
-# Scene context
-
-{narrative_text}
-
-# What the child has said so far
-
-{narration_history}
-
-# Instructions
-
-Listen to the child's audio and transcribe what they say. \
+Listen to the audio and transcribe exactly what is said. \
 Return structured JSON with the transcription.
 """

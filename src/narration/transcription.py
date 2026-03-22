@@ -59,7 +59,7 @@ async def transcribe_audio(
     if narration_history is None:
         narration_history = []
 
-    user_prompt = _build_user_prompt(narration_history, narrative_text)
+    user_prompt = TRANSCRIPTION_USER_PROMPT
 
     audio_part = types.Part.from_bytes(data=audio_bytes, mime_type="audio/webm")
     text_part = types.Part.from_text(text=user_prompt)

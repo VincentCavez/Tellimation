@@ -136,6 +136,19 @@
       btn.textContent = 'All Done!';
       btn.classList.add('btn-disabled');
     }
+
+    // First visit: training not done yet → dim stories and disable Ready
+    var trainingDone = completed['training'] === true;
+    if (!trainingDone) {
+      // Dim story slots
+      var slots = document.querySelectorAll('#story-thumbnails .study-story-slot');
+      for (var i = 0; i < slots.length; i++) {
+        slots[i].style.opacity = '0.5';
+      }
+      // Disable Ready button
+      btn.style.opacity = '0.2';
+      btn.style.pointerEvents = 'none';
+    }
   }
 
   // Training button

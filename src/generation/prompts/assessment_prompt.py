@@ -222,6 +222,12 @@ Return ONLY valid JSON (no markdown fences, no commentary):
 }
 ```
 
+IMPORTANT — target_entities must NEVER be empty. If the error concerns a \
+key_object or background element rather than a named entity, set \
+target_entities to the entity most closely associated with that object \
+(e.g. if the child mentions a bench and the boy is sitting on it, \
+target_entities should be ["boy"]).
+
 If there are NO factual errors, return: {"discrepancies": []}
 
 Animation category mapping for errors:

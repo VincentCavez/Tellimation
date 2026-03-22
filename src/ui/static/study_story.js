@@ -310,7 +310,7 @@
   }
 
   // --- Capture bg-only pixels at half resolution (before entities are drawn) ---
-  var HD_SCALE = 2; // downscale factor: full_res / HD_SCALE = animation buffer
+  var HD_SCALE = 1; // no downscale: full resolution animation buffer
   function captureBgPixels(fullW, fullH) {
     var aw = Math.ceil(fullW / HD_SCALE);
     var ah = Math.ceil(fullH / HD_SCALE);
@@ -528,6 +528,7 @@
     // Reset entity data for new scene
     hdEntityData = {};
     window.hdEntityData = hdEntityData;
+    window._hdSceneImages = null; // will store {bg, entities} for full-res redraw
     scene_entity_order = (scene.entity_urls || []).map(function(e) { return e.id; });
 
     var bgImg = new Image();
@@ -564,6 +565,8 @@
               var ed = hdEntityData[entities[i].id];
               ctx.drawImage(ed && ed.cleanCanvas ? ed.cleanCanvas : images[i], 0, 0);
             }
+            // Store images for full-res redraw after animations
+            window._hdSceneImages = { bg: bgImg, entities: entities, images: images };
             // Build pixel buffer + animation runner for HD
             setupHDAnimations(w, h, bgOnlyPixels);
           }
@@ -601,6 +604,18 @@
     animRunner.buf = hdBuf;
     animRunner.renderer = hdRenderer;
     animRunner.frameInterval = 1000 / 24; // 24fps
+    // Redraw full-res scene after each animation ends
+    animRunner.onAnimationFinish = function() {
+      var sceneImgs = window._hdSceneImages;
+      if (!sceneImgs) return;
+      var mainCtx = canvas.getContext('2d');
+      mainCtx.drawImage(sceneImgs.bg, 0, 0);
+      var ents = sceneImgs.entities;
+      for (var i = 0; i < ents.length; i++) {
+        var ed = hdEntityData[ents[i].id];
+        mainCtx.drawImage(ed && ed.cleanCanvas ? ed.cleanCanvas : sceneImgs.images[i], 0, 0);
+      }
+    };
     window.animRunner = animRunner;
 
     console.log('[HD] Animation buffer ready:', aw + 'x' + ah,
