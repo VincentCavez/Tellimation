@@ -1,32 +1,40 @@
 {
   "A": {
     "name": "The Balloon Seller",
-    "scene_dir": "data/study_scenes/A",
     "image_dir": "data/study_gen/A",
     "story_def": "data/study_scenes/story_a_balloon_seller.json",
     "scene_count": 5
   },
   "B": {
     "name": "The Market Mix-Up",
-    "scene_dir": "data/study_scenes/B",
     "image_dir": "data/study_gen/B",
     "story_def": "data/study_scenes/story_b_market_mixup.json",
     "scene_count": 5
   },
   "C": {
     "name": "The Night Garden",
-    "scene_dir": "data/study_scenes/C",
+    "image_dir": "data/study_gen/C",
     "story_def": "data/study_scenes/story_c_night_garden.json",
     "scene_count": 5
   },
   "D": {
     "name": "The Runaway Train",
-    "scene_dir": "data/study_scenes/D",
+    "image_dir": "data/study_gen/D",
     "story_def": "data/study_scenes/story_d_runaway_train.json",
     "scene_count": 5
   },
   "training": [
-    {"scene_dir": "data/study_scenes/training", "scene_file": "scene_1.json"},
-    {"scene_dir": "data/study_scenes/training", "scene_file": "scene_2.json"}
+    {
+      "name": "Practice Story 1",
+      "image_dir": "data/study_gen/training_1",
+      "story_def": "data/training/training_1.json",
+      "scene_count": 1
+    },
+    {
+      "name": "Practice Story 2",
+      "image_dir": "data/study_gen/training_2",
+      "story_def": "data/training/training_2.json",
+      "scene_count": 1
+    }
   ]
 }

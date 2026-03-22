@@ -114,8 +114,7 @@ a { color: var(--teal); text-decoration: none; }
 }
 
 .login-card {
-  background: var(--dark2);
-  border: 1px solid var(--dark4);
+  background: #d8c4af;
   border-radius: 24px;
   padding: 3rem 2.8rem;
   width: 100%;
@@ -131,20 +130,18 @@ a { color: var(--teal); text-decoration: none; }
   text-align: center;
   margin-bottom: 0;
   letter-spacing: -0.01em;
+  background-color: #ede6e0;
+  border-radius: 14px;
 }
 .login-logo .t1 { color: var(--red); }
 .login-logo .t2 { color: var(--yellow); }
 .login-logo .t3 { color: var(--teal); }
 
-.login-sub {
-  text-align: center;
-  color: #666;
-  font-size: 0.85rem;
-  margin-bottom: 2rem;
-}
+
 
 .field { margin-bottom: 1.2rem; }
 .field label {
+  margin-top: 1rem;
   display: block;
   font-family: var(--font);
   font-size: 0.8rem;
@@ -155,14 +152,13 @@ a { color: var(--teal); text-decoration: none; }
 }
 .field input {
   width: 100%;
-  background: var(--dark);
-  border: 2px solid var(--dark4);
+  background: #bb9777;
   border-radius: var(--radius-sm);
   padding: 12px 16px;
   color: var(--light);
   font-family: var(--font);
   font-size: 0.9rem;
-  font-weight: 300;
+  font-weight: 600;
   transition: border-color 0.2s;
   outline: none;
 }

@@ -1,7 +1,7 @@
 {
   "story_id": "A",
   "title": "The Balloon Seller",
-  "characters": {
+  "entities": {
     "boy": "a shy boy with round glasses",
     "seller": "a tall balloon seller with a striped hat",
     "bird": "a tiny white bird",
