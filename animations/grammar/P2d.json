@@ -4,13 +4,24 @@
   "category": "Property",
   "mode": "both",
   "scaffolding_intent": "Emits heart particles around the entity",
-  "misl_elements": ["ENP", "ADV", "IR"],
-  "target_type": ["entity", "duo", "group"],
+  "misl_elements": [
+    "ENP",
+    "ADV",
+    "IR"
+  ],
+  "target_type": [
+    "entity",
+    "duo",
+    "group"
+  ],
   "parameters": [
     {
       "name": "particleCount",
       "type": "int",
-      "range": [15, 35],
+      "range": [
+        15,
+        35
+      ],
       "default": 15,
       "description": "Number of particles emitted"
     },
@@ -18,13 +29,20 @@
       "name": "tint",
       "type": "rgb",
       "range": [],
-      "default": [80, -25, 25],
+      "default": [
+        80,
+        -25,
+        25
+      ],
       "description": "RGB tint shift applied to entity pixels (additive)"
     },
     {
       "name": "tintSaturation",
       "type": "float",
-      "range": [0, 1],
+      "range": [
+        0.5,
+        1
+      ],
       "default": 0.5,
       "description": "How strongly the tint is applied (0 = no tint, 1 = full tint)"
     }
