@@ -9,7 +9,7 @@
     "P",
     "M"
   ],
-  "target_type": "entity",
+  "target_type": ["entity","duo","group"],
   "parameters": [
     {
       "name": "bubbleText",

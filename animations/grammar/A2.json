@@ -8,7 +8,7 @@
     "A",
     "IE"
   ],
-  "target_type": "entity",
+  "target_type": ["entity","duo","group"],
   "parameters": [
     {
       "name": "speed",
@@ -22,6 +22,6 @@
     }
   ],
   "code_template": "anticipation({target}, {speed})",
-  "correction_intent": "Child described an incorrect or incomplete action",
-  "suggestion_intent": "Child hasn't described an action happening in the scene"
+  "correction_intent": "Child described the WRONG ACTION for an entity (e.g. said 'cooking' when the entity is packing, said 'sleeping' when it's reading). A2 is for any non-movement action error — wrong verb, wrong activity, incomplete action description.",
+  "suggestion_intent": "Child hasn't described a NON-MOVEMENT action happening in the scene (cooking, reading, talking, packing, etc.). Use A2 for static/in-place actions — for locomotion (walking, running) use A1."
 }

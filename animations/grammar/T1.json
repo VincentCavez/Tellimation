@@ -7,7 +7,7 @@
   "misl_elements": [
     "T"
   ],
-  "target_type": "scene",
+  "target_type": ["scene"],
   "parameters": [
     {
       "name": "flickerIntensity",
@@ -31,6 +31,6 @@
     }
   ],
   "code_template": "flashback({target}, {flickerIntensity}, {scratchCount})",
-  "correction_intent": "Child used the wrong tense instead of past tense",
-  "suggestion_intent": "Child hasn't referenced what happened in the past"
+  "correction_intent": "The scene itself depicts a PAST event (the manifest explicitly describes something that already happened) but the child narrated it in present or future tense. NEVER use T1 when the scene is in the present and the child mistakenly used past tense — that is a grammatical error, use D4 instead.",
+  "suggestion_intent": "The scene depicts or implies a PAST event (e.g. aftermath, memories, completed actions) but the child hasn't used past tense or referenced the temporal context. Use T1 only when past-tense narration is grounded in the scene — NOT to generically suggest 'talk about the past'."
 }

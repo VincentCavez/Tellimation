@@ -229,9 +229,24 @@ the animal vs. the humans (e.g. "Max and Buddy" where there is a boy and a dog \
 
 # Animation correction intents
 
-Each animation ID maps to a specific type of error it is designed to correct:
+Each animation ID maps to a specific type of error it is designed to correct. \
+The [targets: ...] bracket shows what target types are valid for each animation:
 
 {correction_intents}
+
+# Target type rules
+
+Each animation above has valid target types shown in [brackets]:
+- "entity": target_entities contains exactly 1 entity ID
+- "duo": target_entities contains exactly 2 entity IDs
+- "group": target_entities contains 3+ entity IDs
+- "scene": target_entities must be ["scene"] — use when the error concerns \
+the setting/environment (child incorrectly described the background, \
+over-mentioned or under-mentioned environmental elements)
+
+You MUST only propose an animation if the number of targets matches one of \
+its valid target types. For example, R1 [targets: duo] REQUIRES exactly \
+2 entities. Do NOT propose R1 with 1 or 3 entities.
 
 # Output JSON schema
 
@@ -255,14 +270,12 @@ Return ONLY valid JSON (no markdown fences, no commentary):
 }}
 ```
 
-IMPORTANT — target_entities must NEVER be empty and must ONLY contain \
-valid entity IDs from the manifest's "entities_in_scene" list. These are \
-short identifiers like "boy", "dog", "grandmother", NOT descriptions \
-like "tall sandcastle" or "brown dog". If the error concerns a \
-key_object or background element rather than a named entity, set \
-target_entities to the entity most closely associated with that object \
-(e.g. if the child mentions a bench and the boy is sitting on it, \
-target_entities should be ["boy"]).
+IMPORTANT — target_entities must NEVER be empty.
+- For entity/duo/group targets: use valid entity IDs from "entities_in_scene" \
+(short identifiers like "boy", "dog", NOT descriptions).
+- For scene targets: use ["scene"] when the error concerns the setting and \
+the animation supports "scene" as a target type.
+- If the error concerns a key_object, use the entity closest to that object.
 
 If there are NO errors, return: {{"discrepancies": []}}
 - ENP = Elaborated Noun Phrases, G = Grammaticality, T = Tense
@@ -353,9 +366,22 @@ Rules:
 
 # Animation suggestion intents
 
-Each animation ID maps to a specific type of enrichment it is designed to scaffold:
+Each animation ID maps to a specific type of enrichment it is designed to scaffold. \
+The [targets: ...] bracket shows what target types are valid for each animation:
 
 {suggestion_intents}
+
+# Target type rules
+
+Each animation above has valid target types shown in [brackets]:
+- "entity": target_entities contains exactly 1 entity ID
+- "duo": target_entities contains exactly 2 entity IDs
+- "group": target_entities contains 3+ entity IDs
+- "scene": target_entities must be ["scene"] — use when the suggestion \
+concerns the setting/environment (child hasn't described the background)
+
+You MUST only propose an animation if the number of targets matches one of \
+its valid target types.
 
 # Output JSON schema
 
@@ -373,13 +399,12 @@ Return ONLY valid JSON (no markdown fences, no commentary):
 }}
 ```
 
-CRITICAL — target_entities must ONLY contain valid entity IDs from the \
-manifest's "entities_in_scene" list. These are short identifiers like \
-"boy", "dog", "grandmother", NOT descriptions like "tall sandcastle" or \
-"brown dog". If the suggestion is about the setting (S1_reveal) and has \
-no specific entity target, use ALL entity IDs from entities_in_scene. \
-If the suggestion targets a key_object that is not an entity, use the \
-entity closest to that object.
+CRITICAL — target_entities must NEVER be empty.
+- For entity/duo/group targets: use valid entity IDs from "entities_in_scene" \
+(short identifiers like "boy", "dog", NOT descriptions).
+- For scene targets: use ["scene"] when the suggestion concerns the \
+setting/environment and the animation supports "scene" as a target type.
+- If the suggestion targets a key_object, use the entity closest to it.
 
 If there are NO enrichment opportunities, return: {{"discrepancies": []}}
 

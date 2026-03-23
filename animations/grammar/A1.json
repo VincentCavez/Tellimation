@@ -8,7 +8,7 @@
     "A",
     "IE"
   ],
-  "target_type": "entity",
+  "target_type": ["entity","duo", "group"],
   "parameters": [
     {
       "name": "direction",
@@ -43,6 +43,6 @@
     }
   ],
   "code_template": "motion_lines({target}, {direction}, {lineLength}, {amplitude})",
-  "correction_intent": "Child described an incorrect movement action happening in the scene",
-  "suggestion_intent": "Child could describe a movement action happening in the scene"
+  "correction_intent": "Child described the wrong MOVEMENT or DIRECTION of an entity (e.g. said 'running' when walking, 'going left' when going right, 'sitting' when standing). A1 is strictly for locomotion errors — NOT for wrong non-movement actions like 'cooking' instead of 'packing' (use A2 for those).",
+  "suggestion_intent": "Child hasn't described a MOVEMENT happening in the scene (walking, running, jumping, flying). Use A1 only for locomotion — NOT for static actions like cooking, reading, talking (use A2 for those)."
 }

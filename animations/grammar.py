@@ -30,9 +30,9 @@ VALID_CATEGORIES = {
 
 VALID_MODES = {"correction", "suggestion", "both"}
 
-VALID_TARGET_TYPES = {"entity", "entities", "scene"}
+VALID_TARGET_TYPES = {"entity", "duo", "group", "scene"}
 
-VALID_PARAM_TYPES = {"int", "float", "enum", "rgb", "bool", "string", "string_array"}
+VALID_PARAM_TYPES = {"int", "float", "enum", "rgb", "rgb_vary", "bool", "string", "string_array"}
 
 
 # ---------------------------------------------------------------------------
@@ -56,7 +56,7 @@ class AnimationDef(BaseModel):
     mode: str
     scaffolding_intent: str
     misl_elements: List[str] = Field(default_factory=list)
-    target_type: str
+    target_type: List[str] = Field(default_factory=list)
     parameters: List[AnimationParameter] = Field(default_factory=list)
     code_template: str
 
@@ -83,11 +83,16 @@ def _validate_definition(data: Dict[str, Any], filepath: Path) -> None:
             f"must be one of {VALID_MODES}"
         )
 
-    if data["target_type"] not in VALID_TARGET_TYPES:
+    if not isinstance(data["target_type"], list):
         raise ValueError(
-            f"{filepath.name}: invalid target_type '{data['target_type']}', "
-            f"must be one of {VALID_TARGET_TYPES}"
+            f"{filepath.name}: target_type must be a list, got {type(data['target_type']).__name__}"
         )
+    for tt in data["target_type"]:
+        if tt not in VALID_TARGET_TYPES:
+            raise ValueError(
+                f"{filepath.name}: invalid target_type '{tt}', "
+                f"must be one of {VALID_TARGET_TYPES}"
+            )
 
     if not isinstance(data["misl_elements"], list):
         raise ValueError(f"{filepath.name}: misl_elements must be a list")

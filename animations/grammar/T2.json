@@ -8,7 +8,7 @@
     "S",
     "T"
   ],
-  "target_type": "scene",
+  "target_type": ["scene"],
   "parameters": [
     {
       "name": "isIndoor",
@@ -32,6 +32,6 @@
     }
   ],
   "code_template": "timelapse({target}, {isIndoor})",
-  "correction_intent": "Child used the wrong tense instead of future tense",
-  "suggestion_intent": "Child hasn't referenced what could happen in the future"
+  "correction_intent": "The scene itself depicts a FUTURE event (the manifest explicitly describes something that has not happened yet) but the child narrated it in present or past tense. NEVER use T2 when the scene is in the present and the child mistakenly used future tense ('will be' instead of 'is') — that is a grammatical error, use D4 instead.",
+  "suggestion_intent": "The scene depicts or implies a FUTURE event (e.g. preparations, anticipation, plans being made) but the child hasn't used future tense or referenced what will happen next. Use T2 only when future-tense narration is grounded in the scene — NOT to generically suggest 'talk about the future'."
 }

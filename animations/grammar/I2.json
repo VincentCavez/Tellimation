@@ -7,7 +7,7 @@
   "misl_elements": [
     "CH"
   ],
-  "target_type": "entity",
+  "target_type": ["entity","duo","group"],
   "parameters": [
     {
       "name": "bgColor",
