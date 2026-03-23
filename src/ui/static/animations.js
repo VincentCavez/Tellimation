@@ -149,7 +149,7 @@ class AnimationRunner {
       if (!self._looping) return;
       self.play(codeOrSpec, dur).then(function() {
         if (!self._looping) return;
-        self._loopTimeout = setTimeout(runOnce, dur * 2);
+        self._loopTimeout = setTimeout(runOnce, dur);
       });
     };
 

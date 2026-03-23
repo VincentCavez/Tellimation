@@ -32,6 +32,8 @@ logger = logging.getLogger(__name__)
 # Default durations per template (matching JS registration)
 _DEFAULT_DURATIONS: Dict[str, int] = {
     "spotlight": 3000, "nametag": 2000, "color_pop": 3000, "emanation": 2500,
+    "emanation_shame": 2500, "emanation_cold": 2500, "emanation_joy": 2500,
+    "emanation_love": 2500, "emanation_anger": 2500, "emanation_fear": 2500,
     "motion_lines": 2000, "flip": 2000, "reveal": 2500, "stamp": 3000,
     "flashback": 3000, "timelapse": 4000, "magnetism": 2500, "repel": 2000,
     "causal_push": 2000, "sequential_glow": 3000, "disintegration": 2000,
@@ -243,7 +245,7 @@ def load_animation_params(
     import random
 
     # Extract the short ID (e.g. "I1" from "I1_spotlight", "P2a" from "P2a_emanation_shame")
-    short_id = animation_id.split("_")[0].upper()
+    short_id = animation_id.split("_")[0]
 
     # Load grammar JSON
     grammar_dir = Path(__file__).parent.parent.parent / "animations" / "grammar"
@@ -259,7 +261,7 @@ def load_animation_params(
     # Check last resolution for this animation
     last_resolved = None
     for entry in study_log_entries:
-        if entry.get("event") == "resolution" and entry.get("animation_id") == short_id:
+        if entry.get("event") == "resolution" and entry.get("animation_id", "").lower() == short_id.lower():
             last_resolved = entry.get("resolved", False)
 
     # Build param dict
