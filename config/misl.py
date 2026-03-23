@@ -188,10 +188,15 @@ ANIMATION_IDS = {
     "I2_nametag": "Floating label with '...' attached to entity, invites naming",
     # P = Property
     "P1_color_pop": "Desaturation of everything except target to emphasize visual attributes",
-    "P2_emanation": "2-3 particle sprites revealing non-visible properties or emotions",
+    "P2a_emanation_shame": "Shame/embarrassment particles",
+    "P2b_emanation_cold": "Cold/frost particles",
+    "P2c_emanation_joy": "Joy/sparkle particles",
+    "P2d_emanation_love": "Heart/love particles",
+    "P2e_emanation_anger": "Anger particles",
+    "P2f_emanation_fear": "Fear/worry particles",
     # A = Action
     "A1_motion_line": "Directional speed streaks showing direction and speed",
-    "A2_anticipation": "Entity compresses and lurches forward, freezes mid-motion",
+    "A2_flip": "Entity compresses and lurches forward, freezes mid-motion",
     # S = Space
     "S1_reveal": "Occluding layer becomes semi-transparent to show hidden elements",
     "S2_stamp": "Entity lifts slowly revealing a black silhouette, snaps back elastically, cracks radiate at impact",
@@ -221,18 +226,18 @@ MISL_TO_ANIMATIONS: Dict[str, List[str]] = {
     # Macrostructure
     "character":         ["I1_spotlight", "I2_nametag"],
     "setting":           ["S1_reveal", "S2_stamp", "T2_timelapse"],
-    "initiating_event":  ["A1_motion_line", "A2_anticipation", "R3_causal_push", "D3_alert"],
-    "internal_response": ["P2_emanation", "D2_thought_bubble", "D3_alert"],
+    "initiating_event":  ["A1_motion_line", "A2_flip", "R3_causal_push", "D3_alert"],
+    "internal_response": ["P2a_emanation_shame", "P2b_emanation_cold", "P2c_emanation_joy", "P2d_emanation_love", "P2e_emanation_anger", "P2f_emanation_fear", "D2_thought_bubble", "D3_alert"],
     "plan":              ["D2_thought_bubble"],
-    "action":            ["A1_motion_line", "A2_anticipation"],
+    "action":            ["A1_motion_line", "A2_flip"],
     "consequence":       ["R3_causal_push"],
     # Microstructure
     "coordinating_conjunctions":  ["R1_magnetism", "R2_repel", "R3_causal_push"],
     "subordinating_conjunctions": ["R3_causal_push"],
     "mental_verbs":               ["D2_thought_bubble"],
     "linguistic_verbs":           ["D1_speech_bubble"],
-    "adverbs":                    ["P1_color_pop", "P2_emanation"],
-    "elaborated_noun_phrases":    ["P1_color_pop", "P2_emanation"],
+    "adverbs":                    ["P1_color_pop", "P2a_emanation_shame", "P2b_emanation_cold", "P2c_emanation_joy", "P2d_emanation_love", "P2e_emanation_anger", "P2f_emanation_fear"],
+    "elaborated_noun_phrases":    ["P1_color_pop", "P2a_emanation_shame", "P2b_emanation_cold", "P2c_emanation_joy", "P2d_emanation_love", "P2e_emanation_anger", "P2f_emanation_fear"],
     "grammaticality":             ["D4_interjection"],
     "tense":                      ["T1_flashback", "T2_timelapse", "D4_interjection"],
 }
@@ -256,9 +261,14 @@ ANIMATION_ID_TO_TEMPLATE: Dict[str, str] = {
     "I1_spotlight": "spotlight",
     "I2_nametag": "nametag",
     "P1_color_pop": "color_pop",
-    "P2_emanation": "emanation",
+    "P2a_emanation_shame": "emanation",
+    "P2b_emanation_cold": "emanation",
+    "P2c_emanation_joy": "emanation",
+    "P2d_emanation_love": "emanation",
+    "P2e_emanation_anger": "emanation",
+    "P2f_emanation_fear": "emanation",
     "A1_motion_line": "motion_lines",
-    "A2_anticipation": "anticipation",
+    "A2_flip": "flip",
     "S1_reveal": "reveal",
     "S2_stamp": "stamp",
     "T1_flashback": "flashback",
@@ -296,7 +306,6 @@ ANIMATION_PARAMS: Dict[str, Dict] = {
         "saturationBoost":      {"type": "float", "min": 0, "max": 0.5, "default": 0.3, "desc": "How much to boost saturation of the active color group"},
     },
     "emanation": {
-        "particleType":  {"type": "enum", "values": ["steam", "frost", "sparkle", "dust", "hearts", "anger", "fear"], "default": "steam", "desc": "Type of emanation particle"},
         "particleCount": {"type": "int", "min": 8, "max": 30, "default": 15, "desc": "Number of particles emitted"},
     },
     "motion_lines": {
@@ -304,7 +313,7 @@ ANIMATION_PARAMS: Dict[str, Dict] = {
         "lineLength": {"type": "int", "min": 10, "max": 30, "default": 20, "desc": "Length of each motion line in pixels"},
         "amplitude":  {"type": "int", "min": 5, "max": 15, "default": 10, "desc": "Vertical wave amplitude"},
     },
-    "anticipation": {
+    "flip": {
         "speed": {"type": "float", "min": 0.5, "max": 2.0, "default": 1.0, "desc": "Speed multiplier for the flip animation"},
     },
     "reveal": {

@@ -125,7 +125,10 @@ def _select_animation_for_discrepancy(
     # Use the animation_id provided by the LLM
     _ID_TO_TEMPLATE = {
         "I1": "I1_spotlight", "I2": "I2_nametag",
-        "P1": "P1_color_pop", "P2": "P2_emanation",
+        "P1": "P1_color_pop",
+        "P2A": "P2a_emanation_shame", "P2B": "P2b_emanation_cold",
+        "P2C": "P2c_emanation_joy", "P2D": "P2d_emanation_love",
+        "P2E": "P2e_emanation_anger", "P2F": "P2f_emanation_fear",
         "A1": "A1_motion_line", "A2": "A2_flip",
         "S1": "S1_reveal", "S2": "S2_stamp",
         "T1": "T1_flashback", "T2": "T2_timelapse",
@@ -135,10 +138,8 @@ def _select_animation_for_discrepancy(
     }
 
     if discrepancy.animation_id:
-        aid = discrepancy.animation_id.upper()
-        # Handle P2 variants: P2_SHAME → P2_emanation (with particleType extracted)
-        if aid.startswith("P2_") and aid != "P2":
-            return "P2_emanation"
+        # Extract short ID: "P2c_emanation_joy" → "P2C", "I1" → "I1"
+        aid = discrepancy.animation_id.split("_")[0].upper()
         if aid in _ID_TO_TEMPLATE:
             # Validate target count vs animation's target_type
             anim_def = get_animation(aid)
@@ -241,15 +242,8 @@ def load_animation_params(
     """
     import random
 
-    # Extract the short ID (e.g. "I1" from "I1_spotlight")
+    # Extract the short ID (e.g. "I1" from "I1_spotlight", "P2a" from "P2a_emanation_shame")
     short_id = animation_id.split("_")[0].upper()
-
-    # Handle P2 variants: "P2_shame" → short_id="P2", variant="shame"
-    p2_variant = None
-    if short_id == "P2" and "_" in animation_id:
-        parts = animation_id.split("_", 1)
-        if len(parts) == 2 and parts[1].lower() in ("shame", "cold", "great", "love", "anger", "fear"):
-            p2_variant = parts[1].lower()
 
     # Load grammar JSON
     grammar_dir = Path(__file__).parent.parent.parent / "animations" / "grammar"
@@ -275,9 +269,6 @@ def load_animation_params(
         # First time or last time resolved → use defaults
         for p in parameters:
             params[p["name"]] = p["default"]
-        # Override particleType for P2 variants
-        if p2_variant:
-            params["particleType"] = p2_variant
     else:
         # Last time NOT resolved → accentuate parameters
         for p in parameters:
@@ -310,10 +301,6 @@ def load_animation_params(
                 params[p["name"]] = default
 
         logger.info("[tellimation] Accentuated params for %s: %s", animation_id, params)
-
-    # Override particleType for P2 variants
-    if p2_variant:
-        params["particleType"] = p2_variant
 
     return params
 
