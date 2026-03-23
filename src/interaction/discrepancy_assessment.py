@@ -150,7 +150,8 @@ def _load_correction_intents() -> str:
             d = json.load(open(f))
             intent = d.get("correction_intent")
             if intent:
-                lines.append(f"- {d['id']} ({d['name']}): {intent}")
+                targets = d.get("target_type", ["entity"])
+                lines.append(f"- {d['id']} ({d['name']}) [targets: {', '.join(targets)}]: {intent}")
         except Exception:
             pass
     return "\n".join(lines) if lines else "(none)"
@@ -243,7 +244,8 @@ def _load_suggestion_intents() -> str:
             d = json.load(open(f))
             intent = d.get("suggestion_intent")
             if intent:
-                lines.append(f"- {d['id']} ({d['name']}): {intent}")
+                targets = d.get("target_type", ["entity"])
+                lines.append(f"- {d['id']} ({d['name']}) [targets: {', '.join(targets)}]: {intent}")
         except Exception:
             pass
     return "\n".join(lines) if lines else "(none)"

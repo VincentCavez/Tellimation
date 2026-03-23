@@ -7,7 +7,7 @@
   "misl_elements": [
     "CC"
   ],
-  "target_type": "entities",
+  "target_type": ["duo"],
   "parameters": [
     {
       "name": "entityPrefixB",

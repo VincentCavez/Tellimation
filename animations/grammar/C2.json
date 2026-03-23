@@ -5,7 +5,7 @@
   "mode": "correction",
   "scaffolding_intent": "Entity pixelates progressively then dissolves into particles, scaffolding excess \u2014 this entity should not be mentioned",
   "misl_elements": [],
-  "target_type": "entity",
+  "target_type": ["entity","duo","group","scene"],
   "parameters": [
     {
       "name": "driftAmount",
@@ -29,6 +29,6 @@
     }
   ],
   "code_template": "disintegration({target}, {driftAmount}, {fallSpeed})",
-  "correction_intent": "Child over-mentioned an entity",
+  "correction_intent": "Child over-mentioned an entity or a setting",
   "suggestion_intent": null
 }

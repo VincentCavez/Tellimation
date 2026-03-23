@@ -10,7 +10,7 @@
     "IE",
     "CO"
   ],
-  "target_type": "entities",
+  "target_type": ["duo"],
   "parameters": [
     {
       "name": "entityPrefixB",

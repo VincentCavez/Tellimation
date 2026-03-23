@@ -1,39 +1,39 @@
-"""Audio transcription via Gemini 3 Flash (multimodal)."""
+"""Audio transcription via Google Cloud Speech-to-Text V2 (Chirp 3).
+
+Auth: uses Application Default Credentials (ADC).
+- Local dev: run `gcloud auth application-default login`
+- Heroku/Railway: set GOOGLE_APPLICATION_CREDENTIALS_JSON env var
+  with the service account JSON content
+"""
 
 from __future__ import annotations
 
+import json
+import logging
+import os
+import tempfile
 from typing import List, Optional
 
-from google import genai
-from google.genai import types
+from google.cloud.speech_v2 import SpeechAsyncClient
+from google.cloud.speech_v2.types import cloud_speech
 
-from src.generation.prompts.transcription_prompt import (
-    TRANSCRIPTION_SYSTEM_PROMPT,
-    TRANSCRIPTION_USER_PROMPT,
-)
-from src.generation.utils import extract_json as _extract_json
+logger = logging.getLogger(__name__)
 
-MODEL_ID = "gemini-3-flash-preview"
+PROJECT_ID = "tellimations-stt"
+REGION = "us"
+MODEL = "chirp_3"
+API_ENDPOINT = f"{REGION}-speech.googleapis.com"
 
-
-def _build_user_prompt(
-    narration_history: List[str],
-    narrative_text: str = "",
-) -> str:
-    """Build the text portion of the user prompt."""
-    narrative_str = narrative_text if narrative_text else "(no narrative context yet)"
-
-    if narration_history:
-        history_str = "\n".join(
-            f'{i+1}. "{utt}"' for i, utt in enumerate(narration_history)
-        )
-    else:
-        history_str = "(no previous utterances — this is the first)"
-
-    return TRANSCRIPTION_USER_PROMPT.format(
-        narrative_text=narrative_str,
-        narration_history=history_str,
-    )
+# On Heroku/Railway, GOOGLE_APPLICATION_CREDENTIALS_JSON contains the
+# service account JSON as a string. Write it to a temp file so the
+# Google client library can pick it up via GOOGLE_APPLICATION_CREDENTIALS.
+_creds_json = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS_JSON")
+if _creds_json and not os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"):
+    _tmp = tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False)
+    _tmp.write(_creds_json)
+    _tmp.close()
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = _tmp.name
+    logger.info("[transcription] Wrote service account credentials to %s", _tmp.name)
 
 
 async def transcribe_audio(
@@ -42,40 +42,43 @@ async def transcribe_audio(
     narration_history: Optional[List[str]] = None,
     narrative_text: str = "",
 ) -> str:
-    """Transcribe child audio to text.
-
-    Uses Gemini 3 Flash in multimodal mode (audio + text) with
-    low thinking budget for minimal latency.
+    """Transcribe child audio to text using Chirp 3.
 
     Args:
-        api_key: Gemini API key.
-        audio_bytes: Raw audio bytes (WAV/WebM/OGG).
-        narration_history: Previous utterance transcriptions (ordered).
-        narrative_text: The scene's story narrative for context.
+        api_key: Unused (kept for signature compatibility). Auth uses ADC.
+        audio_bytes: Raw audio bytes (WebM/OGG/WAV).
+        narration_history: Unused (kept for signature compatibility).
+        narrative_text: Unused (kept for signature compatibility).
 
     Returns:
         The transcription string.
     """
-    if narration_history is None:
-        narration_history = []
-
-    user_prompt = TRANSCRIPTION_USER_PROMPT
-
-    audio_part = types.Part.from_bytes(data=audio_bytes, mime_type="audio/webm")
-    text_part = types.Part.from_text(text=user_prompt)
-
-    client = genai.Client(api_key=api_key)
-    response = await client.aio.models.generate_content(
-        model=MODEL_ID,
-        contents=[audio_part, text_part],
-        config=types.GenerateContentConfig(
-            system_instruction=TRANSCRIPTION_SYSTEM_PROMPT,
-            thinking_config=types.ThinkingConfig(thinking_budget=256),
-            temperature=1.0,
-            response_mime_type="application/json",
-        ),
+    client = SpeechAsyncClient(
+        client_options={"api_endpoint": API_ENDPOINT},
     )
 
-    raw_text = response.text
-    data = _extract_json(raw_text)
-    return data.get("transcription", "")
+    config = cloud_speech.RecognitionConfig(
+        auto_decoding_config=cloud_speech.AutoDetectDecodingConfig(),
+        language_codes=["en-US"],
+        model=MODEL,
+    )
+
+    request = cloud_speech.RecognizeRequest(
+        recognizer=f"projects/{PROJECT_ID}/locations/{REGION}/recognizers/_",
+        config=config,
+        content=audio_bytes,
+    )
+
+    try:
+        response = await client.recognize(request=request)
+    except Exception as exc:
+        logger.error("[transcription] Chirp 3 failed: %s", exc)
+        return ""
+
+    transcript = ""
+    for result in response.results:
+        if result.alternatives:
+            transcript += result.alternatives[0].transcript
+
+    logger.info("[transcription] Chirp 3: %r", transcript.strip())
+    return transcript.strip()

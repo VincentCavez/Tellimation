@@ -293,7 +293,7 @@ ANIMATION_PARAMS: Dict[str, Dict] = {
     },
     "color_pop": {
         "desaturationStrength": {"type": "float", "min": 0, "max": 1, "default": 0.8, "desc": "How much non-target pixels are desaturated"},
-        "cycleCount":           {"type": "int", "min": 1, "max": 4, "default": 2, "desc": "Number of full hue-rotation cycles"},
+        "saturationBoost":      {"type": "float", "min": 0, "max": 0.5, "default": 0.3, "desc": "How much to boost saturation of the active color group"},
     },
     "emanation": {
         "particleType":  {"type": "enum", "values": ["steam", "frost", "sparkle", "dust", "hearts", "anger", "fear"], "default": "steam", "desc": "Type of emanation particle"},

@@ -8,7 +8,7 @@
     "ENP",
     "ADV"
   ],
-  "target_type": "entity",
+  "target_type": ["entity","duo","group"],
   "parameters": [
     {
       "name": "desaturationStrength",
@@ -21,17 +21,17 @@
       "description": "How much non-target pixels are desaturated"
     },
     {
-      "name": "cycleCount",
-      "type": "int",
+      "name": "saturationBoost",
+      "type": "float",
       "range": [
-        2,
-        4
+        0.4,
+        0.6
       ],
-      "default": 2,
-      "description": "Number of full hue-rotation cycles"
+      "default": 0.4,
+      "description": "How much to boost saturation of the active color group"
     }
   ],
-  "code_template": "color_pop({target}, {desaturationStrength}, {cycleCount})",
+  "code_template": "color_pop({target}, {desaturationStrength}, {saturationBoost})",
   "correction_intent": "Child described an incorrect property of an entity",
   "suggestion_intent": "Child hasn't described the properties of an entity"
 }

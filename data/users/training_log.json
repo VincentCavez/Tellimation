@@ -1744,6 +1744,720 @@
         "rationale": "The child mentioned the boy and the woman but missed the little dog watching from under the table.",
         "pass_type": "suggestion",
         "timestamp": "2026-03-22T16:30:44.813807+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "the boy was cooking in the kitchen",
+        "was_interrupted": "",
+        "timestamp": "2026-03-23T04:54:07.066613+00:00"
+      },
+      {
+        "event": "corrections",
+        "items": [
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "The boy isn't actually cooking right now; he is helping to put the fresh cookies into the red box."
+          }
+        ],
+        "timestamp": "2026-03-23T04:54:07.073078+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "grandmother"
+            ],
+            "rationale": "The child mentioned the boy but omitted the grandmother who is also in the kitchen. Identifying her adds character presence."
+          },
+          {
+            "animation_id": "I1",
+            "targets": [
+              "dog"
+            ],
+            "rationale": "The small brown dog is watching from under the table and is a key character element not yet mentioned."
+          },
+          {
+            "animation_id": "P1",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "The child used a simple noun phrase 'the boy'. Describing his curly hair would enrich the narrative with more detail."
+          },
+          {
+            "animation_id": "S2",
+            "targets": [
+              "box"
+            ],
+            "rationale": "Mentioning the red box on the wooden table would help specify where the cookies are being placed."
+          },
+          {
+            "animation_id": "P2_great",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "The child described the action but not how the boy feels. Adding that he is happy or proud of the baking would include an internal response."
+          }
+        ],
+        "timestamp": "2026-03-23T04:54:07.075925+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "A2_flip",
+        "targets": [
+          "boy"
+        ],
+        "rationale": "The boy isn't actually cooking right now; he is helping to put the fresh cookies into the red box.",
+        "pass_type": "correction",
+        "timestamp": "2026-03-23T04:54:07.083535+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "The boy was in the kitchen",
+        "was_interrupted": "",
+        "timestamp": "2026-03-23T04:57:09.510621+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "grandmother"
+            ],
+            "rationale": "The child mentioned the boy but not the grandmother, who is a key part of the scene's activity."
+          },
+          {
+            "animation_id": "I1",
+            "targets": [
+              "dog"
+            ],
+            "rationale": "The child hasn't noticed the small brown dog watching from under the table."
+          },
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "The child mentioned the location but hasn't described the action of putting cookies in the box."
+          },
+          {
+            "animation_id": "P1",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "The child could add more detail to the boy, like describing his curly hair."
+          },
+          {
+            "animation_id": "S1",
+            "targets": [
+              "scene"
+            ],
+            "rationale": "The kitchen is described as warm and cozy with afternoon light, which could enrich the setting description."
+          }
+        ],
+        "timestamp": "2026-03-23T04:57:09.512356+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "I1_spotlight",
+        "targets": [
+          "grandmother"
+        ],
+        "rationale": "The child mentioned the boy but not the grandmother, who is a key part of the scene's activity.",
+        "pass_type": "suggestion",
+        "timestamp": "2026-03-23T04:57:09.515398+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "The boy will be in the kitchen.",
+        "was_interrupted": "",
+        "timestamp": "2026-03-23T04:58:03.402723+00:00"
+      },
+      {
+        "event": "corrections",
+        "items": [
+          {
+            "animation_id": "T2",
+            "targets": [
+              "scene"
+            ],
+            "rationale": "The boy is already in the kitchen with his grandmother right now!"
+          }
+        ],
+        "timestamp": "2026-03-23T04:58:03.404606+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "grandmother"
+            ],
+            "rationale": "The boy isn't alone in the kitchen; his grandmother is there with him to help with the baking."
+          },
+          {
+            "animation_id": "I1",
+            "targets": [
+              "dog"
+            ],
+            "rationale": "There is a little furry friend hiding under the table watching everything!"
+          },
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "What is the boy doing in the kitchen? It looks like he is busy with some cookies!"
+          },
+          {
+            "animation_id": "P1",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "You could describe what the boy looks like, such as his wonderful curly hair."
+          },
+          {
+            "animation_id": "I2",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "The boy might like to have a special name for your story."
+          }
+        ],
+        "timestamp": "2026-03-23T04:58:03.406245+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "T2_timelapse",
+        "targets": [
+          "scene"
+        ],
+        "rationale": "The boy is already in the kitchen with his grandmother right now!",
+        "pass_type": "correction",
+        "timestamp": "2026-03-23T04:58:03.408639+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "The boy will be cooking.",
+        "was_interrupted": "",
+        "timestamp": "2026-03-23T05:10:24.797885+00:00"
+      },
+      {
+        "event": "corrections",
+        "items": [
+          {
+            "animation_id": "T2",
+            "targets": [
+              "scene"
+            ],
+            "rationale": "The boy is in the kitchen right now, so we can talk about what he's doing in the present moment!"
+          },
+          {
+            "animation_id": "A1",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "It looks like the boy is busy packing the cookies into the box rather than cooking them."
+          }
+        ],
+        "timestamp": "2026-03-23T05:10:24.800076+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "grandmother"
+            ],
+            "rationale": "The child mentioned the boy, but didn't mention the grandmother who is also at the table helping with the cookies."
+          },
+          {
+            "animation_id": "P1",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "The child could describe the boy's appearance, like his curly hair, to make the character more vivid."
+          },
+          {
+            "animation_id": "S1",
+            "targets": [
+              "scene"
+            ],
+            "rationale": "The story takes place in a warm, cozy kitchen, but the setting hasn't been described yet."
+          },
+          {
+            "animation_id": "I1",
+            "targets": [
+              "dog"
+            ],
+            "rationale": "There is a small brown dog watching the baking from under the table that hasn't been mentioned."
+          },
+          {
+            "animation_id": "P2_great",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "The child could describe how the boy feels about baking cookies with his grandmother, perhaps he is feeling happy or proud."
+          }
+        ],
+        "timestamp": "2026-03-23T05:10:24.801865+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "T2_timelapse",
+        "targets": [
+          "scene"
+        ],
+        "rationale": "The boy is in the kitchen right now, so we can talk about what he's doing in the present moment!",
+        "pass_type": "correction",
+        "timestamp": "2026-03-23T05:10:24.804731+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "The boy will be cooking.",
+        "was_interrupted": "",
+        "timestamp": "2026-03-23T05:11:49.588869+00:00"
+      },
+      {
+        "event": "corrections",
+        "items": [
+          {
+            "animation_id": "T2",
+            "targets": [
+              "scene"
+            ],
+            "rationale": "The scene is happening right now, but you talked about it like it's in the future!"
+          },
+          {
+            "animation_id": "A1",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "It looks like the boy is actually putting cookies in the box, not cooking anymore."
+          }
+        ],
+        "timestamp": "2026-03-23T05:11:49.592086+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "grandmother"
+            ],
+            "rationale": "The child mentioned the boy but omitted the grandmother, who is a central character standing right next to him at the table."
+          },
+          {
+            "animation_id": "P1",
+            "targets": [
+              "box"
+            ],
+            "rationale": "The child mentioned cooking but didn't describe the specific 'red box' or the 'fresh cookies' that are key objects in this scene's manifest."
+          },
+          {
+            "animation_id": "S1",
+            "targets": [
+              "scene"
+            ],
+            "rationale": "The child describes an action but hasn't mentioned the 'warm kitchen' or the 'afternoon light' that defines the setting of the scene."
+          },
+          {
+            "animation_id": "I1",
+            "targets": [
+              "dog"
+            ],
+            "rationale": "There is a small brown dog watching from under the table that the child hasn't noticed in their narration yet."
+          },
+          {
+            "animation_id": "P2_great",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "The child hasn't expressed how the boy feels about baking cookies with his grandmother, which could add emotional depth to the story."
+          }
+        ],
+        "timestamp": "2026-03-23T05:11:49.594726+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "T2_timelapse",
+        "targets": [
+          "scene"
+        ],
+        "rationale": "The scene is happening right now, but you talked about it like it's in the future!",
+        "pass_type": "correction",
+        "timestamp": "2026-03-23T05:11:49.601801+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "The boy will be cooking.",
+        "was_interrupted": "",
+        "timestamp": "2026-03-23T05:14:18.583099+00:00"
+      },
+      {
+        "event": "corrections",
+        "items": [
+          {
+            "animation_id": "A1",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "It looks like the boy is actually busy putting fresh cookies into a box, rather than cooking them right now."
+          },
+          {
+            "animation_id": "D4",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "Since the boy is busy with the cookies right now, we should say he 'is' doing it instead of 'will be'."
+          }
+        ],
+        "timestamp": "2026-03-23T05:14:18.588282+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "grandmother"
+            ],
+            "rationale": "The child mentioned the boy but missed the grandmother who is also part of the baking scene."
+          },
+          {
+            "animation_id": "P1",
+            "targets": [
+              "box"
+            ],
+            "rationale": "The child could describe the properties of the objects, like the big red box they are using."
+          },
+          {
+            "animation_id": "S1",
+            "targets": [
+              "scene"
+            ],
+            "rationale": "The child hasn't described the setting yet, like the warm, cozy kitchen they are in."
+          },
+          {
+            "animation_id": "I2",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "The child could give the boy a specific name to make the story more personal."
+          },
+          {
+            "animation_id": "P2_great",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "The child hasn't mentioned how the boy feels about baking cookies with his grandmother."
+          }
+        ],
+        "timestamp": "2026-03-23T05:14:18.592055+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "A1_motion_line",
+        "targets": [
+          "boy"
+        ],
+        "rationale": "It looks like the boy is actually busy putting fresh cookies into a box, rather than cooking them right now.",
+        "pass_type": "correction",
+        "timestamp": "2026-03-23T05:14:18.598165+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "The bunny will be cooking",
+        "was_interrupted": "",
+        "timestamp": "2026-03-23T05:17:17.167382+00:00"
+      },
+      {
+        "event": "corrections",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "dog"
+            ],
+            "rationale": "Oh! I don't see a bunny here, but I do see a cute little dog!"
+          },
+          {
+            "animation_id": "D4",
+            "targets": [
+              "dog"
+            ],
+            "rationale": "It looks like the baking is happening right now, so we can say he is cooking!"
+          },
+          {
+            "animation_id": "A2",
+            "targets": [
+              "dog"
+            ],
+            "rationale": "The little dog is actually watching the cookies rather than doing the cooking himself."
+          }
+        ],
+        "timestamp": "2026-03-23T05:17:17.173027+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "grandmother"
+            ],
+            "rationale": "The child mentioned a bunny (perhaps misidentifying the characters), but didn't mention the grandmother who is also in the kitchen."
+          },
+          {
+            "animation_id": "I1",
+            "targets": [
+              "dog"
+            ],
+            "rationale": "There is a little dog watching from under the table that hasn't been mentioned yet."
+          },
+          {
+            "animation_id": "P1",
+            "targets": [
+              "box"
+            ],
+            "rationale": "The child hasn't described the red box or the fresh cookies they are using."
+          },
+          {
+            "animation_id": "S1",
+            "targets": [
+              "scene"
+            ],
+            "rationale": "The story takes place in a cozy kitchen, but the setting hasn't been described yet."
+          },
+          {
+            "animation_id": "A1",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "The child mentioned cooking, but the specific action of putting cookies into the box could be described."
+          }
+        ],
+        "timestamp": "2026-03-23T05:17:17.177161+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "I1_spotlight",
+        "targets": [
+          "dog"
+        ],
+        "rationale": "Oh! I don't see a bunny here, but I do see a cute little dog!",
+        "pass_type": "correction",
+        "timestamp": "2026-03-23T05:17:17.181875+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "test test",
+        "was_interrupted": "",
+        "timestamp": "2026-03-23T06:28:40.435929+00:00"
+      },
+      {
+        "event": "corrections",
+        "items": [
+          {
+            "animation_id": "D3",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "It sounds like you're testing your voice! Can you tell me what the boy and his grandmother are doing in the kitchen?"
+          }
+        ],
+        "timestamp": "2026-03-23T06:28:40.436862+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The child hasn't mentioned the main characters present in the kitchen."
+          },
+          {
+            "animation_id": "S1",
+            "targets": [
+              "scene"
+            ],
+            "rationale": "The child could describe the cozy kitchen setting or the sunny afternoon light."
+          },
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The child hasn't described the characters' action of putting the fresh cookies into the red box."
+          },
+          {
+            "animation_id": "P1",
+            "targets": [
+              "dog"
+            ],
+            "rationale": "The child could describe the small brown dog watching from under the table."
+          },
+          {
+            "animation_id": "I2",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "The child could give the boy a special name to make the story more personal."
+          }
+        ],
+        "timestamp": "2026-03-23T06:28:40.437496+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "D3_alert",
+        "targets": [
+          "boy"
+        ],
+        "rationale": "It sounds like you're testing your voice! Can you tell me what the boy and his grandmother are doing in the kitchen?",
+        "pass_type": "correction",
+        "timestamp": "2026-03-23T06:28:40.439793+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "test test test test okay boy",
+        "was_interrupted": "test test",
+        "timestamp": "2026-03-23T06:29:05.541271+00:00"
+      },
+      {
+        "event": "corrections",
+        "items": [
+          {
+            "animation_id": "D4",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "The child used some filler words before mentioning the boy, which makes the sentence structure a bit broken."
+          }
+        ],
+        "timestamp": "2026-03-23T06:29:05.543364+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "grandmother"
+            ],
+            "rationale": "The child mentioned the boy but missed the grandmother who is also part of the baking activity."
+          },
+          {
+            "animation_id": "S1",
+            "targets": [
+              "scene"
+            ],
+            "rationale": "The scene is set in a warm, cozy kitchen, which provides a lovely backdrop for the story."
+          },
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The characters are actively placing fresh cookies into a red box, which is a key part of the scene's action."
+          },
+          {
+            "animation_id": "P1",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "The boy has curly hair, a detail that can help make the character more descriptive."
+          },
+          {
+            "animation_id": "I1",
+            "targets": [
+              "dog"
+            ],
+            "rationale": "There is a small brown dog watching from under the table that hasn't been mentioned yet."
+          }
+        ],
+        "timestamp": "2026-03-23T06:29:05.547776+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "D4_interjection",
+        "targets": [
+          "boy"
+        ],
+        "rationale": "The child used some filler words before mentioning the boy, which makes the sentence structure a bit broken.",
+        "pass_type": "correction",
+        "timestamp": "2026-03-23T06:29:05.555439+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "test test test test okay boy A boy and his grandmother.",
+        "was_interrupted": "test test test test okay boy",
+        "timestamp": "2026-03-23T06:29:27.935151+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The boy and his grandmother are busy in the kitchen, but the child hasn't mentioned what they are doing with the cookies."
+          },
+          {
+            "animation_id": "I1",
+            "targets": [
+              "dog"
+            ],
+            "rationale": "There is a small brown dog watching from under the table that hasn't been mentioned in the story yet."
+          },
+          {
+            "animation_id": "S1",
+            "targets": [
+              "scene"
+            ],
+            "rationale": "The scene takes place in a warm, cozy kitchen, but the setting hasn't been described yet."
+          },
+          {
+            "animation_id": "P1",
+            "targets": [
+              "box"
+            ],
+            "rationale": "The child mentioned the characters, but could add more detail by describing the big red box on the table."
+          },
+          {
+            "animation_id": "P2_great",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "The boy might be feeling very happy or proud to be baking with his grandmother, which would add more feeling to the story."
+          }
+        ],
+        "timestamp": "2026-03-23T06:29:27.936845+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "A2_flip",
+        "targets": [
+          "boy",
+          "grandmother"
+        ],
+        "rationale": "The boy and his grandmother are busy in the kitchen, but the child hasn't mentioned what they are doing with the cookies.",
+        "pass_type": "suggestion",
+        "timestamp": "2026-03-23T06:29:27.939134+00:00"
       }
     ]
   }
