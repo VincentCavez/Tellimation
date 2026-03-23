@@ -3520,6 +3520,321 @@
         "rationale": "The child mentioned the dog but missed the other main characters who are the focus of the baking activity.",
         "pass_type": "suggestion",
         "timestamp": "2026-03-23T07:28:10.584847+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "The boy is sad.",
+        "was_interrupted": false,
+        "timestamp": "2026-03-23T07:38:23.122943+00:00"
+      },
+      {
+        "event": "corrections",
+        "items": [
+          {
+            "animation_id": "P2c",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "The boy isn't sad; he's actually having a wonderful time baking cookies with his grandmother!"
+          }
+        ],
+        "timestamp": "2026-03-23T07:38:23.125345+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "grandmother"
+            ],
+            "rationale": "The child mentioned the boy but hasn't yet noticed the grandmother who is right there with him in the kitchen."
+          },
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "The child described the boy's feelings but hasn't mentioned that he is actually busy putting fresh cookies into a box."
+          },
+          {
+            "animation_id": "S1",
+            "targets": [
+              "scene"
+            ],
+            "rationale": "The child hasn't described the cozy kitchen or the afternoon sunlight coming through the window."
+          },
+          {
+            "animation_id": "P1",
+            "targets": [
+              "dog"
+            ],
+            "rationale": "The child hasn't mentioned the small brown dog that is watching everything from under the table."
+          },
+          {
+            "animation_id": "I2",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "The child could make the story feel more personal by giving the boy a special name."
+          }
+        ],
+        "timestamp": "2026-03-23T07:38:23.127569+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "P2c_emanation_joy",
+        "targets": [
+          "boy"
+        ],
+        "rationale": "The boy isn't sad; he's actually having a wonderful time baking cookies with his grandmother!",
+        "pass_type": "correction",
+        "timestamp": "2026-03-23T07:38:23.135907+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "The boy is ugly.",
+        "was_interrupted": false,
+        "timestamp": "2026-03-23T07:40:19.058049+00:00"
+      },
+      {
+        "event": "corrections",
+        "items": [
+          {
+            "animation_id": "P1",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "The boy in the kitchen doesn't look ugly; he actually has lovely curly hair!"
+          }
+        ],
+        "timestamp": "2026-03-23T07:40:19.060303+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "grandmother"
+            ],
+            "rationale": "The boy isn't alone in the kitchen; I wonder if you can see who is helping him with the baking?"
+          },
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "It looks like they are busy doing something together with that red box. What are they making?"
+          },
+          {
+            "animation_id": "I1",
+            "targets": [
+              "dog"
+            ],
+            "rationale": "There is a little furry friend hiding under the table! Can you tell me about the dog?"
+          },
+          {
+            "animation_id": "S1",
+            "targets": [
+              "scene"
+            ],
+            "rationale": "The kitchen looks very warm and cozy with the sun shining in. What do you notice about where they are?"
+          },
+          {
+            "animation_id": "P2c",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "The boy is helping his grandmother pack fresh cookies. How do you think that makes him feel?"
+          }
+        ],
+        "timestamp": "2026-03-23T07:40:19.063310+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "P1_color_pop",
+        "targets": [
+          "boy"
+        ],
+        "rationale": "The boy in the kitchen doesn't look ugly; he actually has lovely curly hair!",
+        "pass_type": "correction",
+        "timestamp": "2026-03-23T07:40:19.071475+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "He has curly hair.",
+        "was_interrupted": false,
+        "timestamp": "2026-03-23T07:40:35.348511+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "grandmother"
+            ],
+            "rationale": "The child mentioned the boy but hasn't yet introduced the grandmother who is also at the table."
+          },
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "The boy is busy doing something! The child could describe how he is helping put the cookies into the box."
+          },
+          {
+            "animation_id": "S1",
+            "targets": [
+              "scene"
+            ],
+            "rationale": "The scene takes place in a very cozy kitchen. Describing the setting would help ground the story."
+          },
+          {
+            "animation_id": "P1",
+            "targets": [
+              "box"
+            ],
+            "rationale": "There is a bright red box on the table that the child could describe to add more detail to the scene."
+          },
+          {
+            "animation_id": "P2c",
+            "targets": [
+              "dog"
+            ],
+            "rationale": "The little dog watching from under the table looks very curious or happy to see the treats!"
+          }
+        ],
+        "timestamp": "2026-03-23T07:40:35.351602+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "I1_spotlight",
+        "targets": [
+          "grandmother"
+        ],
+        "rationale": "The child mentioned the boy but hasn't yet introduced the grandmother who is also at the table.",
+        "pass_type": "suggestion",
+        "timestamp": "2026-03-23T07:40:35.357493+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "He has curly hair. His grandmother has grey hair.",
+        "was_interrupted": "He has curly hair.",
+        "timestamp": "2026-03-23T07:40:48.246577+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "dog"
+            ],
+            "rationale": "The child mentioned the boy and grandmother, but hasn't yet noticed the small brown dog watching from under the table."
+          },
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The child described how the characters look, but not the action of them putting the fresh cookies into the box together."
+          },
+          {
+            "animation_id": "S1",
+            "targets": [
+              "scene"
+            ],
+            "rationale": "The child focused on the people, but could enrich the story by describing the cozy kitchen setting or the afternoon light coming through the window."
+          },
+          {
+            "animation_id": "P1",
+            "targets": [
+              "box"
+            ],
+            "rationale": "While the child described the characters' hair, they haven't mentioned the properties of the big red box on the table."
+          },
+          {
+            "animation_id": "P2c",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "The child could describe how the boy feels while baking with his grandmother, such as being happy or excited about the cookies."
+          }
+        ],
+        "timestamp": "2026-03-23T07:40:48.249632+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "I1_spotlight",
+        "targets": [
+          "dog"
+        ],
+        "rationale": "The child mentioned the boy and grandmother, but hasn't yet noticed the small brown dog watching from under the table.",
+        "pass_type": "suggestion",
+        "timestamp": "2026-03-23T07:40:48.257117+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "He has curly hair. His grandmother has grey hair. There is a brown dog under the table who looks cute. He probably wants to eat some cookies.",
+        "was_interrupted": "He has curly hair. His grandmother has grey hair.",
+        "timestamp": "2026-03-23T07:41:08.973698+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "scene"
+            ],
+            "rationale": "The kitchen looks so warm and cozy with the sun shining through the window. Why not describe where the family is baking?"
+          },
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "It looks like the boy and his grandmother are busy with a special task at the table. What are they doing with those cookies?"
+          },
+          {
+            "animation_id": "P1",
+            "targets": [
+              "box"
+            ],
+            "rationale": "You noticed the cookies, but did you see the big red box they are using?"
+          },
+          {
+            "animation_id": "I2",
+            "targets": [
+              "grandmother"
+            ],
+            "rationale": "The grandmother is such a kind character. Does she have a special name you'd like to give her?"
+          },
+          {
+            "animation_id": "D1",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "Baking together is a lot of fun! I wonder what the boy and his grandmother might be saying to each other."
+          }
+        ],
+        "timestamp": "2026-03-23T07:41:08.976667+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "I1_spotlight",
+        "targets": [
+          "scene"
+        ],
+        "rationale": "The kitchen looks so warm and cozy with the sun shining through the window. Why not describe where the family is baking?",
+        "pass_type": "suggestion",
+        "timestamp": "2026-03-23T07:41:08.985371+00:00"
       }
     ]
   }

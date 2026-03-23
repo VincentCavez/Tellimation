@@ -217,17 +217,6 @@ async def execute_animation(
             study_log = getattr(session, 'study_log_entries', [])
             params = load_animation_params(animation_id, study_log)
 
-            # Inject particleType for emanation variants
-            _P2_PARTICLE_MAP = {
-                "P2a": "steam", "P2b": "frost", "P2c": "sparkle",
-                "P2d": "hearts", "P2e": "veins", "P2f": "drops",
-            }
-            p2_key = animation_id.split("_")[0]
-            logger.info("[ANIMATION] p2_key=%s, in_map=%s", p2_key, p2_key in _P2_PARTICLE_MAP)
-            if p2_key in _P2_PARTICLE_MAP:
-                params["particleType"] = _P2_PARTICLE_MAP[p2_key]
-                logger.info("[ANIMATION] Injected particleType=%s", params["particleType"])
-
             decision = {
                 "mode": "use_default",
                 "animation_id": animation_id,

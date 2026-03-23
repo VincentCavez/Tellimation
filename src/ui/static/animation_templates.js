@@ -1048,6 +1048,44 @@ AnimationTemplates.register('emanation', function(params) {
   };
 }, 3000);
 
+// ── P2a–P2f: Emanation variants ──
+// Each wraps the base emanation template with a fixed particleType and tint.
+AnimationTemplates.register('emanation_shame', function(params) {
+  params.particleType = 'steam';
+  if (!params.tint) params.tint = [80, -40, -80];
+  return AnimationTemplates.registry['emanation'].factory(params);
+}, 2500);
+
+AnimationTemplates.register('emanation_cold', function(params) {
+  params.particleType = 'frost';
+  if (!params.tint) params.tint = [-80, 0, 110];
+  return AnimationTemplates.registry['emanation'].factory(params);
+}, 2500);
+
+AnimationTemplates.register('emanation_joy', function(params) {
+  params.particleType = 'sparkle';
+  if (!params.tint) params.tint = [60, 60, 40];
+  return AnimationTemplates.registry['emanation'].factory(params);
+}, 2500);
+
+AnimationTemplates.register('emanation_love', function(params) {
+  params.particleType = 'hearts';
+  if (!params.tint) params.tint = [80, -25, 25];
+  return AnimationTemplates.registry['emanation'].factory(params);
+}, 2500);
+
+AnimationTemplates.register('emanation_anger', function(params) {
+  params.particleType = 'veins';
+  if (!params.tint) params.tint = [100, -35, -35];
+  return AnimationTemplates.registry['emanation'].factory(params);
+}, 2500);
+
+AnimationTemplates.register('emanation_fear', function(params) {
+  params.particleType = 'drops';
+  if (!params.tint) params.tint = [60, 60, 80];
+  return AnimationTemplates.registry['emanation'].factory(params);
+}, 2500);
+
 // ── T1: Flashback ──
 // Old film effect: entire scene goes B&W with projector flicker,
 // vertical scratch lines, and dust specks — like a silent-era film reel.
