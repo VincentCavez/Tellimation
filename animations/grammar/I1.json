@@ -7,7 +7,7 @@
   "misl_elements": [
     "CH"
   ],
-  "target_type": "entity",
+  "target_type": ["entity","duo","group","scene"],
   "parameters": [
     {
       "name": "dimStrength",
@@ -55,6 +55,6 @@
     }
   ],
   "code_template": "spotlight({target}, {dimStrength}, {glowStrength}, {haloColor}, {maxHaloSize})",
-  "correction_intent": "Child misidentified or confused an entity that IS present in the scene (e.g. said 'rabbit' when it's actually a 'dog', or said 'mom' when it's a 'grandmother'). The target should be the CORRECT entity in the scene that was misidentified.",
-  "suggestion_intent": "Child hasn't mentioned an entity present in the scene"
+  "correction_intent": "Child misidentified or confused an entity or a setting that IS present in the scene (e.g. said 'rabbit' when it's actually a 'dog', or said 'bedroom' when it's a 'kitchen'). The target should be the CORRECT entity in the scene that was misidentified, or 'scene'.",
+  "suggestion_intent": "Child hasn't mentioned an entity or a setting present in the scene"
 }

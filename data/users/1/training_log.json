@@ -86,6 +86,84 @@
         "story": "training",
         "scene": 1,
         "timestamp": "2026-03-22T16:30:49.931913+00:00"
+      },
+      {
+        "event": "scene_loaded",
+        "story": "training",
+        "scene": 1,
+        "timestamp": "2026-03-23T04:53:53.951017+00:00"
+      },
+      {
+        "event": "scene_loaded",
+        "story": "training",
+        "scene": 1,
+        "timestamp": "2026-03-23T04:56:58.947304+00:00"
+      },
+      {
+        "event": "scene_loaded",
+        "story": "training",
+        "scene": 1,
+        "timestamp": "2026-03-23T04:57:55.399111+00:00"
+      },
+      {
+        "event": "scene_loaded",
+        "story": "training",
+        "scene": 1,
+        "timestamp": "2026-03-23T05:10:13.765643+00:00"
+      },
+      {
+        "event": "scene_loaded",
+        "story": "training",
+        "scene": 1,
+        "timestamp": "2026-03-23T05:11:41.509399+00:00"
+      },
+      {
+        "event": "scene_loaded",
+        "story": "training",
+        "scene": 1,
+        "timestamp": "2026-03-23T05:14:10.337650+00:00"
+      },
+      {
+        "event": "scene_loaded",
+        "story": "training",
+        "scene": 1,
+        "timestamp": "2026-03-23T05:17:07.927720+00:00"
+      },
+      {
+        "event": "scene_loaded",
+        "story": "training",
+        "scene": 1,
+        "timestamp": "2026-03-23T06:22:30.221824+00:00"
+      },
+      {
+        "event": "scene_loaded",
+        "story": "training",
+        "scene": 1,
+        "timestamp": "2026-03-23T06:24:50.786596+00:00"
+      },
+      {
+        "event": "scene_loaded",
+        "story": "training",
+        "scene": 1,
+        "timestamp": "2026-03-23T06:25:33.048200+00:00"
+      },
+      {
+        "event": "scene_loaded",
+        "story": "training",
+        "scene": 1,
+        "timestamp": "2026-03-23T06:26:12.479349+00:00"
+      },
+      {
+        "event": "scene_loaded",
+        "story": "training",
+        "scene": 1,
+        "timestamp": "2026-03-23T06:27:09.625930+00:00"
+      },
+      {
+        "event": "scene_loaded",
+        "story": "training",
+        "scene": 1,
+        "timestamp": "2026-03-23T06:28:34.685038+00:00"
       }
     ]
   }

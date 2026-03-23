@@ -410,29 +410,224 @@ AnimationTemplates.register('stamp', function(params) {
 }, 3000);
 
 // ── P1: Color Pop ──
-// Rainbow canon: each pixel cycles through all rainbow colors, starting
-// from a hue offset based on its original color. Pixels of the same
-// original hue move in sync; different hues create a canon effect.
-// Non-target entities are desaturated.
+// Sequential color group reveal: quantize entity pixels into ≤7 dominant
+// color groups (6 hue sectors + 1 neutral), then cycle through groups
+// at 400ms each, looping until the animation ends.
+// Active group shows boosted saturation; inactive groups are desaturated.
 AnimationTemplates.register('color_pop', function(params) {
   var prefix = params.entityPrefix || '';
   var desatStr = params.desaturationStrength != null ? params.desaturationStrength : 0.8;
-  var cycleCount = params.cycleCount != null ? params.cycleCount : 2;
+  var satBoost = params.saturationBoost != null ? params.saturationBoost : 0.3;
+
+  var GROUP_MS = 400; // fixed: 400ms per group, not configurable
+  var DURATION_MS = 3000;
+
+  // Cached on first frame
+  var cachedGroupIndex = null;
+  var groupCount = 0;
 
   return function animate(buf, PW, PH, t) {
-    var env = _easeEnvelope(t, 0.12, 0.12);
+    var env = _easeEnvelope(t, 0.10, 0.10);
     if (env < 0.01) return;
 
+    // === INIT (first frame): 3D k-means on (hue, saturation, lightness) ===
+    if (cachedGroupIndex === null) {
+      cachedGroupIndex = new Int8Array(buf.length);
+      for (var k = 0; k < cachedGroupIndex.length; k++) cachedGroupIndex[k] = -1;
+
+      var MAX_K = 7;
+      // Weights: hue is dominant, sat and lum help separate same-hue variants
+      var W_HUE = 1.0, W_SAT = 0.5, W_LUM = 0.5;
+
+      // Step 1: collect HSL of eligible pixels
+      var pixels = []; // {i, h, s, l}
+      for (var i = 0; i < buf.length; i++) {
+        var p = buf[i];
+        if (!_isEntity(p.e, prefix)) continue;
+        var r = p._r, g = p._g, bl = p._b;
+        var mx = Math.max(r, g, bl), mn = Math.min(r, g, bl);
+        var satV = (mx === 0) ? 0 : (mx - mn) / mx;
+        if (mx < 40 || satV < 0.15) continue;
+        var hue = _rgbToHue(r, g, bl);
+        var lum = (mx + mn) / 510; // HSL lightness 0..1
+        var satL = 0;
+        if (mx !== mn) satL = (lum <= 0.5) ? (mx - mn) / (mx + mn) : (mx - mn) / (510 - mx - mn);
+        pixels.push({ i: i, h: hue, s: satL, l: lum });
+      }
+
+      if (pixels.length > 0) {
+        // Step 2: linearize hue circle
+        pixels.sort(function(a, b) { return a.h - b.h; });
+        var bestGap = 0, gapEnd = 0;
+        for (var j = 0; j < pixels.length; j++) {
+          var next = (j + 1) % pixels.length;
+          var gap = (j === pixels.length - 1)
+            ? (1 - pixels[j].h + pixels[0].h)
+            : (pixels[next].h - pixels[j].h);
+          if (gap > bestGap) { bestGap = gap; gapEnd = next; }
+        }
+        var hueOffset = pixels[gapEnd].h;
+        // Store linearized hue back
+        for (var j = 0; j < pixels.length; j++) {
+          pixels[j].lh = (pixels[j].h - hueOffset + 1) % 1;
+        }
+
+        // Step 3: subsample for k-means (max 800 points)
+        var SAMPLE = Math.min(pixels.length, 800);
+        var step = pixels.length / SAMPLE;
+        var samples = [];
+        for (var j = 0; j < SAMPLE; j++) {
+          var px = pixels[Math.floor(j * step)];
+          samples.push({ lh: px.lh, s: px.s, l: px.l });
+        }
+
+        // Weighted distance function
+        function hslDist2(a_lh, a_s, a_l, b_lh, b_s, b_l) {
+          var dh = (a_lh - b_lh) * W_HUE;
+          var ds = (a_s - b_s) * W_SAT;
+          var dl = (a_l - b_l) * W_LUM;
+          return dh * dh + ds * ds + dl * dl;
+        }
+
+        // Step 4: k-means with elbow method
+        var bestK = 1, bestCentroids = [{ lh: 0.5, s: 0.5, l: 0.5 }];
+        var prevVariance = Infinity;
+
+        for (var tryK = 2; tryK <= Math.min(MAX_K, pixels.length); tryK++) {
+          // Init centroids: pick evenly spaced samples
+          var centroids = [];
+          for (var c = 0; c < tryK; c++) {
+            var si = Math.floor((c + 0.5) * SAMPLE / tryK);
+            centroids.push({ lh: samples[si].lh, s: samples[si].s, l: samples[si].l });
+          }
+
+          // Run k-means (max 30 iterations)
+          for (var iter = 0; iter < 30; iter++) {
+            var sumsH = new Float32Array(tryK);
+            var sumsS = new Float32Array(tryK);
+            var sumsL = new Float32Array(tryK);
+            var counts = new Uint32Array(tryK);
+            for (var j = 0; j < SAMPLE; j++) {
+              var minD = Infinity, best = 0;
+              for (var c = 0; c < tryK; c++) {
+                var d = hslDist2(samples[j].lh, samples[j].s, samples[j].l,
+                                 centroids[c].lh, centroids[c].s, centroids[c].l);
+                if (d < minD) { minD = d; best = c; }
+              }
+              sumsH[best] += samples[j].lh;
+              sumsS[best] += samples[j].s;
+              sumsL[best] += samples[j].l;
+              counts[best]++;
+            }
+            var moved = false;
+            for (var c = 0; c < tryK; c++) {
+              if (counts[c] > 0) {
+                var nh = sumsH[c] / counts[c], ns = sumsS[c] / counts[c], nl = sumsL[c] / counts[c];
+                if (Math.abs(nh - centroids[c].lh) > 0.001 ||
+                    Math.abs(ns - centroids[c].s) > 0.001 ||
+                    Math.abs(nl - centroids[c].l) > 0.001) moved = true;
+                centroids[c] = { lh: nh, s: ns, l: nl };
+              }
+            }
+            if (!moved) break;
+          }
+
+          // Compute within-cluster variance
+          var variance = 0;
+          for (var j = 0; j < SAMPLE; j++) {
+            var minD = Infinity;
+            for (var c = 0; c < tryK; c++) {
+              var d = hslDist2(samples[j].lh, samples[j].s, samples[j].l,
+                               centroids[c].lh, centroids[c].s, centroids[c].l);
+              if (d < minD) minD = d;
+            }
+            variance += minD;
+          }
+
+          // Elbow: stop if adding a cluster reduces variance by less than 15%
+          if (prevVariance < Infinity && variance > prevVariance * 0.85) break;
+          bestK = tryK;
+          bestCentroids = centroids;
+          prevVariance = variance;
+        }
+
+        // Sort centroids by linearized hue
+        bestCentroids.sort(function(a, b) { return a.lh - b.lh; });
+
+        // Step 5: assign ALL pixels to nearest centroid
+        groupCount = bestK;
+        for (var j = 0; j < pixels.length; j++) {
+          var minD = Infinity, best = 0;
+          for (var c = 0; c < bestK; c++) {
+            var d = hslDist2(pixels[j].lh, pixels[j].s, pixels[j].l,
+                             bestCentroids[c].lh, bestCentroids[c].s, bestCentroids[c].l);
+            if (d < minD) { minD = d; best = c; }
+          }
+          cachedGroupIndex[pixels[j].i] = best;
+        }
+
+        // Remove empty groups
+        var gCounts = new Uint32Array(groupCount);
+        for (var i = 0; i < cachedGroupIndex.length; i++) {
+          if (cachedGroupIndex[i] >= 0) gCounts[cachedGroupIndex[i]]++;
+        }
+        var remap = new Int8Array(groupCount);
+        var newId = 0;
+        for (var g = 0; g < groupCount; g++) remap[g] = (gCounts[g] > 0) ? newId++ : -1;
+        groupCount = newId;
+        for (var i = 0; i < cachedGroupIndex.length; i++) {
+          if (cachedGroupIndex[i] >= 0) cachedGroupIndex[i] = remap[cachedGroupIndex[i]];
+        }
+      } else {
+        groupCount = 0;
+      }
+    }
+
+    // === PER-FRAME: which group is active? (400ms per group, looping) ===
+    // Hard cuts between groups, no fade between cycles.
+    var msNow = t * DURATION_MS;
+    var cycleDur = groupCount * GROUP_MS;
+    var cycleMs = msNow % cycleDur;
+    var activeGroup = Math.min(groupCount - 1, Math.floor(cycleMs / GROUP_MS));
+
+    // === PER-PIXEL ===
     for (var i = 0; i < buf.length; i++) {
       var p = buf[i];
-      if (_isEntity(p.e, prefix)) {
-        var origHue = _rgbToHue(p._r, p._g, p._b);
-        var hue = ((t * cycleCount + origHue) % 1 + 1) % 1;
-        var rgb = _hslToRgb(hue, 0.7, 0.5);
-        p.r = Math.round(p._r * (1 - env) + rgb[0] * env);
-        p.g = Math.round(p._g * (1 - env) + rgb[1] * env);
-        p.b = Math.round(p._b * (1 - env) + rgb[2] * env);
+      var gid = cachedGroupIndex[i];
+
+      if (gid >= 0) {
+        var L = Math.round(p._r * 0.299 + p._g * 0.587 + p._b * 0.114);
+        var activity = (gid === activeGroup) ? 1 : 0;
+
+        // Desaturate inactive pixels
+        var desat = env * (1 - activity);
+
+        // Boost saturation of active group via HSL manipulation
+        if (activity > 0.01) {
+          var or_ = p._r, og = p._g, ob = p._b;
+          var mx = Math.max(or_, og, ob), mn = Math.min(or_, og, ob);
+          var lum = (mx + mn) / 510; // 0..1
+          var s = 0;
+          if (mx !== mn) s = (lum <= 0.5) ? (mx - mn) / (mx + mn) : (mx - mn) / (510 - mx - mn);
+          var h = _rgbToHue(or_, og, ob);
+          var sNew = Math.min(1, s + satBoost * activity * env);
+          var boosted = _hslToRgb(h, sNew, lum);
+          p.r = Math.min(255, Math.round(boosted[0] * (1 - desat) + L * desat));
+          p.g = Math.min(255, Math.round(boosted[1] * (1 - desat) + L * desat));
+          p.b = Math.min(255, Math.round(boosted[2] * (1 - desat) + L * desat));
+        } else {
+          p.r = Math.round(p._r * (1 - desat) + L * desat);
+          p.g = Math.round(p._g * (1 - desat) + L * desat);
+          p.b = Math.round(p._b * (1 - desat) + L * desat);
+        }
+      } else if (_isEntity(p.e, prefix)) {
+        // Target entity pixel not in any group (outlines): desaturate
+        var L = Math.round(p._r * 0.299 + p._g * 0.587 + p._b * 0.114);
+        p.r = Math.round(p._r * (1 - env) + L * env);
+        p.g = Math.round(p._g * (1 - env) + L * env);
+        p.b = Math.round(p._b * (1 - env) + L * env);
       } else if (p.e && p.e !== '' && !p.e.startsWith('bg.')) {
+        // Non-target entity: desaturate
         var L = Math.round(p._r * 0.299 + p._g * 0.587 + p._b * 0.114);
         var mix = desatStr * env;
         p.r = Math.round(p._r * (1 - mix) + L * mix);

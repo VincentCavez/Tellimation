@@ -21,7 +21,7 @@ from google import genai
 from google.genai import types
 
 from config.misl import ANIMATION_ID_TO_TEMPLATE
-from src.interaction.tellimation import generate_invocation_array, generate_tellimation
+from src.interaction.tellimation import generate_invocation_array, _build_fallback
 from src.models.assessment import Discrepancy
 from src.models.invocation import AnimationInvocation, InvocationArray
 from src.models.scene import SceneManifest
@@ -185,6 +185,7 @@ async def execute_animation(
     target_id: str,
     misl_element: str = "character",
     problematic_segment: Optional[str] = None,
+    animation_id: Optional[str] = None,
 ) -> Optional[Dict[str, Any]]:
     """Generate and send a tellimation animation for a target entity.
 
@@ -197,26 +198,33 @@ async def execute_animation(
         return None
 
     try:
-        decision = await generate_tellimation(
-            api_key=session.api_key,
-            sprite_code=(
-                session.current_scene.get("sprite_code", {})
-                if session.current_scene else {}
-            ),
-            manifest=session.current_manifest,
-            student_profile=session.student_profile,
-            target_id=target_id,
-            misl_element=misl_element,
-            problematic_segment=problematic_segment,
-        )
+        if animation_id:
+            # Use the specific animation requested
+            template = ANIMATION_ID_TO_TEMPLATE.get(animation_id, "spotlight")
+            from src.interaction.tellimation import _DEFAULT_DURATIONS
+            duration_ms = _DEFAULT_DURATIONS.get(template, 1500)
+            decision = {
+                "mode": "use_default",
+                "animation_id": animation_id,
+                "template": template,
+                "params": {},
+                "duration_ms": duration_ms,
+                "steps": [],
+                "code": "",
+                "text_overlays": [],
+            }
+        else:
+            decision = _build_fallback(target_id, misl_element)
 
         # Inject entityPrefix into params for all template-based modes
+        # "scene" target means no specific entity — use empty prefix
+        entity_prefix = "" if target_id == "scene" else target_id
         if decision["mode"] in ("use_default", "adjust_params"):
-            decision["params"]["entityPrefix"] = target_id
+            decision["params"]["entityPrefix"] = entity_prefix
 
         if decision["mode"] == "sequence":
             for step in decision.get("steps", []):
-                step["params"]["entityPrefix"] = target_id
+                step["params"]["entityPrefix"] = entity_prefix
 
         # Send animation to client
         await _send_animation_message(ws, decision, target_id, misl_element)
@@ -359,15 +367,16 @@ async def execute_invocation_array(
                 break
 
         for target_id in targets:
-            all_animations.append((target_id, misl_element))
+            all_animations.append((target_id, misl_element, item.animation_id))
 
     # Fire ALL animations simultaneously — no sequencing
-    for target_id, misl_element in all_animations:
+    for target_id, misl_element, anim_id in all_animations:
         decision = await execute_animation(
             session=session,
             ws=ws,
             target_id=target_id,
             misl_element=misl_element,
+            animation_id=anim_id,
         )
         if first_decision is None:
             first_decision = decision

@@ -8,7 +8,7 @@
     "G",
     "T"
   ],
-  "target_type": "entity",
+  "target_type": ["entity","duo","group"],
   "parameters": [
     {
       "name": "word",
@@ -29,6 +29,6 @@
     }
   ],
   "code_template": "interjection({target}, {word})",
-  "correction_intent": "Child made a SEVERE grammatical error (e.g. wrong verb conjugation like 'he go' instead of 'he goes', wrong pronoun like 'him is' instead of 'he is', severely broken sentence structure). Do NOT flag missing articles, informal speech, sentence fragments, or minor stylistic issues — these are normal for children aged 5-8.",
+  "correction_intent": "Child made a SEVERE grammatical error: wrong verb conjugation ('he go' instead of 'he goes'), wrong pronoun ('him is' instead of 'he is'), wrong tense for a present-tense scene ('will be cooking' instead of 'is cooking'), or severely broken sentence structure. Do NOT flag missing articles, informal speech, sentence fragments, or minor stylistic issues — these are normal for children aged 5-8. NOTE: if the child uses the wrong tense and the scene is in the present, use D4, NOT T1/T2.",
   "suggestion_intent": null
 }

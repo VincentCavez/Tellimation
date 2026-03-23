@@ -55,7 +55,7 @@ from google import genai
 from google.genai import types
 
 from src.models.assessment import Discrepancy
-from src.interaction.tellimation import _select_animation_for_discrepancy, select_discrepancy, load_animation_params, generate_tellimation
+from src.interaction.tellimation import _select_animation_for_discrepancy, select_discrepancy, load_animation_params
 from config.misl import ANIMATION_ID_TO_TEMPLATE
 from src.ui.animation_handler import _send_animation_message, execute_animation, execute_invocation_array, send_voice
 

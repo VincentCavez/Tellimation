@@ -7,7 +7,7 @@
   "misl_elements": [
     "S"
   ],
-  "target_type": "entity",
+  "target_type": ["entity","duo","group"],
   "parameters": [
     {
       "name": "liftPixels",
