@@ -200,14 +200,39 @@ async def execute_animation(
     try:
         if animation_id:
             # Use the specific animation requested
-            template = ANIMATION_ID_TO_TEMPLATE.get(animation_id, "spotlight")
+            # Try full ID first (e.g. "A2_flip"), then short prefix (e.g. "A2")
+            template = ANIMATION_ID_TO_TEMPLATE.get(animation_id)
+            if not template:
+                short_id = animation_id.split("_")[0]  # "A2_flip" → "A2"
+                for key, tmpl in ANIMATION_ID_TO_TEMPLATE.items():
+                    if key.startswith(short_id + "_"):
+                        template = tmpl
+                        break
+            if not template:
+                template = "spotlight"
             from src.interaction.tellimation import _DEFAULT_DURATIONS
             duration_ms = _DEFAULT_DURATIONS.get(template, 1500)
+            # Load params from grammar JSON (includes tint, tintSaturation, etc.)
+            from src.interaction.tellimation import load_animation_params
+            study_log = getattr(session, 'study_log_entries', [])
+            params = load_animation_params(animation_id, study_log)
+
+            # Inject particleType for emanation variants
+            _P2_PARTICLE_MAP = {
+                "P2a": "steam", "P2b": "frost", "P2c": "sparkle",
+                "P2d": "hearts", "P2e": "veins", "P2f": "drops",
+            }
+            p2_key = animation_id.split("_")[0]
+            logger.info("[ANIMATION] p2_key=%s, in_map=%s", p2_key, p2_key in _P2_PARTICLE_MAP)
+            if p2_key in _P2_PARTICLE_MAP:
+                params["particleType"] = _P2_PARTICLE_MAP[p2_key]
+                logger.info("[ANIMATION] Injected particleType=%s", params["particleType"])
+
             decision = {
                 "mode": "use_default",
                 "animation_id": animation_id,
                 "template": template,
-                "params": {},
+                "params": params,
                 "duration_ms": duration_ms,
                 "steps": [],
                 "code": "",
@@ -366,8 +391,9 @@ async def execute_invocation_array(
                     misl_element = disc.misl_elements[0]
                 break
 
-        for target_id in targets:
-            all_animations.append((target_id, misl_element, item.animation_id))
+        # Join multiple targets with | for multi-entity animations
+        combined_target = "|".join(targets)
+        all_animations.append((combined_target, misl_element, item.animation_id))
 
     # Fire ALL animations simultaneously — no sequencing
     for target_id, misl_element, anim_id in all_animations:

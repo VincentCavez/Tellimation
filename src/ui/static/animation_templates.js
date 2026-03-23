@@ -783,42 +783,7 @@ function _drawEmanationSprite(buf, PW, PH, type, cx, cy, size, alpha) {
         if (px >= 0 && px < PW && py >= 0 && py < PH) _blend(py * PW + px, 255, 255, 200, diagA);
       }
     }
-  } else if (type === 'dust') {
-    // Small falling particles in varied brown tones
-    var numDots = Math.round(5 + hdSize * 2);
-    var spread = Math.round(3 * hdSize);
-    var _ds = Math.round(cx * 31 + cy * 17);
-    for (var di = 0; di < numDots; di++) {
-      _ds = (_ds * 16807 + 13) % 2147483647;
-      var ddx = (_ds % (spread * 2 + 1)) - spread;
-      _ds = (_ds * 16807 + 13) % 2147483647;
-      var ddy = (_ds % (spread * 2 + 1)) - spread;
-      _ds = (_ds * 16807 + 13) % 2147483647;
-      var dotR = 1 + (_ds % 2); // 1-2px radius
-      // Varied brown tones
-      _ds = (_ds * 16807 + 13) % 2147483647;
-      var brownIdx = _ds % 6;
-      var browns = [
-        [160, 120, 70],  // sandy
-        [130, 90, 50],   // medium brown
-        [100, 70, 40],   // dark brown
-        [180, 140, 90],  // light tan
-        [110, 80, 45],   // earth
-        [150, 105, 60],  // warm brown
-      ];
-      var bc = browns[brownIdx];
-      px = Math.round(cx + ddx); py = Math.round(cy + ddy);
-      for (var ry = -dotR; ry <= dotR; ry++) {
-        for (var rx = -dotR; rx <= dotR; rx++) {
-          if (rx * rx + ry * ry > dotR * dotR) continue;
-          var dpx = px + rx, dpy = py + ry;
-          if (dpx >= 0 && dpx < PW && dpy >= 0 && dpy < PH) {
-            _blend(dpy * PW + dpx, bc[0], bc[1], bc[2], alpha * 0.8);
-          }
-        }
-      }
-    }
-  } else if (type === 'heart') {
+  } else if (type === 'hearts') {
     // Single heart — used standalone (not via emanation)
     var heartMap = [
       [0,1,1,0,1,1,0],
@@ -880,8 +845,8 @@ function _drawEmanationSprite(buf, PW, PH, type, cx, cy, size, alpha) {
         }
       }
     }
-  } else if (type === 'anger') {
-    var angerMap = [
+  } else if (type === 'veins') {
+    var veinsMap = [
       [0,0,0,1,0,1,0,0,0],
       [0,0,0,1,0,1,0,0,0],
       [0,0,0,1,0,1,0,0,0],
@@ -896,7 +861,7 @@ function _drawEmanationSprite(buf, PW, PH, type, cx, cy, size, alpha) {
     var aW = 9, aH = 9;
     for (var ay = 0; ay < aH; ay++) {
       for (var ax = 0; ax < aW; ax++) {
-        if (!angerMap[ay][ax]) continue;
+        if (!veinsMap[ay][ax]) continue;
         for (var sy = 0; sy < aScale; sy++) {
           for (var sx = 0; sx < aScale; sx++) {
             px = Math.round(cx - 4 * aScale + ax * aScale + sx);
@@ -909,7 +874,7 @@ function _drawEmanationSprite(buf, PW, PH, type, cx, cy, size, alpha) {
         }
       }
     }
-  } else if (type === 'fear') {
+  } else if (type === 'drops') {
     var dropMap = [
       [0,0,1,0,0],
       [0,1,1,1,0],
@@ -946,32 +911,35 @@ function _drawEmanationSprite(buf, PW, PH, type, cx, cy, size, alpha) {
 AnimationTemplates.register('emanation', function(params) {
   var prefix = params.entityPrefix || '';
   var pType = params.particleType || 'steam';
-  var defaultCount = (pType === 'dust') ? 30 : 18;
+  var defaultCount = 18;
   var totalSprites = _clamp(params.particleCount || defaultCount, 8, 40);
 
-  // Stronger tints per type — applied to entity base color during animation
-  var tints = {
+  // Tint from params (set in grammar JSON), fallback to hardcoded defaults
+  var paramTint = params.tint;
+  var tintSat = params.tintSaturation != null ? params.tintSaturation : 0.5;
+  var _defaultTints = {
     steam:   { r: 80, g: -40, b: -80 },
     frost:   { r: -80, g: 0, b: 110 },
     sparkle: { r: 60, g: 60, b: 40 },
-    dust:    { r: -40, g: -40, b: -60 },
-    heart:   { r: 80, g: -25, b: 25 },
     hearts:  { r: 80, g: -25, b: 25 },
-    anger:   { r: 100, g: -35, b: -35 },
-    fear:    { r: 60, g: 60, b: 80 },
+    veins:   { r: 100, g: -35, b: -35 },
+    drops:   { r: 60, g: 60, b: 80 },
   };
-  var tint = tints[pType] || tints.steam;
+  var tint;
+  if (paramTint && Array.isArray(paramTint) && paramTint.length === 3) {
+    tint = { r: paramTint[0], g: paramTint[1], b: paramTint[2] };
+  } else {
+    tint = _defaultTints[pType] || _defaultTints.steam;
+  }
 
   // Movement configs per type
   var moveConfigs = {
     steam:   { vy: -18, vx: 0, vxJitter: 6, vyJitter: 3, gravity: 0, sway: 1.5 },
     frost:   { vy: 8, vx: 0, vxJitter: 5, vyJitter: 2, gravity: 2, sway: 1.5 },
     sparkle: { vy: 0, vx: 0, vxJitter: 2, vyJitter: 2, gravity: 0, sway: 0 },
-    dust:    { vy: 12, vx: 0, vxJitter: 2, vyJitter: 3, gravity: 4, sway: 0.3 },
-    heart:   { vy: -12, vx: 0, vxJitter: 5, vyJitter: 2, gravity: 0, sway: 2.0 },
     hearts:  { vy: -12, vx: 0, vxJitter: 5, vyJitter: 2, gravity: 0, sway: 2.0 },
-    anger:   { vy: 0, vx: 0, vxJitter: 1, vyJitter: 1, gravity: 0, sway: 0 },
-    fear:    { vy: 15, vx: 0, vxJitter: 3, vyJitter: 3, gravity: 8, sway: 0.5 },
+    veins:   { vy: 0, vx: 0, vxJitter: 1, vyJitter: 1, gravity: 0, sway: 0 },
+    drops:   { vy: 15, vx: 0, vxJitter: 3, vyJitter: 3, gravity: 8, sway: 0.5 },
   };
   var mc = moveConfigs[pType] || moveConfigs.steam;
 
@@ -990,9 +958,7 @@ AnimationTemplates.register('emanation', function(params) {
       var sizeVar = 0.7 + _rand() * 0.6;  // 0.7 to 1.3
       // sideType: 0=top, 1=right, 2=bottom, 3=left, 4=over (on top of entity)
       var spSideType;
-      if (pType === 'dust') {
-        spSideType = 0; // dust: always spawn from top
-      } else {
+      {
         // Mix of edge (0-3) and over-entity (4) spawns
         var st = _rand();
         spSideType = st < 0.4 ? 4 : Math.floor(_rand() * 4); // 40% over entity
@@ -1017,12 +983,13 @@ AnimationTemplates.register('emanation', function(params) {
   return function animate(buf, PW, PH, t) {
     var env = _easeEnvelope(t, 0.15, 0.15);
 
-    // Tint entity
+    // Tint entity (scaled by tintSaturation)
+    var ts = tintSat * env;
     for (var i = 0; i < buf.length; i++) {
       if (_isEntity(buf[i].e, prefix)) {
-        buf[i].r = _clamp(buf[i]._r + Math.round(tint.r * env), 0, 255);
-        buf[i].g = _clamp(buf[i]._g + Math.round(tint.g * env), 0, 255);
-        buf[i].b = _clamp(buf[i]._b + Math.round(tint.b * env), 0, 255);
+        buf[i].r = _clamp(buf[i]._r + Math.round(tint.r * ts), 0, 255);
+        buf[i].g = _clamp(buf[i]._g + Math.round(tint.g * ts), 0, 255);
+        buf[i].b = _clamp(buf[i]._b + Math.round(tint.b * ts), 0, 255);
       }
     }
 

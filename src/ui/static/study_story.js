@@ -83,6 +83,13 @@
 
       case 'study_log':
         console.log('[' + msg.tag + '] ' + msg.text);
+        if (msg.tag === 'MISTAKES') window._gotMistakes = true;
+        if (msg.tag === 'OPTIONS') window._gotOptions = true;
+        if (window._gotMistakes && window._gotOptions) {
+          NarrationClient.assessmentDone();
+          window._gotMistakes = false;
+          window._gotOptions = false;
+        }
         break;
 
       case 'error':

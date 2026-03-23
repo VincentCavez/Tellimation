@@ -12,6 +12,7 @@ var NarrationClient = (function() {
   var mediaRecorder = null;
   var audioChunks = [];
   var isRecording = false;
+  var awaitingAssessment = false;
   var stream = null;
 
   // Voice playback state
@@ -99,8 +100,8 @@ var NarrationClient = (function() {
       window.animRunner.stopLoop();
     }
 
-    // Notify server that child interrupted (new utterance cancels pending animation)
-    if (ws && ws.readyState === WebSocket.OPEN) {
+    // Notify server only if assessment is still pending (true interruption)
+    if (awaitingAssessment && ws && ws.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify({ type: 'interrupt' }));
     }
 
@@ -145,6 +146,8 @@ var NarrationClient = (function() {
 
   function sendAudio(blob) {
     if (!ws || ws.readyState !== WebSocket.OPEN) return;
+
+    awaitingAssessment = true;
 
     // Read as ArrayBuffer and send as binary
     var reader = new FileReader();
@@ -341,6 +344,7 @@ var NarrationClient = (function() {
     handleVoiceHeader: handleVoiceHeader,
     handleVoiceBinary: handleVoiceBinary,
     isRecording: function() { return isRecording; },
+    assessmentDone: function() { awaitingAssessment = false; },
   };
 })();
 
