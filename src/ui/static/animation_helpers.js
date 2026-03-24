@@ -9,10 +9,10 @@
 // Section 1: Shared Helpers
 // ═══════════════════════════════════════════════════════════════════
 
-function _collectEntityPixels(buf, PW, prefix) {
+function _collectEntityPixels(buf, PW, prefix, sceneMode) {
   var pixels = [];
   for (var i = 0; i < buf.length; i++) {
-    if (_isEntity(buf[i].e, prefix)) {
+    if (_isTargetPixel(buf[i], prefix, sceneMode)) {
       pixels.push({
         i: i,
         x: i % PW,
@@ -47,10 +47,10 @@ function _redrawEntityPixels(buf, PW, PH, pixels, dx, dy) {
   }
 }
 
-function _computeEntityBounds(buf, PW, prefix) {
+function _computeEntityBounds(buf, PW, prefix, sceneMode) {
   var x1 = Infinity, y1 = Infinity, x2 = -1, y2 = -1;
   for (var i = 0; i < buf.length; i++) {
-    if (_isEntity(buf[i].e, prefix)) {
+    if (_isTargetPixel(buf[i], prefix, sceneMode)) {
       var x = i % PW, y = Math.floor(i / PW);
       if (x < x1) x1 = x;
       if (x > x2) x2 = x;
@@ -658,6 +658,21 @@ function _isEntity(entityId, prefix) {
     return false;
   }
   return entityId === prefix || entityId.startsWith(prefix + '.');
+}
+
+// Scene-mode helpers: when prefix is empty, the target is the background
+function _isBgPixel(p) {
+  return !p.e || p.e === '' || p.e === 'bg' || p.e.startsWith('bg.');
+}
+
+function _isTargetPixel(p, prefix, sceneMode) {
+  if (sceneMode) return _isBgPixel(p);
+  return _isEntity(p.e, prefix);
+}
+
+function _isNonTargetPixel(p, prefix, sceneMode) {
+  if (sceneMode) return p.e && p.e !== '' && !p.e.startsWith('bg.');
+  return p.e && p.e !== '' && !_isEntity(p.e, prefix);
 }
 
 function _drawStarBurst(buf, PW, PH, cx, cy, alpha, cardLen, diagLen) {
