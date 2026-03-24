@@ -21,6 +21,6 @@
     }
   ],
   "code_template": "reveal({target}, {revealAlpha})",
-  "correction_intent": "Child described an incorrect hidden element or setting",
-  "suggestion_intent": "Child hasn't described the setting"
+  "correction_intent": "Child described an incorrect hidden element",
+  "suggestion_intent": "Child hasn't described a hidden element"
 }

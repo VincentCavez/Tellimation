@@ -38,7 +38,14 @@ from src.interaction.decision_logic import (
     get_misl_dimensions_suggested,
     process_assessment,
 )
-from src.interaction.discrepancy_assessment import assess_utterance
+from src.interaction.discrepancy_assessment import (
+    assess_utterance,
+    assess_corrections,
+    assess_enrichment,
+    assess_resolution,
+    detect_misl_elements,
+)
+from src.interaction.misl_selector import select_misl_candidates
 from src.models.assessment import SceneLog
 from src.models.scene import SceneManifest
 from src.models.session_state import SessionState
@@ -1335,67 +1342,51 @@ async def _handle_study_audio(
     audio_bytes: bytes,
     ws: _WebSocketAdapter,
 ) -> None:
-    """Study mode audio handler.
+    """Study mode audio handler — restructured pipeline.
 
-    Transcription + assessment are done together inside assess_utterance().
-    Animated condition: also runs animation pipeline.
+    Pipeline:
+      1. Transcribe
+      2. Resolution check + MISL detection (parallel)
+      3. Update logs (resolution result + mention_counts)
+      4. Path A: corrections + Path B: deterministic selector → enrichment (parallel)
+      5. Animation handler: errors > suggestions, fixed priority
     """
     if not session.current_manifest or not session.current_scene_log:
         return
 
     try:
+        scene_data = session.current_scene.get("manifest") if session.current_scene else None
+        misl_targets = scene_data.get("misl_targets") if scene_data else None
         story_so_far = get_accepted_utterances(session.current_scene_log)
         misl_already = get_misl_dimensions_suggested(session.current_scene_log)
 
-        # Training: ignore student profile
         is_training = getattr(session, "study_story_key", "").lower().startswith("training")
         misl_profile = MISLDifficultyProfile() if is_training else session.student_profile.misl_difficulty_profile
 
-        assessment = await assess_utterance(
+        # ── Step 1: Transcribe ──
+        transcription = await transcribe_audio(
             api_key=session.api_key,
-            manifest=session.current_manifest,
-            utterance_text="",
-            story_so_far=story_so_far,
-            misl_already_suggested=misl_already,
-            misl_difficulty_profile=misl_profile,
-            character_names=session.character_names,
             audio_bytes=audio_bytes,
             narration_history=session.narration_history,
             narrative_text="",
-            scene_data=session.current_scene.get("manifest") if session.current_scene else None,
         )
-
-        transcription = assessment.transcription
         if not transcription:
             return
 
-        # If previous utterance was interrupted, concatenate and re-assess
+        logger.info("\033[92m[TRANSCRIPTION]\033[0m %s", transcription)
+
+        # If previous utterance was interrupted, concatenate
         was_interrupted = session.study_interrupted and session.study_pending_transcription
         if was_interrupted:
             transcription = session.study_pending_transcription + " " + transcription
             session.study_interrupted = False
 
-            # Re-assess the concatenated text
-            assessment = await assess_utterance(
-                api_key=session.api_key,
-                manifest=session.current_manifest,
-                utterance_text=transcription,
-                story_so_far=story_so_far,
-                misl_already_suggested=misl_already,
-                misl_difficulty_profile=misl_profile,
-                character_names=session.character_names,
-                narration_history=session.narration_history,
-                narrative_text="",
-                scene_data=session.current_scene.get("manifest") if session.current_scene else None,
-            )
-
-        # Store current transcription for potential concatenation
         session.study_pending_transcription = transcription
 
         # Send transcription to client
         await ws.send_json({"type": "study_log", "tag": "TRANSCRIPTION", "text": transcription})
 
-        # --- Persist to study log ---
+        # --- Study log identifiers ---
         _pid = getattr(session, "session_id", "").replace("study_", "")
         _story_key = getattr(session, "study_story_key", "")
         _scene_num = session.current_scene.get("scene_number", 1) if session.current_scene else 1
@@ -1405,126 +1396,247 @@ async def _handle_study_audio(
         append_study_log_entry(_pid, _is_training, _story_key, _scene_num, {
             "event": "transcription",
             "text": transcription,
-            "was_interrupted": was_interrupted if 'was_interrupted' in dir() else False,
+            "was_interrupted": was_interrupted,
         })
 
-        # Log resolution
-        if assessment.resolution:
+        # ── Step 2: Resolution check + MISL detection (parallel) ──
+        previous_disc = getattr(session, "_study_previous_discrepancy", None)
+        resolution_result, detected_misl = await asyncio.gather(
+            assess_resolution(
+                api_key=session.api_key,
+                utterance_text=transcription,
+                previous_discrepancy=previous_disc,
+                scene_data=scene_data,
+            ),
+            detect_misl_elements(
+                api_key=session.api_key,
+                utterance_text=transcription,
+                scene_data=scene_data,
+            ),
+        )
+
+        # ── Step 3: Update logs ──
+        # 3a. Log resolution
+        if resolution_result:
             append_study_log_entry(_pid, _is_training, _story_key, _scene_num, {
                 "event": "resolution",
-                "resolved": assessment.resolution.get("resolved", False),
-                "animation_id": assessment.resolution.get("animation_id"),
-                "pass_type": assessment.resolution.get("pass_type"),
+                "resolved": resolution_result.get("resolved", False),
+                "animation_id": resolution_result.get("animation_id"),
+                "pass_type": resolution_result.get("pass_type"),
+                "misl_element": getattr(previous_disc, "misl_elements", [None])[0] if previous_disc and getattr(previous_disc, "misl_elements", None) else None,
             })
 
+        # 3b. Update mention_counts from detected MISL elements
+        for code in detected_misl:
+            session.current_scene_log.mention_counts[code] = (
+                session.current_scene_log.mention_counts.get(code, 0) + 1
+            )
+
+        # Load study log entries for deterministic selection
+        _log_data = load_study_log(_pid, _is_training)
+        _all_entries = []
+        for entries in _log_data.get("scenes", {}).values():
+            _all_entries.extend(entries)
+
+        # ── Step 4: Parallel paths ──
+        # Path A: Corrections (Gemini)
+        async def _run_corrections():
+            try:
+                return await assess_corrections(
+                    api_key=session.api_key,
+                    manifest=session.current_manifest,
+                    utterance_text=transcription,
+                    story_so_far=story_so_far,
+                    character_names=session.character_names,
+                    scene_data=scene_data,
+                )
+            except Exception as exc:
+                logger.error("[study] Correction pass failed: %s", exc)
+                return [], []
+
+        # Path B: Deterministic selector → Enrichment (Gemini)
+        async def _run_enrichment_path():
+            if not misl_targets:
+                return []
+            macro_sel, micro_cands, sel_trace = select_misl_candidates(
+                misl_targets=misl_targets,
+                mention_counts=session.current_scene_log.mention_counts,
+                study_log_entries=_all_entries,
+            )
+            # Store trace for logging
+            session._study_selection_trace = sel_trace
+
+            if macro_sel is None and micro_cands is None:
+                return []
+
+            try:
+                return await assess_enrichment(
+                    api_key=session.api_key,
+                    manifest=session.current_manifest,
+                    utterance_text=transcription,
+                    story_so_far=story_so_far,
+                    misl_already_suggested=misl_already,
+                    misl_difficulty_profile=misl_profile,
+                    character_names=session.character_names,
+                    scene_data=scene_data,
+                    macro_selected=macro_sel,
+                    micro_candidates=micro_cands,
+                    misl_targets=misl_targets,
+                )
+            except Exception as exc:
+                logger.error("[study] Enrichment pass failed: %s", exc)
+                return []
+
+        (corrections_result, suggestions) = await asyncio.gather(
+            _run_corrections(), _run_enrichment_path()
+        )
+        corrections, name_assignments = corrections_result
+
+        # Register name assignments
+        if name_assignments:
+            for na in name_assignments:
+                session.character_names[na["entity_id"]] = na["name"]
+            await ws.send_json({"type": "study_log", "tag": "NAMES", "text": str(name_assignments)})
+
+        session.narration_history.append(transcription)
+        session.conversation_history.append({"role": "child", "text": transcription})
+        session.student_profile.total_utterances += 1
+
         # Log corrections
-        if [d for d in assessment.discrepancies if d.pass_type == "correction"]:
+        if corrections:
             append_study_log_entry(_pid, _is_training, _story_key, _scene_num, {
                 "event": "corrections",
                 "items": [
                     {"animation_id": d.animation_id, "targets": d.target_entities, "rationale": d.description}
-                    for d in assessment.discrepancies if d.pass_type == "correction"
+                    for d in corrections
                 ],
             })
 
         # Log suggestions
-        if [d for d in assessment.discrepancies if d.pass_type == "suggestion"]:
+        if suggestions:
             append_study_log_entry(_pid, _is_training, _story_key, _scene_num, {
                 "event": "suggestions",
                 "items": [
                     {"animation_id": d.animation_id, "targets": d.target_entities, "rationale": d.description}
-                    for d in assessment.discrepancies if d.pass_type == "suggestion"
+                    for d in suggestions
                 ],
             })
 
-        session.narration_history.append(transcription)
-        session.conversation_history.append({
-            "role": "child",
-            "text": transcription,
-        })
-        session.student_profile.total_utterances += 1
-
-        # Log name assignments if detected
-        if assessment.name_assignments:
-            for na in assessment.name_assignments:
-                session.character_names[na["entity_id"]] = na["name"]
-            await ws.send_json({"type": "study_log", "tag": "NAMES", "text": str(assessment.name_assignments)})
-
-        # Split discrepancies into corrections vs suggestions
-        corrections = [d for d in assessment.discrepancies if d.pass_type == "correction"]
-        suggestions = [d for d in assessment.discrepancies if d.pass_type == "suggestion"]
-
-        # Send mistakes
+        # Send mistakes/options to client
         if corrections:
             mistakes = [{"desc": d.description, "targets": d.target_entities} for d in corrections]
             await ws.send_json({"type": "study_log", "tag": "MISTAKES", "text": str(mistakes)})
-
-        # Send available options (suggestions from enrichment)
         if suggestions:
             options = [{"desc": d.description, "targets": d.target_entities, "misl": d.misl_elements} for d in suggestions]
             await ws.send_json({"type": "study_log", "tag": "OPTIONS", "text": str(options)})
 
-        # For animated condition: run animation pipeline
+        # ── Step 5: Animation handler ──
+        # Deterministic: errors > suggestions, fixed category priority
+        from src.interaction.tellimation import _CATEGORY_PRIORITY
+
+        # Build selection trace for logging
+        sel_trace = getattr(session, "_study_selection_trace", {})
+
+        # Update micro_gemini_selected in trace if Gemini picked one
+        if suggestions and sel_trace.get("micro_candidates_shuffled") is not None:
+            sel_trace["micro_gemini_selected"] = suggestions[0].misl_elements[0] if suggestions[0].misl_elements else None
+
+        # Log the full pipeline cycle
+        chosen_disc = None
+        chosen_source = "no_action"
+        animation_id = None
+
+        if corrections:
+            # Sort by category priority, pick highest
+            sorted_corrections = sorted(
+                corrections,
+                key=lambda d: _CATEGORY_PRIORITY.get(d.type, 99),
+            )
+            chosen_disc = sorted_corrections[0]
+            chosen_source = "error"
+        elif suggestions:
+            chosen_disc = suggestions[0]
+            chosen_source = "suggestion"
+
         is_animated = getattr(session, "study_animations_enabled", False)
-        if is_animated:
-            # Load study log for deterministic selection
-            _log_data = load_study_log(_pid, _is_training)
-            _all_entries = []
-            for entries in _log_data.get("scenes", {}).values():
-                _all_entries.extend(entries)
+        is_control = not is_animated
 
-            # Deterministic selection: corrections > suggestions, skip recently resolved
-            chosen_disc = select_discrepancy(corrections, suggestions, _all_entries)
+        if chosen_disc:
+            targets = chosen_disc.target_entities or []
+            animation_id = _select_animation_for_discrepancy(chosen_disc, session.student_profile)
+            if not animation_id:
+                chosen_disc = None
 
-            if chosen_disc:
-                targets = chosen_disc.target_entities or []
-                animation_id = _select_animation_for_discrepancy(chosen_disc, session.student_profile)
-                if not animation_id:
-                    # No animation_id from LLM → skip
-                    chosen_disc = None
+        # Log full pipeline trace
+        append_study_log_entry(_pid, _is_training, _story_key, _scene_num, {
+            "event": "pipeline_cycle",
+            "mention_counts": dict(session.current_scene_log.mention_counts),
+            "deterministic_selection": sel_trace,
+            "errors_found": [
+                {"animation_id": d.animation_id, "targets": d.target_entities, "category": d.type, "desc": d.description}
+                for d in corrections
+            ],
+            "suggestion": {
+                "misl_element": suggestions[0].misl_elements[0] if suggestions and suggestions[0].misl_elements else None,
+                "rationale": suggestions[0].description if suggestions else None,
+                "targets": suggestions[0].target_entities if suggestions else None,
+                "animation_id": suggestions[0].animation_id if suggestions else None,
+            } if suggestions else None,
+            "selected": {
+                "source": chosen_source,
+                "animation_id": animation_id,
+                "targets": chosen_disc.target_entities if chosen_disc else None,
+            } if chosen_disc else {"source": "no_action", "animation_id": None, "targets": None},
+            "action": "control_suppressed" if is_control and chosen_disc else ("triggered" if chosen_disc else "no_action"),
+            "condition": "control" if is_control else "animation",
+        })
 
-            if chosen_disc and animation_id:
-                template = ANIMATION_ID_TO_TEMPLATE.get(animation_id, "spotlight")
+        # Play animation (animated condition only)
+        if is_animated and chosen_disc and animation_id:
+            targets = chosen_disc.target_entities or []
+            template = ANIMATION_ID_TO_TEMPLATE.get(animation_id, "spotlight")
 
-                # For reveal (S1) with no targets → use ALL scene entities
-                if animation_id == "S1_reveal" and not targets:
-                    scene_data = session.current_scene.get("manifest") if session.current_scene else None
-                    if scene_data and "entities_in_scene" in scene_data:
-                        targets = scene_data["entities_in_scene"]
+            # For animations with no targets → use ALL scene entities
+            if not targets:
+                if scene_data and "entities_in_scene" in scene_data:
+                    targets = scene_data["entities_in_scene"]
 
-                # Log with rationale + animation
-                tag = "CORRECTION" if assessment.factual_errors else "SUGGESTION"
-                await ws.send_json({"type": "study_log", "tag": tag, "text": str({
-                    "rationale": chosen_disc.description,
-                    "targets": targets,
-                    "animation": animation_id,
-                })})
+            # Log with rationale + animation
+            tag = "CORRECTION" if chosen_source == "error" else "SUGGESTION"
+            await ws.send_json({"type": "study_log", "tag": tag, "text": str({
+                "rationale": chosen_disc.description,
+                "targets": targets,
+                "animation": animation_id,
+            })})
 
-                # Log the chosen animation
-                append_study_log_entry(_pid, _is_training, _story_key, _scene_num, {
-                    "event": "animation_played",
+            # Log the chosen animation
+            append_study_log_entry(_pid, _is_training, _story_key, _scene_num, {
+                "event": "animation_played",
+                "animation_id": animation_id,
+                "targets": targets,
+                "rationale": chosen_disc.description,
+                "pass_type": chosen_disc.pass_type,
+                "misl_element": chosen_disc.misl_elements[0] if chosen_disc.misl_elements else None,
+            })
+
+            # Load params from grammar JSON (accentuated if last resolution was False)
+            anim_params = load_animation_params(animation_id, _all_entries)
+
+            # Send ONE animation with combined prefix for all targets
+            combined_prefix = "|".join(targets) if targets else ""
+            if combined_prefix:
+                anim_params["entityPrefix"] = "" if combined_prefix == "scene" else combined_prefix
+                decision = {
+                    "mode": "use_default",
                     "animation_id": animation_id,
-                    "targets": targets,
-                    "rationale": chosen_disc.description,
-                    "pass_type": chosen_disc.pass_type,
-                })
+                    "template": template,
+                    "params": anim_params,
+                    "duration_ms": 3000,
+                }
+                await _send_animation_message(ws, decision, combined_prefix, chosen_disc.misl_elements[0] if chosen_disc.misl_elements else "character")
 
-                # Load params from grammar JSON (accentuated if last resolution was False)
-                anim_params = load_animation_params(animation_id, _all_entries)
-
-                # Send ONE animation with combined prefix for all targets
-                combined_prefix = "|".join(targets) if targets else ""
-                if combined_prefix:
-                    # "scene" target means whole background — use empty prefix
-                    anim_params["entityPrefix"] = "" if combined_prefix == "scene" else combined_prefix
-                    decision = {
-                        "mode": "use_default",
-                        "animation_id": animation_id,
-                        "template": template,
-                        "params": anim_params,
-                        "duration_ms": 3000,
-                    }
-                    await _send_animation_message(ws, decision, combined_prefix, chosen_disc.misl_elements[0] if chosen_disc.misl_elements else "character")
+        # Store the chosen discrepancy for next cycle's resolution check
+        session._study_previous_discrepancy = chosen_disc
 
     except Exception:
         logger.exception("[study] Assessment/animation failed")
@@ -1539,7 +1651,7 @@ async def _handle_audio(
     audio_bytes: bytes,
     ws: _WebSocketAdapter,
 ) -> None:
-    """Handle an audio utterance: transcribe → assess → decide → execute.
+    """Handle an audio utterance — restructured pipeline.
 
     Animation-first flow:
       - Animation fires immediately. Voice is DEFERRED.
@@ -1547,11 +1659,13 @@ async def _handle_audio(
       - If corrected → success (no voice). If not → failure (fire voice as escalation).
 
     Pipeline:
-      0. Check pending animation outcome from previous utterance
-      1. assess_utterance (includes transcription + two-pass assessment)
-      2. process_assessment → deterministic action
-      3. generate_invocation_array → structured animation sequence
-      4. execute_invocation_array → play animations with delays
+      1. Transcribe
+      2. Resolve pending animation outcome from previous utterance
+      3. Resolution check + MISL detection (parallel)
+      4. Update mention_counts
+      5. Path A: corrections + Path B: deterministic selector → enrichment (parallel)
+      6. process_assessment → deterministic action routing
+      7. Execute action (animation + voice)
     """
     if session.current_manifest is None or session.current_scene_log is None:
         await ws.send_json({"type": "error", "message": "No active scene"})
@@ -1577,18 +1691,14 @@ async def _handle_audio(
                 await _handle_ending_choice(session, ws, transcription)
             return
 
-        # 1. Assess utterance (transcription + correction + enrichment)
+        scene_data = session.current_scene.get("manifest") if session.current_scene else None
+        misl_targets = scene_data.get("misl_targets") if scene_data else None
         story_so_far = get_accepted_utterances(session.current_scene_log)
         misl_already = get_misl_dimensions_suggested(session.current_scene_log)
 
-        assessment = await assess_utterance(
+        # ── Step 1: Transcribe ──
+        transcription = await transcribe_audio(
             api_key=session.api_key,
-            manifest=session.current_manifest,
-            utterance_text="",
-            story_so_far=story_so_far,
-            misl_already_suggested=misl_already,
-            misl_difficulty_profile=session.student_profile.misl_difficulty_profile,
-            character_names=session.character_names,
             audio_bytes=audio_bytes,
             narration_history=session.narration_history,
             narrative_text=(
@@ -1596,10 +1706,10 @@ async def _handle_audio(
                 if session.current_scene else ""
             ),
         )
-
-        transcription = assessment.transcription
         if not transcription:
             return
+
+        logger.info("\033[92m[TRANSCRIPTION]\033[0m %s", transcription)
 
         # Add child utterance to conversation + narration history
         session.narration_history.append(transcription)
@@ -1609,35 +1719,144 @@ async def _handle_audio(
         })
         session.student_profile.total_utterances += 1
 
-        # ── Step 0: Resolve pending animation outcome ──
+        # ── Step 2: Resolve pending animation outcome ──
         if session.pending_animation is not None:
             voice_fired = await _resolve_pending_animation(session, ws, transcription)
             if voice_fired:
-                # Voice escalation sent — don't assess this utterance for new
-                # errors (would trigger a simultaneous animation).
                 save_student_profile(session.participant_id, session.student_profile)
                 return
 
-        # ── Console log: assessment results ──
-        if assessment.factual_errors:
-            for fe in assessment.factual_errors:
-                logger.info(
-                    "\033[91m[FACTUAL ERROR]\033[0m fragment=%r  ref=%s  explanation=%s",
-                    fe.utterance_fragment if hasattr(fe, "utterance_fragment") else "?",
-                    fe.manifest_ref if hasattr(fe, "manifest_ref") else "?",
-                    fe.explanation if hasattr(fe, "explanation") else "?",
-                )
-        if assessment.discrepancies:
-            for disc in assessment.discrepancies:
-                tag = "\033[91m[CORRECTION]\033[0m" if disc.pass_type == "correction" else "\033[93m[SUGGESTION]\033[0m"
-                logger.info(
-                    "%s type=%s  targets=%s  misl=%s  desc=%s",
-                    tag, disc.type,
-                    disc.target_entities, disc.misl_elements,
-                    disc.description,
-                )
+        # ── Step 3: Resolution check + MISL detection (parallel) ──
+        previous_disc = session.pending_animation  # already cleared by _resolve above
+        # Use the stored previous discrepancy for resolution
+        _prev_disc_for_resolution = getattr(session, "_interactive_previous_discrepancy", None)
+        resolution_result, detected_misl = await asyncio.gather(
+            assess_resolution(
+                api_key=session.api_key,
+                utterance_text=transcription,
+                previous_discrepancy=_prev_disc_for_resolution,
+                scene_data=scene_data,
+            ),
+            detect_misl_elements(
+                api_key=session.api_key,
+                utterance_text=transcription,
+                scene_data=scene_data,
+            ),
+        )
 
-        # 3. Deterministic decision
+        # ── Step 4: Update mention_counts ──
+        for code in detected_misl:
+            session.current_scene_log.mention_counts[code] = (
+                session.current_scene_log.mention_counts.get(code, 0) + 1
+            )
+
+        # ── Step 5: Parallel paths ──
+        async def _run_corrections():
+            try:
+                return await assess_corrections(
+                    api_key=session.api_key,
+                    manifest=session.current_manifest,
+                    utterance_text=transcription,
+                    story_so_far=story_so_far,
+                    character_names=session.character_names,
+                    scene_data=scene_data,
+                )
+            except Exception as exc:
+                logger.error("[audio] Correction pass failed: %s", exc)
+                return [], []
+
+        async def _run_enrichment_path():
+            if not misl_targets:
+                # Fall back to legacy enrichment
+                try:
+                    return await assess_enrichment(
+                        api_key=session.api_key,
+                        manifest=session.current_manifest,
+                        utterance_text=transcription,
+                        story_so_far=story_so_far,
+                        misl_already_suggested=misl_already,
+                        misl_difficulty_profile=session.student_profile.misl_difficulty_profile,
+                        character_names=session.character_names,
+                        scene_data=scene_data,
+                    )
+                except Exception as exc:
+                    logger.error("[audio] Enrichment pass failed: %s", exc)
+                    return []
+
+            macro_sel, micro_cands, sel_trace = select_misl_candidates(
+                misl_targets=misl_targets,
+                mention_counts=session.current_scene_log.mention_counts,
+                study_log_entries=[],  # interactive mode has no study log
+            )
+            session._interactive_selection_trace = sel_trace
+
+            if macro_sel is None and micro_cands is None:
+                return []
+
+            try:
+                return await assess_enrichment(
+                    api_key=session.api_key,
+                    manifest=session.current_manifest,
+                    utterance_text=transcription,
+                    story_so_far=story_so_far,
+                    misl_already_suggested=misl_already,
+                    misl_difficulty_profile=session.student_profile.misl_difficulty_profile,
+                    character_names=session.character_names,
+                    scene_data=scene_data,
+                    macro_selected=macro_sel,
+                    micro_candidates=micro_cands,
+                    misl_targets=misl_targets,
+                )
+            except Exception as exc:
+                logger.error("[audio] Enrichment pass failed: %s", exc)
+                return []
+
+        (corrections_result, suggestions) = await asyncio.gather(
+            _run_corrections(), _run_enrichment_path()
+        )
+        corrections, name_assignments = corrections_result
+
+        # Register name assignments
+        if name_assignments and session.character_names is not None:
+            for na in name_assignments:
+                session.character_names[na["entity_id"]] = na["name"]
+                logger.info("[assessment] Registered name: %s → %s", na["entity_id"], na["name"])
+
+        # Build unified AssessmentResponse for process_assessment
+        from src.models.assessment import AssessmentResponse, FactualError, MISLOpportunity
+        factual_errors = [
+            FactualError(utterance_fragment="", manifest_ref=", ".join(d.target_entities), explanation=d.description)
+            for d in corrections
+        ]
+        misl_opportunities = [
+            MISLOpportunity(
+                dimension=d.misl_elements[0] if d.misl_elements else d.type,
+                manifest_elements=d.target_entities,
+                suggestion=d.description,
+            )
+            for d in suggestions
+        ]
+        assessment = AssessmentResponse(
+            transcription=transcription,
+            factual_errors=factual_errors,
+            misl_opportunities=misl_opportunities,
+            discrepancies=corrections + suggestions,
+            utterance_is_acceptable=len(corrections) == 0,
+            name_assignments=name_assignments or [],
+            resolution=resolution_result,
+        )
+
+        # ── Console log: assessment results ──
+        for disc in assessment.discrepancies:
+            tag = "\033[91m[CORRECTION]\033[0m" if disc.pass_type == "correction" else "\033[93m[SUGGESTION]\033[0m"
+            logger.info(
+                "%s type=%s  targets=%s  misl=%s  desc=%s",
+                tag, disc.type,
+                disc.target_entities, disc.misl_elements,
+                disc.description,
+            )
+
+        # ── Step 6: Deterministic decision ──
         action, action_data = process_assessment(
             utterance_text=transcription,
             response=assessment,
@@ -1647,8 +1866,7 @@ async def _handle_audio(
 
         logger.info("\033[96m[DECISION]\033[0m action=%s", action)
 
-        # 4. Execute action
-        # Extract discrepancies for the new invocation array pipeline
+        # ── Step 7: Execute action ──
         discrepancies: List[Discrepancy] = []
         if action_data and "discrepancies" in action_data:
             for d in action_data["discrepancies"]:
@@ -1658,19 +1876,16 @@ async def _handle_audio(
                     discrepancies.append(d)
 
         if action == "correct":
-            # Factual errors — animate errored entity, defer voice
             errors = action_data["factual_errors"]
             first_error = errors[0] if errors else {}
             target_id = first_error.get("manifest_ref", "").split(".")[0]
             explanation = first_error.get("explanation", "")
 
-            # If no target from legacy field, try discrepancies
             if not target_id and discrepancies:
                 first_disc = discrepancies[0]
                 target_id = first_disc.target_entities[0] if first_disc.target_entities else ""
                 explanation = explanation or first_disc.description
 
-            # Send assessment_result WITHOUT guidance_text (text will come later after animation)
             await ws.send_json({
                 "type": "assessment_result",
                 "action": "correct",
@@ -1684,7 +1899,6 @@ async def _handle_audio(
             esc_key = f"{target_id}::{misl_el}"
 
             if esc_key in session.voice_escalated_errors:
-                # Same error after voice → skip animation, voice only
                 if explanation:
                     session.conversation_history.append({
                         "role": "system",
@@ -1694,12 +1908,10 @@ async def _handle_audio(
                     asyncio.ensure_future(send_voice(session, ws, explanation))
 
             elif discrepancies:
-                # Use invocation array pipeline for all discrepancies
                 decision = await execute_invocation_array(
                     session, ws, discrepancies,
                 )
 
-                # Animation-first: NO text during animation.
                 if decision and explanation:
                     _set_pending_animation(
                         session, target_id, misl_el, explanation, decision,
@@ -1717,7 +1929,6 @@ async def _handle_audio(
                     })
 
             elif target_id:
-                # Fallback: single animation call (legacy path)
                 decision = await execute_animation(
                     session, ws, target_id,
                     misl_element=misl_el,
@@ -1741,7 +1952,6 @@ async def _handle_audio(
                     })
 
             elif explanation:
-                # No target to animate — send correction text immediately
                 await ws.send_json({
                     "type": "correction_text",
                     "guidance_text": explanation,
@@ -1754,8 +1964,10 @@ async def _handle_audio(
                 })
                 asyncio.ensure_future(send_voice(session, ws, explanation))
 
+            # Store discrepancy for next resolution check
+            session._interactive_previous_discrepancy = discrepancies[0] if discrepancies else None
+
         elif action == "accept_and_guide":
-            # MISL guidance — animate, defer text display
             opps = action_data["misl_opportunities"]
             first_opp = opps[0] if opps else {}
             suggestion = first_opp.get("suggestion", "")
@@ -1763,25 +1975,21 @@ async def _handle_audio(
             target_id = elements[0] if elements else ""
             misl_dim = first_opp.get("dimension", "character")
 
-            # Enrich from discrepancies if available
             suggestion_discrepancies = [d for d in discrepancies if d.pass_type == "suggestion"]
             if not target_id and suggestion_discrepancies:
                 first_sd = suggestion_discrepancies[0]
                 target_id = first_sd.target_entities[0] if first_sd.target_entities else ""
                 suggestion = suggestion or first_sd.description
 
-            # Was this the LAST MISL opportunity for this scene?
             is_last_opportunity = (
                 session.current_scene_log.misl_opportunities_given
                 >= MAX_MISL_OPPORTUNITIES_PER_SCENE
             )
 
             if is_last_opportunity:
-                # ── Last suggestion: skip animation, advance directly ──
                 logger.info("[scene] Last MISL opportunity given → auto-advancing")
                 await _advance_scene(session, ws)
             else:
-                # Send assessment_result WITHOUT guidance_text (text will come later after animation)
                 await ws.send_json({
                     "type": "assessment_result",
                     "action": "guide",
@@ -1792,7 +2000,6 @@ async def _handle_audio(
                 esc_key = f"{target_id}::{misl_dim}"
 
                 if esc_key in session.voice_escalated_errors:
-                    # Same suggestion after voice → skip animation, voice only
                     if suggestion:
                         session.conversation_history.append({
                             "role": "system",
@@ -1802,12 +2009,10 @@ async def _handle_audio(
                         asyncio.ensure_future(send_voice(session, ws, suggestion))
 
                 elif suggestion_discrepancies:
-                    # Use invocation array pipeline for suggestion discrepancies
                     decision = await execute_invocation_array(
                         session, ws, suggestion_discrepancies,
                     )
 
-                    # Animation-first: NO text during animation.
                     if decision and suggestion:
                         _set_pending_animation(
                             session, target_id, misl_dim, suggestion, decision,
@@ -1826,7 +2031,6 @@ async def _handle_audio(
                         })
 
                 elif target_id:
-                    # Fallback: single animation call (legacy path)
                     decision = await execute_animation(
                         session, ws, target_id,
                         misl_element=misl_dim,
@@ -1850,7 +2054,6 @@ async def _handle_audio(
                         })
 
                 elif suggestion:
-                    # No target to animate — send guidance text immediately
                     await ws.send_json({
                         "type": "guidance_text",
                         "guidance_text": suggestion,
@@ -1864,9 +2067,12 @@ async def _handle_audio(
                     })
                     asyncio.ensure_future(send_voice(session, ws, suggestion))
 
+            # Store discrepancy for next resolution check
+            session._interactive_previous_discrepancy = suggestion_discrepancies[0] if suggestion_discrepancies else None
+
         elif action == "accept_and_advance":
-            # Scene complete (no MISL opportunities left) — advance immediately
             await _advance_scene(session, ws)
+            session._interactive_previous_discrepancy = None
 
         # Persist profile after every utterance
         save_student_profile(session.participant_id, session.student_profile)

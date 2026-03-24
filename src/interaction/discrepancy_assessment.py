@@ -271,39 +271,105 @@ async def assess_enrichment(
     character_names: Optional[Dict[str, str]] = None,
     correction_results: Optional[List[Discrepancy]] = None,
     scene_data: Optional[Dict[str, Any]] = None,
+    macro_selected: Optional[str] = None,
+    micro_candidates: Optional[List[str]] = None,
+    misl_targets: Optional[Dict[str, Any]] = None,
 ) -> List[Discrepancy]:
     """Pass 2: Identify enrichment opportunities.
+
+    Supports three modes:
+    - **Macro mode** (macro_selected is set): Gemini produces ONE suggestion
+      for the pre-selected MISL element.
+    - **Micro mode** (micro_candidates is set): Gemini picks ONE from the
+      shuffled list and produces a suggestion.
+    - **Legacy mode** (both None): original behavior, Gemini picks freely.
 
     Returns a list of Discrepancy objects with pass_type="suggestion",
     each with an animation_id from the grammar.
     """
+    from config.misl import MISL_CODE_TO_KEY
+    from src.generation.prompts.assessment_prompt import (
+        ENRICHMENT_MACRO_USER_PROMPT_TEMPLATE,
+        ENRICHMENT_MICRO_USER_PROMPT_TEMPLATE,
+    )
+
     client = genai.Client(api_key=api_key)
 
     manifest_json = json.dumps(scene_data, indent=2) if scene_data else json.dumps(manifest.model_dump(), indent=2)
-    misl_taxonomy = _build_misl_taxonomy()
     story_text = _build_story_text(story_so_far)
     names_text = _build_names_text(manifest, character_names)
-
-    suggested_text = (
-        ", ".join(misl_already_suggested) if misl_already_suggested
-        else "(None yet.)"
-    )
-    difficulty_text = misl_difficulty_profile.to_prompt_context()
 
     # Inject suggestion intents into system prompt
     system_prompt = ENRICHMENT_SYSTEM_PROMPT.format(
         suggestion_intents=_get_suggestion_intents(),
     )
 
-    user_prompt = ENRICHMENT_USER_PROMPT_TEMPLATE.format(
-        manifest_json=manifest_json,
-        misl_taxonomy=misl_taxonomy,
-        utterance_text=utterance_text,
-        story_so_far=story_text,
-        misl_already_suggested=suggested_text,
-        misl_difficulty_profile=difficulty_text,
-        character_names=names_text,
-    )
+    if macro_selected is not None:
+        # ── Macro mode: single pre-selected element ──
+        element_name = MISL_CODE_TO_KEY.get(macro_selected, macro_selected)
+        targets_for_el = ""
+        if misl_targets:
+            macro_targets = misl_targets.get("macro", {})
+            val = macro_targets.get(macro_selected)
+            if isinstance(val, list):
+                targets_for_el = ", ".join(str(v) for v in val)
+            elif val:
+                targets_for_el = str(val)
+
+        user_prompt = ENRICHMENT_MACRO_USER_PROMPT_TEMPLATE.format(
+            manifest_json=manifest_json,
+            misl_element_code=macro_selected,
+            misl_element_name=element_name,
+            misl_targets_for_element=targets_for_el or "(see manifest)",
+            utterance_text=utterance_text,
+            story_so_far=story_text,
+            character_names=names_text,
+        )
+        logger.info("[assessment:enrichment] Macro mode: element=%s", macro_selected)
+
+    elif micro_candidates is not None and len(micro_candidates) > 0:
+        # ── Micro mode: shuffled candidate list ──
+        candidates_text_lines = []
+        for code in micro_candidates:
+            name = MISL_CODE_TO_KEY.get(code, code)
+            targets_for_el = ""
+            if misl_targets:
+                micro_targets = misl_targets.get("micro", {})
+                val = micro_targets.get(code)
+                if isinstance(val, list):
+                    targets_for_el = ", ".join(str(v) for v in val)
+            candidates_text_lines.append(
+                f"- **{code}** ({name}): {targets_for_el or '(see manifest)'}"
+            )
+
+        user_prompt = ENRICHMENT_MICRO_USER_PROMPT_TEMPLATE.format(
+            manifest_json=manifest_json,
+            micro_candidates_text="\n".join(candidates_text_lines),
+            utterance_text=utterance_text,
+            story_so_far=story_text,
+            character_names=names_text,
+        )
+        logger.info("[assessment:enrichment] Micro mode: candidates=%s", micro_candidates)
+
+    else:
+        # ── Legacy mode: Gemini picks freely ──
+        misl_taxonomy = _build_misl_taxonomy()
+        suggested_text = (
+            ", ".join(misl_already_suggested) if misl_already_suggested
+            else "(None yet.)"
+        )
+        difficulty_text = misl_difficulty_profile.to_prompt_context()
+
+        user_prompt = ENRICHMENT_USER_PROMPT_TEMPLATE.format(
+            manifest_json=manifest_json,
+            misl_taxonomy=misl_taxonomy,
+            utterance_text=utterance_text,
+            story_so_far=story_text,
+            misl_already_suggested=suggested_text,
+            misl_difficulty_profile=difficulty_text,
+            character_names=names_text,
+        )
+        logger.info("[assessment:enrichment] Legacy mode")
 
     data = await _gemini_call(client, system_prompt, user_prompt)
 
@@ -321,9 +387,93 @@ async def assess_enrichment(
                     animation_id=item.get("animation_id"),
                 ))
 
+    # In macro/micro mode, cap at 1 suggestion
+    if (macro_selected is not None or micro_candidates is not None) and len(discrepancies) > 1:
+        discrepancies = discrepancies[:1]
+
     logger.info("[assessment:enrichment] Found %d enrichment discrepancies",
                 len(discrepancies))
     return discrepancies
+
+
+# ---------------------------------------------------------------------------
+# MISL element detection (lightweight call)
+# ---------------------------------------------------------------------------
+
+async def detect_misl_elements(
+    api_key: str,
+    utterance_text: str,
+    scene_data: Optional[Dict[str, Any]] = None,
+) -> List[str]:
+    """Detect which MISL narrative elements are present in the child's utterance.
+
+    Lightweight Gemini call that returns a list of MISL abbreviation codes
+    (e.g. ["CH", "A", "ENP"]) found in the utterance.
+
+    Args:
+        api_key: Gemini API key.
+        utterance_text: The child's transcribed utterance.
+        scene_data: Optional scene manifest for context.
+
+    Returns:
+        List of MISL codes present in the utterance.
+    """
+    from config.misl import ALL_MISL_CODES, MISL_CODE_TO_KEY
+
+    if not utterance_text:
+        return []
+
+    client = genai.Client(api_key=api_key)
+
+    scene_context = ""
+    if scene_data:
+        scene_context = f"\n\n# Scene context\n```json\n{json.dumps(scene_data, indent=2)}\n```"
+
+    codes_ref = "\n".join(
+        f"- {code}: {MISL_CODE_TO_KEY[code]}"
+        for code in ALL_MISL_CODES
+    )
+
+    system_prompt = (
+        "You analyze a child's narrative utterance and identify which MISL "
+        "(Monitoring Indicators of Scholarly Language) narrative elements are "
+        "present. Return ONLY valid JSON.\n\n"
+        "# MISL codes\n"
+        f"{codes_ref}\n\n"
+        "# Rules\n"
+        "- CH: child mentions or refers to a character\n"
+        "- S: child describes the setting (place or time)\n"
+        "- IE: child describes an initiating event that starts an episode\n"
+        "- A: child describes an action by a character\n"
+        "- CO: child describes a consequence or outcome\n"
+        "- IR: child expresses feelings, emotions, or internal states\n"
+        "- P: child expresses a plan or intention\n"
+        "- ENP: child uses elaborated noun phrases (adjectives, modifiers)\n"
+        "- SC: child uses subordinating conjunctions (because, when, after...)\n"
+        "- CC: child uses coordinating conjunctions (and, but, so...)\n"
+        "- M: child uses mental verbs (thought, decided, wanted...)\n"
+        "- L: child uses linguistic verbs (said, told, yelled...)\n"
+        "- ADV: child uses adverbs (suddenly, slowly, very...)\n"
+        "- G: grammaticality — score 1 if there are errors, omit if correct\n"
+        "- T: tense — score 1 if there are tense changes, omit if consistent\n\n"
+        'Return: {"misl_elements": ["CH", "A", ...]}'
+    )
+
+    user_prompt = (
+        f'Child\'s utterance:\n"{utterance_text}"{scene_context}\n\n'
+        "Which MISL elements are present in this utterance?"
+    )
+
+    try:
+        data = await _gemini_call(client, system_prompt, user_prompt, thinking_budget=256)
+        raw = data.get("misl_elements", [])
+        # Validate: only keep known codes
+        valid = [code for code in raw if code in ALL_MISL_CODES]
+        logger.info("[assessment:misl_detect] Detected MISL elements: %s", valid)
+        return valid
+    except Exception as exc:
+        logger.error("[assessment:misl_detect] Failed: %s", exc)
+        return []
 
 
 # ---------------------------------------------------------------------------

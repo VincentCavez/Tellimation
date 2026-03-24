@@ -180,7 +180,7 @@ and narrative errors, taking into account the story context.
 # Your task
 
 Given:
-- The scene MANIFEST (entities, properties, relations, actions, key_objects)
+- The scene MANIFEST (entities, properties, relations, actions)
 - The child's UTTERANCE (transcribed text)
 - The story so far (previously accepted utterances in this scene)
 - The animation CORRECTION INTENTS (each animation has a specific error type it corrects)
@@ -275,7 +275,7 @@ IMPORTANT — target_entities must NEVER be empty.
 (short identifiers like "boy", "dog", NOT descriptions).
 - For scene targets: use ["scene"] when the error concerns the setting and \
 the animation supports "scene" as a target type.
-- If the error concerns a key_object, use the entity closest to that object.
+
 
 If there are NO errors, return: {{"discrepancies": []}}
 - ENP = Elaborated Noun Phrases, G = Grammaticality, T = Tense
@@ -329,7 +329,7 @@ given the scene but has not.
 # Your task
 
 Given:
-- The scene MANIFEST (entities, properties, relations, actions, key_objects)
+- The scene MANIFEST (entities, properties, relations, actions)
 - The MISL taxonomy (15 narrative dimensions organized by developmental tier)
 - The child's UTTERANCE (transcribed text)
 - The story so far (previously accepted utterances in this scene)
@@ -404,7 +404,7 @@ CRITICAL — target_entities must NEVER be empty.
 (short identifiers like "boy", "dog", NOT descriptions).
 - For scene targets: use ["scene"] when the suggestion concerns the \
 setting/environment and the animation supports "scene" as a target type.
-- If the suggestion targets a key_object, use the entity closest to it.
+
 
 If there are NO enrichment opportunities, return: {{"discrepancies": []}}
 
@@ -455,4 +455,86 @@ in the manifest.
 2. Map each to the animation whose suggestion_intent best matches.
 3. Order by MISL developmental tier (lower first), then difficulty profile.
 4. Return structured JSON with animation_id for each suggestion.
+"""
+
+
+# ============================================================================
+# Enrichment: macro mode (single pre-selected MISL element)
+# ============================================================================
+
+ENRICHMENT_MACRO_USER_PROMPT_TEMPLATE = """\
+Produce ONE enrichment suggestion for a specific MISL element.
+
+# Scene Manifest
+
+```json
+{manifest_json}
+```
+
+# MISL element to scaffold
+
+**{misl_element_code}** ({misl_element_name})
+
+The scene offers these targets for this element:
+{misl_targets_for_element}
+
+# Child's Utterance
+
+"{utterance_text}"
+
+# Story so far (accepted utterances in this scene)
+
+{story_so_far}
+
+# Character names (given by the child)
+
+{character_names}
+
+# Instructions
+
+1. Produce exactly ONE suggestion for the MISL element **{misl_element_code}** \
+using specific manifest elements from the scene.
+2. Choose the animation whose suggestion_intent best matches from the list above.
+3. Return structured JSON with animation_id, target_entities, and description.
+"""
+
+
+# ============================================================================
+# Enrichment: micro mode (shuffled candidate list, Gemini picks one)
+# ============================================================================
+
+ENRICHMENT_MICRO_USER_PROMPT_TEMPLATE = """\
+Choose the ONE most pertinent MISL element from a candidate list and \
+produce a suggestion for it.
+
+# Scene Manifest
+
+```json
+{manifest_json}
+```
+
+# Candidate MISL elements (choose ONE)
+
+{micro_candidates_text}
+
+# Child's Utterance
+
+"{utterance_text}"
+
+# Story so far (accepted utterances in this scene)
+
+{story_so_far}
+
+# Character names (given by the child)
+
+{character_names}
+
+# Instructions
+
+1. From the candidate list above, choose the ONE element that is most \
+pertinent given the child's last utterance and the scene.
+2. Produce exactly ONE suggestion for that element, grounded in the manifest.
+3. Choose the animation whose suggestion_intent best matches.
+4. Return structured JSON with animation_id, target_entities, misl_elements \
+(with the chosen code), and description.
 """

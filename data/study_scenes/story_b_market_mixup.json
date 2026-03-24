@@ -12,135 +12,385 @@
       "title": "The Errand",
       "background_prompt": "A colorful outdoor market with stalls, fruit displays, crates, and bright awnings. Busy atmosphere. No people, no animals.",
       "full_scene_prompt": "A colorful outdoor market. A boy in a blue cap walks with his mother who carries a big bag. She is giving him a list. A sneaky brown monkey sits nearby, watching them. Bright stalls with fruit and awnings in the background.",
-      "entities_in_scene": ["boy", "mother", "monkey"],
-      "key_objects": ["big bag", "list", "crate", "market stalls"],
+      "entities_in_scene": [
+        "boy",
+        "mother",
+        "monkey"
+      ],
       "misl_targets": {
         "macro": {
-          "CH": ["boy with blue cap", "mother with big bag", "sneaky brown monkey"],
-          "S": ["colorful outdoor market","day"],
-          "IE": null,
-          "IR": null,
-          "P": null,
-          "A": ["walks through market", "carries bag", "gives list to boy"],
+          "CH": [
+            "boy in a blue cap",
+            "mother with a brown bun",
+            "sneaky brown monkey"
+          ],
+          "S": [
+            "bright outdoor market",
+            "sunny day"
+          ],
+          "IE": [
+            "mother hands the boy a shopping list"
+          ],
+          "IR": [
+            "boy looks curious",
+            "mother looks kind",
+            "monkey looks mischievous"
+          ],
+          "P": [
+            "boy plans to buy groceries",
+            "monkey wants to steal fruit"
+          ],
+          "A": null,
           "CO": null
         },
         "micro": {
-          "ENP": ["blue cap", "colorful outdoor market", "big bag", "sneaky brown monkey", "list of fruits"],
-          "ADV": [],
-          "SC": [],
-          "CC": ["and"],
-          "M": [],
-          "L": []
+          "ENP": [
+            "bright blue cap",
+            "green patterned cardigan",
+            "large woven bag",
+            "long brown tail",
+            "wooden fruit crates",
+            "ripe orange oranges",
+            "striped blue roof",
+            "small white flowers"
+          ],
+          "ADV": [
+            "sneakily",
+            "happily"
+          ],
+          "SC": [
+            "because",
+            "while",
+            "as",
+            "before"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": null,
+          "L": [
+            "tells",
+            "says",
+            "asks",
+            "explains"
+          ]
         }
-      }
+      },
+      "scene_description": "A vibrant, cheerful outdoor market scene under a bright blue sky with soft, fluffy white clouds. In the foreground, a winding dirt path with light-colored stones leads across the scene. To the left, a small brown monkey with a long tail and a curious expression sits perched on top of a small wooden crate. He is looking towards the center of the scene. In the middle-right, a young boy with a blue cap, a yellow shirt under a green vest, and brown shorts is walking along the path. He has a small green backpack on his shoulders and is reaching out for a white paper list being handed to him by his mother. His mother has brown hair pulled back in a bun and a kind smile. She wears a yellow shirt under a green patterned cardigan, a blue skirt, and brown shoes. She carries a large, brown woven bag over her shoulder. Behind them are several colorful market stalls. The stalls have various awnings: one is solid yellow and orange, one is solid green with scalloped edges, one is blue and white striped, and another is yellow and white striped. These stalls are filled with baskets and crates of fresh produce, including bright orange oranges, red apples, purple grapes, white garlic cloves, and red tomatoes. Wooden barrels and more crates sit on the grass around the stalls. The background features rolling green hills and many lush, green trees under the clear daylight. Small white and pink flowers dot the green grass in the very front of the scene."
     },
     {
       "scene_number": 2,
       "title": "The Theft",
       "background_prompt": "A fruit stand in an outdoor market with piles of mangoes and other fruits. A pole and a narrow lane visible behind the stalls. No people, no animals.",
       "full_scene_prompt": "A fruit stand in a market. A boy in a blue cap reaches for mangoes. A sneaky brown monkey swings down from a crate, grabbing the big bag from the mother, and climbs quickly up a pole into a narrow lane behind the stalls. The boy looks surprised.",
-      "entities_in_scene": ["boy", "monkey", "mother", "bag"],
-      "key_objects": ["fruit stand", "mangoes", "big bag", "pole", "narrow lane"],
+      "entities_in_scene": [
+        "boy",
+        "monkey",
+        "mother",
+        "bag"
+      ],
       "misl_targets": {
         "macro": {
-          "CH": ["boy", "monkey", "mother"],
-          "S": ["fruit stand","day"],
-          "IE": ["monkey steals the bag"],
-          "IR": ["surprise"],
+          "CH": [
+            "boy in the blue cap",
+            "mother in the green cardigan",
+            "mischievous brown monkey"
+          ],
+          "S": [
+            "sunny day",
+            "outdoor fruit market"
+          ],
+          "IE": [
+            "the monkey steals the woman's bag"
+          ],
+          "IR": [
+            "the boy is surprised",
+            "the mother feels shocked",
+            "the monkey looks happy and cheeky"
+          ],
           "P": null,
-          "A": ["boy picks mangoes", "monkey swings down", "monkey grabs bag", "climbs up pole"],
+          "A": null,
           "CO": null
         },
         "micro": {
-          "ENP": ["fruit stand", "mangoes"],
-          "ADV": ["down", "quickly", "up"],
-          "SC": ["to pick some mangoes"],
-          "CC": ["and"],
-          "M": [],
-          "L": []
+          "ENP": [
+            "wooden fruit stand",
+            "yellow mangoes",
+            "woven brown bag",
+            "tall utility pole",
+            "green patterned cardigan",
+            "blue cap",
+            "fluffy white clouds"
+          ],
+          "ADV": [
+            "quickly",
+            "suddenly",
+            "mischievously",
+            "up",
+            "away"
+          ],
+          "SC": [
+            "because",
+            "while",
+            "as",
+            "when"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": null,
+          "L": [
+            "gasps",
+            "shouts",
+            "calls out",
+            "cries"
+          ]
         }
-      }
+      },
+      "scene_description": "In this bright and colorful scene, a mischievous monkey is stealing a bag at a fruit market. The setting is a sunny day with a clear blue sky and fluffy white clouds. In the center, there is a wooden fruit stand with a yellow and orange striped awning. The stand is filled with crates of fresh fruit, including yellow mangoes, red apples, purple plums, and orange citrus fruits. To the left of the stand, a young boy with a blue cap and a green vest over a yellow shirt is reaching out towards the mangoes. He has a surprised expression on his face with his mouth open. Next to him, his mother wearing a green patterned cardigan and a blue skirt looks shocked and worried, reaching her hand out towards a monkey. On the far right, a brown monkey is climbing up a tall wooden utility pole. The monkey has a wide, cheeky grin and is holding a large, woven brown bag that it just stole from the mother. The scene takes place on a dirt path with small stones, surrounded by green grass filled with white and yellow flowers. In the background, there are lush green trees, more market stalls, and rolling blue hills under the bright sky. Electrical wires stretch between the wooden poles, leading into the distance."
     },
     {
       "scene_number": 3,
       "title": "The Chase",
       "background_prompt": "A narrow lane behind market stalls, full of stacked boxes and hanging cloths. A low rooftop is visible at the end. No people, no animals.",
       "full_scene_prompt": "A narrow lane behind market stalls. A boy in a blue cap chases the monkey. Boxes and hanging cloths crowd the lane. A sneaky brown monkey sits on a low rooftop holding a big bag. The boy's mother catches up behind him, out of breath.",
-      "entities_in_scene": ["boy", "mother", "monkey", "bag"],
-      "key_objects": ["boxes", "hanging cloths", "rooftop", "big bag"],
+      "entities_in_scene": [
+        "boy",
+        "mother",
+        "monkey",
+        "bag"
+      ],
       "misl_targets": {
         "macro": {
-          "CH": ["boy", "mother", "monkey"],
-          "S": ["narrow lane", "rooftop"],
+          "CH": [
+            "determined boy in a blue cap",
+            "tired mother in a green cardigan",
+            "sneaky brown monkey"
+          ],
+          "S": [
+            "narrow market lane"
+          ],
           "IE": null,
-          "IR": ["frustrated", "out of breath"],
-          "P": ["chases the monkey"],
-          "A": ["boy runs after monkey", "monkey climbs onto rooftop", "mother catches up"],
-          "CO": null
+          "IR": [
+            "boy feels angry",
+            "mother feels worried and tired",
+            "monkey feels playful"
+          ],
+          "P": [
+            "the boy wants to catch the monkey"
+          ],
+          "A": [
+            "running through the lane",
+            "chasing the monkey"
+          ],
+          "CO": [
+            "the mother is out of breath"
+          ]
         },
         "micro": {
-          "ENP": ["narrow lane", "hanging cloths", "low rooftop"],
-          "ADV": ["fast"],
-          "SC": ["because the monkey is too fast"],
-          "CC": ["but"],
-          "M": [],
-          "L": []
+          "ENP": [
+            "sneaky monkey",
+            "blue cap",
+            "green cardigan",
+            "wooden crates",
+            "colorful laundry",
+            "cobblestone path",
+            "large basket",
+            "white clouds"
+          ],
+          "ADV": [
+            "quickly",
+            "angrily",
+            "high up",
+            "behind",
+            "mischievously"
+          ],
+          "SC": [
+            "because the monkey stole the bag"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "wants",
+            "feels"
+          ],
+          "L": [
+            "shouts",
+            "calls out"
+          ]
         }
-      }
+      },
+      "scene_description": "In this bright and busy scene, a narrow market lane is filled with wooden stalls and stacked boxes. In the center, a young boy with brown hair and a blue cap is running quickly to the left. He looks very determined and a bit angry, with his fists clenched. He wears a green and yellow shirt, brown shorts, and brown shoes. Following behind him is his mother, who looks exhausted and worried. She has brown hair pulled into a bun and is wearing a green patterned cardigan over a blue skirt. She is carrying a small brown basket and has her mouth open as if she is panting. High above them, a sneaky brown monkey is perched on a wooden beam. The monkey is smiling mischievously and holding a large, woven basket it has stolen. The lane is crowded with wooden crates and boxes of different sizes. Colorful cloths in green, yellow, and blue hang from laundry lines above the path. The ground is made of grey cobblestones, and small white flowers grow near the bottom edge. In the background, there are tiled rooftops and a clear blue sky with soft, white clouds. The bright lighting suggests it is a sunny afternoon."
     },
     {
       "scene_number": 4,
       "title": "The Trick",
       "background_prompt": "The same narrow lane, with a barrel on the ground below the low rooftop. No people, no animals.",
       "full_scene_prompt": "A narrow lane. The boy's mother places a banana on a barrel below a low rooftop. A sneaky brown monkey is climbing slowly down from the rooftop, reaching for the banana. The big bag is falling from the monkey's hand. The boy in the blue cap watches from behind his mother.",
-      "entities_in_scene": ["boy","banana", "mother", "monkey","bag"],
-      "key_objects": ["banana", "barrel", "big bag", "rooftop","bag"],
+      "entities_in_scene": [
+        "boy",
+        "banana",
+        "mother",
+        "monkey",
+        "bag"
+      ],
       "misl_targets": {
         "macro": {
-          "CH": ["boy", "mother", "monkey"],
-          "S": null,
-          "IE": null,
-          "IR": null,
-          "P": ["mother has an idea to trick the monkey"],
-          "A": ["takes banana from pocket", "places on barrel", "monkey sees banana", "monkey climbs down slowly", "drops bag", "grabs banana with both hands"],
-          "CO": null
+          "CH": [
+            "the clever mother",
+            "the curious boy in the blue cap",
+            "the sneaky brown monkey"
+          ],
+          "S": [
+            "a sunny countryside lane",
+            "outside a cottage"
+          ],
+          "IE": [
+            "the mother places a banana on the barrel",
+            "the monkey drops its bag"
+          ],
+          "IR": [
+            "the mother looks pleased with her plan",
+            "the boy feels curious",
+            "the monkey looks focused and greedy"
+          ],
+          "P": [
+            "the mother wants to trick the monkey",
+            "the monkey wants to grab the banana"
+          ],
+          "A": [
+            "placing a banana",
+            "dropping a bag"
+          ],
+          "CO": [
+            "the bag falls through the air",
+            "the monkey is distracted by the fruit"
+          ]
         },
         "micro": {
-          "ENP": ["banana", "barrel", "both hands"],
-          "ADV": ["slowly", "below"],
-          "SC": ["to grab the banana"],
-          "CC": [],
-          "M": ["has an idea"],
-          "L": []
+          "ENP": [
+            "yellow banana",
+            "wooden barrel",
+            "sneaky brown monkey",
+            "falling woven bag",
+            "blue cap"
+          ],
+          "ADV": [
+            "carefully",
+            "slowly",
+            "above",
+            "below",
+            "downward"
+          ],
+          "SC": [
+            "while the mother sets the trap",
+            "because the monkey wants the banana",
+            "as the bag falls from the roof"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "wants",
+            "notices",
+            "wonders"
+          ],
+          "L": null
         }
-      }
+      },
+      "scene_description": "A sunny day in a peaceful countryside lane. In the foreground, a kind-looking mother with brown hair in a bun, wearing a yellow patterned blouse, a green patterned cardigan, and a long blue skirt, is leaning over a large wooden barrel. She is carefully placing a yellow banana on top of the barrel. She has a small, clever smile on her face. Next to her, a young boy with a blue cap, a yellow shirt under a green vest, and brown shorts stands watching. He wears a small brown backpack and looks up with a curious and slightly surprised expression. Above them, on the gray shingled roof of a half-timbered cottage, a sneaky brown monkey with a long curly tail is leaning down. The monkey has just dropped a brown woven bag, which is currently falling through the air. The monkey's hand is stretched out, and it looks focused on the banana. The path is made of irregular gray cobblestones, and various small flowers like yellow buttercups and blue forget-me-nots grow along the edges. To the right, a low stone wall is covered with pink hollyhocks and green bushes. In the background, rolling green hills under a bright blue sky with soft white clouds and a glowing sun create a warm atmosphere. Another small cottage can be seen nestled in the distant trees."
     },
     {
       "scene_number": 5,
       "title": "The Recovery",
       "background_prompt": "A colorful outdoor market, same as scene 1. Fruit stand visible, bright stalls. No people, no animals.",
       "full_scene_prompt": "A colorful outdoor market. A boy in a blue cap holds a big bag, smiling. His mother laughs beside him. They stand at a fruit stand. In the background, a sneaky brown monkey sits on a crate eating a banana, watching them. Bright stalls and awnings.",
-      "entities_in_scene": ["boy", "mother", "monkey"],
-      "key_objects": ["big bag", "fruit stand", "banana"],
+      "entities_in_scene": [
+        "boy",
+        "mother",
+        "monkey"
+      ],
       "misl_targets": {
         "macro": {
-          "CH": ["boy", "mother", "monkey"],
-          "S": ["back to market"],
+          "CH": [
+            "boy in a blue cap",
+            "mother in a green cardigan",
+            "sneaky brown monkey"
+          ],
+          "S": [
+            "sunny outdoor market",
+            "fruit stand",
+            "cobblestone path",
+            "bright daytime"
+          ],
           "IE": null,
-          "IR": ["mother laughs", "relief"],
-          "P": null,
-          "A": ["boy picks up bag", "monkey eats banana", "mother laughs", "walk back to fruit stand", "monkey watches them leave"],
-          "CO": ["bag recovered, everything still inside"]
+          "IR": [
+            "mother laughs",
+            "boy feels happy",
+            "monkey looks pleased",
+            "relief",
+            "joy"
+          ],
+          "P": [
+            "going home",
+            "finishing the shopping"
+          ],
+          "A": [
+            "boy holds the bag",
+            "monkey eats a banana"
+          ],
+          "CO": [
+            "the bag is recovered",
+            "the monkey has a snack"
+          ]
         },
         "micro": {
-          "ENP": ["fruit stand"],
-          "ADV": ["quickly", "still"],
-          "SC": ["while the monkey eats"],
-          "CC": ["and"],
-          "M": [],
-          "L": []
+          "ENP": [
+            "red and yellow awning",
+            "large wicker bag",
+            "juicy red apples",
+            "sweet purple grapes",
+            "fluffy white clouds",
+            "long blue skirt",
+            "wooden crate",
+            "cheeky monkey"
+          ],
+          "ADV": [
+            "happily"
+          ],
+          "SC": [
+            "while the monkey eats",
+            "because they found the bag",
+            "as they stand together"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "feels",
+            "thinks",
+            "remembers"
+          ],
+          "L": [
+            "laughs",
+            "says",
+            "tells"
+          ]
         }
-      }
+      },
+      "scene_description": "This is a bright and cheerful scene at a sunny outdoor market. In the center, a young boy and his mother are standing on a cobblestone path. The boy, wearing a blue cap, a yellow shirt under a green vest, and brown shorts, is smiling widely as he holds a large brown wicker bag with both hands. His mother, standing next to him, has her hair in a bun and wears a green cardigan over a blue skirt. She is laughing joyfully with her eyes closed. To their right, a small brown monkey sits on a wooden crate. The monkey looks mischievous and is holding a half-peeled yellow banana, taking a bite while watching the pair. To the left is a wooden fruit stand with a red and yellow striped awning. It is filled with baskets of red apples, oranges, yellow bananas, green grapes, purple grapes, and green apples. Several other market stalls with colorful tents (blue, green, orange, and striped) are visible in the background under a clear blue sky with fluffy white clouds. A string of multi-colored bunting flags hangs between the trees and stalls. The ground is a mix of dirt and grey cobblestones, surrounded by green grass dotted with small yellow, white, and orange flowers and four-leaf clovers. Large, leafy green trees frame the scene, and a winding path leads into the distance toward soft rolling hills."
     }
   ]
 }

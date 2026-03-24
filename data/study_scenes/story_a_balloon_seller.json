@@ -13,135 +13,393 @@
       "title": "The Gift",
       "background_prompt": "A busy park on a sunny day with a wooden bench, green trees, a path, and people in the distance. No one sitting on the bench. No animals.",
       "full_scene_prompt": "A busy park on a sunny day. A shy boy with round glasses sits alone on a wooden bench. A tall balloon seller with a striped hat walks by, holding many colorful balloons. He is giving the boy a big yellow balloon. The boy smiles. Green trees and paths in the background.",
-      "entities_in_scene": ["boy", "seller", "balloon"],
-      "key_objects": ["park bench", "colorful balloons", "big yellow balloon"],
+      "entities_in_scene": [
+        "boy",
+        "seller",
+        "balloon"
+      ],
       "misl_targets": {
         "macro": {
-          "CH": ["shy boy with round glasses", "tall balloon seller with striped hat"],
-          "S": ["pretty park","sunny day"],
-          "IE": null,
-          "IR": ["boy is shy", "boy smiles"],
-          "P": null,
-          "A": ["sits on bench", "walks by", "gives balloon"],
-          "CO": null
+          "CH": [
+            "friendly balloon seller with a striped hat",
+            "shy boy with round glasses",
+            "bearded man in a patched jacket"
+          ],
+          "S": [
+            "sunny park",
+            "bright blue sky with fluffy clouds",
+            "grassy field with flowers",
+            "winding stone path"
+          ],
+          "IE": [
+            "the seller offers the boy a balloon"
+          ],
+          "IR": [
+            "the boy feels shy",
+            "the seller feels kind"
+          ],
+          "P": [
+            "the seller wants to cheer the boy up",
+            "the boy wants to take the balloon"
+          ],
+          "A": [
+            "sitting on the bench",
+            "walking along the path",
+            "holding colorful balloons",
+            "giving a yellow balloon"
+          ],
+          "CO": [
+            "the boy is no longer lonely",
+            "the boy has a new balloon"
+          ]
         },
         "micro": {
-          "ENP": ["round glasses", "tall balloon seller", "striped hat", "colorful balloons", "big yellow balloon"],
-          "ADV": ["alone"],
-          "SC": [],
-          "CC": [],
-          "M": [],
-          "L": []
+          "ENP": [
+            "tall striped hat",
+            "colorful bunch of balloons",
+            "big yellow balloon",
+            "wooden bench",
+            "curly brown hair",
+            "round glasses",
+            "patched purple jacket",
+            "bright yellow sweater",
+            "stone path",
+            "fluffy white clouds"
+          ],
+          "ADV": [
+            "kindly",
+            "alone"
+          ],
+          "SC": [
+            "because the boy was alone",
+            "when he saw the boy",
+            "so that the boy would smile"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "feels",
+            "wants",
+            "wonders",
+            "notices"
+          ],
+          "L": [
+            "says",
+            "offers",
+            "greets"
+          ]
         }
-      }
+      },
+      "scene_description": "A heartwarming scene in a sunny park. On the left, a tall, friendly balloon seller with a brown beard walks along a winding stone path. He is wearing a tall top hat with red and white stripes and a blue band, a purple jacket with visible patches, a brown satchel over his shoulder, blue trousers with patches, and brown boots. In his left hand, he holds a large bunch of colorful balloons in shades of red, blue, green, purple, and yellow. In his right hand, he holds out a single, large yellow balloon towards a child. On the right, a young boy with curly brown hair and round glasses sits on a dark wooden bench. The boy is wearing a yellow sweater, dark green striped trousers, and brown shoes, with a small backpack on his back. He looks down shyly but has a gentle smile on his face as he notices the balloon. The background features lush, round green trees under a bright blue sky filled with fluffy white clouds. The ground is covered in green grass dotted with small yellow and white flowers. The lighting is bright and cheerful, suggesting a pleasant afternoon."
     },
     {
       "scene_number": 2,
       "title": "The Walk",
       "background_prompt": "A path along a lake in a park, trees on one side, calm water on the other. Sunny day. No people, no animals.",
       "full_scene_prompt": "A path along a lake in a park. A shy boy with round glasses walks proudly, holding a big yellow balloon by its string tightly. A tiny white bird has landed on the balloon and is pecking at it. The boy shoos the bird gently with his other hand. Calm lake and trees in the background.",
-      "entities_in_scene": ["boy", "balloon", "bird"],
-      "key_objects": ["yellow balloon", "balloon string", "lake", "path"],
+      "entities_in_scene": [
+        "boy",
+        "balloon",
+        "bird"
+      ],
       "misl_targets": {
         "macro": {
-          "CH": ["boy", "tiny white bird"],
-          "S": ["path along the lake"],
-          "IE": null,
-          "IR": null,
-          "P": null,
-          "A": ["walks along path", "bird lands on balloon", "bird pecks at balloon", "boy shoos the bird"],
+          "CH": [
+            "boy with curly brown hair",
+            "tiny white bird",
+            "boy with round glasses"
+          ],
+          "S": [
+            "sunny park",
+            "cobblestone path",
+            "calm blue lake",
+            "bright blue sky"
+          ],
+          "IE": [
+            "a bird lands on the balloon",
+            "the bird starts pecking the balloon"
+          ],
+          "IR": [
+            "the boy feels worried",
+            "the boy looks surprised",
+            "the boy is nervous his balloon will pop"
+          ],
+          "P": [
+            "the boy tries to shoo the bird away"
+          ],
+          "A": [
+            "walking on the path",
+            "holding the balloon string",
+            "pecking at the balloon",
+            "shooing the bird away",
+            "looking up in surprise"
+          ],
           "CO": null
         },
         "micro": {
-          "ENP": ["balloon string", "tiny white bird"],
-          "ADV": ["proudly", "tightly", "gently"],
-          "SC": [],
-          "CC": ["and"],
-          "M": [],
-          "L": []
+          "ENP": [
+            "bright yellow balloon",
+            "tiny white bird",
+            "curly brown hair",
+            "round black glasses",
+            "calm blue lake",
+            "yellow knit sweater",
+            "puffy white clouds"
+          ],
+          "ADV": [
+            "gently",
+            "suddenly"
+          ],
+          "SC": [
+            "because",
+            "while",
+            "as",
+            "if"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "worries",
+            "notices",
+            "fears",
+            "wonders"
+          ],
+          "L": [
+            "gasps",
+            "shouts"
+          ]
         }
-      }
+      },
+      "scene_description": "A young boy with curly brown hair and large round glasses is walking along a brown cobblestone path. He is wearing a yellow knit sweater over a blue-and-white striped shirt, dark green pants, and sturdy brown boots. On his back, he carries a brown backpack. He is walking from left to right, but he has stopped mid-stride, looking up with a worried and surprised expression at a large, bright yellow balloon he is holding. The balloon is attached to a thin string that he holds tightly in his left hand. A tiny, fluffy white bird with a small yellow beak is perched on the very top of the balloon, pecking aggressively at its surface. Small yellow sparks fly where the bird's beak touches the balloon. The boy has raised his right hand in a gentle shooing motion to try and wave the bird away. The scene is set in a peaceful park during a bright, sunny day. To the left of the path are tall, leafy green trees with thick trunks. To the right is a wide, calm blue lake that reflects the light. In the background, there are rolling green hills under a bright blue sky filled with soft, white clouds. The grass along the path is lush and dotted with tiny white and yellow flowers."
     },
     {
       "scene_number": 3,
       "title": "The Pop",
       "background_prompt": "A wooden bridge over water in a park. Calm water below, trees on both sides. Sunny day. No people, no animals.",
       "full_scene_prompt": "A wooden bridge over water. A shy boy with round glasses leans over the edge of the bridge, looking sad. Yellow pieces of a popped balloon fall into the water below. A tiny white bird flies away from the bridge. The boy's face is sad.",
-      "entities_in_scene": ["boy", "bird", "balloon"],
-      "key_objects": ["wooden bridge", "yellow balloon pieces", "water"],
+      "entities_in_scene": [
+        "boy",
+        "bird",
+        "balloon"
+      ],
       "misl_targets": {
         "macro": {
-          "CH": ["boy", "bird"],
-          "S": ["wooden bridge"],
-          "IE": ["balloon pops"],
-          "IR": ["boy's face turns sad"],
+          "CH": [
+            "boy with round glasses",
+            "small white bird"
+          ],
+          "S": [
+            "wooden bridge",
+            "sunny park",
+            "calm blue river",
+            "grassy bank"
+          ],
+          "IE": [
+            "balloon popping"
+          ],
+          "IR": [
+            "boy feels sad",
+            "boy looks disappointed"
+          ],
           "P": null,
-          "A": ["bird pecks", "balloon pops", "pieces fall into water", "boy leans over edge"],
-          "CO": null
+          "A": [
+            "leaning over the railing",
+            "flying away",
+            "floating on the surface",
+            "watching the pieces"
+          ],
+          "CO": [
+            "yellow pieces are in the water",
+            "the balloon is destroyed"
+          ]
         },
         "micro": {
-          "ENP": ["loud bang", "yellow pieces", "edge of the bridge"],
-          "ADV": ["below", "away"],
-          "SC": ["when the bird pecks"],
-          "CC": [],
-          "M": [],
-          "L": []
+          "ENP": [
+            "yellow sweater",
+            "curly brown hair",
+            "round black glasses",
+            "wooden railing",
+            "jagged yellow pieces",
+            "fluffy white clouds",
+            "dark green pants",
+            "clear blue water"
+          ],
+          "ADV": [
+            "sadly",
+            "slowly",
+            "below"
+          ],
+          "SC": [
+            "because the balloon popped",
+            "as the pieces fall",
+            "while the bird flies",
+            "when he looks down"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "feels",
+            "thinks",
+            "wishes"
+          ],
+          "L": null
         }
-      }
+      },
+      "scene_description": "The scene is a bright, sunny park with a wooden bridge arching over a calm blue river. On the bridge, a young boy with curly brown hair and round black glasses leans over the wooden railing. He is wearing a yellow sweater over a blue collared shirt, dark green pants, and brown shoes. His facial expression is very sad, with downcast eyes and a small, frowning mouth as he watches the remains of his yellow balloon. The balloon has popped into several jagged yellow pieces that are falling through the air and floating on the water's surface below. A small white bird with spread wings is flying away from the bridge toward the right side of the image, appearing to leave the scene of the accident. The background is filled with lush, round green trees under a light blue sky with fluffy white clouds. The water is clear, showing soft reflections of the bridge's wooden pillars and ripples around the floating balloon fragments. Reeds and cattails grow along the grassy banks of the river in the foreground, and small grey stones sit near the water's edge. The overall atmosphere is peaceful yet melancholic because of the boy's lost toy."
     },
     {
       "scene_number": 4,
       "title": "The Search",
       "background_prompt": "A windy hilltop in a park, grass blowing, a park entrance with a gate visible in the distance below. Emptier area of the park. No people, no animals.",
       "full_scene_prompt": "A windy hilltop in a park. A shy boy with round glasses walks sadly down the hill, looking around. In the distance near the park entrance, a tall balloon seller with a striped hat is visible holding balloons. The boy is running toward him but the wind is blowing him back. Grass blowing in the wind.",
-      "entities_in_scene": ["boy", "seller"],
-      "key_objects": ["hilltop", "park entrance", "wind"],
+      "entities_in_scene": [
+        "boy",
+        "seller"
+      ],
       "misl_targets": {
         "macro": {
-          "CH": ["boy", "balloon seller"],
-          "S": ["windy hilltop"],
-          "IE": null,
-          "IR": ["sad", "determined"],
-          "P": ["decides to find the seller"],
-          "A": ["walks up hill", "looking for seller", "spots striped hat", "runs toward him"],
+          "CH": [
+            "a boy with curly hair and glasses",
+            "a bearded balloon seller with a striped hat"
+          ],
+          "S": [
+            "a windy hilltop in a park",
+            "at sunset",
+            "on a winding dirt path"
+          ],
+          "IE": [
+            "the boy spots the man with the balloons"
+          ],
+          "IR": null,
+          "P": [
+            "the boy wants to reach the seller",
+            "the boy is trying to run fast"
+          ],
+          "A": [
+            "running up the hill",
+            "holding colorful balloons"
+          ],
           "CO": null
         },
         "micro": {
-          "ENP": ["striped hat", "park entrance"],
-          "ADV": ["sadly", "in the distance"],
-          "SC": ["but the wind pushes him back"],
-          "CC": [],
-          "M": ["wants to find him"],
-          "L": []
+          "ENP": [
+            "curly brown hair",
+            "round glasses",
+            "yellow sweater",
+            "striped top hat",
+            "colorful balloons",
+            "winding path",
+            "tall green grass",
+            "blue wildflowers"
+          ],
+          "ADV": [
+            "quickly"
+          ],
+          "SC": [
+            "because he is sad",
+            "as the wind blows",
+            "while he runs",
+            "so that he can catch up"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "hopes"
+          ],
+          "L": null
         }
-      }
+      },
+      "scene_description": "The scene is a lush, windy hilltop in a park during a soft sunset or sunrise. In the foreground on the left, a small boy with messy curly brown hair and large round glasses is running up a winding dirt path. He wears a mustard-yellow sweater over a blue-and-white striped shirt, green corduroy trousers with rolled-up cuffs, and sturdy brown boots. He carries a tan backpack with blue patches on his back. His expression is sad and worried, with his mouth turned down and eyes wide. He is leaning forward as if struggling to move quickly. In the middle ground on the right, a tall, bearded balloon seller stands waiting. He wears a tall top hat with red, white, and blue stripes, a brown patchwork jacket, and blue patched trousers. He holds a large bunch of colorful balloons in shades of red, blue, green, yellow, and purple. He has a gentle, smiling expression. The environment is filled with tall green grass that is visibly swaying to the right, indicating a strong wind. Small clusters of yellow and blue wildflowers are scattered through the grass. In the background, there are rolling green hills, several leafy trees, two black wrought-iron gates, and a small gazebo in the far distance. The sky is a beautiful gradient of light blue, soft pink, and warm orange with long, wispy clouds stretching across the horizon."
     },
     {
       "scene_number": 5,
       "title": "The New Balloon",
       "background_prompt": "A park bench under a tree, same as scene 1. Sunny day, a branch visible above the bench. No people, no animals.",
       "full_scene_prompt": "A park bench under a tree. A tall balloon seller with a striped hat gives a beautiful red balloon to a shy boy with round glasses. The boy holds it with both hands, smiling. A tiny white bird watches from a branch above, staying away. Sunny day, same park as the beginning.",
-      "entities_in_scene": ["boy", "seller", "bird", "balloon"],
-      "key_objects": ["strong red balloon", "park bench", "branch"],
+      "entities_in_scene": [
+        "boy",
+        "seller",
+        "bird",
+        "balloon"
+      ],
       "misl_targets": {
         "macro": {
-          "CH": ["boy", "seller", "bird"],
-          "S": ["park bench"],
+          "CH": [
+            "shy boy with round glasses",
+            "friendly balloon seller with a beard",
+            "tiny white bird on a branch"
+          ],
+          "S": [
+            "sunny park with green grass",
+            "under a large oak tree",
+            "village in the distance"
+          ],
           "IE": null,
-          "IR": ["happy"],
+          "IR": [
+            "the boy feels happy"
+          ],
           "P": null,
-          "A": ["seller sees boy and waves", "gives new balloon", "boy holds with both hands", "bird watches", "boy sits on bench"],
-          "CO": ["boy gets a new balloon"]
+          "A": [
+            "handing a balloon",
+            "smiling at each other"
+          ],
+          "CO": [
+            "the boy has a new balloon to play with"
+          ]
         },
         "micro": {
-          "ENP": ["beautiful red balloon", "both hands", "white bird", "branch"],
-          "ADV": ["again"],
-          "SC": ["but stays away"],
-          "CC": ["and"],
-          "M": [],
-          "L": []
+          "ENP": [
+            "shiny red balloon",
+            "striped top hat",
+            "patched brown jacket",
+            "wooden park bench",
+            "curly brown hair",
+            "tiny white bird",
+            "yellow sweater",
+            "colorful bunch of balloons"
+          ],
+          "ADV": [
+            "happily",
+            "kindly",
+            "gently"
+          ],
+          "SC": [
+            "because he is kind",
+            "while the bird watches",
+            "as he takes the balloon"
+          ],
+          "CC": [
+            "and",
+            "but"
+          ],
+          "M": [
+            "feels",
+            "thinks",
+            "wants",
+            "hopes"
+          ],
+          "L": [
+            "says",
+            "thanks",
+            "tells"
+          ]
         }
-      }
+      },
+      "scene_description": "In a bright and sunny park, a friendly tall man is giving a special gift to a little boy. The man is a balloon seller with a bushy brown beard and a very tall top hat with red and blue stripes. He wears a brown jacket that has colorful patches on the elbows and a green vest underneath. He is holding out a shiny red balloon to the boy. In his other hand, he holds a big bunch of many colorful balloons like blue, yellow, green, and purple. The boy has curly brown hair and wears big round glasses. He looks very happy as he holds the string of his new red balloon with both hands. He is wearing a yellow sweater over a striped shirt and green trousers. He also has a brown backpack on his back. Behind them is a comfortable wooden bench with black metal legs sitting under the shade of a massive oak tree with many green leaves. High up on a branch, a tiny white bird with a yellow beak is watching them. In the distance, the landscape features rolling green hills and a peaceful little village with small houses and a church steeple. The sky is a light blue with soft, fluffy white clouds. The ground is covered in green grass with pretty yellow and blue flowers growing near the bottom corners of the scene."
     }
   ]
 }
