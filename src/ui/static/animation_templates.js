@@ -11,6 +11,8 @@
 // Uses pre-computed distance field from PixelBuffer.computeDistanceFields().
 AnimationTemplates.register('spotlight', function(params) {
   var prefix = params.entityPrefix || '';
+  var sceneMode = !prefix || prefix === '';
+  console.log('[spotlight] prefix="' + prefix + '" sceneMode=' + sceneMode);
   var dimStrength = params.dimStrength != null ? params.dimStrength : 0.7;
   var glowStrength = params.glowStrength != null ? params.glowStrength : 0.35;
   var haloColor = params.haloColor || [255, 240, 180]; // warm yellow
@@ -23,31 +25,29 @@ AnimationTemplates.register('spotlight', function(params) {
     var glow = 1 + glowStrength * env * pulse;
     var dim = 1 - dimStrength * env;
 
-    // Get pre-computed distance field for this entity
-    var df = _getDistField(buf, prefix);
+    // Halo only in entity mode (no meaningful contour for bg)
+    var df = sceneMode ? null : _getDistField(buf, prefix);
     var haloSize = Math.round(5 + (maxHaloSize - 5) * env * pulse);
     var hr = haloColor[0], hg = haloColor[1], hb = haloColor[2];
     var haloAlphaMax = 0.7 * env * pulse;
 
-    // Single pass: dim non-target, brighten target, draw silhouette halo
     for (var i = 0; i < buf.length; i++) {
       var p = buf[i];
-      var isTarget = _isEntity(p.e, prefix);
 
-      if (isTarget) {
-        // Brighten target entity
+      if (_isTargetPixel(p, prefix, sceneMode)) {
+        // Brighten target (entity or bg in scene mode)
         p.r = Math.min(255, Math.round(p._r * glow));
         p.g = Math.min(255, Math.round(p._g * glow));
         p.b = Math.min(255, Math.round(p._b * glow));
-      } else if (df && df[i] > 0 && df[i] <= haloSize) {
-        // Pixel is near entity contour — draw halo with smooth cubic falloff
+      } else if (!sceneMode && df && df[i] > 0 && df[i] <= haloSize) {
+        // Halo around entity contour (entity mode only)
         var falloff = 1 - df[i] / haloSize;
         var a = haloAlphaMax * falloff * falloff * falloff;
         p.r = Math.min(255, Math.round(p._r * dim * (1 - a) + hr * a));
         p.g = Math.min(255, Math.round(p._g * dim * (1 - a) + hg * a));
         p.b = Math.min(255, Math.round(p._b * dim * (1 - a) + hb * a));
-      } else if (p.e && p.e !== '') {
-        // Dim everything else
+      } else if (_isNonTargetPixel(p, prefix, sceneMode) || (!sceneMode && p.e && p.e !== '')) {
+        // Dim non-target
         p.r = Math.round(p._r * dim);
         p.g = Math.round(p._g * dim);
         p.b = Math.round(p._b * dim);
@@ -416,6 +416,7 @@ AnimationTemplates.register('stamp', function(params) {
 // Active group shows boosted saturation; inactive groups are desaturated.
 AnimationTemplates.register('color_pop', function(params) {
   var prefix = params.entityPrefix || '';
+  var sceneMode = !prefix || prefix === '';
   var desatStr = params.desaturationStrength != null ? params.desaturationStrength : 0.8;
   var satBoost = params.saturationBoost != null ? params.saturationBoost : 0.3;
 
@@ -443,7 +444,7 @@ AnimationTemplates.register('color_pop', function(params) {
       var pixels = []; // {i, h, s, l}
       for (var i = 0; i < buf.length; i++) {
         var p = buf[i];
-        if (!_isEntity(p.e, prefix)) continue;
+        if (!_isTargetPixel(p, prefix, sceneMode)) continue;
         var r = p._r, g = p._g, bl = p._b;
         var mx = Math.max(r, g, bl), mn = Math.min(r, g, bl);
         var satV = (mx === 0) ? 0 : (mx - mn) / mx;
@@ -620,14 +621,14 @@ AnimationTemplates.register('color_pop', function(params) {
           p.g = Math.round(p._g * (1 - desat) + L * desat);
           p.b = Math.round(p._b * (1 - desat) + L * desat);
         }
-      } else if (_isEntity(p.e, prefix)) {
-        // Target entity pixel not in any group (outlines): desaturate
+      } else if (_isTargetPixel(p, prefix, sceneMode)) {
+        // Target pixel not in any group (outlines/low-sat): desaturate
         var L = Math.round(p._r * 0.299 + p._g * 0.587 + p._b * 0.114);
         p.r = Math.round(p._r * (1 - env) + L * env);
         p.g = Math.round(p._g * (1 - env) + L * env);
         p.b = Math.round(p._b * (1 - env) + L * env);
-      } else if (p.e && p.e !== '' && !p.e.startsWith('bg.')) {
-        // Non-target entity: desaturate
+      } else if (_isNonTargetPixel(p, prefix, sceneMode)) {
+        // Non-target: desaturate
         var L = Math.round(p._r * 0.299 + p._g * 0.587 + p._b * 0.114);
         var mix = desatStr * env;
         p.r = Math.round(p._r * (1 - mix) + L * mix);
@@ -1764,6 +1765,7 @@ AnimationTemplates.register('sequential_glow', function(params) {
 // Entity pixels fall downward with slight horizontal drift, fading to opacity 0.
 AnimationTemplates.register('disintegration', function(params) {
   var prefix = params.entityPrefix || '';
+  var sceneMode = !prefix || prefix === '';
   var driftAmount = params.driftAmount != null ? params.driftAmount : 0.3;
   var fallSpeed = params.fallSpeed != null ? params.fallSpeed : 1.0;
 
@@ -1773,8 +1775,8 @@ AnimationTemplates.register('disintegration', function(params) {
 
   return function animate(buf, PW, PH, t) {
     if (!cachedPixels) {
-      cachedPixels = _collectEntityPixels(buf, PW, prefix);
-      cachedBounds = _computeEntityBounds(buf, PW, prefix);
+      cachedPixels = _collectEntityPixels(buf, PW, prefix, sceneMode);
+      cachedBounds = _computeEntityBounds(buf, PW, prefix, sceneMode);
       cachedOffsets = [];
       var bh = cachedBounds.y2 - cachedBounds.y1 + 1;
       var bw = cachedBounds.x2 - cachedBounds.x1 + 1;

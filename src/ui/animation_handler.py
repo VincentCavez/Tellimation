@@ -233,6 +233,7 @@ async def execute_animation(
         # Inject entityPrefix into params for all template-based modes
         # "scene" target means no specific entity — use empty prefix
         entity_prefix = "" if target_id == "scene" else target_id
+        logger.info("[ANIMATION] target_id=%r entity_prefix=%r", target_id, entity_prefix)
         if decision["mode"] in ("use_default", "adjust_params"):
             decision["params"]["entityPrefix"] = entity_prefix
 

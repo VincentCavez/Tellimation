@@ -3835,6 +3835,503 @@
         "rationale": "The kitchen looks so warm and cozy with the sun shining through the window. Why not describe where the family is baking?",
         "pass_type": "suggestion",
         "timestamp": "2026-03-23T07:41:08.985371+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "The kitchen is yellow.",
+        "was_interrupted": false,
+        "timestamp": "2026-03-23T08:07:50.194055+00:00"
+      },
+      {
+        "event": "corrections",
+        "items": [
+          {
+            "animation_id": "P1",
+            "targets": [
+              "scene"
+            ],
+            "rationale": "It looks like a very warm and cozy kitchen, but it isn't quite yellow."
+          }
+        ],
+        "timestamp": "2026-03-23T08:07:50.196660+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "The story would be even better if you mentioned the boy who is in the kitchen with his grandmother!"
+          },
+          {
+            "animation_id": "I1",
+            "targets": [
+              "dog"
+            ],
+            "rationale": "Did you see the little brown dog hiding under the table? He's watching everything very closely!"
+          },
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "It looks like the boy and his grandmother are busy doing something together with those cookies!"
+          },
+          {
+            "animation_id": "P1",
+            "targets": [
+              "box"
+            ],
+            "rationale": "That's a very special box on the table. Can you describe what it looks like?"
+          },
+          {
+            "animation_id": "P2c",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "How do you think the boy feels about helping his grandmother bake these fresh cookies?"
+          }
+        ],
+        "timestamp": "2026-03-23T08:07:50.198571+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "I1_spotlight",
+        "targets": [
+          "scene"
+        ],
+        "rationale": "It looks like a very warm and cozy kitchen, but it isn't quite yellow.",
+        "pass_type": "correction",
+        "timestamp": "2026-03-23T08:07:50.204986+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "The kitchen is yellow.",
+        "was_interrupted": false,
+        "timestamp": "2026-03-23T08:09:55.144722+00:00"
+      },
+      {
+        "event": "corrections",
+        "items": [
+          {
+            "animation_id": "P1",
+            "targets": [
+              "scene"
+            ],
+            "rationale": "The kitchen doesn't look yellow; it's a cozy kitchen with a wooden table and tiled floor."
+          }
+        ],
+        "timestamp": "2026-03-23T08:09:55.147789+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "The child mentioned the kitchen but hasn't yet introduced the boy who is in the scene."
+          },
+          {
+            "animation_id": "I1",
+            "targets": [
+              "grandmother"
+            ],
+            "rationale": "The grandmother is an important part of this scene, but she hasn't been mentioned yet."
+          },
+          {
+            "animation_id": "I1",
+            "targets": [
+              "dog"
+            ],
+            "rationale": "There is a small dog watching from under the table that could be part of the story."
+          },
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The characters are busy with a task, like packing the cookies, which would add more action to the story."
+          },
+          {
+            "animation_id": "P1",
+            "targets": [
+              "box"
+            ],
+            "rationale": "The child could describe the big red box to add more detail to the scene."
+          }
+        ],
+        "timestamp": "2026-03-23T08:09:55.150458+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "I1_spotlight",
+        "targets": [
+          "scene"
+        ],
+        "rationale": "The kitchen doesn't look yellow; it's a cozy kitchen with a wooden table and tiled floor.",
+        "pass_type": "correction",
+        "timestamp": "2026-03-23T08:09:55.158436+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "The kitchen is yellow.",
+        "was_interrupted": false,
+        "timestamp": "2026-03-23T08:11:08.648094+00:00"
+      },
+      {
+        "event": "corrections",
+        "items": [
+          {
+            "animation_id": "P1",
+            "targets": [
+              "scene"
+            ],
+            "rationale": "The kitchen isn't actually yellow, it's a cozy wooden kitchen with afternoon light."
+          }
+        ],
+        "timestamp": "2026-03-23T08:11:08.651176+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "The child mentioned the kitchen but didn't describe the boy who is one of the main characters in the scene."
+          },
+          {
+            "animation_id": "I1",
+            "targets": [
+              "grandmother"
+            ],
+            "rationale": "The child hasn't mentioned the grandmother who is standing by the table in the kitchen."
+          },
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The child described the room but hasn't mentioned that the characters are busy packing fresh cookies into a box."
+          },
+          {
+            "animation_id": "P1",
+            "targets": [
+              "box"
+            ],
+            "rationale": "The child could add more detail by describing the bright red box sitting on the table."
+          },
+          {
+            "animation_id": "P2c",
+            "targets": [
+              "dog"
+            ],
+            "rationale": "The child hasn't mentioned the small dog or how excited it might be watching the cookies from under the table."
+          }
+        ],
+        "timestamp": "2026-03-23T08:11:08.653823+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "I1_spotlight",
+        "targets": [
+          "scene"
+        ],
+        "rationale": "The kitchen isn't actually yellow, it's a cozy wooden kitchen with afternoon light.",
+        "pass_type": "correction",
+        "timestamp": "2026-03-23T08:11:08.660260+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "The kitchen is yellow.",
+        "was_interrupted": false,
+        "timestamp": "2026-03-23T08:12:07.680329+00:00"
+      },
+      {
+        "event": "corrections",
+        "items": [
+          {
+            "animation_id": "P1",
+            "targets": [
+              "scene"
+            ],
+            "rationale": "The kitchen is described as warm and cozy with afternoon light, but it isn't actually yellow."
+          }
+        ],
+        "timestamp": "2026-03-23T08:12:07.683901+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "The child mentioned the kitchen but didn't mention the boy who is right there in the middle of the scene."
+          },
+          {
+            "animation_id": "I1",
+            "targets": [
+              "grandmother"
+            ],
+            "rationale": "The grandmother is also in the kitchen helping out, but she hasn't been mentioned yet."
+          },
+          {
+            "animation_id": "I1",
+            "targets": [
+              "dog"
+            ],
+            "rationale": "There is a little dog watching everything from under the table that could be part of the story."
+          },
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The characters are busy putting fresh cookies into a box, which is a great detail to include."
+          },
+          {
+            "animation_id": "P2c",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "Baking cookies is usually a very happy time! Describing how the boy feels would add more to the story."
+          }
+        ],
+        "timestamp": "2026-03-23T08:12:07.686079+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "I1_spotlight",
+        "targets": [
+          "scene"
+        ],
+        "rationale": "The kitchen is described as warm and cozy with afternoon light, but it isn't actually yellow.",
+        "pass_type": "correction",
+        "timestamp": "2026-03-23T08:12:07.694642+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "The kitchen is yellow.",
+        "was_interrupted": false,
+        "timestamp": "2026-03-23T08:13:13.374614+00:00"
+      },
+      {
+        "event": "corrections",
+        "items": [
+          {
+            "animation_id": "P1",
+            "targets": [
+              "scene"
+            ],
+            "rationale": "The kitchen is described as warm and cozy with afternoon light, but it isn't actually yellow."
+          }
+        ],
+        "timestamp": "2026-03-23T08:13:13.378228+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "The child mentioned the kitchen but didn't mention the boy who is right there in the middle of the scene."
+          },
+          {
+            "animation_id": "I1",
+            "targets": [
+              "grandmother"
+            ],
+            "rationale": "The grandmother is a key part of this baking scene, but the child hasn't introduced her yet."
+          },
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The boy and his grandmother are busy putting cookies in a box, but the child hasn't described what they are doing yet."
+          },
+          {
+            "animation_id": "I1",
+            "targets": [
+              "dog"
+            ],
+            "rationale": "There is a small dog watching from under the table that the child hasn't noticed in their story yet."
+          },
+          {
+            "animation_id": "P1",
+            "targets": [
+              "box"
+            ],
+            "rationale": "The child could add more detail by describing the bright red box the family is using for their cookies."
+          }
+        ],
+        "timestamp": "2026-03-23T08:13:13.380963+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "I1_spotlight",
+        "targets": [
+          "scene"
+        ],
+        "rationale": "The kitchen is described as warm and cozy with afternoon light, but it isn't actually yellow.",
+        "pass_type": "correction",
+        "timestamp": "2026-03-23T08:13:13.388664+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "The kitchen is yellow.",
+        "was_interrupted": false,
+        "timestamp": "2026-03-23T08:14:35.052001+00:00"
+      },
+      {
+        "event": "corrections",
+        "items": [
+          {
+            "animation_id": "P1",
+            "targets": [
+              "scene"
+            ],
+            "rationale": "The kitchen isn't actually yellow, it has warm wooden furniture and light through the window."
+          }
+        ],
+        "timestamp": "2026-03-23T08:14:35.055552+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "The child mentioned the kitchen but hasn't yet introduced the boy who is part of the scene."
+          },
+          {
+            "animation_id": "I1",
+            "targets": [
+              "grandmother"
+            ],
+            "rationale": "The grandmother is also in the kitchen, but she hasn't been mentioned in the story yet."
+          },
+          {
+            "animation_id": "I1",
+            "targets": [
+              "dog"
+            ],
+            "rationale": "There is a small dog watching from under the table that would be a great addition to the description."
+          },
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The boy and his grandmother are busy putting fresh cookies into a box, which adds a lot of action to the kitchen scene."
+          },
+          {
+            "animation_id": "P1",
+            "targets": [
+              "box"
+            ],
+            "rationale": "The child could describe the bright red color of the cookie box to add more detail to the kitchen."
+          }
+        ],
+        "timestamp": "2026-03-23T08:14:35.057699+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "I1_spotlight",
+        "targets": [
+          "scene"
+        ],
+        "rationale": "The kitchen isn't actually yellow, it has warm wooden furniture and light through the window.",
+        "pass_type": "correction",
+        "timestamp": "2026-03-23T08:14:35.066705+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "The kitchen is yellow.",
+        "was_interrupted": false,
+        "timestamp": "2026-03-23T08:15:37.766889+00:00"
+      },
+      {
+        "event": "corrections",
+        "items": [
+          {
+            "animation_id": "P1",
+            "targets": [
+              "scene"
+            ],
+            "rationale": "The child mentioned the kitchen is yellow, but the kitchen is described as being warm and cozy with a wooden table and tiled floor, with no mention of yellow walls."
+          }
+        ],
+        "timestamp": "2026-03-23T08:15:37.770023+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "The child mentioned the kitchen but didn't mention the boy who is right there in the middle of the scene."
+          },
+          {
+            "animation_id": "I1",
+            "targets": [
+              "grandmother"
+            ],
+            "rationale": "The grandmother is also in the kitchen, but she hasn't been mentioned in the story yet."
+          },
+          {
+            "animation_id": "I1",
+            "targets": [
+              "dog"
+            ],
+            "rationale": "There is a little dog watching from under the table that could be part of the story."
+          },
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The characters are busy doing something together with the cookies, but the child hasn't described their actions yet."
+          },
+          {
+            "animation_id": "P1",
+            "targets": [
+              "box"
+            ],
+            "rationale": "The child could describe the big red box that the characters are using for the cookies."
+          }
+        ],
+        "timestamp": "2026-03-23T08:15:37.773052+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "I1_spotlight",
+        "targets": [
+          "scene"
+        ],
+        "rationale": "The child mentioned the kitchen is yellow, but the kitchen is described as being warm and cozy with a wooden table and tiled floor, with no mention of yellow walls.",
+        "pass_type": "correction",
+        "timestamp": "2026-03-23T08:15:37.782307+00:00"
       }
     ]
   }

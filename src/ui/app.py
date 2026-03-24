@@ -1515,7 +1515,8 @@ async def _handle_study_audio(
                 # Send ONE animation with combined prefix for all targets
                 combined_prefix = "|".join(targets) if targets else ""
                 if combined_prefix:
-                    anim_params["entityPrefix"] = combined_prefix
+                    # "scene" target means whole background — use empty prefix
+                    anim_params["entityPrefix"] = "" if combined_prefix == "scene" else combined_prefix
                     decision = {
                         "mode": "use_default",
                         "animation_id": animation_id,
