@@ -13,135 +13,384 @@
       "title": "The Light",
       "background_prompt": "A child's bedroom at night, a bed with pillows, a small table beside it. A strange glow is visible through the window outside. Cozy room, dim lighting. No people, no animals.",
       "full_scene_prompt": "A child's bedroom at night. A girl in striped pajamas stands by the window, looking at something outside. Her older sister with a green scarf stands at the door, having just followed her. Dim room, nighttime.",
-      "entities_in_scene": ["girl", "sister"],
-      "key_objects": ["bedroom window", "outside", "small table", "strange glow"],
+      "entities_in_scene": [
+        "girl",
+        "sister"
+      ],
       "misl_targets": {
         "macro": {
-          "CH": ["girl in striped pajamas", "older sister with green scarf"],
-          "S": ["bedroom", "nighttime"],
-          "IE": ["strange glow through window"],
-          "IR": null,
-          "P": null,
-          "A": ["sees glow", "looks outside", "sister hears her", "follows her down stairs"],
+          "CH": [
+            "girl in striped pajamas",
+            "older sister with a green scarf",
+            "girl with pigtails"
+          ],
+          "S": [
+            "cozy bedroom",
+            "sunset sky",
+            "evening",
+            "rolling hills",
+            "inside a house"
+          ],
+          "IE": null,
+          "IR": [
+            "curious",
+            "peaceful"
+          ],
+          "P": [
+            "to check on her sister"
+          ],
+          "A": null,
           "CO": null
         },
         "micro": {
-          "ENP": ["striped pajamas", "strange glow", "bedroom window", "small table next to her bed", "green scarf"],
-          "ADV": ["quietly"],
-          "SC": [],
-          "CC": [],
-          "M": [],
-          "L": []
+          "ENP": [
+            "striped pajamas",
+            "green scarf",
+            "glowing sky",
+            "wooden nightstand",
+            "blue pillow",
+            "patterned quilt",
+            "brown boots",
+            "colorful flags",
+            "open window",
+            "long braid"
+          ],
+          "ADV": [
+            "curiously",
+            "brightly"
+          ],
+          "SC": [
+            "because",
+            "while",
+            "as",
+            "since",
+            "when"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "wonders",
+            "notices",
+            "sees",
+            "watches"
+          ],
+          "L": null
         }
-      }
+      },
+      "scene_description": "A cozy child's bedroom is shown at sunset. On the left, a wooden bed is neatly made with a blue pillow, a white sheet, and a green quilt featuring various patterns. A small, round wooden nightstand with one drawer stands next to the bed. Above the bed, a framed picture of mountains hangs on the wall, and a string of colorful triangular bunting in yellow, blue, green, and pink is draped nearby. The floor is made of wide brown wooden planks, with a patterned rug visible in the bottom left corner. In the center of the room, a young girl with brown hair in pigtails stands with her back to the viewer. She wears blue and white horizontal striped pajamas and blue slippers. She is looking out a large, dark-framed window with four panes; the right pane is swung open. Outside, the sky is a vibrant gradient of purple, pink, and orange from the sunset, with soft white and pink clouds. The landscape outside features rolling green hills, a meadow dotted with small flowers, and trees with purple, yellow, and green foliage. On the right side of the image, an older sister enters the room through an open brown door. She has a long brown braid and wears a thick green scarf over a brown coat, blue jeans, and brown boots. She is walking toward the girl with a gentle, smiling expression. The room is filled with a warm, dim light coming from the sunset outside."
     },
     {
       "scene_number": 2,
       "title": "The Garden",
       "background_prompt": "A dark garden at night seen from a back door. Bushes, a path leading deeper into the garden, long shadows. Moonlight. No people, no animals.",
       "full_scene_prompt": "A dark garden at night. A girl in striped pajamas walks carefully ahead, making long shadows on the bushes. Her older sister with a green scarf stands beside her near the back door. A large glowing firefly floats just ahead of them on the path, moving toward the back of the garden. Moonlight, dark sky.",
-      "entities_in_scene": ["girl", "sister", "firefly"],
-      "key_objects": ["back door", "bushes", "long shadows", "garden path"],
+      "entities_in_scene": [
+        "girl",
+        "sister",
+        "firefly"
+      ],
       "misl_targets": {
         "macro": {
-          "CH": ["girl", "sister", "large glowing firefly"],
-          "S": ["dark garden"],
-          "IE": null,
-          "IR": null,
-          "P": null,
-          "A": ["step through back door", "flashlight makes shadows", "firefly floats ahead", "firefly moves toward back of garden", "girl whispers to sister"],
+          "CH": [
+            "young girl in striped pajamas",
+            "older sister with a green scarf",
+            "large glowing firefly"
+          ],
+          "S": [
+            "dark garden at night",
+            "winding stone path",
+            "under the crescent moon",
+            "starry night sky"
+          ],
+          "IE": [
+            "The girls step out into the garden to follow a firefly."
+          ],
+          "IR": [
+            "The girl feels curious and excited.",
+            "They both feel amazed by the firefly."
+          ],
+          "P": [
+            "The girls plan to follow the firefly.",
+            "The firefly wants to lead them through the garden."
+          ],
+          "A": [
+            "walking along the path",
+            "following the firefly"
+          ],
           "CO": null
         },
         "micro": {
-          "ENP": ["back door", "dark garden", "long shadows", "bushes", "large glowing firefly"],
-          "ADV": ["just ahead"],
-          "SC": [],
-          "CC": ["and"],
-          "M": [],
-          "L": ["whispers"]
+          "ENP": [
+            "striped blue pajamas",
+            "bright green scarf",
+            "glowing yellow tail",
+            "smooth stone path",
+            "crescent moon",
+            "fluffy white clouds",
+            "dark blue sky",
+            "brown leather boots",
+            "colorful bushes"
+          ],
+          "ADV": [
+            "slowly",
+            "ahead"
+          ],
+          "SC": [
+            "as they walk",
+            "while the firefly glows"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": null,
+          "L": [
+            "whispers"
+          ]
         }
-      }
+      },
+      "scene_description": "A peaceful nighttime garden scene under a dark blue sky. In the center-right of the image, a young girl with brown hair tied in pigtails is walking along a winding stone path. She is wearing light blue and white striped pajamas and matching slippers. She has a curious and happy expression on her face. Behind her and slightly to the right stands her older sister, who has long brown hair in a braid. The older sister is wearing a brown jacket, a long green scarf wrapped around her neck, blue pants, and brown boots. She has one hand in her pocket and is smiling warmly at the younger girl. Just ahead of the little girl on the path, a very large, cartoonish firefly is floating. The firefly has a brown body, large blue eyes, and translucent wings. Its round abdomen is glowing with a bright yellow light, casting a warm glow on the nearby green and yellow bushes. The stone path is made of smooth, grey, irregular cobbles. The garden is filled with lush greenery, including round green bushes, bright yellow bushes, and pale blue flowering shrubs. Small white flowers dot the green grass. In the background, tall green and teal trees stand against the sky. The sky is a deep blue, featuring several soft white clouds and a bright yellow crescent moon that illuminates the scene. Long shadows are cast on the ground, indicating the moonlight and the firefly's glow. The overall atmosphere is magical, calm, and adventurous."
     },
     {
       "scene_number": 3,
       "title": "The Path",
       "background_prompt": "A narrow path between thick bushes at night, a tree root across the path, a rusty metal gate barely visible at the end. Moonlight filtering through. No people, no animals.",
       "full_scene_prompt": "A narrow path between thick bushes at night. The older sister with a green scarf has tripped on a root. The girl in striped pajamas helps her up. A green scarf lies on the ground. A large glowing firefly floats above a rusty gate at the end of the path, waiting. Moonlight.",
-      "entities_in_scene": ["girl", "sister", "firefly"],
-      "key_objects": ["narrow path", "thick bushes", "root", "green scarf", "rusty gate"],
+      "entities_in_scene": [
+        "girl",
+        "sister",
+        "firefly"
+      ],
       "misl_targets": {
         "macro": {
-          "CH": ["girl", "sister", "firefly"],
-          "S": ["narrow path"],
-          "IE": null,
-          "IR": ["surprised by the gate"],
+          "CH": [
+            "older sister in a brown coat",
+            "younger girl in striped pajamas",
+            "large glowing firefly"
+          ],
+          "S": [
+            "dark forest at night",
+            "narrow dirt path",
+            "moonlit sky with clouds",
+            "thick green bushes"
+          ],
+          "IE": [
+            "the sister trips on a thick root"
+          ],
+          "IR": [
+            "sister feels pained",
+            "younger girl feels worried"
+          ],
           "P": null,
-          "A": ["follow firefly", "sister trips on root", "drops scarf", "girl helps her up", "firefly waits", "firefly floats above gate"],
-          "CO": null
+          "A": [
+            "helping her sister up",
+            "holding her arm",
+            "dropping a green scarf"
+          ],
+          "CO": [
+            "the scarf is on the ground",
+            "the sister is on her knees"
+          ]
         },
         "micro": {
-          "ENP": ["narrow path", "thick bushes", "root", "rusty gate"],
-          "ADV": ["above"],
-          "SC": ["that they have never seen before"],
-          "CC": ["and"],
-          "M": [],
-          "L": []
+          "ENP": [
+            "rusty metal gate",
+            "glowing yellow firefly",
+            "striped blue pajamas",
+            "thick brown root",
+            "green knitted scarf",
+            "worried expression",
+            "narrow dirt path",
+            "dense green bushes"
+          ],
+          "ADV": [
+            "suddenly"
+          ],
+          "SC": [
+            "because she tripped",
+            "while they were walking",
+            "as the firefly waited",
+            "so that she doesn't get hurt"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "feels",
+            "wonders",
+            "wants",
+            "knows"
+          ],
+          "L": [
+            "asks for help",
+            "shouts"
+          ]
         }
-      }
+      },
+      "scene_description": "The scene is set at night on a narrow dirt path winding through a dense forest. Two young girls are the central figures. The older sister, with brown hair in a long braid, has just tripped over a thick, gnarled tree root that snakes across the path. She is wearing a brown coat over a white ribbed sweater and blue trousers. She is on her knees with her hands pressed against the ground, her face showing a pained and surprised expression with eyes tightly shut. In front of her on the path lies her long green knitted scarf. To her right, a younger girl in blue and white horizontal striped pajamas and light blue slippers is kneeling to help. She is grasping the older girl's arm with both hands, looking worried with raised eyebrows and a slightly open mouth. Above them, a large, magical firefly with a brown body, iridescent wings, and large blue eyes floats in the air. Its lower abdomen glows with a bright, warm yellow light that illuminates the girls and the path. In the background, a dark, rusty metal gate stands at the end of the path between thick, rounded green bushes. The night sky is dark blue with soft grey clouds, and cool moonlight filters through the trees, creating a contrast with the warm glow of the firefly. Small white and blue flowers, along with four-leaf clovers, are scattered in the grass lining the path."
     },
     {
       "scene_number": 4,
       "title": "The Greenhouse",
       "background_prompt": "Inside an old greenhouse at night, cracked glass walls, vines growing on the frame, strange plants with big leaves, soft golden light filling the air. Through the cracked glass, a house is visible in the distance with a light on in one window. No people, no animals.",
       "full_scene_prompt": "Inside an old greenhouse at night. Dozens of glowing fireflies fill the air with soft golden light. Through the cracked glass walls, their house is visible in the distance with a light turned on in a window. Strange plants with big leaves grow everywhere. The children look amazed by all the beauty.",
-      "entities_in_scene": ["girl", "sister", "firefly", "house"],
-      "key_objects": ["old greenhouse", "cracked glass walls", "vines", "strange plants", "big leaves"],
+      "entities_in_scene": [
+        "girl",
+        "sister",
+        "firefly",
+        "house"
+      ],
       "misl_targets": {
         "macro": {
-          "CH": ["girl", "sister", "firefly", "house"],
-          "S": ["old greenhouse"],
-          "IE": ["light turns on in house", "it is getting very late", "go back to the house"],
-          "IR": ["amazed by the fireflies","amazed by the beauty","amazed by the lights"],
-          "P": null,
-          "A": ["push open gate", "find greenhouse", "fireflies fill the air", "see house in distance", "light turns on"],
+          "CH": [
+            "younger girl in striped pajamas",
+            "older sister in a brown coat and green scarf",
+            "giant glowing fireflies"
+          ],
+          "S": [
+            "inside an old wooden greenhouse"
+          ],
+          "IE": null,
+          "IR": [
+            "amazed by the glowing lights",
+            "feeling happy and safe together",
+            "full of wonder and surprise"
+          ],
+          "P": [
+            "to go back home"
+          ],
+          "A": null,
           "CO": null
         },
         "micro": {
-          "ENP": ["old greenhouse", "vines", "dozens of fireflies", "soft golden light", "cracked glass walls", "strange plants", "big leaves", "house in the distance"],
-          "ADV": ["everywhere"],
-          "SC": ["because it is getting very late"],
-          "CC": ["but"],
-          "M": ["amazed", "realize"],
-          "L": []
+          "ENP": [
+            "old wooden frame",
+            "cracked glass walls",
+            "blue and white striped pajamas",
+            "long green scarf",
+            "glowing yellow abdomens",
+            "bright crescent moon",
+            "large green leaves",
+            "overturned clay pots",
+            "stone stepping path",
+            "lit house window"
+          ],
+          "ADV": [
+            "brightly",
+            "softly",
+            "magically",
+            "together",
+            "peacefully",
+            "upward"
+          ],
+          "SC": [
+            "because it is dark outside",
+            "while they are exploring",
+            "when the fireflies fly",
+            "as they look around"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "wonders",
+            "notices",
+            "feels",
+            "enjoys",
+            "thinks"
+          ],
+          "L": [
+            "whispers",
+            "says",
+            "gasps"
+          ]
         }
-      }
+      },
+      "scene_description": "The scene takes place inside a magical, old greenhouse at night. The greenhouse has a dark wooden frame and curved glass walls, some of which are cracked. In the center, a younger girl and an older sister stand on a stone path. The younger girl on the left wears blue and white horizontal striped pajamas and blue slippers. Her brown hair is tied in small pigtails, and she has an expression of wide-eyed wonder with her mouth slightly open, looking up. The older sister on the right wears a brown coat, a thick green scarf, blue jeans, and brown boots. Her long brown hair is in a single braid, and she is smiling warmly at her younger sister. Surrounding them are several giant fireflies that look like large bees with glowing golden abdomens. One firefly is flying directly between the girls, while others are scattered around the greenhouse. The floor is covered in lush green grass, clovers, and large-leafed plants. To the right, there are large yellow bell-shaped flowers. Two overturned terracotta pots sit on the ground. Through the glass walls and roof, a bright yellow crescent moon and small stars are visible against a dark blue sky with soft white clouds. In the far distance, a cozy blue house with a single glowing yellow window can be seen among the trees. The atmosphere is warm, enchanted, and peaceful, filled with soft golden light from the fireflies."
     },
     {
       "scene_number": 5,
       "title": "The Secret",
       "background_prompt": "A child's bedroom at night, same as scene 1. A bed with a pillow, a small table, the window now showing a faint glow in the distance. Cozy, dim. No people, no animals.",
       "full_scene_prompt": "A child's bedroom at night. A girl in striped pajamas sits on her bed drawing a map on paper. A pillow is lifted showing where she will hide the map. Her older sister with a green scarf around her neck sits beside her, smiling. The green scarf is slightly dirty. The window shows a faint glow in the distance outside.",
-      "entities_in_scene": ["girl", "sister"],
-      "key_objects": ["map", "pillow", "bed", "green scarf", "window"],
+      "entities_in_scene": [
+        "girl",
+        "sister"
+      ],
       "misl_targets": {
         "macro": {
-          "CH": ["girl", "sister"],
-          "S": ["back to bedroom"],
+          "CH": [
+            "girl in striped pajamas",
+            "older sister with a green scarf"
+          ],
+          "S": [
+            "cozy bedroom",
+            "inside the house"
+          ],
           "IE": null,
-          "IR": null,
-          "P": ["plan to come back tomorrow night"],
-          "A": ["sister picks up scarf", "close gate carefully", "girl draws map", "hides map under pillow", "they agree to return"],
-          "CO": ["secret discovered, plan to return"]
+          "IR": [
+            "happy",
+            "focused",
+            "excited"
+          ],
+          "P": [
+            "making a map to find the greenhouse again"
+          ],
+          "A": [
+            "sitting on the bed",
+            "sitting on the nightstand",
+            "drawing a map"
+          ],
+          "CO": null
         },
         "micro": {
-          "ENP": ["green scarf", "path", "map", "pillow"],
-          "ADV": ["carefully"],
-          "SC": ["on the way back"],
-          "CC": [],
-          "M": ["agree", "decide"],
-          "L": ["agree"]
+          "ENP": [
+            "blue striped pajamas",
+            "long brown braid",
+            "dirty green scarf",
+            "purple sunset sky",
+            "wooden nightstand",
+            "white fluffy pillow",
+            "colorful bunting banner",
+            "small box of crayons"
+          ],
+          "ADV": [
+            "carefully",
+            "happily",
+            "quietly",
+            "together",
+            "outside"
+          ],
+          "SC": null,
+          "CC": [
+            "and",
+            "but"
+          ],
+          "M": [
+            "thinks",
+            "knows",
+            "remembers",
+            "decides",
+            "wonders"
+          ],
+          "L": [
+            "whispers",
+            "tells",
+            "asks",
+            "explains"
+          ]
         }
-      }
+      },
+      "scene_description": "The scene takes place inside a cozy bedroom at twilight. To the left, a young girl with brown hair in pigtails is sitting on her bed. She wears blue and white striped pajamas and holds a brown crayon, carefully drawing a map on a piece of parchment paper. A small wooden bowl filled with colorful crayons sits next to her on the bedspread, which features a blue and white pattern and a dark green patterned blanket at the foot. A large white pillow is propped up behind her. Next to the bed sits her older sister, who has a long brown braid. The sister is wearing a brown jacket, a textured green scarf that looks slightly dusty, blue jeans, and brown leather boots. She is sitting on a small wooden nightstand with a single drawer and is looking at the girl with a gentle, encouraging smile. Above the bed, a framed picture of green mountains and a blue sky hangs on the wall, and a colorful triangle bunting banner is draped nearby. The right side of the room is dominated by a very large window with four panes. Outside, the sky is a beautiful gradient of purple, pink, and orange as the sun sets. Soft purple clouds float above rolling green hills dotted with tiny white, yellow, and pink flowers. There are several round, stylized trees in shades of purple and pink, and a vibrant green tree to the far right. The wooden floor of the room is made of horizontal planks, and a patterned rug is partially visible under the bed. The lighting is warm and soft indoors, contrasting with the cool, magical colors of the landscape outside."
     }
   ]
 }

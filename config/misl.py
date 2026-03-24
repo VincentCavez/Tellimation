@@ -254,6 +254,24 @@ MICRO_KEYS: List[str] = list(MICROSTRUCTURE.keys())
 ALL_KEYS: List[str] = MACRO_KEYS + MICRO_KEYS
 
 # ============================================================================
+# MISL abbreviation codes and priority ordering
+# ============================================================================
+
+MACRO_PRIORITY_ORDER: List[str] = ["CH", "S", "IE", "A", "CO", "IR", "P"]
+MICRO_CODES: List[str] = ["ENP", "SC", "CC", "M", "L", "ADV", "G", "T"]
+ALL_MISL_CODES: List[str] = MACRO_PRIORITY_ORDER + MICRO_CODES
+
+MISL_CODE_TO_KEY: Dict[str, str] = {
+    "CH": "character", "S": "setting", "IE": "initiating_event",
+    "A": "action", "CO": "consequence", "IR": "internal_response", "P": "plan",
+    "ENP": "elaborated_noun_phrases", "SC": "subordinating_conjunctions",
+    "CC": "coordinating_conjunctions", "M": "mental_verbs", "L": "linguistic_verbs",
+    "ADV": "adverbs", "G": "grammaticality", "T": "tense",
+}
+
+MISL_KEY_TO_CODE: Dict[str, str] = {v: k for k, v in MISL_CODE_TO_KEY.items()}
+
+# ============================================================================
 # Animation ID → template name mapping
 # ============================================================================
 

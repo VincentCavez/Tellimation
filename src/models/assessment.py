@@ -67,6 +67,11 @@ class SceneStoryEntry(BaseModel):
     audio_path: str = ""
 
 
+def _default_mention_counts() -> Dict[str, int]:
+    from config.misl import ALL_MISL_CODES
+    return {code: 0 for code in ALL_MISL_CODES}
+
+
 class SceneLog(BaseModel):
     """Per-scene log of all assessments and accepted story utterances."""
     scene_id: str = ""
@@ -74,3 +79,4 @@ class SceneLog(BaseModel):
     assessments: List[SceneAssessmentEntry] = Field(default_factory=list)
     story: List[SceneStoryEntry] = Field(default_factory=list)
     misl_opportunities_given: int = 0
+    mention_counts: Dict[str, int] = Field(default_factory=_default_mention_counts)

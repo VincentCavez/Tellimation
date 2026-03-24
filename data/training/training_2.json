@@ -12,27 +12,87 @@
       "title": "The Visitor",
       "background_prompt": "A sandy beach with tide pools nearby, a tall sandcastle with two towers and a moat in the foreground. Sunny afternoon. No people, no animals.",
       "full_scene_prompt": "A sandy beach on a sunny afternoon. A girl in a sun hat is walking back from the tide pools carrying a small bucket of water. A younger boy in green swim shorts kneels next to a tall sandcastle with two towers and a moat, looking the other way. A large gray crab has come out of a tide pool and is digging into the base of one tower. The boy does not see the crab.",
-      "entities_in_scene": ["girl", "boy", "crab"],
-      "key_objects": ["tall sandcastle", "two towers", "moat", "small bucket", "tide pools"],
+      "entities_in_scene": [
+        "girl",
+        "boy",
+        "crab"
+      ],
       "misl_targets": {
         "macro": {
-          "CH": ["girl in sun hat", "younger boy in green swim shorts", "large gray crab"],
-          "S": ["sandy beach", "sunny afternoon"],
-          "IE": ["crab digs into sandcastle"],
-          "IR": ["boy does not see it"],
-          "P": null,
-          "A": ["girl walks back carrying bucket", "boy kneels next to sandcastle", "crab comes out of tide pool", "crab digs into base of tower"],
+          "CH": [
+            "girl in a straw sun hat",
+            "boy in green swim shorts",
+            "large gray crab"
+          ],
+          "S": [
+            "sandy beach",
+            "sunny afternoon",
+            "tide pools",
+            "near the forest"
+          ],
+          "IE": [
+            "the crab reaches the sandcastle",
+            "the girl brings a bucket of water"
+          ],
+          "IR": [
+            "the boy looks curious",
+            "the girl looks happy",
+            "the boy is unaware of the crab"
+          ],
+          "P": [
+            "the girl wants to help",
+            "the crab wants to climb the castle"
+          ],
+          "A": [
+            "walking toward the boy",
+            "carrying a bucket",
+            "kneeling on the sand",
+            "climbing on the castle",
+            "looking away"
+          ],
           "CO": null
         },
         "micro": {
-          "ENP": ["sun hat", "green swim shorts", "tall sandcastle", "two towers", "moat", "small bucket", "large gray crab", "tide pools"],
-          "ADV": [],
-          "SC": [],
-          "CC": ["and"],
-          "M": [],
-          "L": []
+          "ENP": [
+            "straw sun hat",
+            "green swim shorts",
+            "tall sandcastle",
+            "large gray crab",
+            "puffy white clouds",
+            "metal bucket",
+            "blue water",
+            "yellow flower",
+            "patterned bag"
+          ],
+          "ADV": [
+            "slowly",
+            "happily",
+            "quietly"
+          ],
+          "SC": [
+            "while",
+            "because",
+            "as",
+            "although"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "wonders",
+            "notices",
+            "doesn't see"
+          ],
+          "L": [
+            "shouts",
+            "tells"
+          ]
         }
-      }
+      },
+      "scene_description": "A bright and sunny afternoon at a sandy beach where the shoreline meets a lush green forest. In the left foreground, a magnificent sandcastle stands tall, featuring two main towers with square battlements and a lower middle wall. A circular moat filled with clear blue water surrounds the base of the castle. To the left, a large gray crab with two prominent claws has climbed out of the moat and is busy digging its pincers into the soft sand at the base of the left tower, in order to climb. A young boy with messy brown hair and wearing green swim shorts with yellow side stripes is kneeling on the sand to the right of the castle. He is leaning forward on his knees and hands, looking away from the crab and toward a girl approaching him. The girl, appearing slightly older, has brown hair tied in pigtails and wears a wide-brimmed straw sun hat decorated with a green band and a yellow flower. She is dressed in a yellow t-shirt and green trousers with brown shoes. She walks from the right side of the scene, carrying a patterned blue shoulder bag and a small metal bucket brimming with water. The background shows several calm tide pools scattered across the sand, reflecting the blue sky. Large, rounded green trees with thick brown trunks frame the beach on both sides, and tiny colorful flowers like orange poppies and pink daisies dot the grassy patches near the tree line. The sky is a pale blue filled with soft, white, puffy clouds, creating a peaceful and playful atmosphere."
     }
   ]
 }
