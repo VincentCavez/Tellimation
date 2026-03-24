@@ -242,6 +242,60 @@
         "story": "training",
         "scene": 1,
         "timestamp": "2026-03-23T07:40:10.876065+00:00"
+      },
+      {
+        "event": "scene_loaded",
+        "story": "training",
+        "scene": 1,
+        "timestamp": "2026-03-23T08:07:32.944945+00:00"
+      },
+      {
+        "event": "scene_loaded",
+        "story": "training",
+        "scene": 1,
+        "timestamp": "2026-03-23T08:09:48.646821+00:00"
+      },
+      {
+        "event": "scene_loaded",
+        "story": "training",
+        "scene": 1,
+        "timestamp": "2026-03-23T08:11:02.450759+00:00"
+      },
+      {
+        "event": "scene_loaded",
+        "story": "training",
+        "scene": 1,
+        "timestamp": "2026-03-23T08:12:01.208243+00:00"
+      },
+      {
+        "event": "scene_loaded",
+        "story": "training",
+        "scene": 1,
+        "timestamp": "2026-03-23T08:13:06.554580+00:00"
+      },
+      {
+        "event": "scene_loaded",
+        "story": "training",
+        "scene": 1,
+        "timestamp": "2026-03-23T08:14:28.149176+00:00"
+      },
+      {
+        "event": "scene_loaded",
+        "story": "training",
+        "scene": 1,
+        "timestamp": "2026-03-23T08:15:31.371887+00:00"
+      },
+      {
+        "event": "scene_loaded",
+        "story": "training",
+        "scene": 1,
+        "timestamp": "2026-03-23T19:19:24.054729+00:00"
+      },
+      {
+        "event": "scene_loaded",
+        "story": "training",
+        "scene": 1,
+        "timestamp": "2026-03-23T21:59:34.827076+00:00"
       }
     ]
   }
