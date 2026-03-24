@@ -13,135 +13,397 @@
       "title": "The Station",
       "background_prompt": "A small country train station with a wooden platform, a wooden bench, a food stand with colorful sandwiches, train tracks leading into the distance. Sunny day. No people, no animals.",
       "full_scene_prompt": "A small country train station. A small colorful train sits on the tracks with steam puffing from the engine. A train conductor with a sandwich and a tall blue hat stands on the wooden platform checking his watch. Wooden bench and flower box on the platform. Sunny day.",
-      "entities_in_scene": ["conductor", "train"],
-      "key_objects": ["platform", "wooden bench", "food stand"],
+      "entities_in_scene": [
+        "conductor",
+        "train"
+      ],
       "misl_targets": {
         "macro": {
-          "CH": ["train conductor with a sandwich and a tall blue hat", "small colorful train"],
-          "S": ["country train station", "platform"],
-          "IE": null,
-          "IR": null,
-          "P": null,
-          "A": ["checks his watch", "steam puffs from engine"],
+          "CH": [
+            "friendly train conductor with a white beard",
+            "conductor in a blue uniform and tall hat",
+            "small colorful train on the tracks"
+          ],
+          "S": [
+            "sunny country train station",
+            "wooden platform",
+            "grassy hills under a blue sky",
+            "bright and peaceful morning"
+          ],
+          "IE": [
+            "the train has pulled into the station",
+            "it is time for the conductor's lunch break"
+          ],
+          "IR": [
+            "the conductor feels happy and hungry"
+          ],
+          "P": [
+            "the conductor is planning to eat his sandwich",
+            "the conductor is checking if the train is on time"
+          ],
+          "A": [
+            "checking his golden pocket watch",
+            "holding a big sandwich"
+          ],
           "CO": null
         },
         "micro": {
-          "ENP": ["tall blue hat", "small colorful train", "wooden bench", "food stand"],
-          "ADV": [],
-          "SC": [],
-          "CC": ["and"],
-          "M": [],
-          "L": []
+          "ENP": [
+            "tall blue hat",
+            "thick white beard",
+            "golden pocket watch",
+            "large delicious sandwich",
+            "small green engine",
+            "striped scalloped awning",
+            "colorful flower box",
+            "puffy grey steam",
+            "wooden bench",
+            "bright red apples"
+          ],
+          "ADV": [
+            "patiently"
+          ],
+          "SC": [
+            "while he waits",
+            "because he is hungry",
+            "as the sun shines",
+            "before the train leaves"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "wants",
+            "feels"
+          ],
+          "L": null
         }
-      }
+      },
+      "scene_description": "A cheerful and detailed cartoon scene of a small country train station on a beautiful sunny day. In the center, a friendly train conductor stands on a wooden platform. He has a thick white beard and mustache, a warm smile, and is wearing a tall blue uniform hat with gold trim and a matching blue suit with gold piping. He is holding a golden pocket watch in his right hand, checking the time, and a large, multi-layered sandwich in his left hand. To his left, a small, colorful train is stopped on the tracks. The engine is green with yellow and blue accents, puffing three soft grey clouds of steam. Behind the engine are blue and yellow passenger carriages. Behind the conductor is a simple wooden bench. To the right of the platform is a charming wooden food stand with a scalloped, striped awning in shades of beige and tan. The stand is stocked with plates of sandwiches, red and green apples, pears, jars of jam, and bottles of juice. The background features rolling green hills, large leafy trees with rounded shapes, and a bright blue sky filled with fluffy white clouds. The entire scene is bathed in warm, golden light, creating a peaceful and happy atmosphere."
     },
     {
       "scene_number": 2,
       "title": "The Escape",
       "background_prompt": "A train station platform with a small food stand. Train tracks stretch away from the station. Sunny day. No people, no animals, no train.",
       "full_scene_prompt": "A train station platform. A train conductor with a tall blue hat has dropped a sandwich on the ground and runs along the tracks after a small colorful train that is moving away on its own. The train is pulling away fast. A small food stand is visible on the platform behind the conductor.",
-      "entities_in_scene": ["conductor", "train"],
-      "key_objects": ["sandwich", "food stand", "tracks"],
+      "entities_in_scene": [
+        "conductor",
+        "train"
+      ],
       "misl_targets": {
         "macro": {
-          "CH": ["conductor", "train"],
-          "S": null,
-          "IE": ["train leaves without the conductor"],
-          "IR": ["conductor is panicked"],
+          "CH": [
+            "panicked conductor with a white beard",
+            "small colorful train",
+            "puffing steam engine"
+          ],
+          "S": [
+            "sunny countryside train station",
+            "wooden platform",
+            "bright day"
+          ],
+          "IE": [
+            "the train pulls away from the station",
+            "the conductor drops his sandwich"
+          ],
+          "IR": [
+            "the conductor is surprised",
+            "the conductor feels panicked"
+          ],
           "P": null,
-          "A": ["conductor steps off train", "train starts moving on its own", "conductor drops sandwich", "runs after train"],
-          "CO": null
+          "A": [
+            "running along the platform",
+            "dropping a sandwich",
+            "shouting for the train to stop",
+            "chasing the engine"
+          ],
+          "CO": [
+            "the conductor is left behind on the platform",
+            "the train is moving too fast to catch"
+          ]
         },
         "micro": {
-          "ENP": ["sandwich", "food stand"],
-          "ADV": ["on its own", "already"],
-          "SC": ["while he is away", "because it is too fast"],
-          "CC": ["but"],
-          "M": ["didn't expect"],
-          "L": []
+          "ENP": [
+            "tall blue hat",
+            "shiny gold buttons",
+            "wooden food stand",
+            "striped awning",
+            "ripe red apples",
+            "golden metal lantern",
+            "folded newspaper",
+            "green engine"
+          ],
+          "ADV": [
+            "quickly",
+            "fast",
+            "away",
+            "suddenly"
+          ],
+          "SC": [
+            "because the train is leaving",
+            "as he runs",
+            "while he was eating",
+            "before it disappears"
+          ],
+          "CC": [
+            "but",
+            "and",
+            "so"
+          ],
+          "M": [
+            "realizes",
+            "wants",
+            "hopes",
+            "fears"
+          ],
+          "L": [
+            "shouts",
+            "calls out",
+            "gasps"
+          ]
         }
-      }
+      },
+      "scene_description": "A vibrant, storybook-style illustration depicts a frantic scene at a countryside train station on a bright, sunny day. In the center, a portly conductor with a thick white beard and mustache is captured mid-stride, running desperately along a wooden platform. He wears a formal blue conductor’s uniform with gold trim and buttons, a brown vest, a green tie, and a tall blue hat with a gold emblem. His mouth is wide open in a gasp of panic, and his eyes are wide. Behind him on the wooden planks, he has dropped his lunch—a sandwich with green lettuce and red tomato—along with a folded newspaper and a glowing metal lantern. To the left, a small, colorful train is puffing away on steel tracks. The train consists of a green engine with a yellow boiler, followed by a red passenger car and a yellow one. Small puffs of white steam rise from the engine's funnel. To the right, a charming wooden food stand with a brown-and-tan striped awning sits on the platform. The stand is filled with jars, bottles of juice, and baskets of red apples, green pears, and oranges. The background features rolling green hills, lush leafy trees, and a pale blue sky filled with soft, white clouds. The foreground is decorated with green grass, clovers, and tiny white and yellow wildflowers, adding to the cheerful but chaotic atmosphere."
     },
     {
       "scene_number": 3,
       "title": "The Farm Crossing",
       "background_prompt": "Countryside landscape with green fields on both sides of train tracks. A farm crossing with a wooden gate. A side track branches off to the right toward a river. Sunny day. No people, no animals, no train.",
       "full_scene_prompt": "Countryside with green fields. A small colorful train speeds along the tracks toward a farm crossing. A large white goose stands in the middle of the tracks at the crossing, flapping its wings. The train is turning quickly onto a side track to the right, bumping and shaking. Green fields and a wooden gate at the crossing.",
-      "entities_in_scene": ["train", "goose"],
-      "key_objects": ["farm crossing", "wooden gate", "side track", "green fields"],
+      "entities_in_scene": [
+        "train",
+        "goose"
+      ],
       "misl_targets": {
         "macro": {
-          "CH": ["train", "large white goose"],
-          "S": ["countryside", "green fields", "farm crossing"],
-          "IE": null,
-          "IR": null,
-          "P": null,
-          "A": ["train speeds through countryside", "reaches farm crossing", "train honks horn", "goose flaps wings", "train turns onto side track", "train bumps and shakes"],
-          "CO": null
+          "CH": [
+            "colorful steam train",
+            "large white goose"
+          ],
+          "S": [
+            "sunny countryside",
+            "farm crossing",
+            "green fields",
+            "winding river",
+            "bright blue sky"
+          ],
+          "IE": [
+            "the goose stands on the tracks",
+            "the train approaches the crossing"
+          ],
+          "IR": [
+            "the goose looks brave",
+            "the goose looks surprised"
+          ],
+          "P": [
+            "the goose wants to stop the train"
+          ],
+          "A": [
+            "the goose flaps its wings",
+            "the goose honks"
+          ],
+          "CO": [
+            "the train might have to turn"
+          ]
         },
         "micro": {
-          "ENP": ["green fields", "farm crossing", "large white goose", "side track"],
-          "ADV": ["loudly", "quickly", "through"],
-          "SC": ["to avoid the goose"],
-          "CC": ["but"],
-          "M": [],
-          "L": ["honks"]
+          "ENP": [
+            "large white goose",
+            "colorful steam train",
+            "bright yellow sun",
+            "puffy white smoke",
+            "wooden farm gate",
+            "small yellow flowers",
+            "winding blue river"
+          ],
+          "ADV": [
+            "bravely",
+            "suddenly"
+          ],
+          "SC": [
+            "because the goose is blocking the way",
+            "while the train is moving",
+            "before the train reaches the crossing"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": null,
+          "L": [
+            "the goose honks",
+            "the goose shouts"
+          ]
         }
-      }
+      },
+      "scene_description": "A vibrant and cheerful cartoon scene depicts a small, colorful steam train traveling through a sun-drenched countryside. The train consists of three parts: a green and yellow engine at the front puffing a cloud of white smoke, a blue passenger car with red trim in the middle, and a yellow caboose with a green roof at the back. The train is moving along wooden tracks that run horizontally across the middle of the image. Directly in the path of the train, at a crossing marked by a simple wooden gate, stands a large white goose. The goose is positioned in the center-right of the tracks, facing the train with its wings spread wide and its orange beak open as if it is honking loudly. The tracks split into two paths just behind the goose, with one track curving off toward the right side of the scene. To the right, a gentle blue river flows through the rolling green hills. The landscape is filled with lush green grass, several round leafy trees, and small white and yellow wildflowers in the foreground. In the background, rolling hills transition from green to golden brown under a pale blue sky. A large, bright yellow sun sits low in the sky, surrounded by soft, puffy white clouds, suggesting it is early morning or late afternoon. The overall atmosphere is playful and a bit dramatic, centered on the standoff between the tiny train and the brave goose."
     },
     {
       "scene_number": 4,
       "title": "The Mud",
       "background_prompt": "A muddy riverbank where train tracks end abruptly. Thick brown mud along the bank, a slow river in the background. Tall grass on the sides. No people, no animals, no train.",
       "full_scene_prompt": "A muddy riverbank. A small colorful train has slid off the end of the tracks and is sinking into thick brown mud, tilted to one side. Its wheels are partially in the mud. A large white goose walks over, honking at the stuck train. Tall grass and a slow river in the background.",
-      "entities_in_scene": ["train", "goose"],
-      "key_objects": ["thick brown mud", "tracks", "river"],
+      "entities_in_scene": [
+        "train",
+        "goose"
+      ],
       "misl_targets": {
         "macro": {
-          "CH": ["train", "goose"],
-          "S": ["muddy riverbank"],
-          "IE": null,
-          "IR": null,
+          "CH": [
+            "small colorful train",
+            "large white goose"
+          ],
+          "S": [
+            "muddy riverbank",
+            "end of the tracks",
+            "near a calm river"
+          ],
+          "IE": [
+            "the train tracks end suddenly",
+            "the train slides off the rails"
+          ],
+          "IR": [
+            "the goose is noisy"
+          ],
           "P": null,
-          "A": ["train slides off rails", "sinks into mud", "wheels spin", "goose walks over", "goose honks at stuck train"],
-          "CO": ["train is stuck"]
+          "A": [
+            "sinking into the mud",
+            "tilting forward",
+            "sliding off the tracks"
+          ],
+          "CO": [
+            "the train is stuck",
+            "the engine is buried in mud"
+          ]
         },
         "micro": {
-          "ENP": ["muddy riverbank", "thick brown mud", "stuck train"],
-          "ADV": ["off"],
-          "SC": ["because the wheels just spin"],
-          "CC": ["but"],
-          "M": [],
-          "L": []
+          "ENP": [
+            "thick brown mud",
+            "small green engine",
+            "bright red chimney",
+            "large white goose",
+            "shiny orange beak",
+            "tall green grass",
+            "fluffy white clouds",
+            "wooden train tracks",
+            "blue passenger car"
+          ],
+          "ADV": [
+            "loudly",
+            "deeply",
+            "suddenly",
+            "forward"
+          ],
+          "SC": [
+            "because the tracks ended",
+            "when it hit the mud",
+            "while the goose watches"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": null,
+          "L": [
+            "honks",
+            "shouts",
+            "calls",
+            "warns"
+          ]
         }
-      }
+      },
+      "scene_description": "In this bright and colorful illustration, a small toy-like train has had an accident. The train consists of a green engine, a blue passenger car, and a wooden-textured car at the back. The engine, which has a yellow boiler and a red chimney, has slid off the end of the wooden train tracks and is now tilted forward, sinking into thick, dark brown mud. The blue car behind it is also tilted, while the last car remains on the rails. To the right of the stuck train, a large white goose with a bright orange beak and orange webbed feet stands on a patch of green grass. The goose has its beak wide open as if it is honking loudly at the train. The ground is a mix of tall green grass with tiny yellow flowers and the dark, textured mud where the tracks end. In the background, a calm, light blue river flows gently, and the far bank is lined with lush, rounded green trees under a pale blue sky filled with soft, fluffy white clouds. The lighting is bright and cheerful, suggesting a sunny day, despite the train's predicament. The whole scene is framed by tall blades of grass in the foreground."
     },
     {
       "scene_number": 5,
       "title": "The Rescue",
       "background_prompt": "A muddy riverbank with train tracks visible nearby, leading back toward the countryside. A dirt path connects to the tracks. Sunny late afternoon. No people, no animals, no train.",
       "full_scene_prompt": "A muddy riverbank. A big green tractor is pulling a small colorful train out of the mud with a heavy rope tied to its front. A train conductor with a tall blue hat stands nearby, out of breath, shaking his head but laughing. A farmer sits on the tractor. A large white goose watches from a safe distance in the grass. Late afternoon light.",
-      "entities_in_scene": ["conductor", "train", "goose", "tractor"],
-      "key_objects": ["big green tractor", "heavy rope", "mud"],
+      "entities_in_scene": [
+        "conductor",
+        "train",
+        "goose",
+        "tractor"
+      ],
       "misl_targets": {
         "macro": {
-          "CH": ["conductor", "train", "goose", "farmer"],
-          "S": null,
-          "IE": null,
-          "IR": ["conductor laughs"],
-          "P": ["get tractor to pull train out"],
-          "A": ["conductor arrives", "tie rope to train", "tractor pulls train out", "goose watches", "conductor shakes head", "conductor laughs"],
-          "CO": ["train rescued, back on tracks"]
+          "CH": [
+            "smiling farmer",
+            "laughing conductor",
+            "white goose",
+            "colorful train",
+            "big green tractor"
+          ],
+          "S": [
+            "muddy riverbank",
+            "sunny countryside",
+            "train tracks",
+            "late afternoon"
+          ],
+          "IE": [
+            "the train got stuck off the tracks",
+            "the farmer tied a rope to the tractor"
+          ],
+          "IR": [
+            "farmer is happy",
+            "conductor is relieved",
+            "conductor is laughing",
+            "goose is curious"
+          ],
+          "P": [
+            "pull the train back onto the tracks",
+            "rescue the little train"
+          ],
+          "A": [
+            "tractor pulls the train",
+            "farmer drives the tractor"
+          ],
+          "CO": [
+            "the train is being saved",
+            "everyone is happy the train is moving"
+          ]
         },
         "micro": {
-          "ENP": ["big green tractor", "heavy rope", "front of the train", "safe distance"],
-          "ADV": ["slowly", "out of breath"],
-          "SC": ["back onto the tracks"],
-          "CC": ["but", "and"],
-          "M": ["relieved"],
-          "L": []
+          "ENP": [
+            "big green tractor",
+            "heavy brown rope",
+            "jolly old conductor",
+            "colorful little train",
+            "muddy riverbank",
+            "bright yellow wheels",
+            "tall blue hat",
+            "large white goose"
+          ],
+          "ADV": [
+            "slowly",
+            "happily"
+          ],
+          "SC": [
+            "because",
+            "while",
+            "as",
+            "when",
+            "after"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "feels relieved"
+          ],
+          "L": [
+            "laughs",
+            "cheers"
+          ]
         }
-      }
+      },
+      "scene_description": "This is a cheerful and bright scene in the countryside during a sunny late afternoon. In the foreground, a muddy brown river flows by, with visible ripples in the water. The riverbank is a dark brown, leading up to a lush green grassy area filled with small blue, white, and yellow flowers. A large green tractor with massive black tires and bright yellow hubs is driving along a dirt path. Sitting on the tractor is an elderly farmer with a wide, happy smile. He has gray hair and is wearing a tan hat, an orange shirt, and blue denim overalls. He holds the steering wheel firmly with both hands. A thick, heavy brown rope is tied to the back of the tractor and is stretched tight as it pulls a small, colorful train out of the grass and toward the tracks. The train has three cars: a green and blue engine, a middle blue car with a red roof, and a yellow end car with a green roof. Standing on the wooden train tracks is a jolly conductor with a long white beard. He wears a bright blue uniform with gold buttons and a tall blue hat. He is laughing heartily, with one hand on his head and the other holding a small lantern. To the right, a large white goose with an orange beak stands in the grass, watching the rescue. The background shows rolling green hills and yellow-leafed trees under a soft blue sky with fluffy white and yellowish clouds reflecting the warm light of the sunset. The entire scene feels helpful, relieved, and happy."
     }
   ]
 }

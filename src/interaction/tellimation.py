@@ -93,11 +93,11 @@ _CATEGORY_TO_MISL: Dict[str, str] = {
 _CATEGORY_PRIORITY: Dict[str, int] = {
     "Identity": 0,
     "Count": 1,
-    "Property": 2,
+    "Space": 2,
     "Action": 3,
-    "Space": 4,
-    "Time": 5,
-    "Relation": 6,
+    "Property": 4,
+    "Relation": 5,
+    "Time": 6,
     "Discourse": 7,
 }
 
@@ -375,8 +375,8 @@ async def generate_invocation_array(
                 parameter_overrides={},
             ))
 
-    # Hard cap: max 2 animations per invocation array
-    sequence = sequence[:2]
+    # Hard cap: max 1 animation per invocation array (highest-priority only)
+    sequence = sequence[:1]
 
     result = InvocationArray(sequence=sequence)
     logger.info("[invocation] Generated invocation array with %d animations",
