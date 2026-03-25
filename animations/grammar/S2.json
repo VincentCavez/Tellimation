@@ -5,7 +5,7 @@
   "mode": "both",
   "scaffolding_intent": "Entity lifts to reveal a silhouette then snaps back with cracks radiating on impact, reinforcing actual spatial location",
   "misl_elements": [
-    "S"
+    "CH","S"
   ],
   "target_type": ["entity","duo","group"],
   "parameters": [
@@ -31,6 +31,6 @@
     }
   ],
   "code_template": "stamp({target}, {liftPixels}, {crackCount})",
-  "correction_intent": "Child described an incorrect location for an entity",
+  "correction_intent": "Child described an incorrect location for the entity",
   "suggestion_intent": "Child hasn't mentioned the location of an entity"
 }

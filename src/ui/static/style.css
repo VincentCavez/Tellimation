@@ -83,6 +83,16 @@ a { color: var(--teal); text-decoration: none; }
   background: rgba(83,186,193,0.08);
 }
 
+.btn-finish {
+  background: #53BAC1;
+  color: #fff;
+  border: none;
+  box-shadow: 0 4px 20px rgba(83,186,193,0.35);
+}
+.btn-finish:hover {
+  box-shadow: 0 6px 28px rgba(83,186,193,0.5);
+}
+
 .btn-full { width: 100%; }
 
 /* ---- Login page ---- */
@@ -609,6 +619,7 @@ a { color: var(--teal); text-decoration: none; }
 }
 .instruction-left { left: 1.5rem; }
 .instruction-right { right: 1.5rem; }
+.instruction-center { left: 50%; top: 50%; transform: translate(-50%, -50%); max-width: 500px; }
 .instruction-slot {
   background: #fff;
   color: #000;

@@ -45,7 +45,6 @@ app = FastAPI(title="Scene Enrichment Tool")
 
 DATA_DIR = PROJECT_ROOT / "data"
 STUDY_SCENES_DIR = DATA_DIR / "study_scenes"
-TRAINING_DIR = DATA_DIR / "training"
 STUDY_GEN_DIR = DATA_DIR / "study_gen"
 
 API_KEY = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY", "")
@@ -56,13 +55,9 @@ app.mount("/images", StaticFiles(directory=str(STUDY_GEN_DIR)), name="images")
 
 
 def _load_all_stories() -> list[dict]:
-    """Load all story JSON files."""
+    """Load all story JSON files (study scenes + training, all in one folder)."""
     stories = []
     for path in sorted(STUDY_SCENES_DIR.glob("*.json")):
-        data = json.loads(path.read_text(encoding="utf-8"))
-        data["_path"] = str(path)
-        stories.append(data)
-    for path in sorted(TRAINING_DIR.glob("*.json")):
         data = json.loads(path.read_text(encoding="utf-8"))
         data["_path"] = str(path)
         stories.append(data)

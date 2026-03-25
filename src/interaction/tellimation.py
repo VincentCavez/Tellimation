@@ -16,8 +16,6 @@ from typing import Any, Dict, List, Optional
 
 from src.models.assessment import Discrepancy
 from src.models.invocation import AnimationInvocation, InvocationArray
-from src.models.scene import SceneManifest
-from src.models.student_profile import StudentProfile
 from animations.grammar import get_animation, get_animations_by_category, get_animations_by_mode
 from config.misl import (
     MISL_TO_ANIMATIONS,
@@ -104,7 +102,7 @@ _CATEGORY_PRIORITY: Dict[str, int] = {
 
 def _select_animation_for_discrepancy(
     discrepancy: Discrepancy,
-    student_profile: StudentProfile,
+    student_profile: "Any" = None,  # DEPRECATED — kept for backward compat, unused
 ) -> Optional[str]:
     """Select the best animation ID for a discrepancy.
 
@@ -307,32 +305,26 @@ def load_animation_params(
     return params
 
 
-async def generate_invocation_array(
-    api_key: str,
-    sprite_code: Dict[str, Any],
-    manifest: SceneManifest,
-    student_profile: StudentProfile,
+def generate_invocation_array(
     discrepancies: List[Discrepancy],
 ) -> InvocationArray:
     """Generate a structured invocation array from a list of discrepancies.
 
+    Purely deterministic — no LLM calls, no profile needed.
+
     For each discrepancy:
     1. Select the best animation via the grammar loader
-    2. Build animation parameters from grammar defaults
-    3. Build an AnimationInvocation with the result
+    2. Build an AnimationInvocation with the result
 
     Corrections come first in the sequence, then suggestions.
-    Within each pass, ordered by category priority.
+    Within each pass, ordered by category priority:
+    Identity > Count > Space > Action > Property > Relation > Time > Discourse
 
     Args:
-        api_key: Gemini API key.
-        sprite_code: Current scene sprite data.
-        manifest: Scene manifest.
-        student_profile: Child's profile with efficacy history.
         discrepancies: Unified discrepancy list from assessment.
 
     Returns:
-        InvocationArray with ordered sequence of animations.
+        InvocationArray with at most 1 animation (highest-priority).
     """
     if not discrepancies:
         return InvocationArray(sequence=[])
@@ -356,18 +348,8 @@ async def generate_invocation_array(
                            disc.description)
             continue
 
-        # Determine MISL element for the LLM call
-        misl_element = _CATEGORY_TO_MISL.get(disc.type, "character")
-        if disc.misl_elements:
-            # Try to map MISL code to full MISL key
-            code_to_key = _build_misl_code_to_key()
-            for code in disc.misl_elements:
-                if code in code_to_key:
-                    misl_element = code_to_key[code]
-                    break
-
         # Use animation_id from the discrepancy (set by LLM)
-        aid = _select_animation_for_discrepancy(disc, student_profile)
+        aid = _select_animation_for_discrepancy(disc)
         if aid:
             sequence.append(AnimationInvocation(
                 animation_id=aid,
