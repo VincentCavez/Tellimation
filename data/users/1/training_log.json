@@ -712,6 +712,780 @@
         "story": "training",
         "scene": 1,
         "timestamp": "2026-03-24T18:24:28.096032+00:00"
+      },
+      {
+        "event": "scene_loaded",
+        "story": "training",
+        "scene": 1,
+        "timestamp": "2026-03-25T01:37:33.282728+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "a boy",
+        "timestamp": "2026-03-25T01:37:37.889212+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "R3",
+            "targets": [
+              "boy",
+              "box"
+            ],
+            "rationale": "The boy is working hard, and now the box is almost full! Can you tell us what happens now that he has finished filling it?"
+          }
+        ],
+        "timestamp": "2026-03-25T01:37:41.365749+00:00"
+      },
+      {
+        "event": "pipeline_cycle",
+        "mention_counts": {
+          "CH": 1,
+          "S": 0,
+          "IE": 0,
+          "A": 0,
+          "CO": 0,
+          "IR": 0,
+          "P": 0,
+          "ENP": 0,
+          "SC": 0,
+          "CC": 0,
+          "M": 0,
+          "L": 0,
+          "ADV": 0,
+          "G": 0,
+          "T": 0
+        },
+        "deterministic_selection": {
+          "macro_in_scene": [
+            "CH",
+            "S",
+            "A",
+            "CO",
+            "IR",
+            "P"
+          ],
+          "macro_under_3": [
+            "CH",
+            "S",
+            "A",
+            "CO",
+            "IR",
+            "P"
+          ],
+          "macro_unresolved": [
+            "CO",
+            "IR",
+            "P"
+          ],
+          "macro_selected": "CO",
+          "micro_in_scene": null,
+          "micro_under_3": null,
+          "micro_unresolved": null,
+          "micro_candidates_shuffled": null,
+          "micro_gemini_selected": null
+        },
+        "errors_found": [],
+        "suggestion": {
+          "misl_element": "CO",
+          "rationale": "The boy is working hard, and now the box is almost full! Can you tell us what happens now that he has finished filling it?",
+          "targets": [
+            "boy",
+            "box"
+          ],
+          "animation_id": "R3"
+        },
+        "selected": {
+          "source": "suggestion",
+          "animation_id": "R3_causal_push",
+          "targets": [
+            "boy",
+            "box"
+          ]
+        },
+        "action": "triggered",
+        "condition": "animation",
+        "timestamp": "2026-03-25T01:37:41.370539+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "R3_causal_push",
+        "targets": [
+          "boy",
+          "box"
+        ],
+        "rationale": "The boy is working hard, and now the box is almost full! Can you tell us what happens now that he has finished filling it?",
+        "pass_type": "suggestion",
+        "misl_element": "CO",
+        "displayed": false,
+        "timestamp": "2026-03-25T01:39:46.763012+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "He has filled the box with cookies and will be able to give it.",
+        "timestamp": "2026-03-25T01:39:48.020835+00:00"
+      },
+      {
+        "event": "resolution",
+        "resolved": true,
+        "animation_id": "R3",
+        "pass_type": "suggestion",
+        "misl_element": "CO",
+        "timestamp": "2026-03-25T01:39:49.032080+00:00"
+      },
+      {
+        "event": "corrections",
+        "items": [
+          {
+            "animation_id": "D4",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "The child is describing a completed action and a future possibility while the boy is currently in the middle of putting cookies into the box."
+          }
+        ],
+        "timestamp": "2026-03-25T01:39:50.455831+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "P2c",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "The boy has filled the box with cookies for his gift! You could say more about how happy he feels now that he is ready to share them."
+          }
+        ],
+        "timestamp": "2026-03-25T01:39:50.456836+00:00"
+      },
+      {
+        "event": "pipeline_cycle",
+        "mention_counts": {
+          "CH": 2,
+          "S": 0,
+          "IE": 0,
+          "A": 1,
+          "CO": 0,
+          "IR": 0,
+          "P": 0,
+          "ENP": 0,
+          "SC": 0,
+          "CC": 1,
+          "M": 0,
+          "L": 0,
+          "ADV": 0,
+          "G": 0,
+          "T": 1
+        },
+        "deterministic_selection": {
+          "macro_in_scene": [
+            "CH",
+            "S",
+            "A",
+            "CO",
+            "IR",
+            "P"
+          ],
+          "macro_under_3": [
+            "CH",
+            "S",
+            "A",
+            "CO",
+            "IR",
+            "P"
+          ],
+          "macro_unresolved": [
+            "IR",
+            "P"
+          ],
+          "macro_selected": "IR",
+          "micro_in_scene": null,
+          "micro_under_3": null,
+          "micro_unresolved": null,
+          "micro_candidates_shuffled": null,
+          "micro_gemini_selected": null
+        },
+        "errors_found": [
+          {
+            "animation_id": "D4",
+            "targets": [
+              "boy"
+            ],
+            "category": "Discourse",
+            "desc": "The child is describing a completed action and a future possibility while the boy is currently in the middle of putting cookies into the box."
+          }
+        ],
+        "suggestion": {
+          "misl_element": "IR",
+          "rationale": "The boy has filled the box with cookies for his gift! You could say more about how happy he feels now that he is ready to share them.",
+          "targets": [
+            "boy"
+          ],
+          "animation_id": "P2c"
+        },
+        "selected": {
+          "source": "error",
+          "animation_id": "D4_interjection",
+          "targets": [
+            "boy"
+          ]
+        },
+        "action": "triggered",
+        "condition": "animation",
+        "timestamp": "2026-03-25T01:39:50.458115+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "D4_interjection",
+        "targets": [
+          "boy"
+        ],
+        "rationale": "The child is describing a completed action and a future possibility while the boy is currently in the middle of putting cookies into the box.",
+        "pass_type": "correction",
+        "misl_element": "T",
+        "displayed": true,
+        "timestamp": "2026-03-25T01:40:05.069110+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "He is filling the box with cookies and will soon be able to give it.",
+        "timestamp": "2026-03-25T01:40:06.453141+00:00"
+      },
+      {
+        "event": "resolution",
+        "resolved": true,
+        "animation_id": "D4",
+        "pass_type": "correction",
+        "misl_element": "T",
+        "timestamp": "2026-03-25T01:40:11.166932+00:00"
+      },
+      {
+        "event": "corrections",
+        "items": [
+          {
+            "animation_id": "D4",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "I noticed you used 'will be' for what's happening right now in our cozy kitchen! We can say 'is giving' to describe what he's doing in the picture."
+          }
+        ],
+        "timestamp": "2026-03-25T01:40:12.934004+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "P2c",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "The child mentioned the boy is filling a box with cookies but didn't describe how the boy feels about it. Adding that he feels happy or excited to give the gift would enrich his internal response."
+          }
+        ],
+        "timestamp": "2026-03-25T01:40:12.935684+00:00"
+      },
+      {
+        "event": "pipeline_cycle",
+        "mention_counts": {
+          "CH": 3,
+          "S": 0,
+          "IE": 0,
+          "A": 2,
+          "CO": 0,
+          "IR": 0,
+          "P": 1,
+          "ENP": 1,
+          "SC": 0,
+          "CC": 2,
+          "M": 0,
+          "L": 0,
+          "ADV": 1,
+          "G": 0,
+          "T": 2
+        },
+        "deterministic_selection": {
+          "macro_in_scene": [
+            "CH",
+            "S",
+            "A",
+            "CO",
+            "IR",
+            "P"
+          ],
+          "macro_under_3": [
+            "S",
+            "A",
+            "CO",
+            "IR",
+            "P"
+          ],
+          "macro_unresolved": [
+            "IR",
+            "P"
+          ],
+          "macro_selected": "IR",
+          "micro_in_scene": null,
+          "micro_under_3": null,
+          "micro_unresolved": null,
+          "micro_candidates_shuffled": null,
+          "micro_gemini_selected": null
+        },
+        "errors_found": [
+          {
+            "animation_id": "D4",
+            "targets": [
+              "boy"
+            ],
+            "category": "Discourse",
+            "desc": "I noticed you used 'will be' for what's happening right now in our cozy kitchen! We can say 'is giving' to describe what he's doing in the picture."
+          }
+        ],
+        "suggestion": {
+          "misl_element": "IR",
+          "rationale": "The child mentioned the boy is filling a box with cookies but didn't describe how the boy feels about it. Adding that he feels happy or excited to give the gift would enrich his internal response.",
+          "targets": [
+            "boy"
+          ],
+          "animation_id": "P2c"
+        },
+        "selected": {
+          "source": "error",
+          "animation_id": "D4_interjection",
+          "targets": [
+            "boy"
+          ]
+        },
+        "action": "triggered",
+        "condition": "animation",
+        "timestamp": "2026-03-25T01:40:12.937662+00:00"
+      },
+      {
+        "event": "scene_loaded",
+        "story": "training",
+        "scene": 1,
+        "timestamp": "2026-03-25T01:52:36.001757+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "The boy will be giving his cookies.",
+        "timestamp": "2026-03-25T01:52:42.391369+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "P2c",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "The boy seems very happy to be sharing his cookies with everyone!"
+          }
+        ],
+        "timestamp": "2026-03-25T01:52:47.305099+00:00"
+      },
+      {
+        "event": "pipeline_cycle",
+        "mention_counts": {
+          "CH": 1,
+          "S": 0,
+          "IE": 0,
+          "A": 1,
+          "CO": 0,
+          "IR": 0,
+          "P": 0,
+          "ENP": 0,
+          "SC": 0,
+          "CC": 0,
+          "M": 0,
+          "L": 0,
+          "ADV": 0,
+          "G": 0,
+          "T": 0
+        },
+        "deterministic_selection": {
+          "macro_in_scene": [
+            "CH",
+            "S",
+            "A",
+            "CO",
+            "IR",
+            "P"
+          ],
+          "macro_under_3": [
+            "CH",
+            "S",
+            "A",
+            "CO",
+            "IR",
+            "P"
+          ],
+          "macro_unresolved": [
+            "IR",
+            "P"
+          ],
+          "macro_selected": "IR",
+          "micro_in_scene": null,
+          "micro_under_3": null,
+          "micro_unresolved": null,
+          "micro_candidates_shuffled": null,
+          "micro_gemini_selected": null
+        },
+        "errors_found": [],
+        "suggestion": {
+          "misl_element": "IR",
+          "rationale": "The boy seems very happy to be sharing his cookies with everyone!",
+          "targets": [
+            "boy"
+          ],
+          "animation_id": "P2c"
+        },
+        "selected": {
+          "source": "suggestion",
+          "animation_id": "P2c_emanation_joy",
+          "targets": [
+            "boy"
+          ]
+        },
+        "action": "triggered",
+        "condition": "animation",
+        "timestamp": "2026-03-25T01:52:47.311449+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "P2c_emanation_joy",
+        "targets": [
+          "boy"
+        ],
+        "rationale": "The boy seems very happy to be sharing his cookies with everyone!",
+        "pass_type": "suggestion",
+        "misl_element": "IR",
+        "displayed": false,
+        "timestamp": "2026-03-25T01:53:03.586991+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "He is very happy.",
+        "timestamp": "2026-03-25T01:53:04.812358+00:00"
+      },
+      {
+        "event": "resolution",
+        "resolved": true,
+        "animation_id": "P2c",
+        "pass_type": "suggestion",
+        "misl_element": "IR",
+        "timestamp": "2026-03-25T01:53:07.236960+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "D2",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "The boy seems to have a special goal for those cookies. He could be thinking about who he wants to share them with next!"
+          }
+        ],
+        "timestamp": "2026-03-25T01:53:08.705318+00:00"
+      },
+      {
+        "event": "pipeline_cycle",
+        "mention_counts": {
+          "CH": 2,
+          "S": 0,
+          "IE": 0,
+          "A": 1,
+          "CO": 0,
+          "IR": 1,
+          "P": 0,
+          "ENP": 0,
+          "SC": 0,
+          "CC": 0,
+          "M": 0,
+          "L": 0,
+          "ADV": 1,
+          "G": 0,
+          "T": 0
+        },
+        "deterministic_selection": {
+          "macro_in_scene": [
+            "CH",
+            "S",
+            "A",
+            "CO",
+            "IR",
+            "P"
+          ],
+          "macro_under_3": [
+            "CH",
+            "S",
+            "A",
+            "CO",
+            "IR",
+            "P"
+          ],
+          "macro_unresolved": [
+            "P"
+          ],
+          "macro_selected": "P",
+          "micro_in_scene": null,
+          "micro_under_3": null,
+          "micro_unresolved": null,
+          "micro_candidates_shuffled": null,
+          "micro_gemini_selected": null
+        },
+        "errors_found": [],
+        "suggestion": {
+          "misl_element": "P",
+          "rationale": "The boy seems to have a special goal for those cookies. He could be thinking about who he wants to share them with next!",
+          "targets": [
+            "boy"
+          ],
+          "animation_id": "D2"
+        },
+        "selected": {
+          "source": "suggestion",
+          "animation_id": "D2_thought_bubble",
+          "targets": [
+            "boy"
+          ]
+        },
+        "action": "triggered",
+        "condition": "animation",
+        "timestamp": "2026-03-25T01:53:08.707539+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "D2_thought_bubble",
+        "targets": [
+          "boy"
+        ],
+        "rationale": "The boy seems to have a special goal for those cookies. He could be thinking about who he wants to share them with next!",
+        "pass_type": "suggestion",
+        "misl_element": "P",
+        "displayed": false,
+        "timestamp": "2026-03-25T01:53:18.043692+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "He thinks about what he might do with his cookies.",
+        "timestamp": "2026-03-25T01:53:19.351019+00:00"
+      },
+      {
+        "event": "resolution",
+        "resolved": true,
+        "animation_id": "D2",
+        "pass_type": "suggestion",
+        "misl_element": "P",
+        "timestamp": "2026-03-25T01:53:24.046544+00:00"
+      },
+      {
+        "event": "corrections",
+        "items": [
+          {
+            "animation_id": "D2",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "It looks like the boy is already busy putting his cookies in the box, rather than just thinking about it!"
+          }
+        ],
+        "timestamp": "2026-03-25T01:53:25.401484+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "scene"
+            ],
+            "rationale": "The child has not described where the story is taking place. Adding a detail about the cozy kitchen or the sunny window would help set the scene."
+          }
+        ],
+        "timestamp": "2026-03-25T01:53:25.402812+00:00"
+      },
+      {
+        "event": "pipeline_cycle",
+        "mention_counts": {
+          "CH": 3,
+          "S": 0,
+          "IE": 0,
+          "A": 1,
+          "CO": 0,
+          "IR": 2,
+          "P": 1,
+          "ENP": 0,
+          "SC": 1,
+          "CC": 0,
+          "M": 1,
+          "L": 0,
+          "ADV": 1,
+          "G": 0,
+          "T": 0
+        },
+        "deterministic_selection": {
+          "macro_in_scene": [
+            "CH",
+            "S",
+            "A",
+            "CO",
+            "IR",
+            "P"
+          ],
+          "macro_under_3": [
+            "S",
+            "A",
+            "CO",
+            "IR",
+            "P"
+          ],
+          "macro_unresolved": [],
+          "macro_selected": "S",
+          "micro_in_scene": null,
+          "micro_under_3": null,
+          "micro_unresolved": null,
+          "micro_candidates_shuffled": null,
+          "micro_gemini_selected": null
+        },
+        "errors_found": [
+          {
+            "animation_id": "D2",
+            "targets": [
+              "boy"
+            ],
+            "category": "Discourse",
+            "desc": "It looks like the boy is already busy putting his cookies in the box, rather than just thinking about it!"
+          }
+        ],
+        "suggestion": {
+          "misl_element": "S",
+          "rationale": "The child has not described where the story is taking place. Adding a detail about the cozy kitchen or the sunny window would help set the scene.",
+          "targets": [
+            "scene"
+          ],
+          "animation_id": "I1"
+        },
+        "selected": {
+          "source": "error",
+          "animation_id": "D2_thought_bubble",
+          "targets": [
+            "boy"
+          ]
+        },
+        "action": "triggered",
+        "condition": "animation",
+        "timestamp": "2026-03-25T01:53:25.404266+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "D2_thought_bubble",
+        "targets": [
+          "boy"
+        ],
+        "rationale": "It looks like the boy is already busy putting his cookies in the box, rather than just thinking about it!",
+        "pass_type": "correction",
+        "misl_element": "IR",
+        "displayed": true,
+        "timestamp": "2026-03-25T01:54:20.158329+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "He is putting the cookies in the box. He will give it later.",
+        "timestamp": "2026-03-25T01:54:21.468697+00:00"
+      },
+      {
+        "event": "resolution",
+        "resolved": true,
+        "animation_id": "D2",
+        "pass_type": "correction",
+        "misl_element": "IR",
+        "timestamp": "2026-03-25T01:54:26.311913+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "scene"
+            ],
+            "rationale": "The child has described the action and the character's feelings, but hasn't mentioned that this lovely scene is taking place in a cozy kitchen."
+          }
+        ],
+        "timestamp": "2026-03-25T01:54:28.270963+00:00"
+      },
+      {
+        "event": "pipeline_cycle",
+        "mention_counts": {
+          "CH": 4,
+          "S": 1,
+          "IE": 0,
+          "A": 2,
+          "CO": 0,
+          "IR": 2,
+          "P": 2,
+          "ENP": 0,
+          "SC": 1,
+          "CC": 0,
+          "M": 1,
+          "L": 0,
+          "ADV": 2,
+          "G": 0,
+          "T": 1
+        },
+        "deterministic_selection": {
+          "macro_in_scene": [
+            "CH",
+            "S",
+            "A",
+            "CO",
+            "IR",
+            "P"
+          ],
+          "macro_under_3": [
+            "S",
+            "A",
+            "CO",
+            "IR",
+            "P"
+          ],
+          "macro_unresolved": [],
+          "macro_selected": "S",
+          "micro_in_scene": null,
+          "micro_under_3": null,
+          "micro_unresolved": null,
+          "micro_candidates_shuffled": null,
+          "micro_gemini_selected": null
+        },
+        "errors_found": [],
+        "suggestion": {
+          "misl_element": "S",
+          "rationale": "The child has described the action and the character's feelings, but hasn't mentioned that this lovely scene is taking place in a cozy kitchen.",
+          "targets": [
+            "scene"
+          ],
+          "animation_id": "I1"
+        },
+        "selected": {
+          "source": "suggestion",
+          "animation_id": "I1_spotlight",
+          "targets": [
+            "scene"
+          ]
+        },
+        "action": "triggered",
+        "condition": "animation",
+        "timestamp": "2026-03-25T01:54:28.272945+00:00"
+      },
+      {
+        "event": "scene_loaded",
+        "story": "training",
+        "scene": 1,
+        "timestamp": "2026-03-25T01:54:32.752232+00:00"
       }
     ]
   }

@@ -221,6 +221,14 @@ completely wrong verb conjugation ("he go" instead of "he goes"), wrong pronouns
 ("him is" instead of "he is"), or severely broken sentence structure. \
 When in doubt, do NOT flag D4.
 
+CRITICAL — Tense tolerance:
+Be generous with tense. Future ("will be giving") and near-future ("is going \
+to give") are acceptable even when the scene describes the present — the child \
+is anticipating, which is valid storytelling. Only flag tense with D4 if it is \
+CLEARLY wrong relative to the scene description (e.g. past "was cooking" when \
+the scene describes a present action "is cooking", or present "is running" when \
+the scene describes a completed past action).
+
 CRITICAL — Adjective tolerance:
 Only flag an adjective as a factual error if the child's description is \
 GROSSLY wrong — the opposite or a completely unrelated quality. \
