@@ -5,7 +5,6 @@
   "mode": "both",
   "scaffolding_intent": "Plays a day-night cycle effect signaling temporal progression, scaffolding setting and tense",
   "misl_elements": [
-    "S",
     "T"
   ],
   "target_type": ["scene"],

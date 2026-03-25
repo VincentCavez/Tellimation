@@ -39,7 +39,6 @@ from src.interaction.decision_logic import (
     process_assessment,
 )
 from src.interaction.discrepancy_assessment import (
-    assess_utterance,
     assess_corrections,
     assess_enrichment,
     assess_resolution,
@@ -348,7 +347,16 @@ async def study_instructions():
         "/oral-instructions/1_3_next.wav",
         "/oral-instructions/1_4_practice.wav",
     ]
-    return JSONResponse(content={"paragraphs": paragraphs, "audio": audio_files})
+    return JSONResponse(content={
+        "paragraphs": paragraphs,
+        "audio": audio_files,
+        "post_training_paragraph": paragraphs[4] if len(paragraphs) > 4 else "",
+        "post_training_audio": "/oral-instructions/2_end_practice.wav",
+        "between_stories_paragraph": paragraphs[5] if len(paragraphs) > 5 else "",
+        "between_stories_audio": "/oral-instructions/3_continue.wav",
+        "end_paragraph": paragraphs[6] if len(paragraphs) > 6 else "",
+        "end_audio": "/oral-instructions/4_end.wav",
+    })
 
 
 @app.post("/api/study/validate")
@@ -651,15 +659,14 @@ async def study_websocket_endpoint(websocket: WebSocket):
         await websocket.close()
         return
 
-    session = SessionState(api_key, f"study_{participant}")
+    session = SessionState(api_key, str(participant))
     session.student_profile.age = 8
     session.naming_phase = False  # Study: no naming phase
     session.awaiting_ending_choice = False  # Study: no ending choice
     # Store animation flag on session for use in audio handler
     session.study_animations_enabled = is_animated  # type: ignore[attr-defined]
     session.study_story_key = story_key  # type: ignore[attr-defined]
-    session.study_pending_transcription = ""  # type: ignore[attr-defined]
-    session.study_interrupted = False  # type: ignore[attr-defined]
+    session._study_pending_anim_log = None  # type: ignore[attr-defined]
     ws = _WebSocketAdapter(websocket)
 
     try:
@@ -690,14 +697,10 @@ async def study_websocket_endpoint(websocket: WebSocket):
                         "story": _story_key,
                         "scene": _scene_num,
                     })
-                # Reset pending transcription on new scene
-                session.study_pending_transcription = ""
-                session.study_interrupted = False
-
             elif msg_type == "interrupt":
-                # Child started speaking again — mark current animation as interrupted
-                session.study_interrupted = True
-                await ws.send_json({"type": "study_log", "tag": "INTERRUPTED", "text": "New utterance, cancelling pending animation"})
+                # Child started speaking again before animation was displayed
+                if session._study_pending_anim_log:
+                    session._study_pending_anim_log["displayed"] = False
 
             elif msg_type == "entity_moved":
                 await _handle_entity_moved(session, data)
@@ -1355,13 +1358,26 @@ async def _handle_study_audio(
         return
 
     try:
-        scene_data = session.current_scene.get("manifest") if session.current_scene else None
-        misl_targets = scene_data.get("misl_targets") if scene_data else None
-        story_so_far = get_accepted_utterances(session.current_scene_log)
-        misl_already = get_misl_dimensions_suggested(session.current_scene_log)
+        # --- Study log identifiers ---
+        _pid = session.participant_id
+        _story_key = getattr(session, "study_story_key", "")
+        _scene_num = session.current_scene.get("scene_number", 1) if session.current_scene else 1
+        _is_training = _story_key.lower().startswith("training")
 
-        is_training = getattr(session, "study_story_key", "").lower().startswith("training")
-        misl_profile = MISLDifficultyProfile() if is_training else session.student_profile.misl_difficulty_profile
+        # ── Flush pending animation log from previous cycle ──
+        if session._study_pending_anim_log:
+            pending = session._study_pending_anim_log
+            if "displayed" not in pending:
+                pending["displayed"] = True  # no interrupt → was displayed
+            append_study_log_entry(_pid, _is_training, _story_key, pending.pop("_scene_num", _scene_num), pending)
+            session._study_pending_anim_log = None
+
+        _scene = session.current_scene or {}
+        _sm = _scene.get("manifest") or _scene
+        misl_targets = _sm.get("misl_targets") or _scene.get("misl_targets")
+        scene_description = _sm.get("scene_description") or _scene.get("scene_description", "")
+        entities_in_scene = _sm.get("entities_in_scene") or _scene.get("entities_in_scene", [])
+        story_so_far = list(session.story_utterances)  # full story, not just scene
 
         # ── Step 1: Transcribe ──
         transcription = await transcribe_audio(
@@ -1375,55 +1391,40 @@ async def _handle_study_audio(
 
         logger.info("\033[92m[TRANSCRIPTION]\033[0m %s", transcription)
 
-        # If previous utterance was interrupted, concatenate
-        was_interrupted = session.study_interrupted and session.study_pending_transcription
-        if was_interrupted:
-            transcription = session.study_pending_transcription + " " + transcription
-            session.study_interrupted = False
-
-        session.study_pending_transcription = transcription
-
         # Send transcription to client
         await ws.send_json({"type": "study_log", "tag": "TRANSCRIPTION", "text": transcription})
-
-        # --- Study log identifiers ---
-        _pid = getattr(session, "session_id", "").replace("study_", "")
-        _story_key = getattr(session, "study_story_key", "")
-        _scene_num = session.current_scene.get("scene_number", 1) if session.current_scene else 1
-        _is_training = _story_key.lower().startswith("training")
 
         # Log transcription
         append_study_log_entry(_pid, _is_training, _story_key, _scene_num, {
             "event": "transcription",
             "text": transcription,
-            "was_interrupted": was_interrupted,
         })
 
         # ── Step 2: Resolution check + MISL detection (parallel) ──
         previous_disc = getattr(session, "_study_previous_discrepancy", None)
+        previous_rationale = previous_disc.description if previous_disc else None
         resolution_result, detected_misl = await asyncio.gather(
             assess_resolution(
                 api_key=session.api_key,
                 utterance_text=transcription,
-                previous_discrepancy=previous_disc,
-                scene_data=scene_data,
+                previous_rationale=previous_rationale,
+                scene_description=scene_description,
             ),
             detect_misl_elements(
                 api_key=session.api_key,
                 utterance_text=transcription,
-                scene_data=scene_data,
             ),
         )
 
         # ── Step 3: Update logs ──
-        # 3a. Log resolution
-        if resolution_result:
+        # 3a. Log resolution (caller logs animation_id/pass_type/misl_element from previous_disc)
+        if resolution_result is not None:
             append_study_log_entry(_pid, _is_training, _story_key, _scene_num, {
                 "event": "resolution",
-                "resolved": resolution_result.get("resolved", False),
-                "animation_id": resolution_result.get("animation_id"),
-                "pass_type": resolution_result.get("pass_type"),
-                "misl_element": getattr(previous_disc, "misl_elements", [None])[0] if previous_disc and getattr(previous_disc, "misl_elements", None) else None,
+                "resolved": resolution_result,
+                "animation_id": previous_disc.animation_id if previous_disc else None,
+                "pass_type": previous_disc.pass_type if previous_disc else None,
+                "misl_element": previous_disc.misl_elements[0] if previous_disc and previous_disc.misl_elements else None,
             })
 
         # 3b. Update mention_counts from detected MISL elements
@@ -1444,11 +1445,10 @@ async def _handle_study_audio(
             try:
                 return await assess_corrections(
                     api_key=session.api_key,
-                    manifest=session.current_manifest,
                     utterance_text=transcription,
                     story_so_far=story_so_far,
+                    scene_description=scene_description,
                     character_names=session.character_names,
-                    scene_data=scene_data,
                 )
             except Exception as exc:
                 logger.error("[study] Correction pass failed: %s", exc)
@@ -1472,16 +1472,13 @@ async def _handle_study_audio(
             try:
                 return await assess_enrichment(
                     api_key=session.api_key,
-                    manifest=session.current_manifest,
                     utterance_text=transcription,
                     story_so_far=story_so_far,
-                    misl_already_suggested=misl_already,
-                    misl_difficulty_profile=misl_profile,
                     character_names=session.character_names,
-                    scene_data=scene_data,
+                    misl_targets=misl_targets,
+                    entities_in_scene=entities_in_scene,
                     macro_selected=macro_sel,
                     micro_candidates=micro_cands,
-                    misl_targets=misl_targets,
                 )
             except Exception as exc:
                 logger.error("[study] Enrichment pass failed: %s", exc)
@@ -1501,6 +1498,10 @@ async def _handle_study_audio(
         session.narration_history.append(transcription)
         session.conversation_history.append({"role": "child", "text": transcription})
         session.student_profile.total_utterances += 1
+
+        # Add to story_utterances only if accepted (no corrections)
+        if not corrections:
+            session.story_utterances.append(transcription)
 
         # Log corrections
         if corrections:
@@ -1563,7 +1564,7 @@ async def _handle_study_audio(
 
         if chosen_disc:
             targets = chosen_disc.target_entities or []
-            animation_id = _select_animation_for_discrepancy(chosen_disc, session.student_profile)
+            animation_id = _select_animation_for_discrepancy(chosen_disc)
             if not animation_id:
                 chosen_disc = None
 
@@ -1609,23 +1610,39 @@ async def _handle_study_audio(
                 "animation": animation_id,
             })})
 
-            # Log the chosen animation
-            append_study_log_entry(_pid, _is_training, _story_key, _scene_num, {
+            # Store animation log as pending — will be flushed at start of next cycle
+            # with displayed=true (normal) or displayed=false (child spoke before display)
+            session._study_pending_anim_log = {
                 "event": "animation_played",
                 "animation_id": animation_id,
                 "targets": targets,
                 "rationale": chosen_disc.description,
                 "pass_type": chosen_disc.pass_type,
                 "misl_element": chosen_disc.misl_elements[0] if chosen_disc.misl_elements else None,
-            })
+                "_scene_num": _scene_num,  # internal, popped before logging
+            }
 
             # Load params from grammar JSON (accentuated if last resolution was False)
             anim_params = load_animation_params(animation_id, _all_entries)
 
-            # Send ONE animation with combined prefix for all targets
+            # D4 interjection: inject the correct word from Gemini
+            if template == "interjection" and chosen_disc.correction_word:
+                anim_params["word"] = chosen_disc.correction_word
+
+            # Send ONE animation — adapt params to template target expectations
             combined_prefix = "|".join(targets) if targets else ""
             if combined_prefix:
-                anim_params["entityPrefix"] = "" if combined_prefix == "scene" else combined_prefix
+                if len(targets) >= 2 and template in ("magnetism", "repel", "causal_push"):
+                    # Duo animations: separate A and B prefixes
+                    anim_params["entityPrefixA"] = targets[0]
+                    anim_params["entityPrefixB"] = targets[1]
+                    anim_params["entityPrefix"] = targets[0]
+                elif len(targets) >= 2 and template in ("sequential_glow",):
+                    # Group animations: pass as array
+                    anim_params["entityPrefixes"] = targets
+                    anim_params["entityPrefix"] = targets[0]
+                else:
+                    anim_params["entityPrefix"] = "" if combined_prefix == "scene" else combined_prefix
                 decision = {
                     "mode": "use_default",
                     "animation_id": animation_id,
@@ -1691,10 +1708,12 @@ async def _handle_audio(
                 await _handle_ending_choice(session, ws, transcription)
             return
 
-        scene_data = session.current_scene.get("manifest") if session.current_scene else None
-        misl_targets = scene_data.get("misl_targets") if scene_data else None
-        story_so_far = get_accepted_utterances(session.current_scene_log)
-        misl_already = get_misl_dimensions_suggested(session.current_scene_log)
+        _scene = session.current_scene or {}
+        _sm = _scene.get("manifest") or _scene
+        misl_targets = _sm.get("misl_targets") or _scene.get("misl_targets")
+        scene_description = _sm.get("scene_description") or _scene.get("scene_description", "")
+        entities_in_scene = _sm.get("entities_in_scene") or _scene.get("entities_in_scene", [])
+        story_so_far = list(session.story_utterances)  # full story, not just scene
 
         # ── Step 1: Transcribe ──
         transcription = await transcribe_audio(
@@ -1727,20 +1746,18 @@ async def _handle_audio(
                 return
 
         # ── Step 3: Resolution check + MISL detection (parallel) ──
-        previous_disc = session.pending_animation  # already cleared by _resolve above
-        # Use the stored previous discrepancy for resolution
         _prev_disc_for_resolution = getattr(session, "_interactive_previous_discrepancy", None)
+        _prev_rationale = _prev_disc_for_resolution.description if _prev_disc_for_resolution else None
         resolution_result, detected_misl = await asyncio.gather(
             assess_resolution(
                 api_key=session.api_key,
                 utterance_text=transcription,
-                previous_discrepancy=_prev_disc_for_resolution,
-                scene_data=scene_data,
+                previous_rationale=_prev_rationale,
+                scene_description=scene_description,
             ),
             detect_misl_elements(
                 api_key=session.api_key,
                 utterance_text=transcription,
-                scene_data=scene_data,
             ),
         )
 
@@ -1755,11 +1772,10 @@ async def _handle_audio(
             try:
                 return await assess_corrections(
                     api_key=session.api_key,
-                    manifest=session.current_manifest,
                     utterance_text=transcription,
                     story_so_far=story_so_far,
+                    scene_description=scene_description,
                     character_names=session.character_names,
-                    scene_data=scene_data,
                 )
             except Exception as exc:
                 logger.error("[audio] Correction pass failed: %s", exc)
@@ -1767,21 +1783,8 @@ async def _handle_audio(
 
         async def _run_enrichment_path():
             if not misl_targets:
-                # Fall back to legacy enrichment
-                try:
-                    return await assess_enrichment(
-                        api_key=session.api_key,
-                        manifest=session.current_manifest,
-                        utterance_text=transcription,
-                        story_so_far=story_so_far,
-                        misl_already_suggested=misl_already,
-                        misl_difficulty_profile=session.student_profile.misl_difficulty_profile,
-                        character_names=session.character_names,
-                        scene_data=scene_data,
-                    )
-                except Exception as exc:
-                    logger.error("[audio] Enrichment pass failed: %s", exc)
-                    return []
+                # No misl_targets → skip enrichment (no legacy fallback)
+                return []
 
             macro_sel, micro_cands, sel_trace = select_misl_candidates(
                 misl_targets=misl_targets,
@@ -1796,16 +1799,13 @@ async def _handle_audio(
             try:
                 return await assess_enrichment(
                     api_key=session.api_key,
-                    manifest=session.current_manifest,
                     utterance_text=transcription,
                     story_so_far=story_so_far,
-                    misl_already_suggested=misl_already,
-                    misl_difficulty_profile=session.student_profile.misl_difficulty_profile,
                     character_names=session.character_names,
-                    scene_data=scene_data,
+                    misl_targets=misl_targets,
+                    entities_in_scene=entities_in_scene,
                     macro_selected=macro_sel,
                     micro_candidates=micro_cands,
-                    misl_targets=misl_targets,
                 )
             except Exception as exc:
                 logger.error("[audio] Enrichment pass failed: %s", exc)
@@ -1815,6 +1815,10 @@ async def _handle_audio(
             _run_corrections(), _run_enrichment_path()
         )
         corrections, name_assignments = corrections_result
+
+        # Add to story_utterances only if accepted (no corrections)
+        if not corrections:
+            session.story_utterances.append(transcription)
 
         # Register name assignments
         if name_assignments and session.character_names is not None:
@@ -2216,20 +2220,19 @@ async def _resolve_pending_animation(
 
     # Quick re-assess to check if the child's new utterance is now acceptable
     try:
-        story_so_far = get_accepted_utterances(session.current_scene_log)
-        misl_already = get_misl_dimensions_suggested(session.current_scene_log)
+        _sc = session.current_scene or {}
+        _scm = _sc.get("manifest") or _sc
+        scene_desc = _scm.get("scene_description") or _sc.get("scene_description", "")
 
-        quick_assessment = await assess_utterance(
+        quick_corrections, _ = await assess_corrections(
             api_key=session.api_key,
-            manifest=session.current_manifest,
             utterance_text=transcription,
-            story_so_far=story_so_far,
-            misl_already_suggested=misl_already,
-            misl_difficulty_profile=session.student_profile.misl_difficulty_profile,
+            story_so_far=list(session.story_utterances),
+            scene_description=scene_desc,
             character_names=session.character_names,
         )
 
-        corrected = quick_assessment.utterance_is_acceptable
+        corrected = len(quick_corrections) == 0
     except Exception:
         logger.warning("[pending_anim] Quick assessment failed, treating as not corrected")
         corrected = False

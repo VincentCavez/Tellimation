@@ -5,7 +5,7 @@
   "mode": "both",
   "scaffolding_intent": "Makes an occluding layer semi-transparent to show hidden elements, drawing attention to missed or incorrect descriptions",
   "misl_elements": [
-    "S"
+    "CH","S"
   ],
   "target_type": ["entity","duo", "group"],
   "parameters": [

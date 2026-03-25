@@ -119,7 +119,7 @@ AnimationTemplates.register('nametag', _perTargetWrapper(function(params) {
       var rtx = rayStartX + stringDirX * rd;
       if (rtx < 0 || rtx >= PW) break;
       var rti = rayCY * PW + rtx;
-      if (buf[rti].e && buf[rti].e.startsWith(prefix)) {
+      if (buf[rti].e && _isEntity(buf[rti].e, prefix)) {
         stringEndX = rtx; stringEndY = rayCY;
         rayFoundEntity = true;
       } else if (rayFoundEntity) {
@@ -234,7 +234,7 @@ AnimationTemplates.register('nametag', _perTargetWrapper(function(params) {
 // Phase 1 (0→0.667): entity lifts diagonally (up-right), black silhouette at original position.
 // Phase 2 (0.667→0.833): sharp ease-in snap back to original, no bounce.
 // Phase 3 (0.833→1.0): crack lines radiate from all around the entity contour, then fade.
-AnimationTemplates.register('stamp', function(params) {
+AnimationTemplates.register('stamp', _perTargetWrapper(function(params) {
   var prefix = params.entityPrefix || '';
   var maxLift = params.liftPixels || 44;
   var crackCount = params.crackCount != null ? params.crackCount : 12;
@@ -259,13 +259,13 @@ AnimationTemplates.register('stamp', function(params) {
         var lx = li.idx % PW, ly = Math.floor(li.idx / PW);
         if (lx < minX) minX = lx; if (lx > maxX) maxX = lx;
         if (ly < minY) minY = ly; if (ly > maxY) maxY = ly;
-        if (buf[li.idx].e && buf[li.idx].e.startsWith(prefix)) {
+        if (buf[li.idx].e && _isEntity(buf[li.idx].e, prefix)) {
           indices.push(li.idx);
         }
       }
     } else {
       for (var i = 0; i < buf.length; i++) {
-        if (buf[i].e && buf[i].e.startsWith(prefix)) {
+        if (buf[i].e && _isEntity(buf[i].e, prefix)) {
           var x = i % PW, y = Math.floor(i / PW);
           indices.push(i);
           if (x < minX) minX = x; if (x > maxX) maxX = x;
@@ -361,7 +361,7 @@ AnimationTemplates.register('stamp', function(params) {
           var ty = Math.round(ecy + sinA * d);
           if (tx < 0 || tx >= PW || ty < 0 || ty >= PH) break;
           var ti = ty * PW + tx;
-          if (buf[ti].e && buf[ti].e.startsWith(prefix)) {
+          if (buf[ti].e && _isEntity(buf[ti].e, prefix)) {
             cox = tx; coy = ty;
             foundEntity = true;
           } else if (foundEntity) {
@@ -407,7 +407,7 @@ AnimationTemplates.register('stamp', function(params) {
       }
     }
   };
-}, 3000);
+}), 3000);
 
 // ── P1: Color Pop ──
 // Sequential color group reveal: quantize entity pixels into ≤7 dominant
@@ -909,7 +909,7 @@ function _drawEmanationSprite(buf, PW, PH, type, cx, cy, size, alpha) {
   }
 }
 
-AnimationTemplates.register('emanation', function(params) {
+AnimationTemplates.register('emanation', _perTargetWrapper(function(params) {
   var prefix = params.entityPrefix || '';
   var pType = params.particleType || 'steam';
   var defaultCount = 18;
@@ -1047,7 +1047,7 @@ AnimationTemplates.register('emanation', function(params) {
       _drawEmanationSprite(buf, PW, PH, pType, sp.x, sp.y, sp.size, spriteAlpha);
     }
   };
-}, 3000);
+}), 3000);
 
 // ── P2a–P2f: Emanation variants ──
 // Each wraps the base emanation template with a fixed particleType and tint.
@@ -1244,7 +1244,7 @@ AnimationTemplates.register('timelapse', function(params) {
 // ── A1: Motion Lines ──
 // Fast burst movements with pauses between. Direction coherent with entity
 // type (birds: any direction, others: left/right). Thick, visible speed streaks.
-AnimationTemplates.register('motion_lines', function(params) {
+AnimationTemplates.register('motion_lines', _perTargetWrapper(function(params) {
   var prefix = params.entityPrefix || '';
   var dir = params.direction || 'right';   // 'left', 'right', 'any'
   var lineLen = _clamp(params.lineLength || 90, 50, 150);
@@ -1446,12 +1446,12 @@ AnimationTemplates.register('motion_lines', function(params) {
       }
     }
   };
-}, 3000);
+}), 3000);
 
 // ── A2: Anticipation ──
 // Entity compresses slightly, lurches forward, then freezes mid-motion.
 // Like a momentum that was interrupted. Scaffolds missing/uncompleted action verbs.
-AnimationTemplates.register('flip', function(params) {
+AnimationTemplates.register('flip', _perTargetWrapper(function(params) {
   var prefix = params.entityPrefix || '';
   var speed = params.speed != null ? params.speed : 1.0;
 
@@ -1469,13 +1469,13 @@ AnimationTemplates.register('flip', function(params) {
         var lx = li.idx % PW, ly = Math.floor(li.idx / PW);
         if (lx < minX) minX = lx; if (lx > maxX) maxX = lx;
         if (ly < minY) minY = ly; if (ly > maxY) maxY = ly;
-        if (buf[li.idx].e && buf[li.idx].e.startsWith(prefix)) {
+        if (buf[li.idx].e && _isEntity(buf[li.idx].e, prefix)) {
           indices.push(li.idx);
         }
       }
     } else {
       for (var i = 0; i < buf.length; i++) {
-        if (buf[i].e && buf[i].e.startsWith(prefix)) {
+        if (buf[i].e && _isEntity(buf[i].e, prefix)) {
           var x = i % PW, y = Math.floor(i / PW);
           indices.push(i);
           if (x < minX) minX = x; if (x > maxX) maxX = x;
@@ -1554,10 +1554,10 @@ AnimationTemplates.register('flip', function(params) {
       }
     }
   };
-}, 2000);
+}), 2000);
 
 // ── Decomposition (not in new grammar — legacy support) ──
-AnimationTemplates.register('decomposition', function(params) {
+AnimationTemplates.register('decomposition', _perTargetWrapper(function(params) {
   var prefix = params.entityPrefix || '';
   var sepPx = _clamp(params.separationPixels || 8, 2, 20);
 
@@ -1626,7 +1626,7 @@ AnimationTemplates.register('decomposition', function(params) {
       }
     }
   };
-}, 1800);
+}), 1800);
 
 // ── R3: Causal Push ──
 // Element A rushes toward element B + impact burst at collision.
@@ -2388,7 +2388,7 @@ AnimationTemplates.register('speech_bubble', _perTargetWrapper(function(params) 
       var rty = Math.round(bounds.cy) - rd;
       if (rty < 0) break;
       var rti = rty * PW + rayCX;
-      if (buf[rti].e && buf[rti].e.startsWith(prefix)) {
+      if (buf[rti].e && _isEntity(buf[rti].e, prefix)) {
         entityTopY = rty; foundTop = true;
       } else if (foundTop) { break; }
     }
@@ -2532,7 +2532,7 @@ AnimationTemplates.register('thought_bubble', _perTargetWrapper(function(params)
       var rty = Math.round(bounds.cy) - rd;
       if (rty < 0) break;
       var rti = rty * PW + rayCX;
-      if (buf[rti].e && buf[rti].e.startsWith(prefix)) {
+      if (buf[rti].e && _isEntity(buf[rti].e, prefix)) {
         entityTopY = rty; foundTop = true;
       } else if (foundTop) { break; }
     }

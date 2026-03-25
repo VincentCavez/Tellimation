@@ -5,7 +5,7 @@
   "mode": "both",
   "scaffolding_intent": "Isolates a character or object by darkening the scene and adding a luminous halo, prompting the child to identify and name it",
   "misl_elements": [
-    "CH"
+    "CH","S"
   ],
   "target_type": ["entity","duo","group","scene"],
   "parameters": [

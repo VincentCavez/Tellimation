@@ -1,0 +1,14 @@
+{
+  "participant": "8",
+  "type": "training",
+  "scenes": {
+    "training_scene_1": [
+      {
+        "event": "scene_loaded",
+        "story": "training",
+        "scene": 1,
+        "timestamp": "2026-03-24T11:04:56.282042+00:00"
+      }
+    ]
+  }
+}

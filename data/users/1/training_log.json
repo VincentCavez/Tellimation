@@ -7,13 +7,711 @@
         "event": "scene_loaded",
         "story": "training",
         "scene": 1,
-        "timestamp": "2026-03-24T04:18:56.258785+00:00"
+        "timestamp": "2026-03-24T11:05:07.681904+00:00"
       },
       {
         "event": "scene_loaded",
         "story": "training",
         "scene": 1,
-        "timestamp": "2026-03-24T05:03:43.212371+00:00"
+        "timestamp": "2026-03-24T11:06:52.044597+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "The boy and the grandmother are in the kitchen.",
+        "timestamp": "2026-03-24T11:06:59.785620+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "dog"
+            ],
+            "rationale": "The child mentioned the boy and the grandmother, but didn't notice the small brown dog who is also with them in the kitchen."
+          }
+        ],
+        "timestamp": "2026-03-24T11:07:02.352068+00:00"
+      },
+      {
+        "event": "pipeline_cycle",
+        "mention_counts": {
+          "CH": 1,
+          "S": 1,
+          "IE": 0,
+          "A": 0,
+          "CO": 0,
+          "IR": 0,
+          "P": 0,
+          "ENP": 1,
+          "SC": 0,
+          "CC": 1,
+          "M": 0,
+          "L": 0,
+          "ADV": 0,
+          "G": 0,
+          "T": 0
+        },
+        "deterministic_selection": {
+          "macro_in_scene": [
+            "CH",
+            "S",
+            "A",
+            "CO",
+            "IR",
+            "P"
+          ],
+          "macro_under_3": [
+            "CH",
+            "S",
+            "A",
+            "CO",
+            "IR",
+            "P"
+          ],
+          "macro_unresolved": [
+            "CH",
+            "S",
+            "A",
+            "CO",
+            "IR",
+            "P"
+          ],
+          "macro_selected": "CH",
+          "micro_in_scene": null,
+          "micro_under_3": null,
+          "micro_unresolved": null,
+          "micro_candidates_shuffled": null,
+          "micro_gemini_selected": null
+        },
+        "errors_found": [],
+        "suggestion": {
+          "misl_element": "CH",
+          "rationale": "The child mentioned the boy and the grandmother, but didn't notice the small brown dog who is also with them in the kitchen.",
+          "targets": [
+            "dog"
+          ],
+          "animation_id": "I1"
+        },
+        "selected": {
+          "source": "suggestion",
+          "animation_id": "I1_spotlight",
+          "targets": [
+            "dog"
+          ]
+        },
+        "action": "triggered",
+        "condition": "animation",
+        "timestamp": "2026-03-24T11:07:02.356796+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "I1_spotlight",
+        "targets": [
+          "dog"
+        ],
+        "rationale": "The child mentioned the boy and the grandmother, but didn't notice the small brown dog who is also with them in the kitchen.",
+        "pass_type": "suggestion",
+        "misl_element": "CH",
+        "displayed": false,
+        "timestamp": "2026-03-24T11:07:07.451457+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "There is a dog too?",
+        "timestamp": "2026-03-24T11:07:08.695071+00:00"
+      },
+      {
+        "event": "resolution",
+        "resolved": true,
+        "animation_id": "I1",
+        "pass_type": "suggestion",
+        "misl_element": "CH",
+        "timestamp": "2026-03-24T11:07:11.402323+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "scene"
+            ],
+            "rationale": "The child mentioned the boy, grandmother, and dog in the kitchen, but hasn't yet described the warm and sunny atmosphere of the afternoon coming through the window."
+          }
+        ],
+        "timestamp": "2026-03-24T11:07:12.680719+00:00"
+      },
+      {
+        "event": "pipeline_cycle",
+        "mention_counts": {
+          "CH": 2,
+          "S": 1,
+          "IE": 0,
+          "A": 0,
+          "CO": 0,
+          "IR": 0,
+          "P": 0,
+          "ENP": 1,
+          "SC": 0,
+          "CC": 1,
+          "M": 0,
+          "L": 0,
+          "ADV": 1,
+          "G": 0,
+          "T": 0
+        },
+        "deterministic_selection": {
+          "macro_in_scene": [
+            "CH",
+            "S",
+            "A",
+            "CO",
+            "IR",
+            "P"
+          ],
+          "macro_under_3": [
+            "CH",
+            "S",
+            "A",
+            "CO",
+            "IR",
+            "P"
+          ],
+          "macro_unresolved": [
+            "S",
+            "A",
+            "CO",
+            "IR",
+            "P"
+          ],
+          "macro_selected": "S",
+          "micro_in_scene": null,
+          "micro_under_3": null,
+          "micro_unresolved": null,
+          "micro_candidates_shuffled": null,
+          "micro_gemini_selected": null
+        },
+        "errors_found": [],
+        "suggestion": {
+          "misl_element": "S",
+          "rationale": "The child mentioned the boy, grandmother, and dog in the kitchen, but hasn't yet described the warm and sunny atmosphere of the afternoon coming through the window.",
+          "targets": [
+            "scene"
+          ],
+          "animation_id": "I1"
+        },
+        "selected": {
+          "source": "suggestion",
+          "animation_id": "I1_spotlight",
+          "targets": [
+            "scene"
+          ]
+        },
+        "action": "triggered",
+        "condition": "animation",
+        "timestamp": "2026-03-24T11:07:12.682113+00:00"
+      },
+      {
+        "event": "scene_loaded",
+        "story": "training",
+        "scene": 1,
+        "timestamp": "2026-03-24T11:08:34.550043+00:00"
+      },
+      {
+        "event": "scene_loaded",
+        "story": "training",
+        "scene": 1,
+        "timestamp": "2026-03-24T11:08:59.754879+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "I fucking beg you.",
+        "timestamp": "2026-03-24T11:09:05.561931+00:00"
+      },
+      {
+        "event": "corrections",
+        "items": [
+          {
+            "animation_id": "D1",
+            "targets": [
+              "boy"
+            ],
+            "rationale": "The child used inappropriate language that doesn't match the cozy, warm scene of a boy and his grandmother baking."
+          },
+          {
+            "animation_id": "D3",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The child's words don't describe what is happening in the kitchen, like baking cookies and sharing a happy moment together."
+          }
+        ],
+        "timestamp": "2026-03-24T11:09:10.771575+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "scene"
+            ],
+            "rationale": "The child has not mentioned the setting at all. To help ground the story, they could describe the cozy kitchen or the sunny afternoon light coming through the window."
+          }
+        ],
+        "timestamp": "2026-03-24T11:09:10.772627+00:00"
+      },
+      {
+        "event": "pipeline_cycle",
+        "mention_counts": {
+          "CH": 1,
+          "S": 0,
+          "IE": 0,
+          "A": 1,
+          "CO": 0,
+          "IR": 0,
+          "P": 0,
+          "ENP": 0,
+          "SC": 0,
+          "CC": 0,
+          "M": 0,
+          "L": 1,
+          "ADV": 1,
+          "G": 0,
+          "T": 0
+        },
+        "deterministic_selection": {
+          "macro_in_scene": [
+            "CH",
+            "S",
+            "A",
+            "CO",
+            "IR",
+            "P"
+          ],
+          "macro_under_3": [
+            "CH",
+            "S",
+            "A",
+            "CO",
+            "IR",
+            "P"
+          ],
+          "macro_unresolved": [
+            "S",
+            "A",
+            "CO",
+            "IR",
+            "P"
+          ],
+          "macro_selected": "S",
+          "micro_in_scene": null,
+          "micro_under_3": null,
+          "micro_unresolved": null,
+          "micro_candidates_shuffled": null,
+          "micro_gemini_selected": null
+        },
+        "errors_found": [
+          {
+            "animation_id": "D1",
+            "targets": [
+              "boy"
+            ],
+            "category": "Identity",
+            "desc": "The child used inappropriate language that doesn't match the cozy, warm scene of a boy and his grandmother baking."
+          },
+          {
+            "animation_id": "D3",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "category": "Identity",
+            "desc": "The child's words don't describe what is happening in the kitchen, like baking cookies and sharing a happy moment together."
+          }
+        ],
+        "suggestion": {
+          "misl_element": "S",
+          "rationale": "The child has not mentioned the setting at all. To help ground the story, they could describe the cozy kitchen or the sunny afternoon light coming through the window.",
+          "targets": [
+            "scene"
+          ],
+          "animation_id": "I1"
+        },
+        "selected": {
+          "source": "error",
+          "animation_id": "D1_speech_bubble",
+          "targets": [
+            "boy"
+          ]
+        },
+        "action": "triggered",
+        "condition": "animation",
+        "timestamp": "2026-03-24T11:09:10.775509+00:00"
+      },
+      {
+        "event": "scene_loaded",
+        "story": "training",
+        "scene": 1,
+        "timestamp": "2026-03-24T11:17:06.756953+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "A boy and his grandmother are cooking.",
+        "timestamp": "2026-03-24T11:17:16.347504+00:00"
+      },
+      {
+        "event": "corrections",
+        "items": [
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "rationale": "The boy and his grandmother are actually baking cookies together, not cooking a meal."
+          }
+        ],
+        "timestamp": "2026-03-24T11:17:20.864653+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "scene"
+            ],
+            "rationale": "The child mentioned the characters and their action but hasn't described where the story is taking place. Adding details about the cozy kitchen or the sunny afternoon would help set the scene."
+          }
+        ],
+        "timestamp": "2026-03-24T11:17:20.865971+00:00"
+      },
+      {
+        "event": "pipeline_cycle",
+        "mention_counts": {
+          "CH": 1,
+          "S": 0,
+          "IE": 0,
+          "A": 1,
+          "CO": 0,
+          "IR": 0,
+          "P": 0,
+          "ENP": 0,
+          "SC": 0,
+          "CC": 1,
+          "M": 0,
+          "L": 0,
+          "ADV": 0,
+          "G": 0,
+          "T": 0
+        },
+        "deterministic_selection": {
+          "macro_in_scene": [
+            "CH",
+            "S",
+            "A",
+            "CO",
+            "IR",
+            "P"
+          ],
+          "macro_under_3": [
+            "CH",
+            "S",
+            "A",
+            "CO",
+            "IR",
+            "P"
+          ],
+          "macro_unresolved": [
+            "S",
+            "A",
+            "CO",
+            "IR",
+            "P"
+          ],
+          "macro_selected": "S",
+          "micro_in_scene": null,
+          "micro_under_3": null,
+          "micro_unresolved": null,
+          "micro_candidates_shuffled": null,
+          "micro_gemini_selected": null
+        },
+        "errors_found": [
+          {
+            "animation_id": "A2",
+            "targets": [
+              "boy",
+              "grandmother"
+            ],
+            "category": "Action",
+            "desc": "The boy and his grandmother are actually baking cookies together, not cooking a meal."
+          }
+        ],
+        "suggestion": {
+          "misl_element": "S",
+          "rationale": "The child mentioned the characters and their action but hasn't described where the story is taking place. Adding details about the cozy kitchen or the sunny afternoon would help set the scene.",
+          "targets": [
+            "scene"
+          ],
+          "animation_id": "I1"
+        },
+        "selected": {
+          "source": "error",
+          "animation_id": "A2_flip",
+          "targets": [
+            "boy",
+            "grandmother"
+          ]
+        },
+        "action": "triggered",
+        "condition": "animation",
+        "timestamp": "2026-03-24T11:17:20.870184+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "A2_flip",
+        "targets": [
+          "boy",
+          "grandmother"
+        ],
+        "rationale": "The boy and his grandmother are actually baking cookies together, not cooking a meal.",
+        "pass_type": "correction",
+        "misl_element": "A",
+        "displayed": true,
+        "timestamp": "2026-03-24T11:17:29.019052+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "They are putting cookies in a box.",
+        "timestamp": "2026-03-24T11:17:30.275224+00:00"
+      },
+      {
+        "event": "resolution",
+        "resolved": true,
+        "animation_id": "A2",
+        "pass_type": "correction",
+        "misl_element": "A",
+        "timestamp": "2026-03-24T11:17:32.734498+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "I1",
+            "targets": [
+              "scene"
+            ],
+            "rationale": "The child hasn't mentioned the cozy kitchen or the wooden table where the cookies are being packed."
+          }
+        ],
+        "timestamp": "2026-03-24T11:17:34.089419+00:00"
+      },
+      {
+        "event": "pipeline_cycle",
+        "mention_counts": {
+          "CH": 2,
+          "S": 1,
+          "IE": 0,
+          "A": 2,
+          "CO": 0,
+          "IR": 0,
+          "P": 0,
+          "ENP": 0,
+          "SC": 0,
+          "CC": 1,
+          "M": 0,
+          "L": 0,
+          "ADV": 0,
+          "G": 0,
+          "T": 0
+        },
+        "deterministic_selection": {
+          "macro_in_scene": [
+            "CH",
+            "S",
+            "A",
+            "CO",
+            "IR",
+            "P"
+          ],
+          "macro_under_3": [
+            "CH",
+            "S",
+            "A",
+            "CO",
+            "IR",
+            "P"
+          ],
+          "macro_unresolved": [
+            "S",
+            "CO",
+            "IR",
+            "P"
+          ],
+          "macro_selected": "S",
+          "micro_in_scene": null,
+          "micro_under_3": null,
+          "micro_unresolved": null,
+          "micro_candidates_shuffled": null,
+          "micro_gemini_selected": null
+        },
+        "errors_found": [],
+        "suggestion": {
+          "misl_element": "S",
+          "rationale": "The child hasn't mentioned the cozy kitchen or the wooden table where the cookies are being packed.",
+          "targets": [
+            "scene"
+          ],
+          "animation_id": "I1"
+        },
+        "selected": {
+          "source": "suggestion",
+          "animation_id": "I1_spotlight",
+          "targets": [
+            "scene"
+          ]
+        },
+        "action": "triggered",
+        "condition": "animation",
+        "timestamp": "2026-03-24T11:17:34.092452+00:00"
+      },
+      {
+        "event": "animation_played",
+        "animation_id": "I1_spotlight",
+        "targets": [
+          "scene"
+        ],
+        "rationale": "The child hasn't mentioned the cozy kitchen or the wooden table where the cookies are being packed.",
+        "pass_type": "suggestion",
+        "misl_element": "S",
+        "displayed": false,
+        "timestamp": "2026-03-24T11:17:39.871826+00:00"
+      },
+      {
+        "event": "transcription",
+        "text": "They are in the kitchen.",
+        "timestamp": "2026-03-24T11:17:40.881503+00:00"
+      },
+      {
+        "event": "resolution",
+        "resolved": true,
+        "animation_id": "I1",
+        "pass_type": "suggestion",
+        "misl_element": "S",
+        "timestamp": "2026-03-24T11:17:44.060338+00:00"
+      },
+      {
+        "event": "corrections",
+        "items": [
+          {
+            "animation_id": "C2",
+            "targets": [
+              "scene"
+            ],
+            "rationale": "You've already told me where they are! Let's talk about something new that's happening in the kitchen."
+          }
+        ],
+        "timestamp": "2026-03-24T11:17:45.389147+00:00"
+      },
+      {
+        "event": "suggestions",
+        "items": [
+          {
+            "animation_id": "R3",
+            "targets": [
+              "box",
+              "boy"
+            ],
+            "rationale": "It would be wonderful to hear what happens because of their hard work, such as how the box is almost full of cookies now!"
+          }
+        ],
+        "timestamp": "2026-03-24T11:17:45.395442+00:00"
+      },
+      {
+        "event": "pipeline_cycle",
+        "mention_counts": {
+          "CH": 3,
+          "S": 2,
+          "IE": 0,
+          "A": 2,
+          "CO": 0,
+          "IR": 0,
+          "P": 0,
+          "ENP": 0,
+          "SC": 0,
+          "CC": 1,
+          "M": 0,
+          "L": 0,
+          "ADV": 0,
+          "G": 0,
+          "T": 0
+        },
+        "deterministic_selection": {
+          "macro_in_scene": [
+            "CH",
+            "S",
+            "A",
+            "CO",
+            "IR",
+            "P"
+          ],
+          "macro_under_3": [
+            "S",
+            "A",
+            "CO",
+            "IR",
+            "P"
+          ],
+          "macro_unresolved": [
+            "CO",
+            "IR",
+            "P"
+          ],
+          "macro_selected": "CO",
+          "micro_in_scene": null,
+          "micro_under_3": null,
+          "micro_unresolved": null,
+          "micro_candidates_shuffled": null,
+          "micro_gemini_selected": null
+        },
+        "errors_found": [
+          {
+            "animation_id": "C2",
+            "targets": [
+              "scene"
+            ],
+            "category": "Count",
+            "desc": "You've already told me where they are! Let's talk about something new that's happening in the kitchen."
+          }
+        ],
+        "suggestion": {
+          "misl_element": "CO",
+          "rationale": "It would be wonderful to hear what happens because of their hard work, such as how the box is almost full of cookies now!",
+          "targets": [
+            "box",
+            "boy"
+          ],
+          "animation_id": "R3"
+        },
+        "selected": {
+          "source": "error",
+          "animation_id": "C2_disintegration",
+          "targets": [
+            "scene"
+          ]
+        },
+        "action": "triggered",
+        "condition": "animation",
+        "timestamp": "2026-03-24T11:17:45.396530+00:00"
+      },
+      {
+        "event": "scene_loaded",
+        "story": "training",
+        "scene": 1,
+        "timestamp": "2026-03-24T18:24:28.096032+00:00"
       }
     ]
   }

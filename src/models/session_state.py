@@ -65,6 +65,9 @@ class SessionState:
         self.ending_phase: bool = False          # True after first scene completes, permanent
         self.awaiting_ending_choice: bool = False # True while waiting for child's response
 
+        # Full story utterances — all accepted utterances across ALL scenes (never reset)
+        self.story_utterances: List[str] = []
+
         # Initial scenes generated for the selection page
         self.initial_scenes: List[Dict[str, Any]] = []
 
