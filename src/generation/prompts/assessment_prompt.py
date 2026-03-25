@@ -279,6 +279,15 @@ You MUST only propose an animation if the number of targets matches one of \
 its valid target types. For example, R1 [targets: duo] REQUIRES exactly \
 2 entities. Do NOT propose R1 with 1 or 3 entities.
 
+CRITICAL — duo/group target ordering:
+For duo animations (R1 magnetism, R2 repel, R3 causal_push): target_entities \
+must have exactly 2 entity IDs. The FIRST entity is the "actor" (entity A) \
+and the SECOND is the "receiver" (entity B). For example, if the boy pushes \
+the box: target_entities = ["boy", "box"]. NEVER return a duo animation with \
+only 1 entity.
+For group animations (C1 sequential_glow): target_entities must have 3+ \
+entity IDs in the order they should be highlighted.
+
 # Output JSON schema
 
 Return ONLY valid JSON (no markdown fences, no commentary):
@@ -326,11 +335,18 @@ Check the child's utterance for ALL mistakes (grammatical and narrative).
 
 {manifest_json}
 
+# Valid entity IDs in this scene
+
+{entities_in_scene}
+
+IMPORTANT: target_entities in your output MUST use ONLY these exact IDs. \
+Do NOT invent IDs like "red_box" or "grandmother_01".
+
 # Child's Utterance
 
 "{utterance_text}"
 
-# Story so far (accepted utterances in this scene)
+# Story so far (accepted utterances in the story)
 
 {story_so_far}
 
@@ -411,6 +427,15 @@ concerns the setting/environment (child hasn't described the background)
 
 You MUST only propose an animation if the number of targets matches one of \
 its valid target types.
+
+CRITICAL — duo/group target ordering:
+For duo animations (R1 magnetism, R2 repel, R3 causal_push): target_entities \
+must have exactly 2 entity IDs. The FIRST entity is the "actor" (entity A) \
+and the SECOND is the "receiver" (entity B). For example, if the boy pushes \
+the box: target_entities = ["boy", "box"]. NEVER return a duo animation with \
+only 1 entity.
+For group animations (C1 sequential_glow): target_entities must have 3+ \
+entity IDs in the order they should be highlighted.
 
 # Output JSON schema
 

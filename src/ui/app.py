@@ -1460,6 +1460,7 @@ async def _handle_study_audio(
                     story_so_far=story_so_far,
                     scene_description=scene_description,
                     character_names=session.character_names,
+                    entities_in_scene=entities_in_scene,
                 )
             except Exception as exc:
                 logger.error("[study] Correction pass failed: %s", exc)
@@ -1516,6 +1517,13 @@ async def _handle_study_audio(
             _run_corrections(), _run_enrichment_path()
         )
         corrections, name_assignments = corrections_result
+
+        # Sanitize target_entities: map Gemini-invented IDs to valid ones
+        from src.interaction.discrepancy_assessment import sanitize_target_entities
+        for d in corrections:
+            d.target_entities = sanitize_target_entities(d.target_entities, entities_in_scene or [])
+        for d in suggestions:
+            d.target_entities = sanitize_target_entities(d.target_entities, entities_in_scene or [])
 
         # Register name assignments
         if name_assignments:
@@ -1809,6 +1817,7 @@ async def _handle_audio(
                     story_so_far=story_so_far,
                     scene_description=scene_description,
                     character_names=session.character_names,
+                    entities_in_scene=entities_in_scene,
                 )
             except Exception as exc:
                 logger.error("[audio] Correction pass failed: %s", exc)
@@ -1864,6 +1873,13 @@ async def _handle_audio(
             _run_corrections(), _run_enrichment_path()
         )
         corrections, name_assignments = corrections_result
+
+        # Sanitize target_entities: map Gemini-invented IDs to valid ones
+        from src.interaction.discrepancy_assessment import sanitize_target_entities
+        for d in corrections:
+            d.target_entities = sanitize_target_entities(d.target_entities, entities_in_scene or [])
+        for d in suggestions:
+            d.target_entities = sanitize_target_entities(d.target_entities, entities_in_scene or [])
 
         # Add to story_utterances only if accepted (no corrections)
         if not corrections:
