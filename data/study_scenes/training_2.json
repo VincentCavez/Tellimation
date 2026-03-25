@@ -1,79 +1,84 @@
 {
-  "story_id": "training_2",
-  "title": "Practice Story 2",
+  "story_id": "training_1",
+  "title": "Practice Story 1",
   "entities": {
-    "girl": "a girl in a sun hat",
-    "boy": "a younger boy in green swim shorts",
-    "crab": "a large gray crab"
+    "boy": "a boy with curly hair",
+    "grandmother": "a grandmother wearing a green apron",
+    "dog": "a small brown dog",
+    "box": "a big red box"
   },
   "scenes": [
     {
       "scene_number": 1,
-      "title": "The Visitor",
-      "background_prompt": "A sandy beach with tide pools nearby, a tall sandcastle with two towers and a moat in the foreground. Sunny afternoon. No people, no animals.",
-      "full_scene_prompt": "A sandy beach on a sunny afternoon. A girl in a sun hat is walking back from the tide pools carrying a small bucket of water. A younger boy in green swim shorts kneels next to a tall sandcastle with two towers and a moat, looking the other way. A large gray crab has come out of a tide pool and is digging into the base of one tower. The boy does not see the crab.",
+      "title": "The Baking",
+      "background_prompt": "A warm cozy kitchen with a wooden table, shelves with jars, a window with afternoon light, tiled floor. No people, no animals.",
+      "full_scene_prompt": "A warm cozy kitchen. A boy with curly hair and a grandmother in a green apron stand by a wooden table placing fresh cookies in a red box. A small brown dog watches from under the table. Afternoon light through the window. Shelves with jars in the background.",
       "entities_in_scene": [
-        "girl",
         "boy",
-        "crab"
+        "grandmother",
+        "dog",
+        "box"
       ],
       "misl_targets": {
         "macro": {
           "CH": [
-            "girl in a straw sun hat",
-            "boy in green swim shorts",
-            "large gray crab"
+            "boy with curly hair",
+            "grandmother in a green apron",
+            "small brown dog",
+            "kind grandmother",
+            "happy boy"
           ],
           "S": [
-            "sandy beach",
+            "cozy kitchen",
             "sunny afternoon",
-            "tide pools",
-            "near the forest"
+            "at the wooden table",
+            "in front of the window"
           ],
-          "IE": [
-            "the crab reaches the sandcastle",
-            "the girl brings a bucket of water"
-          ],
+          "IE": null,
           "IR": [
-            "the boy looks curious",
-            "the girl looks happy",
-            "the boy is unaware of the crab"
+            "the boy feels happy",
+            "the grandmother looks proud",
+            "the dog feels hungry"
           ],
           "P": [
-            "the girl wants to help",
-            "the crab wants to climb the castle"
+            "they might give the cookies to a friend"
           ],
           "A": [
-            "walking toward the boy",
-            "carrying a bucket",
-            "kneeling on the sand",
-            "climbing on the castle",
-            "looking away"
+            "placing a cookie in the box",
+            "holding the red box",
+            "smiling at each other",
+            "watching from under the table",
+            "baking together"
           ],
-          "CO": null
+          "CO": [
+            "the box is almost full",
+            "the kitchen smells like fresh bread"
+          ]
         },
         "micro": {
           "ENP": [
-            "straw sun hat",
-            "green swim shorts",
-            "tall sandcastle",
-            "large gray crab",
-            "puffy white clouds",
-            "metal bucket",
-            "blue water",
-            "yellow flower",
-            "patterned bag"
+            "curly brown hair",
+            "green knitted sweater",
+            "spotted green apron",
+            "red rectangular box",
+            "chocolate chip cookies",
+            "warm afternoon light",
+            "patterned ceramic teapot",
+            "small brown dog",
+            "colorful glass jars",
+            "floral tiled floor",
+            "freshly baked bread"
           ],
           "ADV": [
-            "slowly",
+            "carefully",
             "happily",
-            "quietly"
+            "together",
+            "patiently"
           ],
           "SC": [
-            "while",
-            "because",
-            "as",
-            "although"
+            "while they pack the cookies",
+            "because they are baking",
+            "until the box is full"
           ],
           "CC": [
             "and",
@@ -81,18 +86,17 @@
             "so"
           ],
           "M": [
-            "thinks",
-            "wonders",
-            "notices",
-            "doesn't see"
+            "thinks the cookies look delicious",
+            "loves his grandmother",
+            "hopes for a treat",
+            "wants to help"
           ],
           "L": [
-            "shouts",
-            "tells"
+            "asks for a cookie"
           ]
         }
       },
-      "scene_description": "A bright and sunny afternoon at a sandy beach where the shoreline meets a lush green forest. In the left foreground, a magnificent sandcastle stands tall, featuring two main towers with square battlements and a lower middle wall. A circular moat filled with clear blue water surrounds the base of the castle. To the left, a large gray crab with two prominent claws has climbed out of the moat and is busy digging its pincers into the soft sand at the base of the left tower, in order to climb. A young boy with messy brown hair and wearing green swim shorts with yellow side stripes is kneeling on the sand to the right of the castle. He is leaning forward on his knees and hands, looking away from the crab and toward a girl approaching him. The girl, appearing slightly older, has brown hair tied in pigtails and wears a wide-brimmed straw sun hat decorated with a green band and a yellow flower. She is dressed in a yellow t-shirt and green trousers with brown shoes. She walks from the right side of the scene, carrying a patterned blue shoulder bag and a small metal bucket brimming with water. The background shows several calm tide pools scattered across the sand, reflecting the blue sky. Large, rounded green trees with thick brown trunks frame the beach on both sides, and tiny colorful flowers like orange poppies and pink daisies dot the grassy patches near the tree line. The sky is a pale blue filled with soft, white, puffy clouds, creating a peaceful and playful atmosphere."
+      "scene_description": "A warm and inviting kitchen scene shows a young boy and his grandmother baking together. The boy has dark, curly hair and a joyful expression; he wears a green knitted sweater over a blue collared shirt. He is standing at a large wooden table, holding a round chocolate chip cookie as if to place it into a red box. Standing next to him is his grandmother, an elderly woman with grey hair tied in a neat bun. She is wearing a green apron over a blue and white patterned long-sleeved dress. She smiles warmly at the boy while holding the side of the red box on the table. Under the table, a small brown terrier-style dog stands on the tiled floor, looking up at the boy and the cookies with curiosity. On the table sits the red box, several loose cookies, a wooden cutting board with a fresh loaf of bread and one cut slice, a decorative teapot, and three different mugs (yellow, green, and white). The kitchen walls are cream-colored, and the backsplash behind the white sink is made of orange and yellow floral tiles. To the left, three long wooden shelves are filled with dozens of glass jars containing preserved fruits, jams, and spices. A large wooden-framed window on the right reveals a bright, sunny afternoon outdoors with lush green trees and a soft blue sky with fluffy white clouds. The floor is covered in beautiful patterned tiles in shades of orange, yellow, and brown. The overall atmosphere is cozy and full of love."
     }
   ]
 }
