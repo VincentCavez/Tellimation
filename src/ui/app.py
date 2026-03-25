@@ -684,6 +684,17 @@ async def study_websocket_endpoint(websocket: WebSocket):
             msg_type = data.get("type", "")
 
             if msg_type == "study_scene_loaded":
+                # Flush pending animation as unresolved before switching scene
+                if session._study_pending_anim_log:
+                    pending = session._study_pending_anim_log
+                    pending["displayed"] = pending.get("displayed", True)
+                    pending["resolved"] = False  # scene changed → unresolved
+                    _pid_flush = str(participant)
+                    _is_training_flush = story_key.lower().startswith("training")
+                    append_study_log_entry(_pid_flush, _is_training_flush, story_key, pending.pop("_scene_num", 1), pending)
+                    session._study_pending_anim_log = None
+                    session._study_previous_discrepancy = None
+
                 scene = data.get("scene")
                 if scene:
                     await _hydrate_scene(session, scene, ws)
@@ -1469,6 +1480,23 @@ async def _handle_study_audio(
             if macro_sel is None and micro_cands is None:
                 return []
 
+            # ── CH shortcut: if macro=CH and unnamed characters exist, force nametag ──
+            # Filter out inanimate objects — only living beings get nametags
+            _INANIMATE = {"balloon", "box", "train", "cart", "basket", "boat", "gate", "fence", "bridge", "kite", "ball", "cake", "cookie", "jar", "lamp", "lantern", "tent", "wagon", "wheel", "sled"}
+            if macro_sel == "CH" and entities_in_scene:
+                unnamed = [e for e in entities_in_scene if e not in session.character_names and e not in _INANIMATE]
+                if unnamed:
+                    target = unnamed[0]
+                    logger.info("[study] CH shortcut: forcing I2 nametag on unnamed entity '%s'", target)
+                    return [Discrepancy(
+                        pass_type="suggestion",
+                        type="Identity",
+                        target_entities=[target],
+                        misl_elements=["CH"],
+                        description=f"Give a name to {target} to make the story more personal!",
+                        animation_id="I2",
+                    )]
+
             try:
                 return await assess_enrichment(
                     api_key=session.api_key,
@@ -1795,6 +1823,22 @@ async def _handle_audio(
 
             if macro_sel is None and micro_cands is None:
                 return []
+
+            # ── CH shortcut: if macro=CH and unnamed characters exist, force nametag ──
+            _INANIMATE = {"balloon", "box", "train", "cart", "basket", "boat", "gate", "fence", "bridge", "kite", "ball", "cake", "cookie", "jar", "lamp", "lantern", "tent", "wagon", "wheel", "sled"}
+            if macro_sel == "CH" and entities_in_scene:
+                unnamed = [e for e in entities_in_scene if e not in session.character_names and e not in _INANIMATE]
+                if unnamed:
+                    target = unnamed[0]
+                    logger.info("[audio] CH shortcut: forcing I2 nametag on unnamed entity '%s'", target)
+                    return [Discrepancy(
+                        pass_type="suggestion",
+                        type="Identity",
+                        target_entities=[target],
+                        misl_elements=["CH"],
+                        description=f"Give a name to {target} to make the story more personal!",
+                        animation_id="I2",
+                    )]
 
             try:
                 return await assess_enrichment(
