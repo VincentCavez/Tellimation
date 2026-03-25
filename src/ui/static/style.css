@@ -732,6 +732,33 @@ a { color: var(--teal); text-decoration: none; }
   font-size: 1.1rem;
   padding: 14px 36px;
 }
+/* ---- Tutorial panel ---- */
+#tutorial-panel {
+  width: 100%;
+  background: #d8c4af;
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  margin-top: 0.5rem;
+  text-align: center;
+}
+.tutorial-text {
+  font-family: var(--font);
+  font-size: 1.1rem;
+  line-height: 1.6;
+  min-height: 2em;
+  color: #000;
+}
+.tutorial-btn-row {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+.tutorial-btn-row .btn-instr {
+  font-size: 0.9rem;
+  padding: 0.45rem 1.2rem;
+}
+
 .study-controls-row {
   display: flex;
   align-items: stretch;

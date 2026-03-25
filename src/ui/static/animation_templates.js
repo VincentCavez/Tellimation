@@ -169,7 +169,8 @@ AnimationTemplates.register('nametag', _perTargetWrapper(function(params) {
         if (cxDist + cyDist < 9) continue;
 
         var di = drawY * PW + drawX;
-        var isBorder = (ly === 0 || ly === labelH - 1 || lx === 0 || lx === labelW - 1);
+        var borderThick = 3;
+        var isBorder = (ly < borderThick || ly >= labelH - borderThick || lx < borderThick || lx >= labelW - borderThick);
 
         // Hole: round circle inside the tag (not touching border)
         var hdx = lx - holeCenterLx, hdy = ly - holeCenterLy;
