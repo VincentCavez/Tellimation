@@ -24,6 +24,8 @@
   }
 
   var currentScene = 1;
+  var _tutorialActive = (storyKey === 'training' && currentScene === 1);
+  var _tutorialStarted = false;
 
   // --- UI elements ---
   var storyNameEl = document.getElementById('story-name');
@@ -129,16 +131,18 @@
     // Clear any pending next-scene timer
     if (_nextSceneTimer) { clearTimeout(_nextSceneTimer); _nextSceneTimer = null; }
 
-    // Hide buttons initially, show after 60s delay
+    // Hide buttons initially, show after 60s delay (unless tutorial is active)
     btnNextScene.style.display = 'none';
     btnFinish.style.display = 'none';
-    _nextSceneTimer = setTimeout(function() {
-      if (sceneNum < sceneCount) {
-        btnNextScene.style.display = '';
-      } else {
-        btnFinish.style.display = '';
-      }
-    }, 60000);
+    if (!_tutorialActive) {
+      _nextSceneTimer = setTimeout(function() {
+        if (sceneNum < sceneCount) {
+          btnNextScene.style.display = '';
+        } else {
+          btnFinish.style.display = '';
+        }
+      }, 60000);
+    }
 
     fetch('/api/study/scene?story=' + encodeURIComponent(storyKey) + '&scene=' + sceneNum)
       .then(function(resp) {
@@ -220,6 +224,11 @@
       buf.computeDistanceFields(20);
       renderTempSprites(buf);
       renderer.render();
+      // Start tutorial for non-HD scenes if needed
+      if (_tutorialActive && !_tutorialStarted) {
+        _tutorialStarted = true;
+        startTutorial();
+      }
     }
 
     // Render background first (may be async for image_background format)
@@ -652,6 +661,214 @@
     console.log('[HD] Animation buffer ready:', aw + 'x' + ah,
       '(downscaled from ' + w + 'x' + h + ')',
       'entities:', Object.keys(hdEntityData).join(', '));
+
+    // Start tutorial if this is training scene 1
+    if (_tutorialActive && !_tutorialStarted) {
+      _tutorialStarted = true;
+      startTutorial();
+    }
+  }
+
+  // --- Tutorial mode (training scene 1) ---
+  // NOTE: _tutorialActive and _tutorialStarted declared earlier (before setupHDAnimations)
+
+  // Entity targets are resolved dynamically from the loaded scene's entity order.
+  // Fallback: use scene_entity_order[0], [1], [2] etc.
+  function _ent(idx) { return scene_entity_order[idx] || scene_entity_order[0] || ''; }
+
+  // Get entity asset URL for ghost_outline
+  function _entityAssetUrl(idx) {
+    var eid = _ent(idx);
+    var imgs = window._hdSceneImages;
+    if (imgs && imgs.entities) {
+      for (var i = 0; i < imgs.entities.length; i++) {
+        if (imgs.entities[i].id === eid) return imgs.entities[i].url;
+      }
+    }
+    return '';
+  }
+
+  var TUTORIAL_STEPS = [
+    { text: "Welcome to the practice! Let me show you the animations I can do. When you see one, it means I want you to say or repeat something about the picture!", animation: null },
+    { text: "If I want you to talk about a character, I will shine a spotlight on them, like this!", animFn: function() { return { template: 'spotlight', params: { entityPrefix: _ent(0) } }; } },
+    { text: "If I am not sure who or what you are talking about, things will glow one by one!", animFn: function() { return { template: 'sequential_glow', params: { entityPrefixes: scene_entity_order.slice() } }; } },
+    { text: "I can also show a name tag floating above them if they need a name, or want to be called by it!", animFn: function() { return { template: 'nametag', params: { entityPrefix: _ent(1), labelText: '?' } }; } },
+    { text: "When I want you to describe how someone is moving, I show lines of movement!", animFn: function() { return { template: 'motion_lines', params: { entityPrefix: _ent(2), direction: 'right' } }; } },
+    { text: "I can also flip them around to show they are in action!", animFn: function() { return { template: 'flip', params: { entityPrefix: _ent(0) } }; } },
+    { text: "If I want you to describe what something looks like, I will make its colors pop!", animFn: function() { return { template: 'color_pop', params: { entityPrefix: _ent(1) } }; } },
+    { text: "When I want you to tell me how someone is feeling, I show little particles around them!", animFn: function() { return { template: 'emanation', params: { entityPrefix: _ent(1), particleType: 'hearts' } }; } },
+    { text: "If something is hiding behind another thing, I can make it see-through so you can see!", animFn: function() { return { template: 'reveal', params: { entityPrefix: _ent(2) } }; } },
+    { text: "I can also stamp a character to show where they are standing!", animFn: function() { return { template: 'stamp', params: { entityPrefix: _ent(0) } }; } },
+    { text: "If I want you to use the past tense, the picture will look like an old movie!", animFn: function() { return { template: 'flashback', params: { isIndoor: false } }; } },
+    { text: "And if I want you to talk about the future, you will see a day-and-night effect!", animFn: function() { return { template: 'timelapse', params: { isIndoor: false } }; } },
+    { text: "When two characters are connected, they will be pulled toward each other!", animFn: function() { return { template: 'magnetism', params: { entityPrefixA: _ent(0), entityPrefixB: _ent(1) } }; } },
+    { text: "And if they should be apart, they will push away from each other!", animFn: function() { return { template: 'repel', params: { entityPrefixA: _ent(1), entityPrefixB: _ent(2) } }; } },
+    { text: "When one thing causes something to happen to another, you will see a push!", animFn: function() { return { template: 'causal_push', params: { entityPrefixA: _ent(2), entityPrefixB: _ent(1) } }; } },
+    { text: "When something should not be mentioned, it will break apart into tiny pieces!", animFn: function() { return { template: 'disintegration', params: { entityPrefix: _ent(2) } }; } },
+    { text: "And if something is missing, you will see a ghostly shape with a question mark!", animFn: function() { return { template: 'ghost_outline', params: { entityPrefix: _ent(2), ghostImageUrl: _entityAssetUrl(2) } }; }, hideEntity: 2 },
+    { text: "If I want a character to say something, a speech bubble will appear!", animFn: function() { return { template: 'speech_bubble', params: { entityPrefix: _ent(0), text: 'Hello!' } }; } },
+    { text: "If I want a character to think something, a thought bubble will appear!", animFn: function() { return { template: 'thought_bubble', params: { entityPrefix: _ent(1), text: '...' } }; } },
+    { text: "When something important or surprising happens, you will see an exclamation mark!", animFn: function() { return { template: 'alert', params: { entityPrefix: _ent(2) } }; } },
+    { text: "And when a word is really special, it will burst out like in a comic book!", animFn: function() { return { template: 'interjection', params: { entityPrefix: _ent(0), word: 'Wow!' } }; } },
+    { text: "Great job! Now you know all my animations. Let's practice with the next scene!", animation: null },
+  ];
+
+  var tutorialPanel = document.getElementById('tutorial-panel');
+  var tutorialText = document.getElementById('tutorial-text');
+  var tutorialBtns = document.getElementById('tutorial-btns');
+  var btnTutorialReplay = document.getElementById('btn-tutorial-replay');
+  var btnTutorialContinue = document.getElementById('btn-tutorial-continue');
+  var _tutorialStep = 0;
+  var _tutorialWordTimers = [];
+
+  function clearTutorialTimers() {
+    for (var i = 0; i < _tutorialWordTimers.length; i++) clearTimeout(_tutorialWordTimers[i]);
+    _tutorialWordTimers = [];
+  }
+
+  function revealTutorialText(text, onDone) {
+    clearTutorialTimers();
+    var words = text.split(/\s+/);
+    tutorialText.innerHTML = '';
+    for (var i = 0; i < words.length; i++) {
+      var span = document.createElement('span');
+      span.className = 'instr-word';
+      span.textContent = words[i] + ' ';
+      tutorialText.appendChild(span);
+    }
+    var spans = tutorialText.querySelectorAll('.instr-word');
+    var secPerChar = 0.045;
+    var elapsed = 0;
+    for (var i = 0; i < spans.length; i++) {
+      var charLen = Math.max(1, spans[i].textContent.trim().length);
+      (function(s, delay) {
+        _tutorialWordTimers.push(setTimeout(function() { s.classList.add('visible'); }, delay));
+      })(spans[i], elapsed * 1000);
+      elapsed += charLen * secPerChar;
+    }
+    // Callback after all words revealed
+    if (onDone) {
+      _tutorialWordTimers.push(setTimeout(onDone, elapsed * 1000 + 200));
+    }
+  }
+
+  // Save original pixel buffer references for restore after ghost_outline
+  var _savedBuf = null;
+
+  // Redraw HD scene excluding a specific entity (for ghost_outline demo)
+  function _redrawSceneWithout(entityId) {
+    var sceneImgs = window._hdSceneImages;
+    if (!sceneImgs) return;
+    // Save the original buffer before replacing it
+    _savedBuf = animRunner.buf;
+    var mainCtx = canvas.getContext('2d');
+    mainCtx.drawImage(sceneImgs.bg, 0, 0);
+    var ents = sceneImgs.entities;
+    for (var i = 0; i < ents.length; i++) {
+      if (ents[i].id === entityId) continue; // skip this entity
+      var ed = hdEntityData[ents[i].id];
+      mainCtx.drawImage(ed && ed.cleanCanvas ? ed.cleanCanvas : sceneImgs.images[i], 0, 0);
+    }
+    // Rebuild pixel buffer from the modified canvas so animation snapshot excludes the entity
+    var w = canvas.width, h = canvas.height;
+    var bgPixels = captureBgPixels(w, h);
+    var hdBuf = buildHDPixelBuffer(w, h, bgPixels);
+    hdRenderer.buf = hdBuf;
+    buf = hdBuf;
+    animRunner.buf = hdBuf;
+    animRunner.renderer = hdRenderer;
+  }
+
+  // Restore the full scene (all entities + original pixel buffer) after hiding one
+  function _restoreFullScene() {
+    if (!_savedBuf) return;
+    // Restore original pixel buffer
+    buf = _savedBuf;
+    hdRenderer.buf = _savedBuf;
+    animRunner.buf = _savedBuf;
+    animRunner.renderer = hdRenderer;
+    _savedBuf = null;
+    // Redraw full scene on canvas
+    var sceneImgs = window._hdSceneImages;
+    if (!sceneImgs) return;
+    var mainCtx = canvas.getContext('2d');
+    mainCtx.drawImage(sceneImgs.bg, 0, 0);
+    var ents = sceneImgs.entities;
+    for (var i = 0; i < ents.length; i++) {
+      var ed = hdEntityData[ents[i].id];
+      mainCtx.drawImage(ed && ed.cleanCanvas ? ed.cleanCanvas : sceneImgs.images[i], 0, 0);
+    }
+  }
+
+  function playTutorialStep(stepIdx) {
+    _tutorialStep = stepIdx;
+    tutorialBtns.style.display = 'none';
+    var step = TUTORIAL_STEPS[stepIdx];
+    var anim = step.animFn ? step.animFn() : step.animation;
+
+    // Restore full scene if previous step hid an entity
+    _restoreFullScene();
+
+    revealTutorialText(step.text, function() {
+      if (anim) {
+        // Hide entity from scene before animation if requested
+        if (step.hideEntity != null) {
+          _redrawSceneWithout(_ent(step.hideEntity));
+        }
+        animRunner.play({
+          template: anim.template,
+          params: anim.params || {},
+          duration_ms: (anim.params && anim.params.duration_ms) || 2500,
+        }).then(function() {
+          // Restore full scene after ghost_outline
+          if (step.hideEntity != null) {
+            _restoreFullScene();
+          }
+          showTutorialButtons(stepIdx);
+        });
+      } else {
+        showTutorialButtons(stepIdx);
+      }
+    });
+  }
+
+  function showTutorialButtons(stepIdx) {
+    tutorialBtns.style.display = 'flex';
+    btnTutorialContinue.textContent = (stepIdx >= TUTORIAL_STEPS.length - 1) ? 'Finish' : 'Continue';
+  }
+
+  function startTutorial() {
+    // Hide PTT and buttons
+    document.getElementById('ptt-hint').style.display = 'none';
+    btnNextScene.style.display = 'none';
+    btnFinish.style.display = 'none';
+    if (_nextSceneTimer) { clearTimeout(_nextSceneTimer); _nextSceneTimer = null; }
+
+    tutorialPanel.style.display = '';
+    playTutorialStep(0);
+  }
+
+  function endTutorial() {
+    _tutorialActive = false;
+    tutorialPanel.style.display = 'none';
+    // Show PTT hint and Next Scene button
+    document.getElementById('ptt-hint').style.display = '';
+    btnNextScene.style.display = '';
+  }
+
+  if (btnTutorialReplay) {
+    btnTutorialReplay.addEventListener('click', function() {
+      playTutorialStep(_tutorialStep);
+    });
+  }
+  if (btnTutorialContinue) {
+    btnTutorialContinue.addEventListener('click', function() {
+      if (_tutorialStep >= TUTORIAL_STEPS.length - 1) {
+        endTutorial();
+      } else {
+        playTutorialStep(_tutorialStep + 1);
+      }
+    });
   }
 
   // --- Test: play all 20 animations sequentially ---
