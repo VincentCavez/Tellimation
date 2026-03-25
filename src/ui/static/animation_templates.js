@@ -66,16 +66,16 @@ AnimationTemplates.register('nametag', _perTargetWrapper(function(params) {
   var textColor = params.textColor || [80, 50, 30]; // dark brown
   var stringColor = params.stringColor || [200, 50, 40]; // red
 
-  // Extract entity type from prefix: "cat_01" → "CAT", "big_tree_01" → "BIG TREE"
-  var entityType = prefix.replace(/_\d+$/, '').replace(/_/g, ' ').toUpperCase();
+  // Label text: use explicit labelText param if provided, otherwise empty (prompt to name)
+  var entityType = (params.labelText != null && params.labelText !== '') ? params.labelText : '';
   // Pre-compute text width: each char is (_FONT_W + _FONT_SPACING) * scale, minus trailing space
   var textScale = 3;
   var charW = (_FONT_W + _FONT_SPACING) * textScale;
-  var textW = entityType.length * charW - _FONT_SPACING;
+  var textW = entityType.length > 0 ? entityType.length * charW - _FONT_SPACING : 0;
   var textH = _FONT_H * textScale;
 
   var labelPadX = 18, labelPadY = 15;
-  var labelW = Math.max(120, textW + labelPadX * 2);
+  var labelW = Math.max(80, textW + labelPadX * 2);
   var labelH = textH + labelPadY * 2;
 
   return function animate(buf, PW, PH, t) {
