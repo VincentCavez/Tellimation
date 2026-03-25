@@ -18,9 +18,21 @@ import time
 import copy
 import random
 
+import base64
+import tempfile
+
 from dotenv import load_dotenv
 
 load_dotenv()
+
+# On Heroku, reconstruct the credentials file from a base64 env var
+_gcp_b64 = os.environ.get("GOOGLE_CREDENTIALS_B64")
+if _gcp_b64 and not os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"):
+    _creds_file = tempfile.NamedTemporaryFile(delete=False, suffix=".json")
+    _creds_file.write(base64.b64decode(_gcp_b64))
+    _creds_file.close()
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = _creds_file.name
+
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
