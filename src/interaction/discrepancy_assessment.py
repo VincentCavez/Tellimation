@@ -78,6 +78,53 @@ def _category_from_animation_id(animation_id: str) -> Optional[str]:
     return _ANIM_ID_TO_CATEGORY.get(short)
 
 
+def sanitize_target_entities(
+    target_entities: List[str],
+    valid_ids: List[str],
+) -> List[str]:
+    """Map Gemini-invented entity IDs to valid ones from entities_in_scene.
+
+    E.g. "red_box" → "box", "grandmother_01" → "grandmother".
+    Uses substring matching: if a valid ID is contained in the invented ID,
+    or vice versa, it's a match. Preserves order. Removes duplicates.
+    """
+    if not valid_ids:
+        return target_entities
+
+    valid_set = set(valid_ids)
+    result = []
+    seen = set()
+
+    for target in target_entities:
+        if target in valid_set:
+            if target not in seen:
+                result.append(target)
+                seen.add(target)
+            continue
+
+        # "scene" is always valid
+        if target == "scene":
+            if target not in seen:
+                result.append(target)
+                seen.add(target)
+            continue
+
+        # Fuzzy: check if a valid ID is a substring of target or vice versa
+        matched = None
+        for vid in valid_ids:
+            if vid in target or target in vid:
+                matched = vid
+                break
+        if matched and matched not in seen:
+            logger.info("[sanitize] Mapped '%s' → '%s'", target, matched)
+            result.append(matched)
+            seen.add(matched)
+        else:
+            logger.warning("[sanitize] Could not map '%s' to any valid entity, dropping", target)
+
+    return result
+
+
 def _build_misl_taxonomy() -> str:
     """Build a human-readable MISL taxonomy text for the prompt."""
     lines = ["## Macrostructure (7 elements, scores 0-3)\n"]
@@ -198,6 +245,7 @@ async def assess_corrections(
     story_so_far: List[str],
     scene_description: str,
     character_names: Optional[Dict[str, str]] = None,
+    entities_in_scene: Optional[List[str]] = None,
 ) -> "tuple[list[Discrepancy], list[dict[str, str]]]":
     """Pass 1: Detect all mistakes (grammatical and narrative).
 
@@ -226,8 +274,11 @@ async def assess_corrections(
         correction_intents=_get_correction_intents(),
     )
 
+    entities_text = ", ".join(entities_in_scene) if entities_in_scene else "(none)"
+
     user_prompt = CORRECTION_USER_PROMPT_TEMPLATE.format(
         manifest_json=scene_description,
+        entities_in_scene=entities_text,
         utterance_text=utterance_text,
         story_so_far=story_text,
         character_names=names_text,

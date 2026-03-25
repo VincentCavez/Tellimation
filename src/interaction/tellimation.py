@@ -171,7 +171,9 @@ def _select_animation_for_discrepancy(
                             if alt_ok:
                                 logger.info("[tellimation] Using %s instead of %s", alt_id, aid)
                                 return alt_tmpl
-                    # No alternative found, use original anyway
+                    # No alternative found — skip rather than send broken animation
+                    logger.warning("[tellimation] No compatible alternative for %s with %d targets — skipping", aid, n)
+                    return None
             return _ID_TO_TEMPLATE[aid]
 
     # No animation_id → no animation

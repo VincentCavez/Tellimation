@@ -144,34 +144,50 @@
   function updateReadyButton() {
     var btn = document.getElementById('btn-ready');
     var next = getNextStory();
+    var trainingDone = completed['training'] === true;
+    var storySlots = document.querySelectorAll('#story-thumbnails .study-story-slot');
+
     if (!next) {
       btn.textContent = 'All Done!';
       btn.classList.add('btn-disabled');
     }
 
-    // First visit: training not done yet → dim stories and disable Ready
-    var trainingDone = completed['training'] === true;
+    // Training not done → dim all stories and disable Ready
     if (!trainingDone) {
-      // Dim story slots
-      var slots = document.querySelectorAll('#story-thumbnails .study-story-slot');
-      for (var i = 0; i < slots.length; i++) {
-        slots[i].style.opacity = '0.5';
+      for (var i = 0; i < storySlots.length; i++) {
+        storySlots[i].style.opacity = '0.5';
+        storySlots[i].style.pointerEvents = 'none';
       }
-      // Disable Ready button
       btn.style.opacity = '0.2';
       btn.style.pointerEvents = 'none';
+      return;
     }
 
     // Training done → dim training block, disable Practice button
-    if (trainingDone) {
-      var trainingSlots = document.querySelectorAll('#training-thumbnails .study-story-slot, #training-thumbnails .thumbnail-placeholder');
-      for (var j = 0; j < trainingSlots.length; j++) {
-        trainingSlots[j].style.opacity = '0.5';
-      }
-      var btnTraining = document.getElementById('btn-training');
-      if (btnTraining) {
-        btnTraining.style.opacity = '0.2';
-        btnTraining.style.pointerEvents = 'none';
+    var trainingSlots = document.querySelectorAll('#training-thumbnails .study-story-slot, #training-thumbnails .thumbnail-placeholder');
+    for (var j = 0; j < trainingSlots.length; j++) {
+      trainingSlots[j].style.opacity = '0.5';
+    }
+    var btnTraining = document.getElementById('btn-training');
+    if (btnTraining) {
+      btnTraining.style.opacity = '0.2';
+      btnTraining.style.pointerEvents = 'none';
+    }
+
+    // Progressive story unlocking: only the next story is bright, rest dimmed
+    if (assignmentData && assignmentData.order) {
+      var nextStory = next; // null if all done
+      for (var si = 0; si < storySlots.length; si++) {
+        var storyLabel = assignmentData.order[si];
+        if (storyLabel && storyLabel === nextStory) {
+          // Next story to play → bright and clickable
+          storySlots[si].style.opacity = '1';
+          storySlots[si].style.pointerEvents = 'auto';
+        } else {
+          // Completed or locked → dimmed
+          storySlots[si].style.opacity = '0.5';
+          storySlots[si].style.pointerEvents = 'none';
+        }
       }
     }
   }
@@ -464,9 +480,19 @@
   }
 
   function showCenterMessage(text, audioUrl, onDismiss) {
-    var panel = document.getElementById('instruction-center');
-    var slot = document.getElementById('instr-slot-4');
+    // Use top-left panel (same position as initial instructions)
+    var panel = document.getElementById('instruction-left');
+    var slot = document.getElementById('instr-slot-0');
     if (!panel || !slot) return;
+
+    // Hide the other slot and the initial instruction buttons
+    var slot1 = document.getElementById('instr-slot-1');
+    if (slot1) slot1.style.display = 'none';
+    var leftBtnRow = panel.querySelector('.instruction-btn-row');
+    if (leftBtnRow) leftBtnRow.style.display = 'none';
+    // Hide right panel too
+    var rightPanel = document.getElementById('instruction-right');
+    if (rightPanel) rightPanel.style.display = 'none';
 
     // Build word spans
     var words = text.split(/\s+/);
@@ -512,29 +538,30 @@
 
     playAndReveal();
 
-    // Dismiss button
-    var dismissBtn = document.getElementById('btn-dismiss-post-training');
-    if (dismissBtn) {
-      // Remove old listeners by cloning
-      var newBtn = dismissBtn.cloneNode(true);
-      dismissBtn.parentNode.replaceChild(newBtn, dismissBtn);
-      newBtn.addEventListener('click', function() {
-        if (currentAudio) { currentAudio.pause(); currentAudio = null; }
-        clearWordTimers();
-        panel.style.display = 'none';
-        if (onDismiss) onDismiss();
-      });
-    }
+    // Create a temporary button row for this message
+    var tmpBtnRow = document.createElement('div');
+    tmpBtnRow.className = 'instruction-btn-row';
+    tmpBtnRow.style.display = 'flex';
 
-    // Replay button
-    var replayBtn = panel.querySelector('.btn-replay-panel');
-    if (replayBtn) {
-      var newReplay = replayBtn.cloneNode(true);
-      replayBtn.parentNode.replaceChild(newReplay, replayBtn);
-      newReplay.addEventListener('click', function() {
-        playAndReveal();
-      });
-    }
+    var replayMsgBtn = document.createElement('button');
+    replayMsgBtn.className = 'btn-instr btn-instr-blue';
+    replayMsgBtn.textContent = 'Replay';
+    replayMsgBtn.addEventListener('click', function() { playAndReveal(); });
+
+    var dismissBtn = document.createElement('button');
+    dismissBtn.className = 'btn-instr btn-instr-green';
+    dismissBtn.textContent = 'Continue';
+    dismissBtn.addEventListener('click', function() {
+      if (currentAudio) { currentAudio.pause(); currentAudio = null; }
+      clearWordTimers();
+      panel.style.display = 'none';
+      tmpBtnRow.remove();
+      if (onDismiss) onDismiss();
+    });
+
+    tmpBtnRow.appendChild(replayMsgBtn);
+    tmpBtnRow.appendChild(dismissBtn);
+    panel.appendChild(tmpBtnRow);
   }
 
   initInstructions();
@@ -542,7 +569,10 @@
   // Training button
   document.getElementById('btn-training').addEventListener('click', function() {
     sessionStorage.setItem('instructions_shown', 'true');
-    window.location.href = '/study/story?story=training&animated=true&scenes=2&name=Training';
+    // Small delay to ensure sessionStorage is flushed before navigation
+    setTimeout(function() {
+      window.location.href = '/study/story?story=training&animated=true&scenes=2&name=Training';
+    }, 50);
   });
 
   // Ready button — start next incomplete story in order
