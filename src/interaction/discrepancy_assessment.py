@@ -167,7 +167,7 @@ async def _gemini_call(
 # ---------------------------------------------------------------------------
 
 def _load_correction_intents() -> str:
-    """Load correction_intent from all animation grammar JSONs, including misl_elements."""
+    """Load correction_intent from all animation grammar JSONs."""
     grammar_dir = Path(__file__).parent.parent.parent / "animations" / "grammar"
     lines = []
     for f in sorted(grammar_dir.glob("*.json")):
@@ -176,9 +176,7 @@ def _load_correction_intents() -> str:
             intent = d.get("correction_intent")
             if intent:
                 targets = d.get("target_type", ["entity"])
-                misl = d.get("misl_elements", [])
-                misl_str = f" [misl: {', '.join(misl)}]" if misl else ""
-                lines.append(f"- {d['id']} ({d['name']}) [targets: {', '.join(targets)}]{misl_str}: {intent}")
+                lines.append(f"- {d['id']} ({d['name']}) [targets: {', '.join(targets)}]: {intent}")
         except Exception:
             pass
     return "\n".join(lines) if lines else "(none)"
@@ -242,9 +240,6 @@ async def assess_corrections(
     if isinstance(raw_items, list):
         for item in raw_items:
             if isinstance(item, dict):
-                # misl_element: Gemini returns the precise MISL code
-                misl_el = item.get("misl_element", "")
-                misl_elements = [misl_el] if misl_el else item.get("misl_elements", [])
                 # Derive category from animation_id (don't trust Gemini's "type")
                 aid = item.get("animation_id", "")
                 category = _category_from_animation_id(aid) or item.get("type", "Identity")
@@ -252,7 +247,6 @@ async def assess_corrections(
                     pass_type="correction",
                     type=category,
                     target_entities=item.get("target_entities", []),
-                    misl_elements=misl_elements,
                     description=item.get("description", ""),
                     animation_id=aid,
                     correction_word=item.get("correction_word"),
