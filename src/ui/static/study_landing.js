@@ -538,30 +538,8 @@
 
     playAndReveal();
 
-    // Create a temporary button row for this message
-    var tmpBtnRow = document.createElement('div');
-    tmpBtnRow.className = 'instruction-btn-row';
-    tmpBtnRow.style.display = 'flex';
-
-    var replayMsgBtn = document.createElement('button');
-    replayMsgBtn.className = 'btn-instr btn-instr-blue';
-    replayMsgBtn.textContent = 'Replay';
-    replayMsgBtn.addEventListener('click', function() { playAndReveal(); });
-
-    var dismissBtn = document.createElement('button');
-    dismissBtn.className = 'btn-instr btn-instr-green';
-    dismissBtn.textContent = 'Continue';
-    dismissBtn.addEventListener('click', function() {
-      if (currentAudio) { currentAudio.pause(); currentAudio = null; }
-      clearWordTimers();
-      panel.style.display = 'none';
-      tmpBtnRow.remove();
-      if (onDismiss) onDismiss();
-    });
-
-    tmpBtnRow.appendChild(replayMsgBtn);
-    tmpBtnRow.appendChild(dismissBtn);
-    panel.appendChild(tmpBtnRow);
+    // Mark as shown immediately (no Continue button needed)
+    if (onDismiss) onDismiss();
   }
 
   initInstructions();
