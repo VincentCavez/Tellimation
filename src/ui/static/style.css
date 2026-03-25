@@ -635,11 +635,13 @@ a { color: var(--teal); text-decoration: none; }
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
 }
-.instruction-slot .instr-word {
+.instruction-slot .instr-word,
+.tutorial-text .instr-word {
   opacity: 0;
   transition: opacity 0.15s ease;
 }
-.instruction-slot .instr-word.visible {
+.instruction-slot .instr-word.visible,
+.tutorial-text .instr-word.visible {
   opacity: 1;
 }
 .instruction-btn-row {
