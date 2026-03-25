@@ -147,7 +147,6 @@
       })
       .then(function(scene) {
         renderScene(scene);
-        _sceneTransitioning = false;  // Scene ready — accept animations again
         // Tell server we loaded this scene (for transcription context)
         ws.send(JSON.stringify({
           type: 'study_scene_loaded',
@@ -155,6 +154,9 @@
           scene_number: sceneNum,
           scene: scene,
         }));
+        // Keep blocking animations briefly after scene load to let server
+        // flush any pending animations from the previous scene
+        setTimeout(function() { _sceneTransitioning = false; }, 500);
       })
       .catch(function(err) {
         console.error('[study_story] Failed to load scene:', err);

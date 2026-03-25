@@ -30,6 +30,6 @@
     }
   ],
   "code_template": "thought_bubble({target}, {bubbleText})",
-  "correction_intent": "Child attributed an incorrect thought to a character",
+  "correction_intent": "Child attributed the WRONG thought or feeling to a character (e.g. 'he thinks he is sad' when the scene shows the character is happy). Do NOT use D2 when the child described a thought/plan instead of an action — that is an action error, use A1 or A2 instead.",
   "suggestion_intent": "Child hasn't described what a character might be thinking"
 }

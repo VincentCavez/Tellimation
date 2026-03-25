@@ -48,6 +48,22 @@ function _redrawEntityPixels(buf, PW, PH, pixels, dx, dy) {
 }
 
 function _computeEntityBounds(buf, PW, prefix, sceneMode) {
+  // In HD mode, use pre-computed bounds from hdEntityData when available.
+  // These bounds come from the original entity mask (before overlapping entities
+  // overwrite pixel tags), so they are accurate even when entities overlap.
+  if (!sceneMode && prefix && prefix.indexOf('|') < 0 && typeof window !== 'undefined' && window.hdEntityData) {
+    var ed = window.hdEntityData[prefix];
+    if (ed && ed.bounds && ed.bounds.x2 >= 0) {
+      var b = ed.bounds;
+      return {
+        x1: b.x1, y1: b.y1, x2: b.x2, y2: b.y2,
+        cx: Math.round((b.x1 + b.x2) / 2),
+        cy: Math.round((b.y1 + b.y2) / 2)
+      };
+    }
+  }
+
+  // Fallback: scan buffer pixels
   var x1 = Infinity, y1 = Infinity, x2 = -1, y2 = -1;
   for (var i = 0; i < buf.length; i++) {
     if (_isTargetPixel(buf[i], prefix, sceneMode)) {

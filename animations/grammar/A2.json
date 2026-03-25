@@ -22,6 +22,6 @@
     }
   ],
   "code_template": "flip({target}, {speed})",
-  "correction_intent": "Child described the WRONG ACTION for an entity (e.g. said 'cooking' when the entity is packing, said 'sleeping' when it's reading). A2 is for any non-movement action error — wrong verb, wrong activity, incomplete action description.",
+  "correction_intent": "Child described the WRONG ACTION for an entity (e.g. said 'cooking' when the entity is packing, said 'sleeping' when it's reading), OR described a thought/plan instead of the actual action being performed (e.g. 'thinking about packing' when the entity IS packing). A2 is for any non-movement action error — wrong verb, wrong activity, thought instead of action.",
   "suggestion_intent": "Child hasn't described a NON-MOVEMENT action happening in the scene (cooking, reading, talking, packing, etc.). Use A2 for static/in-place actions — for locomotion (walking, running) use A1."
 }

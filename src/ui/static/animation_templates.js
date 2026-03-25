@@ -2380,18 +2380,9 @@ AnimationTemplates.register('speech_bubble', _perTargetWrapper(function(params) 
 
     var alpha = env;
 
-    // Ray-cast upward from entity center to find actual top contour pixel
+    // Use pre-computed bounds.y1 as entity top (accurate even with overlapping entities)
     var rayCX = Math.round(bounds.cx);
     var entityTopY = bounds.y1;
-    var foundTop = false;
-    for (var rd = 1; rd <= Math.ceil(bounds.cy - bounds.y1) + 2; rd++) {
-      var rty = Math.round(bounds.cy) - rd;
-      if (rty < 0) break;
-      var rti = rty * PW + rayCX;
-      if (buf[rti].e && _isEntity(buf[rti].e, prefix)) {
-        entityTopY = rty; foundTop = true;
-      } else if (foundTop) { break; }
-    }
 
     // Ellipse half-radii and horn dimensions
     var rx = 54, ry = 33;
@@ -2524,18 +2515,9 @@ AnimationTemplates.register('thought_bubble', _perTargetWrapper(function(params)
     if (bounds.x2 < 0) return;
     var alpha = env;
 
-    // Ray-cast upward to find entity top contour
+    // Use pre-computed bounds.y1 as entity top (accurate even with overlapping entities)
     var rayCX = Math.round(bounds.cx);
     var entityTopY = bounds.y1;
-    var foundTop = false;
-    for (var rd = 1; rd <= Math.ceil(bounds.cy - bounds.y1) + 2; rd++) {
-      var rty = Math.round(bounds.cy) - rd;
-      if (rty < 0) break;
-      var rti = rty * PW + rayCX;
-      if (buf[rti].e && _isEntity(buf[rti].e, prefix)) {
-        entityTopY = rty; foundTop = true;
-      } else if (foundTop) { break; }
-    }
 
     var gap = 36;
     var bcx = rayCX;
