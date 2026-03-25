@@ -56,6 +56,7 @@ from src.persistence import (
     create_story,
     append_study_log_entry,
     load_study_log,
+    push_to_google_sheet,
 )
 from google import genai
 from google.genai import types
@@ -608,6 +609,17 @@ async def api_report(request: Request):
         )
 
 
+@app.post("/api/push-data")
+async def api_push_data(request: Request):
+    """Manually push participant data to Google Sheet."""
+    body = await request.json()
+    participant_id = body.get("participant_id", "")
+    if not participant_id:
+        return JSONResponse(status_code=400, content={"error": "Missing participant_id"})
+    ok = push_to_google_sheet(participant_id)
+    return JSONResponse(content={"status": "ok" if ok else "failed"})
+
+
 # ---------------------------------------------------------------------------
 # WebSocket adapter
 # ---------------------------------------------------------------------------
@@ -815,6 +827,7 @@ async def websocket_endpoint(websocket: WebSocket):
             except Exception:
                 logger.exception("Failed to save profile on disconnect for %s",
                                  participant_id)
+            push_to_google_sheet(participant_id)
 
 
 # ---------------------------------------------------------------------------
