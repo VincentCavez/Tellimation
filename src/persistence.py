@@ -19,6 +19,9 @@ from __future__ import annotations
 
 import json
 import logging
+import os
+import urllib.request
+import urllib.error
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -280,3 +283,67 @@ def load_story_first_scenes(participant_id: str) -> List[Dict[str, Any]]:
             logger.warning("Failed to load first scene from %s", story_dir)
 
     return first_scenes
+
+
+# ---------------------------------------------------------------------------
+# Google Sheet push (via Apps Script webhook)
+# ---------------------------------------------------------------------------
+
+GOOGLE_SHEET_WEBHOOK = os.environ.get("GOOGLE_SHEET_WEBHOOK", "")
+
+
+def push_to_google_sheet(participant_id: str) -> bool:
+    """Push participant data (profile + study_log + training_log) to Google Sheet.
+
+    Returns True on success, False on failure. Never raises.
+    """
+    if not GOOGLE_SHEET_WEBHOOK:
+        logger.debug("GOOGLE_SHEET_WEBHOOK not set — skipping push")
+        return False
+
+    pdir = DATA_ROOT / participant_id
+    if not pdir.is_dir():
+        logger.warning("No data directory for %s — skipping push", participant_id)
+        return False
+
+    rows = []
+    for filename, data_type in [
+        ("profile.json", "profile"),
+        ("study_log.json", "study_log"),
+        ("training_log.json", "training_log"),
+    ]:
+        fpath = pdir / filename
+        if fpath.exists():
+            try:
+                content = fpath.read_text(encoding="utf-8")
+                rows.append({
+                    "participant_id": participant_id,
+                    "data_type": data_type,
+                    "json_data": content,
+                })
+            except Exception:
+                logger.warning("Failed to read %s for %s", filename, participant_id)
+
+    if not rows:
+        logger.info("No data files to push for %s", participant_id)
+        return False
+
+    payload = json.dumps({"rows": rows}).encode("utf-8")
+    req = urllib.request.Request(
+        GOOGLE_SHEET_WEBHOOK,
+        data=payload,
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+
+    try:
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            body = resp.read().decode("utf-8")
+            logger.info(
+                "Pushed %d rows to Google Sheet for %s: %s",
+                len(rows), participant_id, body,
+            )
+            return True
+    except Exception:
+        logger.exception("Failed to push data to Google Sheet for %s", participant_id)
+        return False
