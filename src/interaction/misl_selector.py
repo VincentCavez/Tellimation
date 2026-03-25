@@ -6,10 +6,10 @@ resolution history.
 
 Algorithm:
   1. Macro pass: fixed priority order CH > S > IE > A > CO > IR > P
-     - Filter < 3 mentions (HARD gate — if none pass, fall through to micros)
+     - Filter < 2 mentions (HARD gate — if none pass, fall through to micros)
      - Filter unresolved (relaxable — if none pass, ignore this filter)
      - Select first in priority order
-  2. Micro pass (if no macro survived < 3 filter):
+  2. Micro pass (if no macro survived < 2 filter):
      - Filter < 3 mentions (relaxable — if none pass, ignore)
      - Filter unresolved (relaxable — if none pass, ignore)
      - Shuffle remaining candidates randomly
@@ -133,9 +133,9 @@ def select_misl_candidates(
     trace["macro_in_scene"] = macro_in_scene
 
     if macro_in_scene:
-        # Filter 1: < 3 mentions — HARD GATE for macros
+        # Filter 1: < 2 mentions — HARD GATE for macros
         # If no macro passes this filter, fall through to micro pass.
-        macro_under_3 = [c for c in macro_in_scene if mention_counts.get(c, 0) < 3]
+        macro_under_3 = [c for c in macro_in_scene if mention_counts.get(c, 0) < 2]
         trace["macro_under_3"] = macro_under_3
 
         if macro_under_3:
@@ -159,8 +159,8 @@ def select_misl_candidates(
             logger.info("[misl_selector] Macro selected: %s (from pool %s)", selected, pool_sorted)
             return selected, None, trace
 
-        # All macros have >= 3 mentions → fall through to micro pass
-        logger.info("[misl_selector] All macros >= 3 mentions, falling through to micros")
+        # All macros have >= 2 mentions → fall through to micro pass
+        logger.info("[misl_selector] All macros >= 2 mentions, falling through to micros")
 
     # ── Micro pass (no macro survived < 3 filter, or no macros in scene) ──
     micro_in_scene = [
