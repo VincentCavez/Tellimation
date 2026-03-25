@@ -24,6 +24,15 @@
       <canvas id="scene-canvas"></canvas>
     </div>
 
+    <!-- Tutorial panel (visible only during tutorial on training scene 1) -->
+    <div id="tutorial-panel" style="display:none">
+      <div id="tutorial-text" class="tutorial-text"></div>
+      <div id="tutorial-btns" class="tutorial-btn-row" style="display:none">
+        <button class="btn-instr btn-instr-blue" id="btn-tutorial-replay">Replay</button>
+        <button class="btn-instr btn-instr-green" id="btn-tutorial-continue">Continue</button>
+      </div>
+    </div>
+
     <!-- Controls row -->
     <div class="study-controls-row">
       <span id="ptt-hint" class="ptt-hint">Hold&nbsp; <kbd>Space</kbd> &nbsp;to speak</span>

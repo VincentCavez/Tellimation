@@ -148,6 +148,7 @@ def _select_animation_for_discrepancy(
                 is_scene = discrepancy.target_entities == ["scene"]
                 target_ok = (
                     (is_scene and "scene" in anim_def.target_type) or
+                    (is_scene and "entity" in anim_def.target_type) or
                     (n == 1 and not is_scene and "entity" in anim_def.target_type) or
                     (n == 2 and "duo" in anim_def.target_type) or
                     (n >= 3 and "group" in anim_def.target_type)
@@ -164,6 +165,7 @@ def _select_animation_for_discrepancy(
                         if alt_def and alt_def.category == category:
                             alt_ok = (
                                 (is_scene and "scene" in alt_def.target_type) or
+                                (is_scene and "entity" in alt_def.target_type) or
                                 (n == 1 and not is_scene and "entity" in alt_def.target_type) or
                                 (n == 2 and "duo" in alt_def.target_type) or
                                 (n >= 3 and "group" in alt_def.target_type)
