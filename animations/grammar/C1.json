@@ -4,7 +4,7 @@
   "category": "Count",
   "mode": "correction",
   "scaffolding_intent": "Entities glow one at a time in sequence to create a visual count, correcting quantity errors",
-  "misl_elements": [],
+  "misl_elements": ["CH"],
   "target_type": ["duo","group"],
   "parameters": [
     {

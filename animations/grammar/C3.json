@@ -4,7 +4,7 @@
   "category": "Count",
   "mode": "correction",
   "scaffolding_intent": "Displays an amorphous shape with a question mark that dissolves, scaffolding absence \u2014 something is missing from the narration",
-  "misl_elements": [],
+  "misl_elements": ["CH"],
   "target_type": ["entity"],
   "parameters": [
     {

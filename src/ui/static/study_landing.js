@@ -161,14 +161,34 @@
       btn.style.opacity = '0.2';
       btn.style.pointerEvents = 'none';
     }
+
+    // Training done → dim training block, disable Practice button
+    if (trainingDone) {
+      var trainingSlots = document.querySelectorAll('#training-thumbnails .study-story-slot, #training-thumbnails .thumbnail-placeholder');
+      for (var j = 0; j < trainingSlots.length; j++) {
+        trainingSlots[j].style.opacity = '0.5';
+      }
+      var btnTraining = document.getElementById('btn-training');
+      if (btnTraining) {
+        btnTraining.style.opacity = '0.2';
+        btnTraining.style.pointerEvents = 'none';
+      }
+    }
   }
 
   // ── Instruction system ──
   var instrShown = sessionStorage.getItem('instructions_shown') === 'true';
+  var postTrainingShown = sessionStorage.getItem('post_training_shown') === 'true';
   var instrParagraphs = [];
   var instrAudio = [];
   var instrIndex = 0;
   var currentAudio = null;
+  var postTrainingParagraph = '';
+  var postTrainingAudioUrl = '';
+  var betweenStoriesParagraph = '';
+  var betweenStoriesAudioUrl = '';
+  var endParagraph = '';
+  var endAudioUrl = '';
 
   var wordTimers = [];
 
@@ -260,11 +280,25 @@
   }
 
   function initInstructions() {
-    if (instrShown) return;
-
+    // Always fetch — we need the data for post-training too
     fetch('/api/study/instructions')
       .then(function(r) { return r.json(); })
       .then(function(data) {
+        postTrainingParagraph = data.post_training_paragraph || '';
+        postTrainingAudioUrl = data.post_training_audio || '';
+        betweenStoriesParagraph = data.between_stories_paragraph || '';
+        betweenStoriesAudioUrl = data.between_stories_audio || '';
+        endParagraph = data.end_paragraph || '';
+        endAudioUrl = data.end_audio || '';
+
+        // If initial instructions already shown, check for transitional messages
+        if (instrShown) {
+          checkPostTraining();
+          checkBetweenStories();
+          checkAllDone();
+          return;
+        }
+
         instrParagraphs = data.paragraphs.slice(0, 4);
         instrAudio = data.audio.slice(0, 4);
         if (instrParagraphs.length === 0) return;
@@ -351,6 +385,155 @@
       } else {
         btns[i].textContent = 'Next';
       }
+    }
+  }
+
+  // ── Post-training instruction (5th paragraph) ──
+  function checkPostTraining() {
+    if (postTrainingShown || !postTrainingParagraph) return;
+    var trainingDone = completed['training'] === true;
+    if (!trainingDone) return;
+
+    showCenterMessage(postTrainingParagraph, postTrainingAudioUrl, function() {
+      sessionStorage.setItem('post_training_shown', 'true');
+      postTrainingShown = true;
+    });
+  }
+
+  // ── Between-stories instruction (6th paragraph, shown after stories 1-3) ──
+  function countCompletedStories() {
+    var count = 0;
+    if (!assignmentData) return count;
+    for (var i = 0; i < assignmentData.order.length; i++) {
+      if (completed[assignmentData.order[i]] === true) count++;
+    }
+    return count;
+  }
+
+  function checkBetweenStories() {
+    if (!betweenStoriesParagraph) return;
+    if (!postTrainingShown) return; // post-training takes priority
+    var trainingDone = completed['training'] === true;
+    if (!trainingDone) return;
+
+    // Need assignmentData to count stories — retry if not loaded yet
+    if (!assignmentData) {
+      setTimeout(checkBetweenStories, 200);
+      return;
+    }
+
+    var storiesDone = countCompletedStories();
+    var lastSeenCount = parseInt(sessionStorage.getItem('stories_shown_count') || '0', 10);
+
+    // Show between-stories message if a new story was completed (stories 1-3, not 4)
+    if (storiesDone > lastSeenCount && storiesDone >= 1 && storiesDone <= 3) {
+      showCenterMessage(betweenStoriesParagraph, betweenStoriesAudioUrl, function() {
+        sessionStorage.setItem('stories_shown_count', String(storiesDone));
+      });
+    }
+  }
+
+  // ── End of study (all 4 stories done) ──
+  function checkAllDone() {
+    if (!endParagraph) return;
+    if (!postTrainingShown) return;
+    var trainingDone = completed['training'] === true;
+    if (!trainingDone) return;
+    if (sessionStorage.getItem('end_shown') === 'true') return;
+
+    // Need assignmentData to count stories
+    if (!assignmentData) {
+      setTimeout(checkAllDone, 200);
+      return;
+    }
+
+    var storiesDone = countCompletedStories();
+    var totalStories = assignmentData.order ? assignmentData.order.length : 4;
+
+    if (storiesDone >= totalStories) {
+      // Triple the falling pixels
+      var pixelInterval = window._pixelInterval;
+      if (pixelInterval) clearInterval(pixelInterval);
+      window._maxPixels = (window._maxPixels || 8) * 3;
+      window._pixelInterval = setInterval(window._createPixel, 200);
+
+      showCenterMessage(endParagraph, endAudioUrl, function() {
+        sessionStorage.setItem('end_shown', 'true');
+      });
+    }
+  }
+
+  function showCenterMessage(text, audioUrl, onDismiss) {
+    var panel = document.getElementById('instruction-center');
+    var slot = document.getElementById('instr-slot-4');
+    if (!panel || !slot) return;
+
+    // Build word spans
+    var words = text.split(/\s+/);
+    slot.innerHTML = '';
+    for (var i = 0; i < words.length; i++) {
+      var span = document.createElement('span');
+      span.className = 'instr-word';
+      span.textContent = words[i] + ' ';
+      slot.appendChild(span);
+    }
+    slot.style.display = 'block';
+    panel.style.display = 'flex';
+
+    // Play audio and reveal words
+    function playAndReveal() {
+      if (currentAudio) { currentAudio.pause(); currentAudio = null; }
+      clearWordTimers();
+      var spans = slot.querySelectorAll('.instr-word');
+      for (var k = 0; k < spans.length; k++) spans[k].classList.remove('visible');
+
+      if (audioUrl) {
+        currentAudio = new Audio(audioUrl);
+        currentAudio.addEventListener('loadedmetadata', function() {
+          var dur = currentAudio.duration || 5;
+          var charCount = text.replace(/\s+/g, '').length;
+          var secPerChar = dur / Math.max(1, charCount);
+          var elapsed = 0;
+          for (var j = 0; j < spans.length; j++) {
+            var charLen = Math.max(1, spans[j].textContent.trim().length);
+            (function(s, delay) {
+              wordTimers.push(setTimeout(function() { s.classList.add('visible'); }, delay));
+            })(spans[j], elapsed * 1000);
+            elapsed += charLen * secPerChar;
+          }
+        });
+        currentAudio.play().catch(function() {
+          for (var j = 0; j < spans.length; j++) spans[j].classList.add('visible');
+        });
+      } else {
+        for (var j = 0; j < spans.length; j++) spans[j].classList.add('visible');
+      }
+    }
+
+    playAndReveal();
+
+    // Dismiss button
+    var dismissBtn = document.getElementById('btn-dismiss-post-training');
+    if (dismissBtn) {
+      // Remove old listeners by cloning
+      var newBtn = dismissBtn.cloneNode(true);
+      dismissBtn.parentNode.replaceChild(newBtn, dismissBtn);
+      newBtn.addEventListener('click', function() {
+        if (currentAudio) { currentAudio.pause(); currentAudio = null; }
+        clearWordTimers();
+        panel.style.display = 'none';
+        if (onDismiss) onDismiss();
+      });
+    }
+
+    // Replay button
+    var replayBtn = panel.querySelector('.btn-replay-panel');
+    if (replayBtn) {
+      var newReplay = replayBtn.cloneNode(true);
+      replayBtn.parentNode.replaceChild(newReplay, replayBtn);
+      newReplay.addEventListener('click', function() {
+        playAndReveal();
+      });
     }
   }
 

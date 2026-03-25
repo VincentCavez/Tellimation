@@ -180,9 +180,9 @@ and narrative errors, taking into account the story context.
 # Your task
 
 Given:
-- The scene MANIFEST (entities, properties, relations, actions)
+- The scene DESCRIPTION (detailed text describing everything in the scene)
 - The child's UTTERANCE (transcribed text)
-- The story so far (previously accepted utterances in this scene)
+- The story so far (all previously accepted utterances in the story)
 - The animation CORRECTION INTENTS (each animation has a specific error type it corrects)
 
 You must:
@@ -199,8 +199,18 @@ You must:
 3. **Return the list of errors in decreasing order of severity** (most \
    severe first), with the animation ID.
 
-Be generous with vocabulary: "bunny" = "rabbit", "big" = "large", etc. \
-Only flag genuine contradictions, not imprecise but acceptable descriptions.
+CRITICAL — Be very generous. Only flag CLEAR, UNAMBIGUOUS contradictions \
+with the scene description. If the child's description is approximately \
+correct, vague, or a reasonable interpretation, it is NOT an error.
+
+CRITICAL — Action/verb tolerance:
+Closely related actions are NOT errors. Examples of acceptable descriptions: \
+"cooking" when the scene shows baking, "running" when the scene shows jogging, \
+"talking" when the scene shows whispering, "playing" when the scene shows \
+building with blocks. Only flag an action error if the child's verb is \
+COMPLETELY WRONG — the opposite or totally unrelated to what is happening. \
+E.g. "sleeping" when the entity is running, "eating" when the entity is \
+reading.
 
 CRITICAL — Grammar tolerance for children:
 The child is 5-8 years old. Do NOT flag D4 (grammatical error) for: \
@@ -211,10 +221,23 @@ completely wrong verb conjugation ("he go" instead of "he goes"), wrong pronouns
 ("him is" instead of "he is"), or severely broken sentence structure. \
 When in doubt, do NOT flag D4.
 
-IMPORTANT — Adjective tolerance:
+CRITICAL — Adjective tolerance:
 Only flag an adjective as a factual error if the child's description is \
 GROSSLY wrong — the opposite or a completely unrelated quality. \
-Near-misses or creative interpretations are NOT errors.
+Near-misses or creative interpretations are NOT errors. \
+"big" = "large", "bunny" = "rabbit", "pretty" = "nice", etc.
+
+CRITICAL — Repetition is NOT an error:
+If the child repeats something they already said, or describes something \
+already mentioned in the story so far, that is NOT a factual error. \
+NEVER flag repetition as an error. Repetition is normal for children. \
+Only the enrichment pass handles encouraging new content.
+
+CRITICAL — Do NOT hallucinate errors:
+Only flag errors that are EXPLICITLY contradicted by the scene description. \
+If the scene description does not mention something, the child saying it is \
+NOT an error (it may be creative addition). If you are unsure whether \
+something is an error, it is NOT an error. Return an empty list.
 
 When the child refers to an entity by a name listed in the character names \
 section, treat it as a valid reference to that entity.
@@ -257,8 +280,10 @@ Return ONLY valid JSON (no markdown fences, no commentary):
   "discrepancies": [
     {{
       "animation_id": "<animation ID, e.g. I1, D4, P1>",
+      "misl_element": "<the PRECISE MISL code from [misl: ...] of the chosen animation, e.g. IR, ENP, ADV, CH, A>",
       "target_entities": ["<entity_id>", ...],
-      "description": "<brief rationale explaining the error>"
+      "description": "<brief rationale explaining the error>",
+      "correction_word": "<ONLY for D4 (Interjection): the correct word or short phrase the child should say, e.g. 'goes', 'he is', 'was running'. Omit for other animations.>"
     }}
   ],
   "name_assignments": [
@@ -269,6 +294,12 @@ Return ONLY valid JSON (no markdown fences, no commentary):
   ]
 }}
 ```
+
+IMPORTANT — misl_element:
+Each animation has [misl: ...] tags listing which MISL elements it can address. \
+You MUST pick the ONE most specific MISL code that matches the error. \
+For example, P2c has [misl: ENP, ADV, IR] — if the error is about a wrong \
+emotion, use "IR". If it's about a wrong adjective, use "ENP".
 
 IMPORTANT — target_entities must NEVER be empty.
 - For entity/duo/group targets: use valid entity IDs from "entities_in_scene" \
@@ -290,11 +321,9 @@ any technical term.
 CORRECTION_USER_PROMPT_TEMPLATE = """\
 Check the child's utterance for ALL mistakes (grammatical and narrative).
 
-# Scene Manifest
+# Scene Description
 
-```json
 {manifest_json}
-```
 
 # Child's Utterance
 
@@ -329,13 +358,12 @@ given the scene but has not.
 # Your task
 
 Given:
-- The scene MANIFEST (entities, properties, relations, actions)
-- The MISL taxonomy (15 narrative dimensions organized by developmental tier)
+- The MISL element(s) to scaffold (pre-selected by the system)
+- The scene's MISL targets (examples of what can be described)
+- The entities present in the scene
 - The child's UTTERANCE (transcribed text)
-- The story so far (previously accepted utterances in this scene)
-- MISL dimensions already suggested in this scene (do NOT repeat these)
-- The child's MISL difficulty profile (which dimensions they struggle with)
-- The animation SUGGESTION INTENTS (each animation has a specific enrichment it scaffolds)
+- The story so far (all previously accepted utterances in the story)
+- The animation SUGGESTION INTENTS (filtered to relevant animations only)
 
 You must:
 1. **Identify what is missing** from the utterance — narrative dimensions \
@@ -392,12 +420,17 @@ Return ONLY valid JSON (no markdown fences, no commentary):
   "discrepancies": [
     {{
       "animation_id": "<animation ID, e.g. I1, P1, S1>",
+      "misl_element": "<the PRECISE MISL code from [misl: ...] of the chosen animation>",
       "target_entities": ["<entity_id>", ...],
       "description": "<rationale: why this suggestion is relevant to the scene>"
     }}
   ]
 }}
 ```
+
+IMPORTANT — misl_element:
+Each animation has [misl: ...] tags listing which MISL elements it can scaffold. \
+You MUST pick the ONE most specific MISL code that matches your suggestion.
 
 CRITICAL — target_entities must NEVER be empty.
 - For entity/duo/group targets: use valid entity IDs from "entities_in_scene" \
@@ -465,11 +498,9 @@ in the manifest.
 ENRICHMENT_MACRO_USER_PROMPT_TEMPLATE = """\
 Produce ONE enrichment suggestion for a specific MISL element.
 
-# Scene Manifest
+# Entities in scene
 
-```json
 {manifest_json}
-```
 
 # MISL element to scaffold
 
@@ -482,7 +513,7 @@ The scene offers these targets for this element:
 
 "{utterance_text}"
 
-# Story so far (accepted utterances in this scene)
+# Story so far (accepted utterances in the story)
 
 {story_so_far}
 
@@ -493,9 +524,13 @@ The scene offers these targets for this element:
 # Instructions
 
 1. Produce exactly ONE suggestion for the MISL element **{misl_element_code}** \
-using specific manifest elements from the scene.
+using specific elements from the scene.
 2. Choose the animation whose suggestion_intent best matches from the list above.
-3. Return structured JSON with animation_id, target_entities, and description.
+3. target_entities: only list multiple entities if they have EQUAL importance \
+in the suggestion. If one entity dominates (e.g. the actor), list only that one. \
+Use duo/group targets only when the relationship between entities IS the point \
+(e.g. magnetism between two characters, sequential glow across a group).
+4. Return structured JSON with animation_id, misl_element, target_entities, and description.
 """
 
 
@@ -507,11 +542,9 @@ ENRICHMENT_MICRO_USER_PROMPT_TEMPLATE = """\
 Choose the ONE most pertinent MISL element from a candidate list and \
 produce a suggestion for it.
 
-# Scene Manifest
+# Entities in scene
 
-```json
 {manifest_json}
-```
 
 # Candidate MISL elements (choose ONE)
 
@@ -533,8 +566,10 @@ produce a suggestion for it.
 
 1. From the candidate list above, choose the ONE element that is most \
 pertinent given the child's last utterance and the scene.
-2. Produce exactly ONE suggestion for that element, grounded in the manifest.
+2. Produce exactly ONE suggestion for that element, grounded in the scene.
 3. Choose the animation whose suggestion_intent best matches.
-4. Return structured JSON with animation_id, target_entities, misl_elements \
-(with the chosen code), and description.
+4. target_entities: only list multiple entities if they have EQUAL importance \
+in the suggestion. If one entity dominates (e.g. the actor), list only that one. \
+Use duo/group targets only when the relationship between entities IS the point.
+5. Return structured JSON with animation_id, misl_element, target_entities, and description.
 """

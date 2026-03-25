@@ -4,7 +4,7 @@
   "category": "Count",
   "mode": "correction",
   "scaffolding_intent": "Entity pixelates progressively then dissolves into particles, scaffolding excess \u2014 this entity should not be mentioned",
-  "misl_elements": [],
+  "misl_elements": ["CH"],
   "target_type": ["entity","duo","group","scene"],
   "parameters": [
     {

@@ -38,6 +38,9 @@ from src.generation.prompts.assessment_prompt import (
     ENRICHMENT_SYSTEM_PROMPT,
     ENRICHMENT_USER_PROMPT_TEMPLATE,
 )
+
+# Type alias for flexibility
+from typing import Any
 from src.generation.utils import (
     extract_json as _extract_json,
     get_response_text as _get_response_text,
@@ -48,6 +51,31 @@ logger = logging.getLogger(__name__)
 MODEL_ID = "gemini-3-flash-preview"
 ASSESSMENT_TIMEOUT = 30
 MAX_RETRIES = 2
+
+# Cache: animation short ID → category (loaded from grammar JSONs)
+_ANIM_ID_TO_CATEGORY: Optional[Dict[str, str]] = None
+
+
+def _category_from_animation_id(animation_id: str) -> Optional[str]:
+    """Derive the category from an animation ID using the grammar JSONs.
+
+    E.g. "D1" → "Discourse", "P2c" → "Property", "I1" → "Identity".
+    Returns None if the ID is unknown.
+    """
+    global _ANIM_ID_TO_CATEGORY
+    if _ANIM_ID_TO_CATEGORY is None:
+        _ANIM_ID_TO_CATEGORY = {}
+        grammar_dir = Path(__file__).parent.parent.parent / "animations" / "grammar"
+        for f in grammar_dir.glob("*.json"):
+            try:
+                d = json.load(open(f))
+                _ANIM_ID_TO_CATEGORY[d["id"].upper()] = d["category"]
+            except Exception:
+                pass
+    if not animation_id:
+        return None
+    short = animation_id.split("_")[0].upper()
+    return _ANIM_ID_TO_CATEGORY.get(short)
 
 
 def _build_misl_taxonomy() -> str:
@@ -70,15 +98,12 @@ def _build_misl_taxonomy() -> str:
 
 
 def _build_names_text(
-    manifest: SceneManifest,
     character_names: Optional[Dict[str, str]],
 ) -> str:
     if character_names:
         names_lines = []
         for eid, name in character_names.items():
-            ent = manifest.get_entity(eid)
-            etype = ent.type if ent else eid
-            names_lines.append(f'- {eid} is named "{name}" (type: {etype})')
+            names_lines.append(f'- {eid} is named "{name}"')
         return "\n".join(names_lines)
     return "(No character names given yet.)"
 
@@ -142,7 +167,7 @@ async def _gemini_call(
 # ---------------------------------------------------------------------------
 
 def _load_correction_intents() -> str:
-    """Load correction_intent from all animation grammar JSONs."""
+    """Load correction_intent from all animation grammar JSONs, including misl_elements."""
     grammar_dir = Path(__file__).parent.parent.parent / "animations" / "grammar"
     lines = []
     for f in sorted(grammar_dir.glob("*.json")):
@@ -151,7 +176,9 @@ def _load_correction_intents() -> str:
             intent = d.get("correction_intent")
             if intent:
                 targets = d.get("target_type", ["entity"])
-                lines.append(f"- {d['id']} ({d['name']}) [targets: {', '.join(targets)}]: {intent}")
+                misl = d.get("misl_elements", [])
+                misl_str = f" [misl: {', '.join(misl)}]" if misl else ""
+                lines.append(f"- {d['id']} ({d['name']}) [targets: {', '.join(targets)}]{misl_str}: {intent}")
         except Exception:
             pass
     return "\n".join(lines) if lines else "(none)"
@@ -169,31 +196,40 @@ def _get_correction_intents() -> str:
 
 async def assess_corrections(
     api_key: str,
-    manifest: SceneManifest,
     utterance_text: str,
     story_so_far: List[str],
+    scene_description: str,
     character_names: Optional[Dict[str, str]] = None,
-    scene_data: Optional[Dict[str, Any]] = None,
-) -> List[Discrepancy]:
+) -> "tuple[list[Discrepancy], list[dict[str, str]]]":
     """Pass 1: Detect all mistakes (grammatical and narrative).
 
-    Returns a list of Discrepancy objects with pass_type="correction",
-    ordered by decreasing severity, with animation_id from grammar.
+    Args:
+        api_key: Gemini API key.
+        utterance_text: The child's transcribed utterance.
+        story_so_far: All accepted phrases from the ENTIRE story (not just scene).
+        scene_description: Detailed scene description (obligatory).
+        character_names: entity_id → child-given name.
+
+    Returns:
+        Tuple of (discrepancies, name_assignments).
+        Each Discrepancy has pass_type="correction", with animation_id and
+        misl_elements identifying the precise MISL element concerned.
     """
     client = genai.Client(api_key=api_key)
 
-    # Use raw scene_data (full story def) when available for richer context
-    manifest_json = json.dumps(scene_data, indent=2) if scene_data else json.dumps(manifest.model_dump(), indent=2)
     story_text = _build_story_text(story_so_far)
-    names_text = _build_names_text(manifest, character_names)
+    names_text = _build_names_text(character_names)
 
-    # Inject correction intents into system prompt
+    logger.info("[assessment:correction] scene_description length=%d, first 100 chars: %s",
+                len(scene_description), scene_description[:100] if scene_description else "(EMPTY)")
+
+    # Inject correction intents (with [misl: ...]) into system prompt
     system_prompt = CORRECTION_SYSTEM_PROMPT.format(
         correction_intents=_get_correction_intents(),
     )
 
     user_prompt = CORRECTION_USER_PROMPT_TEMPLATE.format(
-        manifest_json=manifest_json,
+        manifest_json=scene_description,
         utterance_text=utterance_text,
         story_so_far=story_text,
         character_names=names_text,
@@ -206,13 +242,20 @@ async def assess_corrections(
     if isinstance(raw_items, list):
         for item in raw_items:
             if isinstance(item, dict):
+                # misl_element: Gemini returns the precise MISL code
+                misl_el = item.get("misl_element", "")
+                misl_elements = [misl_el] if misl_el else item.get("misl_elements", [])
+                # Derive category from animation_id (don't trust Gemini's "type")
+                aid = item.get("animation_id", "")
+                category = _category_from_animation_id(aid) or item.get("type", "Identity")
                 discrepancies.append(Discrepancy(
                     pass_type="correction",
-                    type=item.get("type", "Identity"),
+                    type=category,
                     target_entities=item.get("target_entities", []),
-                    misl_elements=item.get("misl_elements", []),
+                    misl_elements=misl_elements,
                     description=item.get("description", ""),
-                    animation_id=item.get("animation_id"),
+                    animation_id=aid,
+                    correction_word=item.get("correction_word"),
                 ))
 
     # Extract name assignments (child giving names to entities)
@@ -235,57 +278,94 @@ async def assess_corrections(
 # Pass 2: Enrichment
 # ---------------------------------------------------------------------------
 
-def _load_suggestion_intents() -> str:
-    """Load suggestion_intent from all animation grammar JSONs."""
+def _load_suggestion_intents_all() -> List[Dict[str, Any]]:
+    """Load all suggestion_intent records from grammar JSONs as structured data."""
     grammar_dir = Path(__file__).parent.parent.parent / "animations" / "grammar"
-    lines = []
+    records: List[Dict[str, Any]] = []
     for f in sorted(grammar_dir.glob("*.json")):
         try:
             d = json.load(open(f))
             intent = d.get("suggestion_intent")
             if intent:
-                targets = d.get("target_type", ["entity"])
-                lines.append(f"- {d['id']} ({d['name']}) [targets: {', '.join(targets)}]: {intent}")
+                records.append({
+                    "id": d["id"],
+                    "name": d["name"],
+                    "target_type": d.get("target_type", ["entity"]),
+                    "misl_elements": d.get("misl_elements", []),
+                    "suggestion_intent": intent,
+                })
         except Exception:
             pass
-    return "\n".join(lines) if lines else "(none)"
+    return records
 
 
-_SUGGESTION_INTENTS_TEXT: Optional[str] = None
+_SUGGESTION_INTENTS_ALL: Optional[List[Dict[str, Any]]] = None
+
+
+def _get_suggestion_intents_all() -> List[Dict[str, Any]]:
+    global _SUGGESTION_INTENTS_ALL
+    if _SUGGESTION_INTENTS_ALL is None:
+        _SUGGESTION_INTENTS_ALL = _load_suggestion_intents_all()
+    return _SUGGESTION_INTENTS_ALL
 
 
 def _get_suggestion_intents() -> str:
-    global _SUGGESTION_INTENTS_TEXT
-    if _SUGGESTION_INTENTS_TEXT is None:
-        _SUGGESTION_INTENTS_TEXT = _load_suggestion_intents()
-    return _SUGGESTION_INTENTS_TEXT
+    """Format ALL suggestion intents as a string for the system prompt."""
+    records = _get_suggestion_intents_all()
+    lines = []
+    for r in records:
+        targets = ", ".join(r["target_type"])
+        misl = r["misl_elements"]
+        misl_str = f" [misl: {', '.join(misl)}]" if misl else ""
+        lines.append(f"- {r['id']} ({r['name']}) [targets: {targets}]{misl_str}: {r['suggestion_intent']}")
+    return "\n".join(lines) if lines else "(none)"
+
+
+def _get_filtered_suggestion_intents(misl_codes: List[str]) -> str:
+    """Filter suggestion intents to only those whose misl_elements overlap with misl_codes."""
+    records = _get_suggestion_intents_all()
+    lines = []
+    for r in records:
+        if any(code in r["misl_elements"] for code in misl_codes):
+            targets = ", ".join(r["target_type"])
+            misl = r["misl_elements"]
+            misl_str = f" [misl: {', '.join(misl)}]" if misl else ""
+            lines.append(f"- {r['id']} ({r['name']}) [targets: {targets}]{misl_str}: {r['suggestion_intent']}")
+    return "\n".join(lines) if lines else "(none)"
 
 
 async def assess_enrichment(
     api_key: str,
-    manifest: SceneManifest,
     utterance_text: str,
     story_so_far: List[str],
-    misl_already_suggested: List[str],
-    misl_difficulty_profile: MISLDifficultyProfile,
-    character_names: Optional[Dict[str, str]] = None,
-    correction_results: Optional[List[Discrepancy]] = None,
-    scene_data: Optional[Dict[str, Any]] = None,
+    character_names: Optional[Dict[str, str]],
+    misl_targets: Dict[str, Any],
+    entities_in_scene: List[str],
     macro_selected: Optional[str] = None,
     micro_candidates: Optional[List[str]] = None,
-    misl_targets: Optional[Dict[str, Any]] = None,
 ) -> List[Discrepancy]:
     """Pass 2: Identify enrichment opportunities.
 
-    Supports three modes:
+    Two modes:
     - **Macro mode** (macro_selected is set): Gemini produces ONE suggestion
-      for the pre-selected MISL element.
+      for the pre-selected MISL element. Receives only suggestion_intents
+      whose misl_elements contain the selected code.
     - **Micro mode** (micro_candidates is set): Gemini picks ONE from the
-      shuffled list and produces a suggestion.
-    - **Legacy mode** (both None): original behavior, Gemini picks freely.
+      shuffled list. Receives suggestion_intents whose misl_elements overlap
+      with any of the candidate codes.
 
-    Returns a list of Discrepancy objects with pass_type="suggestion",
-    each with an animation_id from the grammar.
+    Args:
+        api_key: Gemini API key.
+        utterance_text: The child's transcribed utterance.
+        story_so_far: All accepted phrases from the ENTIRE story.
+        character_names: entity_id → child-given name.
+        misl_targets: Scene's misl_targets dict (obligatory).
+        entities_in_scene: List of entity IDs present in the scene.
+        macro_selected: Single MISL code for macro mode, or None.
+        micro_candidates: Shuffled list of MISL codes for micro mode, or None.
+
+    Returns:
+        List of Discrepancy objects (capped to 1).
     """
     from config.misl import MISL_CODE_TO_KEY
     from src.generation.prompts.assessment_prompt import (
@@ -295,81 +375,72 @@ async def assess_enrichment(
 
     client = genai.Client(api_key=api_key)
 
-    manifest_json = json.dumps(scene_data, indent=2) if scene_data else json.dumps(manifest.model_dump(), indent=2)
     story_text = _build_story_text(story_so_far)
-    names_text = _build_names_text(manifest, character_names)
-
-    # Inject suggestion intents into system prompt
-    system_prompt = ENRICHMENT_SYSTEM_PROMPT.format(
-        suggestion_intents=_get_suggestion_intents(),
-    )
+    names_text = _build_names_text(character_names)
+    entities_text = ", ".join(entities_in_scene) if entities_in_scene else "(none)"
 
     if macro_selected is not None:
         # ── Macro mode: single pre-selected element ──
         element_name = MISL_CODE_TO_KEY.get(macro_selected, macro_selected)
-        targets_for_el = ""
-        if misl_targets:
-            macro_targets = misl_targets.get("macro", {})
-            val = macro_targets.get(macro_selected)
-            if isinstance(val, list):
-                targets_for_el = ", ".join(str(v) for v in val)
-            elif val:
-                targets_for_el = str(val)
+        # Filter suggestion_intents to only those relevant to this MISL code
+        filtered_intents = _get_filtered_suggestion_intents([macro_selected])
 
+        targets_for_el = ""
+        macro_targets = misl_targets.get("macro", {})
+        val = macro_targets.get(macro_selected)
+        if isinstance(val, list):
+            targets_for_el = ", ".join(str(v) for v in val)
+        elif val:
+            targets_for_el = str(val)
+
+        system_prompt = ENRICHMENT_SYSTEM_PROMPT.format(
+            suggestion_intents=filtered_intents,
+        )
         user_prompt = ENRICHMENT_MACRO_USER_PROMPT_TEMPLATE.format(
-            manifest_json=manifest_json,
+            manifest_json=f"Entities in scene: {entities_text}",
             misl_element_code=macro_selected,
             misl_element_name=element_name,
-            misl_targets_for_element=targets_for_el or "(see manifest)",
+            misl_targets_for_element=targets_for_el or "(see scene)",
             utterance_text=utterance_text,
             story_so_far=story_text,
             character_names=names_text,
         )
-        logger.info("[assessment:enrichment] Macro mode: element=%s", macro_selected)
+        logger.info("[assessment:enrichment] Macro mode: element=%s, intents=%d",
+                     macro_selected, filtered_intents.count("\n") + 1)
 
     elif micro_candidates is not None and len(micro_candidates) > 0:
         # ── Micro mode: shuffled candidate list ──
+        # Filter suggestion_intents to those overlapping with any candidate
+        filtered_intents = _get_filtered_suggestion_intents(micro_candidates)
+
         candidates_text_lines = []
         for code in micro_candidates:
             name = MISL_CODE_TO_KEY.get(code, code)
             targets_for_el = ""
-            if misl_targets:
-                micro_targets = misl_targets.get("micro", {})
-                val = micro_targets.get(code)
-                if isinstance(val, list):
-                    targets_for_el = ", ".join(str(v) for v in val)
+            micro_targets = misl_targets.get("micro", {})
+            val = micro_targets.get(code)
+            if isinstance(val, list):
+                targets_for_el = ", ".join(str(v) for v in val)
             candidates_text_lines.append(
-                f"- **{code}** ({name}): {targets_for_el or '(see manifest)'}"
+                f"- **{code}** ({name}): {targets_for_el or '(see scene)'}"
             )
 
+        system_prompt = ENRICHMENT_SYSTEM_PROMPT.format(
+            suggestion_intents=filtered_intents,
+        )
         user_prompt = ENRICHMENT_MICRO_USER_PROMPT_TEMPLATE.format(
-            manifest_json=manifest_json,
+            manifest_json=f"Entities in scene: {entities_text}",
             micro_candidates_text="\n".join(candidates_text_lines),
             utterance_text=utterance_text,
             story_so_far=story_text,
             character_names=names_text,
         )
-        logger.info("[assessment:enrichment] Micro mode: candidates=%s", micro_candidates)
+        logger.info("[assessment:enrichment] Micro mode: candidates=%s, intents=%d",
+                     micro_candidates, filtered_intents.count("\n") + 1)
 
     else:
-        # ── Legacy mode: Gemini picks freely ──
-        misl_taxonomy = _build_misl_taxonomy()
-        suggested_text = (
-            ", ".join(misl_already_suggested) if misl_already_suggested
-            else "(None yet.)"
-        )
-        difficulty_text = misl_difficulty_profile.to_prompt_context()
-
-        user_prompt = ENRICHMENT_USER_PROMPT_TEMPLATE.format(
-            manifest_json=manifest_json,
-            misl_taxonomy=misl_taxonomy,
-            utterance_text=utterance_text,
-            story_so_far=story_text,
-            misl_already_suggested=suggested_text,
-            misl_difficulty_profile=difficulty_text,
-            character_names=names_text,
-        )
-        logger.info("[assessment:enrichment] Legacy mode")
+        logger.warning("[assessment:enrichment] Called with no macro_selected or micro_candidates — skipping")
+        return []
 
     data = await _gemini_call(client, system_prompt, user_prompt)
 
@@ -378,17 +449,21 @@ async def assess_enrichment(
     if isinstance(raw_items, list):
         for item in raw_items:
             if isinstance(item, dict):
+                misl_el = item.get("misl_element", "")
+                misl_elements = [misl_el] if misl_el else item.get("misl_elements", [])
+                aid = item.get("animation_id", "")
+                category = _category_from_animation_id(aid) or item.get("type", "Discourse")
                 discrepancies.append(Discrepancy(
                     pass_type="suggestion",
-                    type=item.get("type", "Discourse"),
+                    type=category,
                     target_entities=item.get("target_entities", []),
-                    misl_elements=item.get("misl_elements", []),
+                    misl_elements=misl_elements,
                     description=item.get("description", ""),
-                    animation_id=item.get("animation_id"),
+                    animation_id=aid,
                 ))
 
-    # In macro/micro mode, cap at 1 suggestion
-    if (macro_selected is not None or micro_candidates is not None) and len(discrepancies) > 1:
+    # Cap at 1 suggestion
+    if len(discrepancies) > 1:
         discrepancies = discrepancies[:1]
 
     logger.info("[assessment:enrichment] Found %d enrichment discrepancies",
@@ -483,21 +558,28 @@ async def detect_misl_elements(
 async def assess_resolution(
     api_key: str,
     utterance_text: str,
-    previous_discrepancy: Optional[Discrepancy] = None,
-    scene_data: Optional[Dict[str, Any]] = None,
-) -> Optional[Dict[str, Any]]:
+    previous_rationale: Optional[str] = None,
+    scene_description: str = "",
+) -> Optional[bool]:
     """Check if the child's new utterance resolves a previous correction/suggestion.
 
-    Returns {"resolved": True/False, "animation_id": "I1"} or None if no previous.
+    Args:
+        api_key: Gemini API key.
+        utterance_text: The child's new utterance.
+        previous_rationale: The .description of the previous Discrepancy.
+        scene_description: The scene_description field from the scene JSON.
+
+    Returns:
+        True if resolved, False if not, None if no previous_rationale.
     """
-    if not previous_discrepancy or not utterance_text:
+    if not previous_rationale or not utterance_text:
         return None
 
     client = genai.Client(api_key=api_key)
 
     scene_context = ""
-    if scene_data:
-        scene_context = f"\n\n# Scene context\n```json\n{json.dumps(scene_data, indent=2)}\n```"
+    if scene_description:
+        scene_context = f"\n\n# Scene description\n{scene_description}"
 
     system_prompt = (
         "You check whether a child's new utterance addresses a previous "
@@ -509,10 +591,8 @@ async def assess_resolution(
     )
 
     user_prompt = (
-        f"Previous feedback (animation {previous_discrepancy.animation_id or 'unknown'}, "
-        f"type {previous_discrepancy.pass_type}):\n"
-        f'"{previous_discrepancy.description}"\n'
-        f"Targets: {previous_discrepancy.target_entities}"
+        f"Previous feedback:\n"
+        f'"{previous_rationale}"'
         f"{scene_context}\n\n"
         f'Child\'s new utterance:\n"{utterance_text}"\n\n'
         f"Did the child address the feedback?"
@@ -522,16 +602,10 @@ async def assess_resolution(
         data = await _gemini_call(client, system_prompt, user_prompt)
         resolved = data.get("resolved", False)
         logger.info(
-            "\033[93m[RESOLUTION]\033[0m %s (animation %s) → %s",
-            previous_discrepancy.pass_type,
-            previous_discrepancy.animation_id,
+            "\033[93m[RESOLUTION]\033[0m → %s",
             "resolved" if resolved else "not resolved",
         )
-        return {
-            "resolved": resolved,
-            "animation_id": previous_discrepancy.animation_id,
-            "pass_type": previous_discrepancy.pass_type,
-        }
+        return resolved
     except Exception as exc:
         logger.error("[assessment] Resolution check failed: %s", exc)
         return None

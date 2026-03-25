@@ -33,6 +33,7 @@ class Discrepancy(BaseModel):
     misl_elements: List[str] = Field(default_factory=list)
     description: str = ""
     animation_id: Optional[str] = None  # e.g. "I1", "D4", "P1" — from grammar JSON
+    correction_word: Optional[str] = None  # D4 only: the correct word/phrase to display
 
 
 class AssessmentResponse(BaseModel):

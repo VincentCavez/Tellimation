@@ -17,11 +17,11 @@
         255
       ],
       "default": [
-        40,
-        40,
-        55
+        255,
+        248,
+        220
       ],
-      "description": "Label background color"
+      "description": "Label background color (cream)"
     },
     {
       "name": "textColor",
@@ -31,11 +31,11 @@
         255
       ],
       "default": [
-        255,
-        255,
-        200
+        30,
+        30,
+        30
       ],
-      "description": "Label text color"
+      "description": "Label text color (black)"
     },
     {
       "name": "stringColor",
@@ -45,11 +45,11 @@
         255
       ],
       "default": [
-        180,
-        180,
-        180
+        139,
+        90,
+        43
       ],
-      "description": "Connecting string color"
+      "description": "Label border / string color (brown)"
     },
     {
       "name": "scale",

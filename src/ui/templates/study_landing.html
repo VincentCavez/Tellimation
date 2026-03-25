@@ -29,6 +29,15 @@
     </div>
   </div>
 
+  <!-- Post-training instruction overlay (5th paragraph) -->
+  <div id="instruction-center" class="instruction-panel instruction-center" style="display:none;">
+    <div id="instr-slot-4" class="instruction-slot"></div>
+    <div class="instruction-btn-row">
+      <button class="btn-instr btn-instr-blue btn-replay-panel" data-panel="center">Replay</button>
+      <button class="btn-instr btn-instr-green" id="btn-dismiss-post-training">Got it!</button>
+    </div>
+  </div>
+
   <div class="study-landing-container">
     <div class="login-logo">
       <span class="t2">Tell</span><span class="t3">imations</span>
@@ -59,10 +68,10 @@
     const colors = ['#DB0038', '#F7C200', '#519DD9', '#53BAC1', '#EDEDED'];
     const pixelsContainer = document.getElementById('falling-pixels');
     let activePixels = 0;
-    const maxPixels = 8;
+    window._maxPixels = 8;
 
-    function createPixel() {
-      if (activePixels >= maxPixels) return;
+    window._createPixel = function() {
+      if (activePixels >= window._maxPixels) return;
       const pixel = document.createElement('div');
       pixel.className = 'falling-pixel';
       const color = colors[Math.floor(Math.random() * colors.length)];
@@ -76,8 +85,8 @@
       pixelsContainer.appendChild(pixel);
       activePixels++;
       setTimeout(() => { pixel.remove(); activePixels--; }, duration * 1000);
-    }
-    setInterval(createPixel, 600);
+    };
+    window._pixelInterval = setInterval(window._createPixel, 600);
   </script>
 </body>
 </html>
