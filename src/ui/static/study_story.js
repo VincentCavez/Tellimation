@@ -112,8 +112,19 @@
   // --- Scene loading ---
   var _nextSceneTimer = null;
 
+  var _sceneTransitioning = false;
+
   function loadScene(sceneNum) {
     sceneNumEl.textContent = sceneNum;
+
+    // Stop any running animation and ignore incoming ones during transition
+    _sceneTransitioning = true;
+    if (window.animRunner) {
+      window.animRunner.stopLoop();
+      // Detach the old runner so late callbacks don't corrupt the new scene's buffer
+      window.animRunner.buf = null;
+      window.animRunner.renderer = null;
+    }
 
     // Clear any pending next-scene timer
     if (_nextSceneTimer) { clearTimeout(_nextSceneTimer); _nextSceneTimer = null; }
@@ -136,6 +147,7 @@
       })
       .then(function(scene) {
         renderScene(scene);
+        _sceneTransitioning = false;  // Scene ready — accept animations again
         // Tell server we loaded this scene (for transcription context)
         ws.send(JSON.stringify({
           type: 'study_scene_loaded',
@@ -708,6 +720,7 @@
   // --- Handle WS messages ---
   function handleAnimation(msg) {
     if (!isAnimated) return;
+    if (_sceneTransitioning) return;  // Ignore animations during scene transition
     if (msg.template) {
       // Mode A/B: template-based animation — play in loop
       animRunner.playLoop({

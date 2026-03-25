@@ -93,7 +93,7 @@ class AnimationRunner {
       let lastFrameTime = 0;
 
       const tick = (now) => {
-        if (!this.isPlaying) return;
+        if (!this.isPlaying || !this.buf) return;
 
         // Framerate limiting
         if (frameInterval > 0 && now - lastFrameTime < frameInterval) {
@@ -221,13 +221,16 @@ class AnimationRunner {
       cancelAnimationFrame(this._rafId);
       this._rafId = null;
     }
-    // Restore original pixel state
-    this.buf.restore();
-    // Re-render temp sprites on top after restore
-    if (typeof renderTempSprites === 'function') {
-      renderTempSprites(this.buf);
+    // Restore original pixel state (guard against detached runner during scene transition)
+    if (this.buf && this.buf.restore) {
+      this.buf.restore();
+      if (typeof renderTempSprites === 'function') {
+        renderTempSprites(this.buf);
+      }
     }
-    this.renderer.render();
+    if (this.renderer && this.renderer.render) {
+      this.renderer.render();
+    }
 
     // Optional callback for full-res redraw after animation
     if (typeof this.onAnimationFinish === 'function') {

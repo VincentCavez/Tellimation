@@ -1523,6 +1523,11 @@ async def _handle_study_audio(
                 session.character_names[na["entity_id"]] = na["name"]
             await ws.send_json({"type": "study_log", "tag": "NAMES", "text": str(name_assignments)})
 
+        # Drop nametag suggestion if the entity was just named
+        if name_assignments and suggestions:
+            named_ids = {na["entity_id"] for na in name_assignments}
+            suggestions = [s for s in suggestions if not (s.animation_id == "I2" and any(t in named_ids for t in s.target_entities))]
+
         session.narration_history.append(transcription)
         session.conversation_history.append({"role": "child", "text": transcription})
         session.student_profile.total_utterances += 1
@@ -1869,6 +1874,11 @@ async def _handle_audio(
             for na in name_assignments:
                 session.character_names[na["entity_id"]] = na["name"]
                 logger.info("[assessment] Registered name: %s → %s", na["entity_id"], na["name"])
+
+        # Drop nametag suggestion if the entity was just named
+        if name_assignments and suggestions:
+            named_ids = {na["entity_id"] for na in name_assignments}
+            suggestions = [s for s in suggestions if not (s.animation_id == "I2" and any(t in named_ids for t in s.target_entities))]
 
         # Build unified AssessmentResponse for process_assessment
         from src.models.assessment import AssessmentResponse, FactualError, MISLOpportunity
