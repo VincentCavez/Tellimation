@@ -288,7 +288,6 @@ Return ONLY valid JSON (no markdown fences, no commentary):
   "discrepancies": [
     {{
       "animation_id": "<animation ID, e.g. I1, D4, P1>",
-      "misl_element": "<the PRECISE MISL code from [misl: ...] of the chosen animation, e.g. IR, ENP, ADV, CH, A>",
       "target_entities": ["<entity_id>", ...],
       "description": "<brief rationale explaining the error>",
       "correction_word": "<ONLY for D4 (Interjection): the correct word or short phrase the child should say, e.g. 'goes', 'he is', 'was running'. Omit for other animations.>"
@@ -302,12 +301,6 @@ Return ONLY valid JSON (no markdown fences, no commentary):
   ]
 }}
 ```
-
-IMPORTANT — misl_element:
-Each animation has [misl: ...] tags listing which MISL elements it can address. \
-You MUST pick the ONE most specific MISL code that matches the error. \
-For example, P2c has [misl: ENP, ADV, IR] — if the error is about a wrong \
-emotion, use "IR". If it's about a wrong adjective, use "ENP".
 
 IMPORTANT — target_entities must NEVER be empty.
 - For entity/duo/group targets: use valid entity IDs from "entities_in_scene" \

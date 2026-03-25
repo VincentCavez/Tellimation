@@ -541,6 +541,7 @@
 
   // Training button
   document.getElementById('btn-training').addEventListener('click', function() {
+    sessionStorage.setItem('instructions_shown', 'true');
     window.location.href = '/study/story?story=training&animated=true&scenes=2&name=Training';
   });
 
