@@ -1,0 +1,25 @@
+{
+  "story_id": "study1_C1_C",
+  "title": "Parking lot (Sequential Glow C)",
+  "entities": {
+    "car_1": "a blue sedan (leftmost)",
+    "car_2": "a blue sedan (middle)",
+    "car_3": "a blue sedan (rightmost)",
+    "man": "a man with car keys"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Parking Lot",
+      "background_prompt": "A small outdoor parking lot with painted white lines, a few parking spaces, a lamppost, and a low hedge along the edge. Afternoon light. No people, no vehicles.",
+      "full_scene_prompt": "A small outdoor parking lot on a clear afternoon. Three identical blue sedans are parked side by side in adjacent spaces, each facing forward. The leftmost car has a small dent on the front bumper, the middle one has a parking sticker on the windshield, and the rightmost one has a slightly open driver-side window. A man in a brown jacket and khaki pants stands at the end of the row, holding a set of car keys in one hand and looking at the three cars with a confused expression, as if he cannot remember which one is his. White lines mark the parking spaces on the dark asphalt. A lamppost stands to the right, and a low green hedge runs along the edge of the lot.",
+      "entities_in_scene": [
+        "car_1",
+        "car_2",
+        "car_3",
+        "man"
+      ],
+      "composition_instructions": "Place car_1 in the left parking space, facing forward, with a small dent on front bumper. Place car_2 in the middle space, facing forward, with a parking sticker on windshield. Place car_3 in the right space, facing forward, with driver-side window slightly open. Place man at the end of the row (right), standing and holding car keys, looking confused."
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "story_id": "study1_I2_B",
+  "title": "Birthday party (Nametag B)",
+  "entities": {
+    "birthday_girl": "a girl wearing a paper crown",
+    "friend_1": "a boy in a bow tie",
+    "friend_2": "a girl with curly red hair",
+    "mother": "a woman carrying a cake"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Birthday Party",
+      "background_prompt": "A decorated living room with colorful balloons, a table with party plates and cups, wrapped presents in a pile, and a banner reading 'Happy Birthday'. No people.",
+      "full_scene_prompt": "A decorated living room for a birthday party. A girl of about seven wearing a shiny paper crown and a pink party dress stands at the head of a table covered in a polka-dot tablecloth. A boy in a white shirt and a green bow tie sits to her left, clapping his hands excitedly. A girl with curly red hair and freckles in a yellow sundress sits across the table, blowing a party horn. A woman in a blue blouse carefully carries a round chocolate cake with seven lit candles toward the table from the kitchen doorway. Colorful balloons in red, blue, and gold are tied to the backs of chairs. A pile of wrapped presents in shiny paper sits on a side table. A banner reading 'Happy Birthday' stretches across the wall in glittery letters.",
+      "entities_in_scene": [
+        "birthday_girl",
+        "friend_1",
+        "friend_2",
+        "mother"
+      ],
+      "composition_instructions": "Place birthday_girl at the head of the table, standing, wearing paper crown and pink dress. Place friend_1 to her left, sitting and clapping. Place friend_2 across the table, sitting and blowing a party horn. Place mother in the kitchen doorway (right), carrying a round chocolate cake with lit candles toward the table."
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_P2e_D",
+  "title": "Boy and his dog (Emanation-Hearts D)",
+  "entities": {
+    "boy": "a boy sitting in the grass",
+    "dog": "a golden retriever resting its head on the boy's lap"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Backyard",
+      "background_prompt": "A suburban backyard with a mowed lawn, a wooden fence, a tire swing hanging from a tree, and a garden shed. Warm summer afternoon. No people, no animals.",
+      "full_scene_prompt": "A suburban backyard on a warm summer afternoon. A boy of about eleven in a green t-shirt and cargo shorts sits cross-legged on the mowed lawn under the shade of a large oak tree. A golden retriever with a thick, shiny coat lies beside him with its head resting on the boy's lap, eyes half-closed in contentment. The boy gently strokes the dog's ear with one hand and rests the other on the dog's back. His face shows pure, quiet happiness — a soft smile, relaxed eyes, completely at peace. A tire swing hangs from a thick branch above them, swaying slightly in the breeze. A wooden fence encloses the yard, and a small garden shed with a blue door sits in the back corner. Dandelions dot the grass.",
+      "entities_in_scene": [
+        "boy",
+        "dog"
+      ],
+      "composition_instructions": "Place boy under the oak tree, sitting cross-legged on the lawn. Place dog beside him with head resting on his lap, eyes half-closed. Boy gently strokes the dog's ear, face showing soft smile and quiet happiness."
+    }
+  ]
+}

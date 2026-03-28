@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_P2d_C",
+  "title": "Vet waiting room (Emanation-Tears C)",
+  "entities": {
+    "boy": "a boy holding an empty pet carrier",
+    "poster": "a pet adoption poster on the wall"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Vet Waiting Room",
+      "background_prompt": "A veterinary clinic waiting room with plastic chairs along the wall, pet posters, a reception desk with a bell, and a tiled floor. No people, no animals.",
+      "full_scene_prompt": "A veterinary clinic waiting room with bright fluorescent lighting. A boy of about ten in a gray sweatshirt and sneakers sits slumped in a blue plastic chair along the wall, an empty pet carrier with its door hanging open resting on the chair beside him. The carrier has a small blanket inside but nothing else. The boy stares at the floor with red-rimmed eyes, his lower lip trembling, both hands gripping the edge of the carrier. On the wall above him, a colorful poster shows smiling puppies and kittens with the text 'Give a pet a forever home.' A reception desk with a small bell and a computer monitor is visible to the right. The tiled floor is spotlessly clean. Other plastic chairs along the wall are empty.",
+      "entities_in_scene": [
+        "boy",
+        "poster"
+      ],
+      "composition_instructions": "Place boy slumped in a blue plastic chair along the wall, staring at the floor with red-rimmed eyes, lower lip trembling, both hands gripping the edge of an empty pet carrier on the chair beside him."
+    }
+  ]
+}

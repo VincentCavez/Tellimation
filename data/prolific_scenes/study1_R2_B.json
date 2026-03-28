@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_R2_B",
+  "title": "Cat and dog (Repel B)",
+  "entities": {
+    "cat": "a black cat on the left armrest",
+    "dog": "a golden retriever on the right cushion"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Living Room Standoff",
+      "background_prompt": "A living room with a large L-shaped couch, a coffee table, a rug, a TV on the wall, and soft afternoon light. No people, no animals.",
+      "full_scene_prompt": "A living room in soft afternoon light. A large L-shaped beige couch sits in the center. On the far left armrest, a sleek black cat with bright yellow eyes perches stiffly, back arched slightly, ears flattened, staring to the right. On the far right cushion of the couch, a golden retriever lies with its chin on its paws, side-eyeing the cat from the opposite end, a low wrinkle on its brow. The middle cushions of the couch are completely empty — a vast no-man's-land between the two animals. Neither is relaxed; both are hyper-aware of the other. A coffee table with a stack of magazines and a remote control sits in front of the couch. A rug with a geometric pattern covers the floor. A TV mounted on the wall shows a paused nature documentary.",
+      "entities_in_scene": [
+        "cat",
+        "dog"
+      ],
+      "composition_instructions": "Place cat on the far left armrest of the couch, perching stiffly with back arched slightly, ears flattened, staring right. Place dog on the far right cushion, lying with chin on paws, side-eyeing the cat. Middle cushions completely empty."
+    }
+  ]
+}

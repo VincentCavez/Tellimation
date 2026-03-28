@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_P2c_A",
+  "title": "Attic (Emanation-Sparkles)",
+  "entities": {
+    "chest": "an old wooden chest, open",
+    "crown": "a shiny golden crown"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Attic",
+      "background_prompt": "A dusty attic with exposed wooden beams, stacked cardboard boxes covered in dust, cobwebs hanging from the ceiling, and a small round window letting in a beam of light. No people.",
+      "full_scene_prompt": "A dusty attic with exposed wooden beams and a sloped ceiling. In the center, an old wooden chest with brass hinges and a curved lid sits open, revealing its contents. Inside the chest, resting on faded red velvet lining, a magnificent golden crown gleams brilliantly, catching the light. The crown has intricate filigree patterns and small embedded jewels that sparkle. It looks pristine and brand-new despite its surroundings. Around the chest, dusty cardboard boxes are stacked haphazardly, some with faded labels. A thick cobweb stretches from one beam to another in the upper right corner, with a tiny spider visible. A small round window on the far wall lets in a single beam of warm golden light that falls directly onto the chest. Dust motes float visibly in the beam of light.",
+      "entities_in_scene": [
+        "chest",
+        "crown"
+      ],
+      "composition_instructions": "Place chest in the center of the attic, open with brass hinges. Place crown inside the chest on faded red velvet lining, gleaming brilliantly and catching the beam of light from the window."
+    }
+  ]
+}

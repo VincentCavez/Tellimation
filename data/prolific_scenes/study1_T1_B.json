@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_T1_B",
+  "title": "Birthday aftermath (Flashback B)",
+  "entities": {
+    "boy": "a boy holding an unwrapped present",
+    "wrapping": "torn gift wrapping on the floor"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Birthday Aftermath",
+      "background_prompt": "A living room after a birthday party with deflated balloons, empty plates on a table, torn wrapping paper on the floor, and a banner hanging lopsided. No people.",
+      "full_scene_prompt": "A living room showing the aftermath of a birthday party. A boy of about eight in a striped polo shirt sits on the carpet, holding a brand new toy robot still in its packaging, smiling down at it with delight. Around him on the floor, torn gift wrapping paper in bright colors — green with gold stars, blue with silver stripes — lies scattered in crumpled heaps. Deflated balloons in red and yellow sag from their strings tied to chair backs. A table behind him has empty paper plates with cake crumbs, half-drunk cups of juice, and a mostly eaten chocolate cake with messy frosting. A 'HAPPY BIRTHDAY' banner hangs lopsided across the wall, one end having come untaped. The room is messy but the boy looks completely content.",
+      "entities_in_scene": [
+        "boy",
+        "wrapping"
+      ],
+      "composition_instructions": "Place boy on the carpet, sitting and holding a new toy robot still in packaging, smiling. Scattered torn wrapping paper in bright colors around him on the floor."
+    }
+  ]
+}

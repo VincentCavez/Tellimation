@@ -1,0 +1,23 @@
+{
+  "story_id": "study1_T2_C",
+  "title": "Growing puppy photos (Timelapse C)",
+  "entities": {
+    "woman": "a woman looking at photos on a mantel",
+    "puppy_photo": "a framed photo of a tiny puppy",
+    "dog": "a large adult golden retriever lying at her feet"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Photo Mantel",
+      "background_prompt": "A living room with a fireplace, a wooden mantel with framed photos, a soft rug, and warm lamp light. No people, no animals.",
+      "full_scene_prompt": "A warm living room in soft lamp light. A woman in a cozy gray sweater stands in front of a fireplace mantel, looking at a row of framed photos arranged chronologically from left to right. The leftmost frame shows a tiny golden retriever puppy, barely a few weeks old, fitting in someone's cupped hands. The next shows the same puppy a bit bigger, chewing a shoe. The third shows an adolescent dog with gangly legs at a park. The rightmost shows a large, dignified adult golden retriever sitting proudly. At the woman's feet on the soft rug, that same golden retriever — now fully grown with a broad chest and wise eyes — lies with its chin on its paws, looking up at her. The passage of time is unmistakable across the photos. A warm fire crackles in the fireplace.",
+      "entities_in_scene": [
+        "woman",
+        "puppy_photo",
+        "dog"
+      ],
+      "composition_instructions": "Place woman standing in front of the fireplace mantel, looking at the row of framed photos. Place dog on the soft rug at her feet, lying with chin on paws, looking up at her."
+    }
+  ]
+}

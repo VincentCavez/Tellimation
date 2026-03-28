@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_P2c_C",
+  "title": "Car wash (Emanation-Sparkles C)",
+  "entities": {
+    "man": "a man admiring his car",
+    "car": "a freshly washed red sports car"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Car Wash",
+      "background_prompt": "A car wash exit area with wet concrete, a drainage grate, a towel station, and clear sky. No people, no vehicles.",
+      "full_scene_prompt": "A car wash exit area on a clear sunny day. A man in a white polo shirt and sunglasses stands with his arms crossed, smiling proudly at a bright red sports car that has just been washed and waxed. The car gleams intensely in the sunlight — every surface is mirror-smooth, reflecting the blue sky and surrounding buildings. Tiny water droplets still bead on the hood and roof, each one catching the light like a small lens. The wet concrete floor beneath the car shows the drainage grate. A rack of clean microfiber towels stands to the right. The car's chrome wheels and door handles are polished to perfection, and the windows are completely streak-free and transparent.",
+      "entities_in_scene": [
+        "man",
+        "car"
+      ],
+      "composition_instructions": "Place man beside the red sports car, standing with arms crossed and smiling proudly. Place car freshly washed, mirror-smooth and gleaming in sunlight with water droplets beading on hood and roof."
+    }
+  ]
+}

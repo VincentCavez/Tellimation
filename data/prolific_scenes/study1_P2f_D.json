@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_P2f_D",
+  "title": "Traffic jam (Emanation-Anger D)",
+  "entities": {
+    "driver": "a driver gripping the steering wheel",
+    "car": "a car stuck in traffic"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Traffic Jam",
+      "background_prompt": "A city street packed with cars bumper to bumper, traffic lights showing red, buildings on both sides, and a crosswalk. Dull overcast light. No people visible from this angle, no visible car interiors.",
+      "full_scene_prompt": "A city street in dull overcast light. A car — a silver sedan — is stuck in a long line of bumper-to-bumper traffic. Through the windshield, the driver is visible: a man in a white dress shirt with the sleeves rolled up, gripping the steering wheel with both hands so tightly his knuckles are pale. His face is contorted with frustration — brows furrowed deeply, mouth pressed into a hard line, eyes glaring at the line of brake lights stretching ahead. On the dashboard, a phone shows a navigation app with a sea of red indicating heavy traffic. The clock on the dashboard reads 8:47 AM. Other cars pack the lanes in both directions. Traffic lights ahead glow red. Tall office buildings line both sides of the street. A pedestrian crosswalk is just visible ahead, empty.",
+      "entities_in_scene": [
+        "driver",
+        "car"
+      ],
+      "composition_instructions": "Place driver in the car (visible through windshield), gripping the steering wheel with both hands, knuckles pale, face contorted with frustration. Place car in a long line of bumper-to-bumper traffic."
+    }
+  ]
+}

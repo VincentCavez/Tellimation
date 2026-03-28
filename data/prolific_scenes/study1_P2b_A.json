@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_P2b_A",
+  "title": "Winter Garden (Emanation-Frost)",
+  "entities": {
+    "birdbath": "a stone birdbath covered in ice",
+    "robin": "a small robin with a red breast"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Winter Garden",
+      "background_prompt": "A wintry garden with bare trees, a wooden fence, dead brown leaves covering the ground, a small wooden shed in the corner, and frost on every surface. Overcast sky. No people, no animals.",
+      "full_scene_prompt": "A wintry garden on an overcast day. A round stone birdbath stands in the center of the garden, its basin completely frozen over with a thick layer of translucent ice, and frost crystals forming delicate patterns on its pedestal. A small robin with a bright red breast and brown feathers perches on the top rail of a weathered wooden fence to the right, its head tilted as if listening. Dead brown and orange leaves cover the ground in thick patches. A small wooden shed with a green door stands in the far corner, its roof dusted with frost. Bare tree branches frame the scene above, and a few remaining brown leaves cling to the branches. The grass is stiff and pale with frost. The sky is a flat white-gray, and the overall atmosphere is still and cold.",
+      "entities_in_scene": [
+        "birdbath",
+        "robin"
+      ],
+      "composition_instructions": "Place birdbath in the center of the garden, frozen over with a thick layer of ice and frost patterns on the pedestal. Place robin on the top rail of the wooden fence (right), perched with head tilted."
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_S2_D",
+  "title": "Hammock (Stamp D)",
+  "entities": {
+    "woman": "a woman lying in a hammock",
+    "book": "an open book on her chest"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Hammock",
+      "background_prompt": "A tropical garden with two palm trees, a colorful woven hammock strung between them, lush ferns and flowering bushes, and a sandy path. Warm afternoon. No people.",
+      "full_scene_prompt": "A tropical garden on a warm afternoon. A colorful woven hammock in stripes of orange, red, and yellow is strung between two tall palm trees. A woman in a white linen dress and bare feet lies fully stretched out in the hammock, suspended off the ground, one arm trailing over the edge and her fingers nearly brushing the sandy ground below. An open book rests on her chest, pages ruffled by a gentle breeze. Her eyes are closed and her expression is completely peaceful. The hammock sags gently under her weight. Beneath the hammock, the sand shows no footprints directly below her — confirming she is truly suspended, not touching the ground. Lush green ferns and bright hibiscus flowers in pink and red surround the area. Dappled sunlight filters through the palm fronds above.",
+      "entities_in_scene": [
+        "woman",
+        "book"
+      ],
+      "composition_instructions": "Place woman lying fully stretched out in the hammock, suspended off the ground, one arm trailing over the edge with fingers nearly brushing the sand. Place book open on her chest, pages ruffled. Eyes closed, expression peaceful."
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_P2a_D",
+  "title": "Laundry room (Emanation-Steam D)",
+  "entities": {
+    "woman": "a woman folding clothes",
+    "iron": "a hot iron with steam rising"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Laundry Room",
+      "background_prompt": "A small laundry room with a washing machine, an ironing board set up, a basket of clothes, and a shelf with detergent bottles. Bright indoor lighting. No people.",
+      "full_scene_prompt": "A small bright laundry room. A woman in a gray t-shirt and her hair in a messy bun stands at an ironing board, pressing a light blue dress shirt. A hot iron in her right hand releases a thick burst of white steam as it glides across the fabric, the steam rising and catching the overhead light. A laundry basket filled with neatly folded clothes — towels, t-shirts, a pair of jeans — sits on the floor beside her. A white washing machine hums quietly against the wall. A shelf above holds bottles of detergent, a box of dryer sheets, and a small potted succulent. A clothesline with wooden pegs stretches across one corner of the room with a few socks hanging from it.",
+      "entities_in_scene": [
+        "woman",
+        "iron"
+      ],
+      "composition_instructions": "Place woman at the ironing board, standing and pressing a light blue dress shirt with a hot iron. The iron releases a thick burst of white steam."
+    }
+  ]
+}

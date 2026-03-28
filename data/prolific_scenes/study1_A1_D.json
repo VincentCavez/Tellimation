@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_A1_D",
+  "title": "Train station (Motion Lines D)",
+  "entities": {
+    "train": "a red express train",
+    "woman": "a woman waving on the platform"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Train Station",
+      "background_prompt": "A small train station with a single platform, a covered waiting area with a wooden bench, a timetable board, flower boxes, and railway tracks extending into the distance. No people, no trains.",
+      "full_scene_prompt": "A small train station on a clear day. A bright red express train speeds through the station from left to right, its cars a blur of motion, windows flashing as they pass. Wind from the train rustles the flowers in the hanging flower boxes on the platform edge. A woman in a long green coat and a white scarf stands on the platform behind the yellow safety line, waving her right hand high at someone visible through one of the passing windows. Her coat and scarf flutter in the train's wind. A wooden bench under the covered waiting area sits behind her. A timetable board shows departure times. The railway tracks extend into the distance, converging at a vanishing point between green fields.",
+      "entities_in_scene": [
+        "train",
+        "woman"
+      ],
+      "composition_instructions": "Place train speeding through the station from left to right, cars a blur of motion. Place woman on the platform behind the yellow safety line, standing and waving her right hand high, coat and scarf fluttering in the wind."
+    }
+  ]
+}

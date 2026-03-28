@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_S1_B",
+  "title": "Library curtain (Reveal B)",
+  "entities": {
+    "librarian": "a librarian standing in front of curtains",
+    "garden": "a secret garden visible through a gap in the curtains"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Library Secret",
+      "background_prompt": "A grand old library with floor-to-ceiling bookshelves, a reading desk with a green lamp, heavy velvet curtains along one wall, and a Persian rug. No people.",
+      "full_scene_prompt": "A grand old library with mahogany floor-to-ceiling bookshelves packed with leather-bound volumes. A librarian — an older woman with silver hair pinned up, wearing a long navy blue cardigan and a pearl necklace — stands directly in front of a pair of heavy dark red velvet curtains that hang along the back wall, arms behind her back. She partially blocks the view, but behind her, through a narrow gap where the curtains don't quite meet, a sliver of something unexpected is visible: a lush secret garden with bright green plants, a stone fountain, and sunlight — completely incongruous with the dim, book-lined interior. A reading desk with a green banker's lamp and an open atlas sits to the left. A Persian rug in deep red and blue covers the wooden floor.",
+      "entities_in_scene": [
+        "librarian",
+        "garden"
+      ],
+      "composition_instructions": "Place librarian standing directly in front of the heavy velvet curtains (back wall), arms behind her back, partially blocking the view. Through a narrow gap in the curtains behind her, a sliver of a secret garden with green plants, stone fountain, and sunlight should be barely visible."
+    }
+  ]
+}

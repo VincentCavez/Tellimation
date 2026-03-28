@@ -19,6 +19,9 @@ import logging
 import os
 import sys
 import time
+
+from dotenv import load_dotenv
+load_dotenv()
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -48,6 +51,7 @@ logger = logging.getLogger("gen_ui")
 
 STORIES_DIR = PROJECT_ROOT / "data" / "study_scenes"
 TRAINING_DIR = PROJECT_ROOT / "data" / "training"
+PROLIFIC_DIR = PROJECT_ROOT / "data" / "prolific_scenes"
 OUTPUT_BASE = PROJECT_ROOT / "data" / "study_gen"
 API_DELAY = 2.0
 
@@ -59,6 +63,10 @@ STORY_FILES = {
     "T1": ("training", "training_1.json"),
     "T2": ("training", "training_2.json"),
 }
+
+# Auto-discover prolific scenes
+for _f in sorted(PROLIFIC_DIR.glob("*.json")):
+    STORY_FILES[_f.stem] = ("prolific", _f.name)
 
 # ---------------------------------------------------------------------------
 # Global art style (consistent across all stories and all prompts)
@@ -234,6 +242,8 @@ def load_story(key: str) -> Dict[str, Any]:
         subdir, fname = entry
         if subdir == "training":
             path = TRAINING_DIR / fname
+        elif subdir == "prolific":
+            path = PROLIFIC_DIR / fname
         else:
             path = STORIES_DIR / fname
     else:

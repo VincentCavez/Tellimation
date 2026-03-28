@@ -1,0 +1,23 @@
+{
+  "story_id": "study1_I1_A",
+  "title": "Playground (Spotlight)",
+  "entities": {
+    "girl": "a girl in a yellow dress",
+    "boy": "a boy in a blue cap",
+    "dog": "a medium-sized brown dog"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Playground",
+      "background_prompt": "A colorful playground on a sunny day with a swing set, a wooden bench, a slide, and a sandbox filled with toys. Green grass, a few trees, blue sky with white clouds. No people, no animals.",
+      "full_scene_prompt": "A colorful playground on a sunny day. A girl in a bright yellow dress with white shoes swings happily on a swing set to the left. A boy wearing a blue baseball cap, a striped t-shirt, and brown shorts sits quietly on a wooden bench in the center, resting his chin on his hands. A medium-sized brown dog with floppy ears lies lazily under the slide to the right, its head resting on its paws. In the foreground, a sandbox filled with colorful plastic toys — a red bucket, a blue shovel, and a green mold — sits near the bench. The background shows green grass, a few leafy trees, and a bright blue sky with fluffy white clouds.",
+      "entities_in_scene": [
+        "girl",
+        "boy",
+        "dog"
+      ],
+      "composition_instructions": "Place girl on the swing set (left), swinging with legs extended. Place boy on the wooden bench (center), sitting with chin resting on hands, looking slightly bored. Place dog under the slide (right), lying down with head on paws."
+    }
+  ]
+}

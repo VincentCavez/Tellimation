@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_R2_C",
+  "title": "Two magnets (Repel C)",
+  "entities": {
+    "magnet_red": "a red horseshoe magnet",
+    "magnet_blue": "a blue horseshoe magnet"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Science Table",
+      "background_prompt": "A school science lab table with a smooth surface, scattered iron filings, a ruler, a notebook, and a desk lamp. No people.",
+      "full_scene_prompt": "A school science lab table under a bright desk lamp. Two horseshoe magnets sit on the smooth white table surface, positioned with their same poles facing each other. A red magnet on the left and a blue magnet on the right are pushed apart with a clear gap between them — iron filings on the table surface between them curve outward in a repulsion pattern, visually showing the invisible force pushing the magnets away from each other. A ruler lies at the back of the table. An open notebook beside the magnets has a child's handwritten note: 'Same poles push apart.' A scattering of loose iron filings catches the lamplight in metallic glints across the white surface.",
+      "entities_in_scene": [
+        "magnet_red",
+        "magnet_blue"
+      ],
+      "composition_instructions": "Place magnet_red on the table (left), horseshoe shape with same pole facing right. Place magnet_blue on the table (right), same pole facing left. Clear gap between them. Iron filings between them curving outward in repulsion pattern."
+    }
+  ]
+}

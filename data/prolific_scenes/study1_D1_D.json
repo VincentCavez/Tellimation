@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_D1_D",
+  "title": "Doctor's office (Speech Bubble D)",
+  "entities": {
+    "doctor": "a doctor with a stethoscope",
+    "patient": "a boy sitting on the exam table"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Doctor's Office",
+      "background_prompt": "A pediatric doctor's office with an exam table, a wall poster of the human body, a desk with a computer, and a jar of lollipops. No people.",
+      "full_scene_prompt": "A pediatric doctor's office with bright walls decorated with cartoon animal stickers. A doctor in a white coat with a stethoscope draped around his neck sits on a rolling stool, holding a clipboard and speaking to his patient with an encouraging expression, mouth open mid-explanation, one hand making a reassuring gesture. On the exam table covered in crinkly white paper, a boy of about seven in a t-shirt and shorts sits with his legs dangling over the edge, looking at the doctor with a slightly nervous expression. A colorful wall poster showing the human skeletal system hangs behind them. On the doctor's desk, a computer monitor shows a medical chart. A glass jar filled with colorful lollipops sits on the counter next to a box of latex gloves — a promised reward for bravery.",
+      "entities_in_scene": [
+        "doctor",
+        "patient"
+      ],
+      "composition_instructions": "Place doctor on a rolling stool, sitting and holding a clipboard, speaking with encouraging expression, mouth open, one hand making a reassuring gesture. Place patient on the exam table, sitting with legs dangling, looking at the doctor with slightly nervous expression."
+    }
+  ]
+}

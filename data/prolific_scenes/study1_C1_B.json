@@ -1,0 +1,29 @@
+{
+  "story_id": "study1_C1_B",
+  "title": "Flower garden (Sequential Glow B)",
+  "entities": {
+    "tulip_1": "a red tulip (leftmost)",
+    "tulip_2": "a red tulip (middle)",
+    "tulip_3": "a red tulip (rightmost)",
+    "tulip_4": "a red tulip (far right)",
+    "butterfly": "a yellow butterfly",
+    "watering_can": "a green watering can"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Flower Garden",
+      "background_prompt": "A neat garden with a row of flower beds, a stone path, a wooden trellis with climbing roses, a green watering can on the path, and a white picket fence. Sunny day. No flowers in the main bed, no animals.",
+      "full_scene_prompt": "A neat garden on a sunny day. Four identical bright red tulips stand in a row along the edge of a flower bed, each with a straight green stem and two smooth leaves, evenly spaced about a foot apart. The leftmost tulip leans slightly toward the sun, the second stands perfectly upright, the third has a dewdrop visible on one petal, and the fourth tilts gently to the right. A yellow butterfly with black-edged wings hovers above the tulips, moving between them. A green metal watering can sits on the stone path in front of the flower bed. Behind the tulips, a wooden trellis supports climbing pink roses. A white picket fence encloses the garden, and the sky is a clear blue.",
+      "entities_in_scene": [
+        "tulip_1",
+        "tulip_2",
+        "tulip_3",
+        "tulip_4",
+        "butterfly",
+        "watering_can"
+      ],
+      "composition_instructions": "Place tulip_1 at the left edge of the flower bed, leaning slightly toward the sun. Place tulip_2 next to it, standing perfectly upright. Place tulip_3 next, with a dewdrop on one petal. Place tulip_4 at the right, tilting gently right. Place butterfly hovering above the tulips, moving between them. Place watering_can on the stone path in front of the bed."
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "story_id": "study1_I2_C",
+  "title": "Fire station (Nametag C)",
+  "entities": {
+    "firefighter": "a firefighter in full gear",
+    "dalmatian": "a dalmatian dog",
+    "child": "a child in a red helmet"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Fire Station",
+      "background_prompt": "A fire station with an open bay showing a bright red fire truck, equipment hung on the walls, a pole in the corner, and a concrete floor. Bright daylight. No people, no animals.",
+      "full_scene_prompt": "A fire station with an open bay on a bright day. A firefighter in full yellow turnout gear with reflective stripes and a black helmet stands next to a bright red fire truck, one hand resting on the truck's chrome bumper. A dalmatian with crisp black spots sits alertly at the firefighter's feet, tongue out and tail wagging. A young child of about five, wearing an oversized red plastic fire helmet that slips over their eyes, stands in front of the truck looking up in awe. Fire hoses hang coiled on the wall, and heavy boots are lined up in a row near the bay entrance. A brass pole gleams in the back corner, and the concrete floor is spotlessly clean.",
+      "entities_in_scene": [
+        "firefighter",
+        "dalmatian",
+        "child"
+      ],
+      "composition_instructions": "Place firefighter next to the fire truck (center), standing with one hand on the chrome bumper. Place dalmatian at the firefighter's feet, sitting alertly with tongue out. Place child in front of the truck, standing and looking up in awe, wearing oversized red plastic helmet slipping over eyes."
+    }
+  ]
+}

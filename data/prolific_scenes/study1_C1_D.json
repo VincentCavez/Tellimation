@@ -1,0 +1,25 @@
+{
+  "story_id": "study1_C1_D",
+  "title": "Bakery shelf (Sequential Glow D)",
+  "entities": {
+    "cupcake_1": "a pink cupcake (left)",
+    "cupcake_2": "a pink cupcake (center)",
+    "cupcake_3": "a pink cupcake (right)",
+    "baker": "a baker behind the counter"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Bakery Shelf",
+      "background_prompt": "A bakery display case with glass shelves, a marble countertop, a chalkboard menu on the wall, and warm golden lighting. No people, no food items on the main shelf.",
+      "full_scene_prompt": "A bakery with warm golden lighting. Behind a glass display case, three identical pink-frosted cupcakes sit in a row on the middle shelf, each in a white paper liner with a small sugar flower on top. The left cupcake's flower is slightly tilted, the center one sits perfectly upright, and the right one has a tiny bite-sized crumb fallen beside it on the shelf. A baker with a flour-dusted apron and a warm smile stands behind the marble counter, holding a pair of tongs. The chalkboard menu on the wall behind lists items in colorful chalk. Other pastries — croissants, muffins, and cookies — fill the other shelves of the display case.",
+      "entities_in_scene": [
+        "cupcake_1",
+        "cupcake_2",
+        "cupcake_3",
+        "baker"
+      ],
+      "composition_instructions": "Place cupcake_1 on the middle shelf (left), with sugar flower slightly tilted. Place cupcake_2 on the shelf (center), sitting perfectly upright. Place cupcake_3 on the shelf (right), with a tiny crumb fallen beside it. Place baker behind the marble counter, standing and holding tongs, smiling."
+    }
+  ]
+}

@@ -22,6 +22,9 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from dotenv import load_dotenv
+load_dotenv()
+
 from flask import Flask, render_template_string, request, send_file, jsonify
 from PIL import Image
 
@@ -46,6 +49,7 @@ logger = logging.getLogger("extract_ui")
 
 STORIES_DIR = PROJECT_ROOT / "data" / "study_scenes"
 TRAINING_DIR = PROJECT_ROOT / "data" / "training"
+PROLIFIC_DIR = PROJECT_ROOT / "data" / "prolific_scenes"
 OUTPUT_BASE = PROJECT_ROOT / "data" / "study_gen"
 API_DELAY = 2.0
 
@@ -57,6 +61,12 @@ STORY_FILES = {
     "T1": "training_1.json",
     "T2": "training_2.json",
 }
+
+# Auto-discover prolific scenes
+PROLIFIC_FILES: Dict[str, str] = {}
+if PROLIFIC_DIR.exists():
+    for f in sorted(PROLIFIC_DIR.glob("*.json")):
+        PROLIFIC_FILES[f.stem] = f.name  # e.g. "study1_A1" -> "study1_A1.json"
 
 # ---------------------------------------------------------------------------
 # Art style (same as gen_ui)
@@ -182,8 +192,11 @@ state: Dict[str, Any] = {
 
 
 def load_story(key: str) -> Dict[str, Any]:
-    base_dir = TRAINING_DIR if key.startswith("T") else STORIES_DIR
-    path = base_dir / STORY_FILES[key]
+    if key in PROLIFIC_FILES:
+        path = PROLIFIC_DIR / PROLIFIC_FILES[key]
+    else:
+        base_dir = TRAINING_DIR if key.startswith("T") else STORIES_DIR
+        path = base_dir / STORY_FILES[key]
     with open(path) as f:
         return json.load(f)
 
@@ -419,13 +432,20 @@ def index():
             stories.append((key, d["title"]))
         else:
             stories.append((key, f"({fname} not found)"))
+    # Add prolific scenes
+    for key, fname in sorted(PROLIFIC_FILES.items()):
+        path = PROLIFIC_DIR / fname
+        if path.exists():
+            with open(path) as f:
+                d = json.load(f)
+            stories.append((key, d["title"]))
     return render_template_string(HTML_TEMPLATE, stories=stories, current_story=state.get("story_key", "A"))
 
 
 @app.route("/api/load_story")
 def api_load_story():
     key = request.args.get("key", "A")
-    if key not in STORY_FILES:
+    if key not in STORY_FILES and key not in PROLIFIC_FILES:
         return jsonify({"error": f"Unknown story: {key}"})
 
     data = load_story(key)

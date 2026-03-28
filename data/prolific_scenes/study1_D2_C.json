@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_D2_C",
+  "title": "Crossroads (Thought Bubble C)",
+  "entities": {
+    "woman": "a woman standing at a fork in the path",
+    "signpost": "a wooden signpost with two arrows"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Crossroads",
+      "background_prompt": "A countryside path that splits into two directions at a fork, with a wooden signpost, wild grass on both sides, a stone wall, and rolling hills. Misty morning. No people.",
+      "full_scene_prompt": "A countryside path on a misty morning. The path reaches a fork and splits into two directions. A wooden signpost stands at the junction with two arrow-shaped signs pointing in opposite directions — one reads 'VILLAGE 2km' and the other reads 'FOREST TRAIL'. A woman of about thirty in a tan hiking jacket, dark leggings, and walking boots stands at the fork, facing the signpost. She has stopped mid-stride, one hand resting on her chin, head tilted slightly, clearly weighing her options. Her expression is contemplative — not lost, but genuinely uncertain about which path to choose. Wild grass and purple wildflowers grow on both sides of the path. A low stone wall runs along the left path, and the right path curves into a dark line of trees. Mist hangs low over the rolling hills beyond.",
+      "entities_in_scene": [
+        "woman",
+        "signpost"
+      ],
+      "composition_instructions": "Place woman at the fork in the path, standing and facing the signpost, one hand on chin, head tilted, expression contemplative. Stopped mid-stride."
+    }
+  ]
+}

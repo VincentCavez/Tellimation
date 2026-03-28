@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_A2_A",
+  "title": "River Bank (Flip)",
+  "entities": {
+    "bear": "a large brown bear",
+    "bird": "a small blue bird"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The River Bank",
+      "background_prompt": "A wide river with clear water, a muddy bank with rocks, tall green reeds growing along the edge, and a large flat rock near the water. Pine trees in the background. No people, no animals.",
+      "full_scene_prompt": "A wide river with clear, flowing water where silver fish leap above the surface, their scales catching the light. A large brown bear with thick fur stands at the muddy edge of the river bank, facing left. The bear leans forward, one massive paw extended toward the water as if about to swat at a jumping fish. A small blue bird with a white belly perches on a large flat gray rock near the water's edge to the right, watching the scene calmly. Tall green reeds and cattails grow in dense clusters along the bank. Pine trees with dark green needles line the far bank of the river. Smooth river stones are scattered along the muddy shore.",
+      "entities_in_scene": [
+        "bear",
+        "bird"
+      ],
+      "composition_instructions": "Place bear at the muddy edge of the river bank (left), standing and facing left, leaning forward with one paw extended toward the water where fish jump. Place bird on the large flat rock near the water (right), perched and watching calmly."
+    }
+  ]
+}

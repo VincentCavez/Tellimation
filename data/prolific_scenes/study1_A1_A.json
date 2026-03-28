@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_A1_A",
+  "title": "Forest Path (Motion Lines)",
+  "entities": {
+    "fox": "a red fox",
+    "rabbit": "a small white rabbit"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Forest Path",
+      "background_prompt": "A winding forest path through tall trees with dappled sunlight, a large oak tree with thick roots, clusters of brown mushrooms along the path edges, and ferns on both sides. No people, no animals.",
+      "full_scene_prompt": "A winding forest path through tall trees with dappled sunlight filtering through the canopy. A red fox with a bushy tail and alert ears runs energetically to the right along the path, its legs stretched out in a full sprint, chasing a small white rabbit that hops ahead of it with long ears laid back and powerful hind legs pushing off the ground. A tall oak tree with a thick trunk and gnarled roots stands to the left of the path. Clusters of brown mushrooms with white spots grow along the path edges in small groups. Ferns and wild grass line both sides of the path. The overall atmosphere is dynamic and lively, with golden-green light creating a warm forest ambiance.",
+      "entities_in_scene": [
+        "fox",
+        "rabbit"
+      ],
+      "composition_instructions": "Place fox on the path (center), running energetically to the right at full sprint, legs stretched out, bushy tail behind. Place rabbit ahead of the fox on the path (right), hopping with ears laid back and hind legs pushing off."
+    }
+  ]
+}

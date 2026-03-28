@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_T1_D",
+  "title": "Empty stadium (Flashback D)",
+  "entities": {
+    "janitor": "a janitor sweeping the stands",
+    "scoreboard": "a scoreboard showing the final score"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Empty Stadium",
+      "background_prompt": "A small outdoor sports stadium with rows of plastic seats, a grass field, a scoreboard, and floodlights. Evening, lights still on. No people.",
+      "full_scene_prompt": "A small outdoor sports stadium in the evening, floodlights still on but the stands almost entirely empty. A janitor in a gray jumpsuit and a reflective vest slowly pushes a wide broom between rows of blue and orange plastic seats, sweeping up discarded popcorn bags, paper cups, and ticket stubs. Confetti in team colors — red and white — is scattered across the concrete steps and caught in seat hinges. The grass field below is scarred with cleat marks and the white line markings are scuffed. The scoreboard at the far end still displays the final score: HOME 3 - VISITORS 2. A few forgotten foam fingers and a deflated balloon lie under seats. The atmosphere is quiet and still, the excitement of the game clearly over, only its traces remaining.",
+      "entities_in_scene": [
+        "janitor",
+        "scoreboard"
+      ],
+      "composition_instructions": "Place janitor between rows of seats, pushing a wide broom and sweeping up discarded popcorn bags, cups, and ticket stubs. Confetti in red and white scattered on steps."
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "story_id": "study1_C2_A",
+  "title": "Farm (Disintegration)",
+  "entities": {
+    "cow": "a black and white cow",
+    "pig": "a pink pig",
+    "chicken": "a brown chicken",
+    "tractor": "a green tractor"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Farm",
+      "background_prompt": "A pastoral farm scene with a large red barn in the background, a green field with a wooden fence, a mud puddle near the barn, and a dirt path. Sunny day with a few clouds. No people, no animals, no vehicles.",
+      "full_scene_prompt": "A sunny pastoral farm scene. A large red barn with white trim and a weathervane stands in the background, its double doors slightly open. A black and white cow with a brass bell around its neck grazes peacefully in the green field to the left, pulling at the tall grass. A pink pig with a curly tail rests contentedly near a brown mud puddle in front of the barn, its snout resting on the ground. A small brown chicken with a red comb walks near the pig, pecking at seeds on the ground. A green tractor with large black tires is parked beside the barn to the right, its engine off. A wooden fence runs along the edge of the field. The sky is bright blue with a few wispy clouds, and wildflowers dot the edges of the dirt path leading to the barn.",
+      "entities_in_scene": [
+        "cow",
+        "pig",
+        "chicken",
+        "tractor"
+      ],
+      "composition_instructions": "Place cow in the green field (left), grazing and pulling at tall grass, wearing a brass bell. Place pig near the mud puddle in front of the barn, resting with snout on the ground. Place chicken near the pig, walking and pecking at seeds. Place tractor beside the barn (right), parked with engine off."
+    }
+  ]
+}

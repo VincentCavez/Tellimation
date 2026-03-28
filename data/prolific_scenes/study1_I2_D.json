@@ -1,0 +1,23 @@
+{
+  "story_id": "study1_I2_D",
+  "title": "Orchestra (Nametag D)",
+  "entities": {
+    "conductor": "a conductor in a black tuxedo",
+    "violinist": "a young woman with a violin",
+    "cellist": "an older man with a cello"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Orchestra",
+      "background_prompt": "A concert hall stage with rows of empty chairs, music stands with sheet music, a conductor's podium, and warm stage lighting. No people.",
+      "full_scene_prompt": "A concert hall stage under warm golden lighting. A conductor in a black tuxedo and white bow tie stands on a raised wooden podium, one arm lifted high holding a baton mid-gesture. To his left in the front row, a young woman with her dark hair in a neat bun holds a violin tucked under her chin, her bow poised on the strings, eyes locked on the conductor. To the right, an older man with gray hair and wire-rimmed glasses sits behind a large wooden cello, his left hand pressing the fingerboard and his right drawing the bow across the strings. Other chairs and music stands fill the background, some with instruments resting on them. Heavy red velvet curtains frame the stage, and the polished wooden floor reflects the stage lights.",
+      "entities_in_scene": [
+        "conductor",
+        "violinist",
+        "cellist"
+      ],
+      "composition_instructions": "Place conductor on the raised podium (center), standing with one arm lifted holding a baton mid-gesture. Place violinist in the front row to his left, seated, holding violin under chin with bow on strings, eyes on conductor. Place cellist to the right, seated behind a large cello, left hand on fingerboard, right hand drawing bow."
+    }
+  ]
+}

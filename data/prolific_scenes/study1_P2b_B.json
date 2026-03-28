@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_P2b_B",
+  "title": "Ice cream shop (Emanation-Frost B)",
+  "entities": {
+    "girl": "a girl licking an ice cream cone",
+    "ice_cream": "a tall ice cream cone with three scoops"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Ice Cream Shop",
+      "background_prompt": "A colorful ice cream shop with a glass display case of ice cream tubs, a tiled counter, a neon 'OPEN' sign, and a striped awning outside. No people, no ice cream cones.",
+      "full_scene_prompt": "A colorful ice cream shop on a warm day. A girl of about eight in a yellow t-shirt and denim shorts stands just outside the shop under a pink and white striped awning, holding a tall waffle cone with three scoops — chocolate on top, strawberry in the middle, and vanilla at the bottom. The scoops are perfectly round and glistening with cold, tiny ice crystals visible on the surface. The girl licks the top scoop with a big smile. Behind her through the open door, a glass display case shows rows of colorful ice cream tubs. A neon 'OPEN' sign glows pink in the window. A small chalkboard easel on the sidewalk lists today's flavors.",
+      "entities_in_scene": [
+        "girl",
+        "ice_cream"
+      ],
+      "composition_instructions": "Place girl just outside the shop under the awning, standing and holding a tall waffle cone with three scoops (chocolate, strawberry, vanilla), licking the top scoop and smiling. Place ice_cream cone in her hand with scoops glistening and icy."
+    }
+  ]
+}

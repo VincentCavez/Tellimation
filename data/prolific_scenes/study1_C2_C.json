@@ -1,0 +1,25 @@
+{
+  "story_id": "study1_C2_C",
+  "title": "Fruit bowl (Disintegration C)",
+  "entities": {
+    "apple": "a red apple",
+    "banana": "a yellow banana",
+    "orange": "an orange",
+    "tennis_ball": "a green tennis ball"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Fruit Bowl",
+      "background_prompt": "A kitchen counter with a large ceramic fruit bowl, a tiled backsplash, a vase with flowers, and a window letting in morning light. No food items in the bowl.",
+      "full_scene_prompt": "A kitchen counter in bright morning light. A large white ceramic fruit bowl sits in the center. Inside the bowl: a shiny red apple, a curved yellow banana, and a round orange are arranged naturally. Tucked among them, a green tennis ball with a white curved line sits in the bowl, clearly not a fruit and looking out of place. A glass vase with fresh white daisies stands to the left of the bowl. The tiled backsplash behind is a soft cream color, and a window to the right lets warm morning sunlight stream across the counter, casting soft shadows from the fruit.",
+      "entities_in_scene": [
+        "apple",
+        "banana",
+        "orange",
+        "tennis_ball"
+      ],
+      "composition_instructions": "Place apple in the fruit bowl (left side). Place banana in the bowl (curved naturally). Place orange in the bowl. Place tennis_ball tucked among the fruit in the bowl, clearly not a fruit."
+    }
+  ]
+}

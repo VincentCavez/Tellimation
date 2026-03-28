@@ -1,0 +1,23 @@
+{
+  "story_id": "study1_D3_A",
+  "title": "Campsite (Alert)",
+  "entities": {
+    "boy": "a boy in a camping vest",
+    "raccoon": "a raccoon with a striped tail",
+    "backpack": "an open green backpack"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Campsite",
+      "background_prompt": "A forest campsite at night with a crackling campfire surrounded by stones, a blue tent with the flap open, a starry sky with visible constellations, and tall pine trees silhouetted against the sky. No people, no animals.",
+      "full_scene_prompt": "A forest campsite at night under a starry sky. A boy of about nine wearing a brown camping vest over a flannel shirt sits on a log next to a crackling campfire surrounded by a ring of stones. He holds a long stick with a white marshmallow toasting over the orange flames, looking at it with a content smile. His back is turned to the right side of the scene. Behind him, a raccoon with dark mask-like markings and a bushy striped tail creeps low to the ground, sneaking toward an open green backpack that leans against a tree trunk. The backpack's main compartment is unzipped, revealing snack wrappers and a water bottle inside. A blue tent with its flap partly open stands to the left. Tall dark pine trees frame the scene, and the sky above is deep navy blue filled with bright white stars and a crescent moon.",
+      "entities_in_scene": [
+        "boy",
+        "raccoon",
+        "backpack"
+      ],
+      "composition_instructions": "Place boy on the log next to the campfire, sitting and holding a stick with a marshmallow over the flames, smiling contentedly, back turned to the right. Place raccoon behind him (right), creeping low to the ground toward the open green backpack leaning against a tree."
+    }
+  ]
+}
