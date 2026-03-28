@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_R3_C",
+  "title": "Ball breaking window (Causal Push C)",
+  "entities": {
+    "ball": "a soccer ball in mid-air",
+    "window": "a house window with a crack spreading"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Broken Window",
+      "background_prompt": "A suburban front yard with a brick house, a large window, a trimmed hedge, and a mowed lawn. Afternoon light. No people, no balls.",
+      "full_scene_prompt": "A suburban front yard on a clear afternoon. A brick house with a large ground-floor window faces the lawn. A black and white soccer ball is captured mid-air, just after impact with the window — a web of cracks radiates from the point of contact, sharp lines spreading across the glass like a frozen spider web. A few small shards have already broken free and tumble through the air. The ball bounces backward off the window, slightly deformed from the impact. On the mowed lawn, a makeshift goal made of two backpacks sits about ten meters from the window, revealing how the ball went astray. A trimmed hedge lines the front of the house, and the front door — painted red — is closed. The scene captures the exact moment of consequence.",
+      "entities_in_scene": [
+        "ball",
+        "window"
+      ],
+      "composition_instructions": "Place ball mid-air just after impact with the window, a web of cracks radiating from the contact point. A few small shards tumbling through the air. Ball bouncing backward slightly deformed."
+    }
+  ]
+}

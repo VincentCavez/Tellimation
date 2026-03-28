@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_D1_B",
+  "title": "Library help desk (Speech Bubble B)",
+  "entities": {
+    "girl": "a girl asking the librarian",
+    "librarian": "a librarian behind the desk"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Library Help Desk",
+      "background_prompt": "A library help desk with a counter, a computer monitor, stacked returned books, a 'QUIET PLEASE' sign, and warm lighting. No people.",
+      "full_scene_prompt": "A public library with warm lighting. A girl of about ten in a school uniform — white blouse, navy skirt, and a backpack slung over one shoulder — stands at the help desk counter, leaning forward slightly. Her mouth is open mid-sentence and one hand gestures toward a piece of paper she holds — a reading list, perhaps. Behind the counter, a librarian with short gray hair and rectangular glasses in a soft purple cardigan sits at a computer, looking at the girl attentively over the top of her glasses. Stacked returned books sit in a cart beside the desk. A small sign on the counter reads 'QUIET PLEASE' in neat letters. Behind the librarian, rows of bookshelves stretch into the dim back of the library.",
+      "entities_in_scene": [
+        "girl",
+        "librarian"
+      ],
+      "composition_instructions": "Place girl at the help desk counter, standing and leaning forward slightly, mouth open mid-sentence, one hand gesturing toward a piece of paper she holds. Place librarian behind the counter, sitting at a computer, looking at the girl attentively over her glasses."
+    }
+  ]
+}

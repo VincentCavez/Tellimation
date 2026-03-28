@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_R2_D",
+  "title": "Two kids on a bench (Repel D)",
+  "entities": {
+    "girl": "a girl with arms crossed looking away",
+    "boy": "a boy with arms crossed looking away"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Park Bench Fight",
+      "background_prompt": "A park bench under a tree, a path, a trash bin, and pigeons on the ground. Overcast afternoon. No people.",
+      "full_scene_prompt": "A park bench under a leafy tree on an overcast afternoon. A girl of about nine in a red jacket sits on the far left end of the wooden bench, arms tightly crossed, body angled away to the left, her face set in a stubborn scowl. A boy of about the same age in a blue windbreaker sits on the far right end, arms also crossed, body angled away to the right, mirroring her posture exactly. The middle of the bench is conspicuously empty — a wide gap between them. Both refuse to look at each other. A crumpled piece of paper (perhaps the cause of the argument) lies on the bench between them. Pigeons peck at crumbs on the path in front of the bench, unbothered. A trash bin stands to the side, and a few fallen leaves are caught against the bench legs.",
+      "entities_in_scene": [
+        "girl",
+        "boy"
+      ],
+      "composition_instructions": "Place girl on the far left end of the bench, sitting with arms tightly crossed, body angled away to the left, stubborn scowl. Place boy on the far right end, sitting with arms crossed, body angled away to the right, mirroring her. Wide empty gap in the middle."
+    }
+  ]
+}

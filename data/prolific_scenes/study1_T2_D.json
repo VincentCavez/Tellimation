@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_T2_D",
+  "title": "Seasons tree (Timelapse D)",
+  "entities": {
+    "girl": "a girl sitting under the tree",
+    "tree": "a large oak tree showing signs of seasonal change"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Seasons Tree",
+      "background_prompt": "A hilltop with a single large tree, a wooden bench beneath it, rolling fields below, and a wide sky. No people.",
+      "full_scene_prompt": "A hilltop with a wide view of rolling fields below and an expansive sky. A single large oak tree stands at the summit, and its appearance tells a story of time passing: the left branches still hold green summer leaves, the center branches display brilliant orange and gold autumn colors, and the right branches are nearly bare, with the last few brown leaves clinging and some drifting to the ground. Beneath the tree, a girl of about ten in a knit sweater and boots sits on a weathered wooden bench, a sketchbook open on her lap. She looks up at the tree's canopy, studying the gradient of seasons visible in its branches. Fallen leaves in various colors carpet the ground around the bench in a thick layer. The sky above shifts from warm golden light on the left to cool gray on the right, echoing the seasonal transition in the tree.",
+      "entities_in_scene": [
+        "girl",
+        "tree"
+      ],
+      "composition_instructions": "Place girl on the weathered wooden bench under the tree, sitting with a sketchbook open on her lap, looking up at the canopy."
+    }
+  ]
+}

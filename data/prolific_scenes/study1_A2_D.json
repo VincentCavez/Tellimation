@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_A2_D",
+  "title": "Street musician (Flip D)",
+  "entities": {
+    "musician": "a man playing a guitar",
+    "boy": "a boy dropping a coin into a hat"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Street Musician",
+      "background_prompt": "A cobblestone city street corner with a brick wall, a lamppost, a café awning in the background, and a fedora hat on the ground. Warm evening light. No people.",
+      "full_scene_prompt": "A cobblestone city street corner in warm evening light. A man with a short beard in a worn brown leather jacket and boots sits on a wooden stool against a brick wall, playing an acoustic guitar. His left hand presses a chord on the fretboard while his right hand strums with fingers spread across the strings, mid-motion. His eyes are closed and his head tilts slightly to one side, absorbed in the music. A boy of about seven in a blue puffy jacket crouches in front of the musician, carefully dropping a shiny coin into an upturned brown fedora hat on the cobblestones. A few other coins and a folded bill are already in the hat. A lamppost casts a pool of golden light over the scene. A café awning in dark green is visible further down the street.",
+      "entities_in_scene": [
+        "musician",
+        "boy"
+      ],
+      "composition_instructions": "Place musician on a wooden stool against the brick wall, sitting and playing acoustic guitar, left hand pressing a chord, right hand strumming, eyes closed, head tilted. Place boy crouching in front, carefully dropping a coin into the upturned fedora hat on the cobblestones."
+    }
+  ]
+}

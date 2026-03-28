@@ -1,0 +1,25 @@
+{
+  "story_id": "study1_D4_A",
+  "title": "Park - Seesaw (Interjection)",
+  "entities": {
+    "child_1": "a girl in a purple jacket",
+    "child_2": "a boy in an orange shirt",
+    "dog": "a black and white border collie",
+    "kite": "a red diamond-shaped kite"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Park",
+      "background_prompt": "A sunny park with a wooden seesaw on a grassy area, a paved path, a few trees with green leaves, and a bright blue sky. No people, no animals.",
+      "full_scene_prompt": "A sunny park on a bright day. Two children play on a wooden seesaw on a grassy area. A girl in a purple jacket with a zipper and brown leggings sits on the left side of the seesaw, which is lifted high in the air, and she laughs with her hands gripping the handle. A boy in an orange shirt and gray shorts sits on the right side, which is touching the ground, and he pushes off with his feet to launch the other side up. A black and white border collie sits on the paved path a few meters away, its tongue out, watching the children with an alert, happy expression and its tail wagging. High in the bright blue sky, a red diamond-shaped kite with a long white tail soars above the trees, its string barely visible. A few leafy green trees line the edge of the park, and the grass is vibrant green.",
+      "entities_in_scene": [
+        "child_1",
+        "child_2",
+        "dog",
+        "kite"
+      ],
+      "composition_instructions": "Place child_1 on the left side of the seesaw, lifted high, laughing with hands gripping handle. Place child_2 on the right side touching the ground, pushing off with feet. Place dog on the paved path a few meters away, sitting with tongue out, watching and wagging tail. Place kite high in the sky above the trees."
+    }
+  ]
+}

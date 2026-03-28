@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_A2_B",
+  "title": "Kitchen chef (Flip B)",
+  "entities": {
+    "chef": "a chef flipping a pancake",
+    "waitress": "a waitress carrying plates"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Restaurant Kitchen",
+      "background_prompt": "A busy restaurant kitchen with stainless steel counters, a gas range, hanging pots, a pass-through window, and bright overhead lights. No people.",
+      "full_scene_prompt": "A busy restaurant kitchen with bright overhead fluorescent lights. A chef in a white double-breasted coat and a tall white toque stands at a gas range, holding a skillet with one hand and flipping a golden pancake into the air — the pancake hovers mid-flip above the pan, perfectly round. His other hand is poised to catch the pan's handle. A waitress in a black apron over a white shirt passes behind him carrying two plates of food, one in each hand, heading toward the pass-through window. Stainless steel counters line the walls, and copper pots hang from an overhead rack. A ticket rail above the pass-through window holds several paper order slips.",
+      "entities_in_scene": [
+        "chef",
+        "waitress"
+      ],
+      "composition_instructions": "Place chef at the gas range, standing and holding a skillet with one hand, flipping a golden pancake mid-air above the pan. Place waitress passing behind him, carrying two plates of food toward the pass-through window."
+    }
+  ]
+}

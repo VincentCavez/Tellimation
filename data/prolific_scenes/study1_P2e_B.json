@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_P2e_B",
+  "title": "Wedding (Emanation-Hearts B)",
+  "entities": {
+    "bride": "a bride in a white dress",
+    "groom": "a groom in a dark suit"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Wedding",
+      "background_prompt": "A garden wedding setup with a flower arch, rows of white chairs, rose petals on the ground, and soft evening light. No people.",
+      "full_scene_prompt": "A garden wedding in soft golden evening light. A bride in a flowing white dress with a lace bodice and a short veil stands under a flower arch covered in white roses and trailing ivy. Facing her, a groom in a dark navy suit with a white boutonniere holds both her hands in his, their fingers interlaced. Both beam at each other with radiant smiles — the bride's eyes glisten, and the groom gazes at her with unmistakable adoration. Rows of white wooden chairs sit on either side of a petal-strewn aisle. Rose petals in pink and white are scattered on the green grass. Soft string lights are woven through the arch and nearby trees, just beginning to glow as the sun dips low.",
+      "entities_in_scene": [
+        "bride",
+        "groom"
+      ],
+      "composition_instructions": "Place bride under the flower arch (center-left), standing in white dress with lace bodice. Place groom facing her (center-right), standing in dark navy suit, holding both her hands. Both beaming at each other with radiant smiles."
+    }
+  ]
+}

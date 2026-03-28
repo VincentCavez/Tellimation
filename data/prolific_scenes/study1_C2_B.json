@@ -1,0 +1,25 @@
+{
+  "story_id": "study1_C2_B",
+  "title": "Toy box (Disintegration B)",
+  "entities": {
+    "teddy": "a teddy bear",
+    "doll": "a rag doll",
+    "block": "a wooden block tower",
+    "shoe": "an adult shoe"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Toy Box",
+      "background_prompt": "A child's playroom with a large open wooden toy box, a colorful rug, building blocks scattered around, and a window with curtains. No people, no toys in the box.",
+      "full_scene_prompt": "A child's playroom with warm light coming through a window with yellow curtains. A large open wooden toy box sits in the center of a colorful striped rug. Inside and around the box: a soft brown teddy bear with a stitched smile sits propped against the inside wall, a rag doll with yarn hair and a patched dress lies draped over the edge, and a tower of stacked wooden blocks in red, blue, and yellow stands on the rug beside the box. Oddly, a single adult leather shoe — brown, scuffed, clearly not a toy — sits inside the toy box among the toys, looking entirely out of place. Crayons and a coloring book are scattered on the floor nearby.",
+      "entities_in_scene": [
+        "teddy",
+        "doll",
+        "block",
+        "shoe"
+      ],
+      "composition_instructions": "Place teddy inside the toy box, propped against the inside wall. Place doll draped over the edge of the toy box. Place block tower on the rug beside the box, stacked. Place shoe inside the toy box among the toys, clearly out of place."
+    }
+  ]
+}

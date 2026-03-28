@@ -1,0 +1,23 @@
+{
+  "story_id": "study1_I1_C",
+  "title": "Carnival (Spotlight C)",
+  "entities": {
+    "clown": "a clown with a red nose",
+    "girl": "a girl holding cotton candy",
+    "juggler": "a juggler tossing balls"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Carnival",
+      "background_prompt": "A colorful carnival with striped tents, a ticket booth, string lights, and a popcorn cart. Evening light. No people.",
+      "full_scene_prompt": "A colorful carnival in the warm evening light. A clown with a round red nose, curly green wig, and oversized polka-dot suspenders stands near a striped red and white tent, waving at passersby with a white-gloved hand. A girl of about eight in a blue dress holds a large stick of pink cotton candy in one hand, looking up at the clown with wide eyes and a delighted smile. To the right, a juggler in a purple vest and black top hat tosses three bright yellow balls in a smooth arc above his head, concentrating intently. String lights in warm white stretch between poles overhead. A popcorn cart with a glass display and red wheels sits in the background, and the smell of caramel seems to fill the air.",
+      "entities_in_scene": [
+        "clown",
+        "girl",
+        "juggler"
+      ],
+      "composition_instructions": "Place clown near the striped tent (left), standing and waving with one white-gloved hand. Place girl in front of the clown (center), standing and looking up at him, holding cotton candy in one hand. Place juggler to the right, standing and tossing three yellow balls in an arc above his head."
+    }
+  ]
+}

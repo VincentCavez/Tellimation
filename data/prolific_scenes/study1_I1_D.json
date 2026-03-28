@@ -1,0 +1,23 @@
+{
+  "story_id": "study1_I1_D",
+  "title": "Bus stop (Spotlight D)",
+  "entities": {
+    "woman": "a woman reading a newspaper",
+    "teenager": "a teenager with headphones",
+    "cat": "a stray orange cat"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Bus Stop",
+      "background_prompt": "A city bus stop with a glass shelter, a bench, a posted schedule, puddles on the sidewalk, and a lamppost. Cloudy morning. No people, no animals.",
+      "full_scene_prompt": "A city bus stop on a cloudy morning. A woman in a navy trench coat sits on the metal bench under a glass shelter, reading a folded newspaper with her legs crossed. Next to her, a teenager in a black hoodie and ripped jeans leans against the shelter wall, wearing large over-ear headphones and scrolling on a phone, completely absorbed. A stray orange cat with a slightly torn ear sits on the sidewalk near the base of a lamppost, grooming its paw. Puddles from recent rain dot the pavement, reflecting the gray sky. A bus schedule is posted behind the glass panel, and a crumpled coffee cup sits near the trash bin.",
+      "entities_in_scene": [
+        "woman",
+        "teenager",
+        "cat"
+      ],
+      "composition_instructions": "Place woman on the metal bench under the glass shelter (left), sitting with legs crossed, reading a folded newspaper. Place teenager leaning against the shelter wall beside her, wearing headphones, scrolling on a phone. Place cat on the sidewalk near the lamppost base (right), sitting and grooming its paw."
+    }
+  ]
+}

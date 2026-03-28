@@ -1,0 +1,23 @@
+{
+  "story_id": "study1_R2_A",
+  "title": "Toy Shelf (Repel)",
+  "entities": {
+    "bear": "a stuffed brown teddy bear",
+    "rabbit": "a stuffed white rabbit",
+    "train": "a wooden toy train"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Toy Shelf",
+      "background_prompt": "A child's bedroom with a long wooden shelf on the wall, a stack of colorful books in the center of the shelf, a wooden toy train on the carpeted floor below, and soft wallpaper with star patterns. No people, no animals.",
+      "full_scene_prompt": "A child's bedroom with soft lighting. A long wooden shelf is mounted on the wall at eye level. On the far left end of the shelf, a worn stuffed brown teddy bear with a red bow tie sits upright, leaning slightly against the wall. On the far right end, a stuffed white rabbit with long floppy ears and a pink nose sits facing the opposite direction, as far from the bear as the shelf allows. Between them, in the exact center of the shelf, a stack of colorful children's books — red, blue, green, and yellow spines — creates a clear divider. The gap between each stuffed animal and the books is wide and deliberate. On the carpeted floor below the shelf, a small wooden toy train with a red engine and two green carriages sits on a short section of circular wooden track. The wallpaper behind has a gentle pattern of silver stars on pale blue.",
+      "entities_in_scene": [
+        "bear",
+        "rabbit",
+        "train"
+      ],
+      "composition_instructions": "Place bear on the far left end of the shelf, sitting upright and leaning slightly against wall. Place rabbit on the far right end, sitting and facing opposite direction. Wide deliberate gap between them with books in the center as divider. Place train on the carpeted floor below the shelf."
+    }
+  ]
+}

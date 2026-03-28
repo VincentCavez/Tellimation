@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_R1_D",
+  "title": "Magnet letters (Magnetism D)",
+  "entities": {
+    "boy": "a boy at a whiteboard",
+    "letters": "magnetic letters spelling a word with a gap"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Whiteboard",
+      "background_prompt": "A kindergarten classroom with a large magnetic whiteboard, small chairs and tables, colorful artwork on the walls, and bins of supplies. No people.",
+      "full_scene_prompt": "A kindergarten classroom with bright artwork covering the walls. A boy of about five in a dinosaur t-shirt stands on tiptoes in front of a large magnetic whiteboard mounted on the wall. On the whiteboard, colorful magnetic letters spell 'C _ T' with a clear gap in the middle. The boy holds a red magnetic letter 'A' in his right hand, reaching up toward the gap, about to complete the word. His tongue pokes out slightly in concentration. Other magnetic letters in various colors are scattered across the bottom of the whiteboard. Small wooden chairs and round tables are arranged behind him. Bins of crayons, markers, and building blocks line the shelves below the windows.",
+      "entities_in_scene": [
+        "boy",
+        "letters"
+      ],
+      "composition_instructions": "Place boy standing on tiptoes in front of the magnetic whiteboard, holding a red letter 'A' in right hand, reaching up toward the gap in 'C_T'. Tongue poking out in concentration."
+    }
+  ]
+}

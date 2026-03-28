@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_T2_A",
+  "title": "Classroom - Exam (Timelapse)",
+  "entities": {
+    "children": "a group of children at desks",
+    "teacher": "a male teacher in a dress shirt"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Exam",
+      "background_prompt": "An elementary school classroom with rows of wooden desks, a whiteboard at the front that reads 'Final Exam', a wall clock showing 2 PM, a teacher's desk with a stack of papers, and large windows along one wall. No people.",
+      "full_scene_prompt": "An elementary school classroom during an exam. Several children sit at wooden desks arranged in rows, each hunched over a sheet of paper, writing with pencils. Their faces show concentration — furrowed brows, bitten lips, and focused eyes. A male teacher in a light blue dress shirt with rolled-up sleeves and dark trousers stands at the front of the room near the whiteboard, which reads 'Final Exam' in large blue letters. His arms are folded and he watches the class calmly. On the teacher's desk to the side, a neat stack of blank report cards sits in a tray, untouched. A round wall clock above the whiteboard shows 2 PM. Large windows along the left wall let in bright afternoon sunlight that casts long rectangles of light across the floor and desks.",
+      "entities_in_scene": [
+        "children",
+        "teacher"
+      ],
+      "composition_instructions": "Place children at wooden desks in rows, each hunched over paper, writing with pencils, faces showing concentration. Place teacher at the front near the whiteboard, standing with arms folded, watching calmly."
+    }
+  ]
+}

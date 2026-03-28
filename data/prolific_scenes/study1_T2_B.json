@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_T2_B",
+  "title": "Construction site (Timelapse B)",
+  "entities": {
+    "worker": "a construction worker in a hard hat",
+    "building": "a half-built building with scaffolding"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Construction Site",
+      "background_prompt": "An urban construction site with a concrete foundation, steel beams rising, scaffolding, a crane in the background, and a chain-link fence. Midday. No people.",
+      "full_scene_prompt": "An urban construction site at midday. A construction worker in an orange hard hat, a high-visibility vest, and work boots stands on a concrete slab, studying a blueprint rolled out on a makeshift table of stacked cinder blocks. Behind him, a building is half-built: the lower floors have concrete walls and windows installed, while the upper floors are still exposed steel beams and scaffolding covered in blue safety netting. A tall yellow crane looms behind the structure, its arm extended. Piles of lumber, rebar, and bags of cement are stacked near the chain-link fence that surrounds the site. A sign on the fence reads 'Coming Soon: Greenfield Apartments' with an artist's rendering of the finished building — a sharp contrast to the current skeletal state.",
+      "entities_in_scene": [
+        "worker",
+        "building"
+      ],
+      "composition_instructions": "Place worker on the concrete slab, standing and studying a blueprint on a makeshift table of stacked cinder blocks."
+    }
+  ]
+}

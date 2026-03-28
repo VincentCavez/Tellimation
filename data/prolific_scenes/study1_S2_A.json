@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_S2_A",
+  "title": "Castle Wall (Stamp)",
+  "entities": {
+    "knight": "a knight in silver armor",
+    "frog": "a green frog"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Castle Bridge",
+      "background_prompt": "A medieval stone bridge over a murky moat, with a castle tower and battlement in the background, a flag on a pole, and lily pads floating in the moat. Overcast sky. No people, no animals.",
+      "full_scene_prompt": "A medieval scene on an overcast day. A knight in polished silver armor with a red plume on the helmet stands firmly on a stone bridge that arches over a murky green moat. The knight's feet are planted solidly on the bridge stones, one hand resting on the pommel of a sheathed sword. Behind the knight, a tall castle tower rises with gray stone battlements, and a red flag with a golden lion emblem waves from a pole at the top. In the moat below the bridge, green lily pads float on the still water, and a bright green frog with bulging eyes sits on one of the larger lily pads, its throat slightly puffed. Ivy grows up the sides of the bridge's stone railings. The water is dark and reflects the gray sky above.",
+      "entities_in_scene": [
+        "knight",
+        "frog"
+      ],
+      "composition_instructions": "Place knight on the stone bridge, standing firmly with feet planted solidly on the bridge stones, one hand on sword pommel. Place frog on one of the larger lily pads in the moat below, sitting with throat slightly puffed."
+    }
+  ]
+}

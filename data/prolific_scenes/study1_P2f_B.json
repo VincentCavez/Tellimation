@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_P2f_B",
+  "title": "Kitchen argument (Emanation-Anger B)",
+  "entities": {
+    "man": "a man gripping the counter",
+    "woman": "a woman with hands on hips"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Kitchen Argument",
+      "background_prompt": "A modern kitchen with a granite island counter, a sink with dishes piled up, a fridge with magnets, and overhead pendant lights. No people.",
+      "full_scene_prompt": "A modern kitchen with cool overhead pendant lighting. A man in a gray henley shirt stands behind a granite island counter, both hands gripping the counter edge, knuckles white, his jaw clenched and his brows drawn tight in visible frustration. Across the island, a woman in a striped apron stands with both hands planted firmly on her hips, her chin lifted and her eyes narrowed. Between them on the counter, a burnt casserole dish sits with smoke still faintly rising from its blackened surface — the apparent source of the tension. Dirty dishes are piled in the sink behind the man. Fridge magnets and a child's crayon drawing are visible on the refrigerator to the side. Despite the anger, neither person is shouting — the tension is taut and silent.",
+      "entities_in_scene": [
+        "man",
+        "woman"
+      ],
+      "composition_instructions": "Place man behind the granite island counter, standing with both hands gripping the counter edge, knuckles white, jaw clenched. Place woman across the island, standing with both hands on hips, chin lifted, eyes narrowed. Place burnt casserole on the counter between them with faint smoke rising."
+    }
+  ]
+}

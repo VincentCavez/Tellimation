@@ -1,0 +1,23 @@
+{
+  "story_id": "study1_R1_A",
+  "title": "Picnic (Magnetism)",
+  "entities": {
+    "mother": "a mother in a sundress",
+    "daughter": "a young girl with pigtails",
+    "dog": "a small white dog"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Picnic",
+      "background_prompt": "A sunny meadow with a red checkered picnic blanket on green grass, an open wicker picnic basket, wildflowers in purple and yellow, and butterflies. A few trees provide partial shade. No people, no animals.",
+      "full_scene_prompt": "A sunny meadow on a warm day. A mother in a light blue sundress with a straw hat sits on a red checkered picnic blanket spread on the green grass. Right next to her, practically shoulder to shoulder, a young girl with brown pigtails tied with pink ribbons and wearing a white t-shirt and denim overalls sits cross-legged. They share a sandwich between them, the mother holding one half and the daughter holding the other, both smiling at each other warmly. An open wicker picnic basket with a red lining sits on the blanket nearby, with a juice box and an apple visible inside. A small white dog with a fluffy coat lies curled up in the grass just off the blanket, dozing in the sun. A butterfly with orange and black wings hovers over a cluster of purple and yellow wildflowers to the left. Dappled shade from a nearby tree falls across part of the blanket.",
+      "entities_in_scene": [
+        "mother",
+        "daughter",
+        "dog"
+      ],
+      "composition_instructions": "Place mother on the picnic blanket (left side), sitting and holding one half of a sandwich, smiling. Place daughter right next to her, practically shoulder to shoulder, sitting cross-legged and holding the other half, smiling at the mother. Place dog curled up in the grass just off the blanket, dozing."
+    }
+  ]
+}

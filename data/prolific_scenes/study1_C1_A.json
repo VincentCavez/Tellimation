@@ -1,0 +1,27 @@
+{
+  "story_id": "study1_C1_A",
+  "title": "Pet Shop (Sequential Glow)",
+  "entities": {
+    "kitten_1": "an orange kitten (leftmost)",
+    "kitten_2": "an orange kitten (middle)",
+    "kitten_3": "an orange kitten (rightmost)",
+    "parrot": "a colorful parrot",
+    "shopkeeper": "a friendly shopkeeper in an apron"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Pet Shop",
+      "background_prompt": "A cozy pet shop interior with a long wooden shelf along the back wall, a glass counter with a cash register, a fishbowl on the counter, and a tall perch stand. Warm lighting. No people, no animals.",
+      "full_scene_prompt": "A cozy pet shop with warm lighting. Three identical orange tabby kittens sit in a neat row on a wooden shelf along the back wall, each in a slightly different pose — the left one licking its paw, the middle one sitting upright with wide eyes, and the right one curled with its tail wrapped around its body. A colorful parrot with green, red, and yellow feathers perches on a tall wooden stand to the right of the shelf, tilting its head. A round glass fishbowl sits on the glass counter in the foreground, containing a small orange goldfish and a tiny castle decoration. A friendly shopkeeper in a brown apron and white shirt stands behind the counter near the cash register, smiling. The walls are lined with shelves of pet supplies — bags of food, leashes, and small toys.",
+      "entities_in_scene": [
+        "kitten_1",
+        "kitten_2",
+        "kitten_3",
+        "parrot",
+        "shopkeeper"
+      ],
+      "composition_instructions": "Place kitten_1 on the wooden shelf (left), sitting and licking its paw. Place kitten_2 on the shelf (center), sitting upright with wide eyes. Place kitten_3 on the shelf (right), curled with tail wrapped around body. Place parrot on the tall wooden stand (far right), tilting head. Place shopkeeper behind the glass counter, standing and smiling."
+    }
+  ]
+}

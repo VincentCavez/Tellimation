@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_T1_A",
+  "title": "Town Square (Flashback)",
+  "entities": {
+    "baker": "a baker in a white apron and chef hat",
+    "girl": "a girl in a blue jacket"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Town Square",
+      "background_prompt": "A charming town square with cobblestone ground, a bakery shopfront with a striped awning, a clock tower showing 3 PM, and autumn leaves scattered on the ground. Warm afternoon light. No people.",
+      "full_scene_prompt": "A charming town square on a warm autumn afternoon. A baker in a white apron and a tall white chef hat stands outside his bakery shop, holding a wooden tray piled with freshly baked golden-brown loaves of bread. Steam still rises faintly from the bread. The bakery behind him has a warm yellow facade with a brown-and-white striped awning and a chalkboard sign. A girl in a blue jacket and brown boots walks toward the baker from the right side of the scene, looking at the bread with interest. A clock tower rises in the background, its face clearly showing 3 PM. Fallen orange and red autumn leaves swirl gently on the cobblestone ground. A few other shops with colorful facades line the square, and warm golden light bathes the scene.",
+      "entities_in_scene": [
+        "baker",
+        "girl"
+      ],
+      "composition_instructions": "Place baker outside his shop, standing and holding a wooden tray piled with freshly baked golden-brown loaves, faint steam rising. Place girl walking toward the baker from the right, looking at the bread with interest."
+    }
+  ]
+}

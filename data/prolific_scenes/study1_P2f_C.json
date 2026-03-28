@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_P2f_C",
+  "title": "Soccer field (Emanation-Anger C)",
+  "entities": {
+    "player": "a boy in a red jersey scowling",
+    "referee": "a referee holding a yellow card"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Red Card",
+      "background_prompt": "A soccer field with painted white lines, two goals, grass slightly worn in the center, corner flags, and an overcast sky. No people.",
+      "full_scene_prompt": "A soccer field on an overcast afternoon. A boy of about twelve in a red jersey with the number 7, white shorts, and muddy cleats stands in the center circle, scowling intensely. His fists are clenched at his sides, his face flushed red, and his shoulders are raised in barely contained fury. Facing him at arm's length, a referee in a black shirt and shorts holds up a yellow card at head height, expression stern and impartial. Other players in the background are blurred, some standing with hands on their hips. The soccer ball sits on the worn grass between them. Corner flags in bright yellow flutter in the breeze. A scoreboard on the sideline reads 2-1.",
+      "entities_in_scene": [
+        "player",
+        "referee"
+      ],
+      "composition_instructions": "Place player in the center circle, standing with fists clenched at sides, face flushed red, scowling intensely. Place referee facing him at arm's length, standing and holding up a yellow card at head height, expression stern."
+    }
+  ]
+}

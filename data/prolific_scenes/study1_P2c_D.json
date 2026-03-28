@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_P2c_D",
+  "title": "Christmas morning (Emanation-Sparkles D)",
+  "entities": {
+    "child": "a child in pajamas",
+    "ornament": "a shiny gold star ornament on the tree"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "Christmas Morning",
+      "background_prompt": "A living room decorated for Christmas with a tall tree in the corner, wrapped presents underneath, stockings hung on a fireplace mantel, and morning light through a window. No people, no ornaments on the tree.",
+      "full_scene_prompt": "A cozy living room on Christmas morning. Soft golden light streams through a frost-edged window. A tall Christmas tree stands in the corner, covered in green garlands and small white lights. At the very top, a large gold star ornament shines brilliantly, its polished metallic surface catching and reflecting the morning light in dazzling rays — it looks brand new and luminous compared to the softer, matte ornaments below it. A child of about six in red flannel pajamas with white snowflake patterns sits cross-legged on the carpet in front of the tree, looking up at the star with wonder, mouth slightly open. Wrapped presents in green, red, and gold paper are piled under the tree. Stockings hang from the fireplace mantel, each stuffed and bulging.",
+      "entities_in_scene": [
+        "child",
+        "ornament"
+      ],
+      "composition_instructions": "Place child on the carpet in front of the Christmas tree, sitting cross-legged and looking up at the star with wonder. Place ornament (gold star) at the very top of the tree, polished and catching morning light in dazzling rays."
+    }
+  ]
+}

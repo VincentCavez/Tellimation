@@ -1,0 +1,23 @@
+{
+  "story_id": "study1_R3_A",
+  "title": "Hillside (Causal Push)",
+  "entities": {
+    "boulder": "a large round gray boulder",
+    "fence": "a wooden picket fence",
+    "goat": "a white goat with a bell"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Hillside",
+      "background_prompt": "A green grassy hillside sloping steeply downward, with wildflowers in red and yellow growing on the slope, and a clear blue sky. No people, no animals, no structures.",
+      "full_scene_prompt": "A green grassy hillside on a clear day. At the very top of the steep slope, a large round gray boulder sits precariously, as if it could roll at any moment. At the bottom of the hill, a simple wooden picket fence in natural brown wood stretches across the base, with a few posts slightly crooked. The fence looks fragile compared to the massive boulder above. To the right side of the hill, standing safely on a flat ledge, a white goat with a small brass bell on a red collar watches the scene with its head turned toward the boulder. Red poppies and yellow buttercups grow scattered across the grassy slope. The sky is a clear bright blue with a single wispy cloud.",
+      "entities_in_scene": [
+        "boulder",
+        "fence",
+        "goat"
+      ],
+      "composition_instructions": "Place boulder at the very top of the slope, sitting precariously. Place fence across the base of the hill, simple wooden picket. Place goat on a flat ledge to the right, standing and watching with head turned toward the boulder."
+    }
+  ]
+}

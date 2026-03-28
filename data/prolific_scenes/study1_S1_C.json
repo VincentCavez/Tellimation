@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_S1_C",
+  "title": "Toy store shelf (Reveal C)",
+  "entities": {
+    "large_box": "a large toy box at the front of the shelf",
+    "hidden_toy": "a small music box hidden behind the large box"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Hidden Music Box",
+      "background_prompt": "A toy store shelf with various boxed toys arranged in a row, price tags, a 'NEW' sign, and bright store lighting. No people.",
+      "full_scene_prompt": "A toy store shelf under bright fluorescent lighting. The shelf is packed with large, colorful toy boxes — a robot kit, a board game, and a dinosaur play set — arranged in a neat row. At the front, a particularly large toy box showing a race car set takes up most of the visible space. However, tucked behind this large box, partially hidden and only barely visible at the edge, sits a small ornate music box with a delicate ballerina figure on its lid, gleaming gold hinges, and intricate floral carvings. It looks old-fashioned and precious compared to the modern toy packaging surrounding it. A small 'NEW' sign on a plastic stand sits on the shelf edge. Price tags in yellow dangle from the larger boxes.",
+      "entities_in_scene": [
+        "large_box",
+        "hidden_toy"
+      ],
+      "composition_instructions": "Place large_box (race car set) at the front of the shelf, taking up most visible space. Place hidden_toy (small ornate music box with ballerina figure, gold hinges, floral carvings) tucked behind the large box, barely visible at the edge."
+    }
+  ]
+}

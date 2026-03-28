@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_R1_C",
+  "title": "Puzzle pieces (Magnetism C)",
+  "entities": {
+    "boy": "a boy holding a puzzle piece",
+    "girl": "a girl holding the matching piece"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Puzzle",
+      "background_prompt": "A carpeted living room floor with a large jigsaw puzzle spread out, a coffee table pushed aside, couch cushions on the floor, and warm lamplight. No people.",
+      "full_scene_prompt": "A carpeted living room floor with warm lamplight. A large jigsaw puzzle depicting a tropical beach is spread across the floor, nearly complete — a hole of about two pieces remains in the center showing the beach's missing sun. A boy of about seven in a blue t-shirt kneels on one side, holding a puzzle piece in his right hand — the left half of the sun. A girl of about the same age in a pink t-shirt kneels on the opposite side, holding the matching piece — the right half of the sun. They look at each other with excited recognition, both realizing their pieces fit together. Couch cushions have been tossed on the floor for comfort. A coffee table is pushed against the wall to make room. The puzzle box with the completed image sits propped against the couch for reference.",
+      "entities_in_scene": [
+        "boy",
+        "girl"
+      ],
+      "composition_instructions": "Place boy kneeling on one side of the puzzle, holding a puzzle piece (left half of sun) in right hand. Place girl kneeling on the opposite side, holding the matching piece (right half of sun). Both looking at each other with excited recognition."
+    }
+  ]
+}

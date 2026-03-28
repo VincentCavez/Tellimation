@@ -1,0 +1,23 @@
+{
+  "story_id": "study1_P1_B",
+  "title": "Toy store (Color Pop B)",
+  "entities": {
+    "firetruck": "a bright red toy fire truck",
+    "boy": "a boy browsing toys",
+    "clerk": "a store clerk"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Toy Store",
+      "background_prompt": "A toy store aisle with shelves of toys, a tiled floor, bright fluorescent lighting, and a checkout counter at the far end. No people, no toys on the main display.",
+      "full_scene_prompt": "A brightly lit toy store aisle. On a wooden shelf at eye level, a bright red toy fire truck with a shiny chrome ladder and small rubber wheels sits prominently in the center, surrounded by other toys in duller packaging — a beige teddy bear box, a gray robot kit, and a white puzzle box. A boy of about seven in a green jacket stands in front of the shelf, pointing at the red fire truck with wide excited eyes. A store clerk in a blue polo shirt and khaki pants stands at the end of the aisle near the checkout counter, organizing boxes. The shelves stretch upward filled with colorful toy packaging, and the tiled floor reflects the fluorescent ceiling lights.",
+      "entities_in_scene": [
+        "firetruck",
+        "boy",
+        "clerk"
+      ],
+      "composition_instructions": "Place firetruck on the wooden shelf (center), bright red with shiny chrome ladder. Place boy in front of the shelf, standing and pointing at the fire truck with wide eyes. Place clerk at the end of the aisle near checkout, standing and organizing boxes."
+    }
+  ]
+}

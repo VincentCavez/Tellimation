@@ -1,0 +1,23 @@
+{
+  "story_id": "study1_P1_D",
+  "title": "Aquarium (Color Pop D)",
+  "entities": {
+    "clownfish": "a bright orange clownfish",
+    "child": "a child pressing against the glass",
+    "turtle": "a green sea turtle"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Aquarium",
+      "background_prompt": "An aquarium viewing room with a large curved glass tank, blue-tinted lighting, coral decorations inside the tank, and a bench in front. No people, no fish.",
+      "full_scene_prompt": "An aquarium viewing room with dim blue-tinted lighting. A large curved glass tank takes up the entire wall, filled with clear water and colorful coral formations — pink fans, purple branches, and green anemones. In the center of the tank, a bright orange clownfish with white stripes darts among the anemone tentacles, its vivid color standing out against the blue water. A green sea turtle glides slowly through the upper portion of the tank, its flippers extended gracefully. A young child in a red raincoat presses both palms flat against the glass, face close to the surface, mesmerized by the clownfish. A wooden bench sits behind the child, and informational plaques are mounted on the wall beside the tank.",
+      "entities_in_scene": [
+        "clownfish",
+        "child",
+        "turtle"
+      ],
+      "composition_instructions": "Place clownfish among the anemone tentacles in the center of the tank, darting and vivid orange with white stripes. Place turtle in the upper portion of the tank, gliding with flippers extended. Place child in front of the glass, pressing both palms flat against the surface, face close, mesmerized."
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_T1_C",
+  "title": "Melted snowman (Flashback C)",
+  "entities": {
+    "girl": "a girl looking at the remains",
+    "puddle": "a melted snowman (scarf, carrot, stones in a puddle)"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Melted Snowman",
+      "background_prompt": "A front yard with a patchy lawn showing both snow and grass, a picket fence, a mailbox, and a driveway. Mild late-winter day. No people, no snowman.",
+      "full_scene_prompt": "A front yard on a mild late-winter day. The lawn is patchy — half melted snow, half emerging green grass. In the center of the yard, where a snowman once stood, only remnants remain: a wet puddle on flattened grass, a soggy red scarf lying in a coil, a carrot nose resting on its side in the mud, two coal-stone eyes sitting in the puddle, and three dark buttons in a line. The snowman has clearly melted over recent warm days. A girl of about seven in a purple winter coat and rubber boots stands beside the remains, looking down with a wistful, sad expression, her hands hanging at her sides. A white picket fence borders the yard. A mailbox with the flag up stands at the end of the driveway. A few patches of old dirty snow cling to the shaded side of the fence.",
+      "entities_in_scene": [
+        "girl",
+        "puddle"
+      ],
+      "composition_instructions": "Place girl standing beside a wet puddle on the lawn (center), looking down with wistful expression, hands at sides. Place puddle with remnants: a soggy red scarf in a coil, a carrot on its side, two coal-stone eyes, three dark buttons in a line."
+    }
+  ]
+}
