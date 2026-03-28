@@ -1,0 +1,23 @@
+{
+  "story_id": "study1_D1_A",
+  "title": "Bakery Counter (Speech Bubble)",
+  "entities": {
+    "baker": "a baker with a mustache",
+    "boy": "a boy in a red hoodie",
+    "mother": "the boy's mother holding a wallet"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Bakery",
+      "background_prompt": "A bakery interior with a glass display counter showing cakes and pastries, a chalkboard menu on the wall, a small bell hanging above the entrance door, and warm golden lighting. No people.",
+      "full_scene_prompt": "A warm bakery interior with golden lighting. A baker with a thick brown mustache, wearing a white apron and a tall baker's hat, stands behind a glass display counter, smiling warmly. The counter displays several cakes — a large round chocolate cake with glossy frosting in the center, a vanilla cake with strawberries to the left, and a tray of colorful cupcakes to the right. In front of the counter, a boy in a red hoodie and dark jeans stands on his tiptoes, pointing excitedly at the chocolate cake with one hand, his mouth open as if speaking. Behind the boy, his mother in a gray coat stands holding an open brown leather wallet, looking at her son with an amused expression. A small brass bell hangs above the glass entrance door to the right. A chalkboard menu on the wall lists items in chalk.",
+      "entities_in_scene": [
+        "baker",
+        "boy",
+        "mother"
+      ],
+      "composition_instructions": "Place baker behind the glass display counter, standing and smiling. Place boy in front of the counter, standing on tiptoes and pointing excitedly at the chocolate cake, mouth open as if speaking. Place mother behind the boy, standing and holding an open brown leather wallet, looking amused."
+    }
+  ]
+}

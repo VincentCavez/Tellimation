@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_P2a_A",
+  "title": "Kitchen - Steam (Emanation-Steam)",
+  "entities": {
+    "woman": "a woman in a yellow apron",
+    "pot": "a large silver pot with steam rising"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Kitchen",
+      "background_prompt": "A warm kitchen interior with a gas stove, wooden countertops, a loaf of bread on a cutting board, a window showing rain outside, tiled backsplash. No people.",
+      "full_scene_prompt": "A warm kitchen interior. A woman in a yellow apron over a white shirt stands near a gas stove, holding a wooden spoon in one hand. On the stove, a large silver pot sits on a burner with thick curls of steam rising from its surface, the lid resting beside it. On the wooden countertop to the right, a golden-brown loaf of bread sits on a wooden cutting board next to a bread knife. A window above the sink shows heavy rain falling outside, with gray clouds visible and raindrops streaking the glass. The kitchen has a tiled backsplash in pale blue, open shelves with jars and cups, and a checkered dish towel hanging from the oven handle. Warm yellow light fills the room.",
+      "entities_in_scene": [
+        "woman",
+        "pot"
+      ],
+      "composition_instructions": "Place woman near the gas stove, standing and holding a wooden spoon. Place pot on the burner with thick curls of steam rising, lid resting beside it."
+    }
+  ]
+}

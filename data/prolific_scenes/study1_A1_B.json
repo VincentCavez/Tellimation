@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_A1_B",
+  "title": "Skatepark (Motion Lines B)",
+  "entities": {
+    "boy": "a boy on a skateboard",
+    "girl": "a girl watching from a bench"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Skatepark",
+      "background_prompt": "A concrete skatepark with ramps, rails, a half-pipe, graffiti on the walls, and a bench along the fence. Sunny afternoon. No people.",
+      "full_scene_prompt": "A concrete skatepark on a sunny afternoon. A boy of about thirteen in a black t-shirt, baggy jeans, and a backward red cap crouches on a skateboard, racing down a sloped ramp at full speed with his arms out for balance, knees deeply bent. The skateboard's wheels blur against the smooth concrete. A girl of similar age in a denim jacket sits on a wooden bench along the chain-link fence, legs crossed, watching the boy with an amused smile and sipping from a juice box. Graffiti art in bright blues and oranges covers the walls of the half-pipe behind the ramp. A few other skateboards lean against the fence unused. The sun casts long shadows across the concrete.",
+      "entities_in_scene": [
+        "boy",
+        "girl"
+      ],
+      "composition_instructions": "Place boy on the skateboard, crouching and racing down a sloped ramp at full speed, arms out for balance, knees deeply bent. Place girl on the wooden bench along the fence, sitting with legs crossed, watching and sipping a juice box."
+    }
+  ]
+}

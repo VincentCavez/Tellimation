@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_P2d_D",
+  "title": "Playground goodbye (Emanation-Tears D)",
+  "entities": {
+    "girl": "a girl waving goodbye",
+    "friend": "another girl walking away with a suitcase"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Goodbye",
+      "background_prompt": "A residential street with houses, a sidewalk, a moving truck parked at the curb, and cardboard boxes on a front lawn. Overcast afternoon. No people.",
+      "full_scene_prompt": "A residential street on an overcast afternoon. A girl of about eight in a pink hoodie stands on the sidewalk, raising one hand in a slow, reluctant wave. Her face is crumpled with sadness — eyebrows raised in the middle, mouth pressed tight, eyes brimming. She watches another girl of the same age, her best friend, walking away down the sidewalk toward a large white moving truck parked at the curb. The departing girl pulls a small rolling suitcase behind her and looks back over her shoulder with a similarly heartbroken expression. Cardboard boxes labeled 'Kitchen' and 'Toys' sit on the front lawn of the house beside the truck. A 'SOLD' sign stands in the garden. Leaves blow across the empty sidewalk between the two girls.",
+      "entities_in_scene": [
+        "girl",
+        "friend"
+      ],
+      "composition_instructions": "Place girl on the sidewalk (left), standing and raising one hand in a slow reluctant wave, face crumpled with sadness. Place friend walking away (right) toward the moving truck, pulling a small rolling suitcase, looking back over her shoulder."
+    }
+  ]
+}

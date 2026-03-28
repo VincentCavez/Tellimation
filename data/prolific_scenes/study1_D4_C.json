@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_D4_C",
+  "title": "Storybook reading (Interjection C)",
+  "entities": {
+    "mother": "a mother reading a storybook",
+    "boy": "a boy snuggled beside her"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "Bedtime Story",
+      "background_prompt": "A child's bedroom at night with a bed, a nightstand with a lamp on, glow-in-the-dark stars on the ceiling, a bookshelf, and a stuffed animal. No people.",
+      "full_scene_prompt": "A child's bedroom at bedtime with soft warm light from a nightstand lamp. A mother in a comfortable gray sweater sits propped up against pillows on a single bed with a blue duvet. A boy of about six in dinosaur pajamas is snuggled against her side, eyes wide and attentive, clutching a stuffed bear. The mother holds open a large illustrated storybook between them, one finger pointing at a line of text on the page. The visible text reads: 'The rabbit runned as fast as he could.' The boy looks at the word with a slight frown, as if something sounds wrong. Glow-in-the-dark stars are stuck to the ceiling above. A small bookshelf holds a row of children's books. The room is cozy and dim except for the warm circle of lamplight.",
+      "entities_in_scene": [
+        "mother",
+        "boy"
+      ],
+      "composition_instructions": "Place mother propped up against pillows on the bed, sitting and holding open a large illustrated storybook. Place boy snuggled against her side, eyes wide, clutching a stuffed bear."
+    }
+  ]
+}

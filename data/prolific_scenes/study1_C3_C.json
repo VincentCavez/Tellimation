@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_C3_C",
+  "title": "Park bench (Ghost Outline C)",
+  "entities": {
+    "old_man": "an old man reading a book",
+    "empty_spot": "an empty spot on the bench with a folded jacket and glasses case"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Park Bench (Missing Friend)",
+      "background_prompt": "A park with a long green wooden bench under a large maple tree, a gravel path, flower beds with roses, and a distant fountain. Autumn afternoon. No people.",
+      "full_scene_prompt": "An autumn afternoon in a park. A long green wooden bench sits under a large maple tree with leaves turning orange and gold. An old man with white hair and a brown cardigan sits on the left side of the bench, reading a thick book with reading glasses perched on his nose. The right side of the bench is empty, but a neatly folded gray jacket and a leather glasses case sit on the seat as if someone has just stepped away and intends to return. Fallen maple leaves in red and orange are scattered on the gravel path in front of the bench. Rose bushes in deep red bloom in the flower bed behind. A stone fountain is faintly visible in the distance.",
+      "entities_in_scene": [
+        "old_man",
+        "empty_spot"
+      ],
+      "composition_instructions": "Place old_man on the left side of the bench, sitting and reading a thick book with reading glasses on. Place a neatly folded gray jacket and a leather glasses case on the right side of the bench seat, as if someone just stepped away."
+    }
+  ]
+}

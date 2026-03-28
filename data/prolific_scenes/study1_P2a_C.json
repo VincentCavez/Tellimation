@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_P2a_C",
+  "title": "Campfire (Emanation-Steam C)",
+  "entities": {
+    "boy": "a boy in a flannel shirt",
+    "pot": "a cast-iron pot over the fire"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Campfire Cooking",
+      "background_prompt": "A forest clearing with a campfire surrounded by stones, a log to sit on, pine trees, and a starry sky beginning to appear. Evening. No people, no cooking equipment.",
+      "full_scene_prompt": "A forest clearing in the early evening as the first stars appear. A boy of about twelve in a red flannel shirt and hiking boots sits on a thick log beside a crackling campfire ringed with flat stones. Over the fire, a black cast-iron pot hangs from a metal tripod, its contents bubbling and sending thick plumes of steam into the cool evening air. The boy holds a long wooden spoon, stirring the pot carefully. Pine trees with dark green needles surround the clearing, their trunks lit orange by the firelight. A rolled-up sleeping bag and a small backpack lean against the log. The sky above transitions from deep blue to purple, with a few bright stars visible through gaps in the canopy.",
+      "entities_in_scene": [
+        "boy",
+        "pot"
+      ],
+      "composition_instructions": "Place boy on the log beside the campfire, sitting and holding a long wooden spoon. Place pot hanging from a metal tripod over the fire, contents bubbling with thick steam rising."
+    }
+  ]
+}

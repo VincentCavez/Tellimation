@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_S2_B",
+  "title": "Treehouse (Stamp B)",
+  "entities": {
+    "boy": "a boy standing in the treehouse",
+    "ladder": "a wooden rope ladder"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Treehouse",
+      "background_prompt": "A backyard with a large oak tree, a wooden treehouse built among the branches, a rope ladder hanging down, and a lawn below with scattered leaves. No people.",
+      "full_scene_prompt": "A backyard on a breezy afternoon. A wooden treehouse is built among the thick branches of a large oak tree, about three meters above the ground. A boy of about nine in a red t-shirt and khaki shorts stands firmly on the treehouse platform, both hands gripping the wooden railing, looking down at the ground below with a proud grin. His feet are planted solidly on the wooden planks of the platform. A rope ladder with wooden rungs hangs from the platform down to the grass, swaying slightly in the wind. Scattered orange and yellow leaves cover the lawn below. The treehouse has a small window cut into one wall, and a hand-painted sign reading 'KEEP OUT' is nailed above the entrance. A bicycle lies on its side in the grass near the base of the tree.",
+      "entities_in_scene": [
+        "boy",
+        "ladder"
+      ],
+      "composition_instructions": "Place boy on the treehouse platform (up in the tree), standing with both hands gripping the wooden railing, looking down with a proud grin. Feet planted solidly on the wooden planks."
+    }
+  ]
+}

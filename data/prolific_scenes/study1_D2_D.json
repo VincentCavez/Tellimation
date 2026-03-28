@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_D2_D",
+  "title": "Girl with letter (Thought Bubble D)",
+  "entities": {
+    "girl": "a teenage girl holding an opened letter",
+    "desk": "a desk with scattered papers"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Letter",
+      "background_prompt": "A teenager's bedroom with a desk by the window, a bulletin board with photos, fairy lights, and a bookshelf. Afternoon light. No people.",
+      "full_scene_prompt": "A teenager's bedroom in warm afternoon light. A girl of about fifteen with wavy auburn hair sits at a wooden desk by the window, holding an opened letter in both hands. She has clearly just finished reading it — the envelope lies torn open on the desk. Her expression is complex and contemplative: lips slightly parted, eyes unfocused as if looking through the letter rather than at it, processing what she just read. Is it good news or bad? Her face gives no clear answer. Papers and notebooks are scattered across the desk. A bulletin board above the desk is covered in photos of friends, concert tickets, and sticky notes. Fairy lights in warm white are strung along the board's edge. A mug of tea sits untouched on the desk, a tea bag string draped over the rim.",
+      "entities_in_scene": [
+        "girl",
+        "desk"
+      ],
+      "composition_instructions": "Place girl at the desk by the window, sitting and holding an opened letter in both hands, lips slightly parted, eyes unfocused as if processing. Torn envelope on the desk."
+    }
+  ]
+}

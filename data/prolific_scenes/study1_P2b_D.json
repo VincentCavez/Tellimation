@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_P2b_D",
+  "title": "Refrigerator (Emanation-Frost D)",
+  "entities": {
+    "mother": "a mother reaching into the freezer",
+    "frozen_food": "a frost-covered frozen pizza box"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Kitchen Freezer",
+      "background_prompt": "A modern kitchen with a stainless steel refrigerator with the freezer door open, a tiled floor, countertops, and a window. No people, no food visible.",
+      "full_scene_prompt": "A modern kitchen with clean white countertops. A mother in a denim apron over a white blouse stands in front of a stainless steel refrigerator with the top freezer compartment door pulled open. Cold mist spills out from the freezer into the warm kitchen air. She reaches in with one hand and pulls out a frozen pizza box that is completely coated in a layer of white frost crystals, ice clinging to the cardboard edges. The inside of the freezer is visible — stacked containers, ice cube trays, and bags of frozen vegetables, all covered in a fine layer of frost. The kitchen around her is warm and bright, with a bowl of fresh fruit on the counter and sunlight from a window over the sink, making the contrast with the icy freezer dramatic.",
+      "entities_in_scene": [
+        "mother",
+        "frozen_food"
+      ],
+      "composition_instructions": "Place mother in front of the refrigerator with the top freezer open, reaching in with one hand. Place frozen_food (pizza box coated in white frost crystals) being pulled from the freezer. Cold mist spills out."
+    }
+  ]
+}

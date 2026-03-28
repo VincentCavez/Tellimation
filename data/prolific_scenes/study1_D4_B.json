@@ -1,0 +1,23 @@
+{
+  "story_id": "study1_D4_B",
+  "title": "Classroom spelling (Interjection B)",
+  "entities": {
+    "teacher": "a teacher pointing at the whiteboard",
+    "student": "a student raising a hand",
+    "whiteboard": "a whiteboard with a sentence"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Spelling Lesson",
+      "background_prompt": "A classroom with a whiteboard at the front showing a sentence, a teacher's desk, student desks in rows, and educational posters. No people.",
+      "full_scene_prompt": "A bright classroom during a lesson. A teacher in a button-down shirt and slacks stands at the front, pointing with a marker at a sentence written in large clear letters on the whiteboard. The sentence reads: 'The dogs is playing in the park.' A student — a girl of about nine with a raised hand and an eager expression — sits at a front desk, clearly having spotted the error. Other students sit at their desks in rows behind her. Educational posters about grammar and vocabulary decorate the walls. A teacher's desk with a mug and papers sits to the side. The fluorescent lights are bright and the room feels active and engaged.",
+      "entities_in_scene": [
+        "teacher",
+        "student",
+        "whiteboard"
+      ],
+      "composition_instructions": "Place teacher at the front, standing and pointing with a marker at a sentence on the whiteboard. Place student at a front desk, sitting with raised hand and eager expression. Other students at desks behind her."
+    }
+  ]
+}

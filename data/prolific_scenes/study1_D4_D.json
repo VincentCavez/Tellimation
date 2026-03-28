@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_D4_D",
+  "title": "Essay feedback (Interjection D)",
+  "entities": {
+    "girl": "a girl reading her graded essay",
+    "essay": "an essay with red marks"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Graded Essay",
+      "background_prompt": "A school desk with a marked-up paper, a pencil case, a textbook, and a window showing a schoolyard. No people.",
+      "full_scene_prompt": "A classroom after school. A girl of about twelve with a brown ponytail and a denim jacket sits at a desk by the window, holding a graded essay in both hands. The paper has neat handwriting but is covered in the teacher's red ink marks — circled words, underlined phrases, and marginal comments. One prominent red circle surrounds the word 'becuz' with the correction 'because' written beside it in red. The girl studies the corrections with a focused, slightly frustrated expression, biting her lower lip. A pencil case and an English textbook sit on the desk. Through the window, the empty schoolyard is visible with a basketball hoop and painted lines. The afternoon sun casts long shadows across the desk. Other desks around her are empty — she stayed behind to review.",
+      "entities_in_scene": [
+        "girl",
+        "essay"
+      ],
+      "composition_instructions": "Place girl at the desk by the window, sitting and holding a graded essay covered in red marks. Her expression focused, slightly frustrated, biting lower lip."
+    }
+  ]
+}

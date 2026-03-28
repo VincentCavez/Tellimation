@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_A2_C",
+  "title": "Pottery studio (Flip C)",
+  "entities": {
+    "woman": "a woman shaping clay on a wheel",
+    "cat": "a tabby cat watching from a shelf"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Pottery Studio",
+      "background_prompt": "An artisan pottery studio with a wheel in the center, shelves of finished pots and vases, clay tools on a worktable, and natural light from a skylight. No people, no animals.",
+      "full_scene_prompt": "An artisan pottery studio with natural light streaming through a large skylight. A woman with her hair tied back in a bandana and wearing a clay-splattered denim apron sits on a stool at a spinning pottery wheel. Her hands are wet with slip, gently shaping a rising cylinder of reddish-brown clay as the wheel turns — her fingers press into the wall of the vessel, creating a graceful curve. A tabby cat with green eyes sits on a high shelf among finished glazed pots and vases in earthy tones, watching the spinning wheel with lazy curiosity. Clay tools — a wire cutter, wooden ribs, and a sponge — are laid out on a worktable beside the wheel. The floor is concrete with dried clay footprints.",
+      "entities_in_scene": [
+        "woman",
+        "cat"
+      ],
+      "composition_instructions": "Place woman on a stool at the spinning pottery wheel, hands wet with slip, gently shaping a rising cylinder of clay. Place cat on a high shelf among finished pots, sitting and watching the wheel with lazy curiosity."
+    }
+  ]
+}

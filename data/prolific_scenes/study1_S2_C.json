@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_S2_C",
+  "title": "Lighthouse (Stamp C)",
+  "entities": {
+    "keeper": "a lighthouse keeper at the top",
+    "boat": "a small boat in the harbor below"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Lighthouse",
+      "background_prompt": "A tall white lighthouse on a rocky cliff, a winding path, a small harbor with stone walls below, and a dramatic sky with clouds. No people, no boats.",
+      "full_scene_prompt": "A dramatic coastal scene under a sky of towering gray clouds with breaks of golden light. A tall white lighthouse with a red-painted top and a glass lantern room stands at the edge of a rocky cliff. At the very top, visible through the glass of the lantern room, a lighthouse keeper in a dark blue peacoat and a wool cap stands with one hand on the railing of the narrow walkway that circles the lantern, looking out over the sea. His position is unmistakably at the very summit of the lighthouse. Far below, in the small stone-walled harbor at the base of the cliff, a small wooden fishing boat with a blue hull bobs on the choppy water, tied to a rusted iron bollard. A winding stone path connects the lighthouse door to the harbor. Waves crash white against the rocks at the cliff base.",
+      "entities_in_scene": [
+        "keeper",
+        "boat"
+      ],
+      "composition_instructions": "Place keeper inside the glass lantern room at the very top of the lighthouse, standing with one hand on the railing of the narrow walkway, looking out over the sea. Place boat in the small harbor at the base of the cliff, tied to a bollard, bobbing on choppy water."
+    }
+  ]
+}

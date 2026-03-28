@@ -1,0 +1,23 @@
+{
+  "story_id": "study1_S1_A",
+  "title": "Kitchen - Grandmother (Reveal)",
+  "entities": {
+    "grandmother": "an elderly grandmother in a floral dress",
+    "cat": "a gray cat",
+    "window": "a window showing snow falling outside"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Cozy Kitchen",
+      "background_prompt": "A warm, cozy kitchen with a gas stove, copper pots hanging on the wall, a wooden chair with a cushion, and a window with lace curtains. Snow is visible through the window. No people, no animals.",
+      "full_scene_prompt": "A warm, cozy kitchen with yellow walls. An elderly grandmother with white hair pulled into a bun, wearing a floral dress with a lavender apron, stands at the gas stove stirring a large pot with a wooden spoon. She is positioned directly in front of a window, partially blocking the view through it. Behind her, through the window with lace curtains, heavy snowflakes fall against a dark gray sky, and snow covers the ground and tree branches outside. The snowy window is only partially visible because the grandmother stands in front of it. A gray cat with green eyes sleeps curled up on a cushioned wooden chair to the right, its tail draped over the edge. Copper pots hang from hooks on the wall, and a shelf holds jars of spices. The kitchen feels warm and inviting with soft golden light from a lamp above the stove.",
+      "entities_in_scene": [
+        "grandmother",
+        "cat",
+        "window"
+      ],
+      "composition_instructions": "Place grandmother at the gas stove, standing and stirring a large pot with a wooden spoon. Position her directly in front of the window, partially blocking the view of snow falling outside. Place cat curled up on the cushioned wooden chair (right), sleeping with tail draped over edge."
+    }
+  ]
+}

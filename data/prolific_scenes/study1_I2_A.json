@@ -1,0 +1,25 @@
+{
+  "story_id": "study1_I2_A",
+  "title": "Classroom (Nametag)",
+  "entities": {
+    "teacher": "a female teacher in a blue blouse",
+    "boy_glasses": "a short boy with round glasses",
+    "girl_braids": "a tall girl with braids",
+    "girl_headband": "a girl with a red headband"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Classroom",
+      "background_prompt": "A bright elementary school classroom with a whiteboard at the front, three wooden desks arranged in a row, a globe on a side table, and a tall bookshelf filled with colorful books. No people.",
+      "full_scene_prompt": "A bright elementary school classroom. A female teacher in a blue blouse and gray skirt stands near a whiteboard at the front, gesturing with one hand as if explaining something. Three students sit at wooden desks arranged in a row facing the whiteboard. On the left, a tall girl with long brown braids and a green sweater sits up straight. In the middle, a short boy with round glasses, messy dark hair, and a red polo shirt leans forward over his notebook. On the right, a girl with a red headband, shoulder-length blonde hair, and a purple cardigan rests her chin on her hand. A globe sits on a small table by the window to the left. A tall wooden bookshelf packed with colorful books lines the back wall. The whiteboard has simple math equations written in blue marker.",
+      "entities_in_scene": [
+        "teacher",
+        "boy_glasses",
+        "girl_braids",
+        "girl_headband"
+      ],
+      "composition_instructions": "Place teacher near the whiteboard (front), standing and gesturing with one hand. Place girl_braids at the left desk, sitting upright. Place boy_glasses at the middle desk, leaning forward over a notebook. Place girl_headband at the right desk, resting chin on hand."
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_P2d_B",
+  "title": "Rainy window (Emanation-Tears B)",
+  "entities": {
+    "girl": "a girl pressing her forehead against the glass",
+    "window": "a rain-streaked window"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Rainy Window",
+      "background_prompt": "A child's bedroom with a large window showing heavy rain outside, a window seat with cushions, a bookshelf, and a desk with homework. No people.",
+      "full_scene_prompt": "A child's bedroom on a rainy afternoon. A girl of about nine with straight brown hair and a blue sweater sits on a window seat with floral cushions, pressing her forehead against the cold glass of a large window. Heavy rain streams down the outside of the glass in thick rivulets. Her eyes are downcast and glistening, her lips turned down, and one hand rests flat against the pane. Through the blurred rain on the glass, a gray street with parked cars and swaying trees is faintly visible. A bookshelf filled with children's books stands against the adjacent wall. On a small desk nearby, an open math workbook and a pencil case sit untouched. A stuffed rabbit lies on its side on the window seat beside the girl.",
+      "entities_in_scene": [
+        "girl",
+        "window"
+      ],
+      "composition_instructions": "Place girl on the window seat, sitting and pressing her forehead against the glass, eyes downcast and glistening, lips turned down, one hand flat on the pane."
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "story_id": "study1_P1_A",
+  "title": "Market Stall (Color Pop)",
+  "entities": {
+    "woman": "a woman in a white apron",
+    "boy": "a boy in a green t-shirt",
+    "apples": "a pile of bright red apples"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Market Stall",
+      "background_prompt": "An outdoor fruit market stall with a striped red and white awning, wooden crates arranged on a table, and a cobblestone ground with a puddle reflecting the stall. Bright daylight. No people.",
+      "full_scene_prompt": "An outdoor fruit market stall on a bright day. A woman in a white apron over a floral dress stands behind a wooden table, arranging fruit with both hands. On the table, a large pile of bright red apples glistens in the sunlight on the left, a basket of green pears sits in the center, and a bunch of yellow bananas hangs from a hook on the right. A boy in a green t-shirt and denim shorts stands in front of the stall, pointing eagerly at the red apples with one hand. A striped awning in red and white stretches above the stall, casting dappled shadows. The cobblestone ground has a small puddle that reflects the awning and the colorful fruit. Other market stalls are faintly visible in the background.",
+      "entities_in_scene": [
+        "woman",
+        "boy",
+        "apples"
+      ],
+      "composition_instructions": "Place woman behind the wooden table, standing and arranging fruit. Place apples as a large pile on the left of the table, bright red and glistening. Place boy in front of the stall, standing and pointing eagerly at the red apples."
+    }
+  ]
+}

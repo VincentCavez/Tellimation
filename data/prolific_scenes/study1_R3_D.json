@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_R3_D",
+  "title": "Lightning and tree (Causal Push D)",
+  "entities": {
+    "lightning": "a bolt of lightning",
+    "tree": "a split tree with smoke rising"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Lightning Strike",
+      "background_prompt": "An open field with a single tall tree, dark storm clouds, heavy rain, and a dirt path. No fire, no damage to the tree.",
+      "full_scene_prompt": "An open field during a violent thunderstorm. Dark, churning storm clouds fill the sky, and heavy rain falls in sheets. A single tall oak tree stands in the center of the field. A brilliant white-blue bolt of lightning connects the dark clouds to the tree's crown in a jagged, branching line of light so bright it illuminates the entire scene. At the point of impact, the tree's trunk has split cleanly down the middle, the two halves leaning apart, revealing pale raw wood inside. Thin wisps of smoke and steam rise from the split and from charred bark. Splinters of wood are scattered on the wet grass around the base. A dirt path runs across the field in the foreground, puddles forming along its length. The lightning bolt's branching tendrils reach up into the clouds, and a secondary glow reflects off the rain-soaked grass. The scene captures raw cause and effect: bolt strikes tree, tree splits.",
+      "entities_in_scene": [
+        "lightning",
+        "tree"
+      ],
+      "composition_instructions": "Place lightning as a brilliant jagged bolt connecting clouds to the tree's crown. At the impact point, the tree trunk split cleanly down the middle, two halves leaning apart, pale raw wood visible. Wisps of smoke and steam rising from the split."
+    }
+  ]
+}

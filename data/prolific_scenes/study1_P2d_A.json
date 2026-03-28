@@ -1,0 +1,23 @@
+{
+  "story_id": "study1_P2d_A",
+  "title": "School Yard (Emanation-Tears)",
+  "entities": {
+    "boy": "a small boy with a scraped knee",
+    "teacher": "a female teacher in a cardigan",
+    "ball": "a red rubber ball"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The School Yard",
+      "background_prompt": "An elementary school yard with a blacktop area, painted lines for games, a chain-link fence, a climbing frame in the background, and a few trees. Bright afternoon. No people, no animals.",
+      "full_scene_prompt": "An elementary school yard on a bright afternoon. A small boy with short brown hair and a blue t-shirt sits on the blacktop ground, his legs stretched out in front of him. His left knee has a visible red scrape and he clutches it with one hand, his face scrunched up and his mouth open as if about to cry. A red rubber ball lies on the ground a few feet away from him. A female teacher in a gray cardigan over a white blouse and black trousers walks briskly toward the boy from the right, her expression concerned, one hand reaching out. In the background, a group of children are small figures playing near a climbing frame, blurred and indistinct. A chain-link fence runs along the edge of the yard, and a few leafy trees provide shade on the far side.",
+      "entities_in_scene": [
+        "boy",
+        "teacher",
+        "ball"
+      ],
+      "composition_instructions": "Place boy on the blacktop ground (center), sitting with legs stretched out, left knee scraped and red, clutching it with one hand, face scrunched as if about to cry. Place teacher walking briskly toward the boy from the right, expression concerned, one hand reaching out. Place ball on the ground a few feet from the boy."
+    }
+  ]
+}

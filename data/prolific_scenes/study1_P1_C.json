@@ -1,0 +1,23 @@
+{
+  "story_id": "study1_P1_C",
+  "title": "Garden path (Color Pop C)",
+  "entities": {
+    "sunflower": "a bright yellow sunflower",
+    "girl": "a girl walking on the path",
+    "cat": "a gray cat in the grass"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Garden Path",
+      "background_prompt": "A cottage garden path with stone pavers, mixed flower beds, a wooden gate, and a stone wall covered in ivy. Warm afternoon. No people, no animals, no sunflowers.",
+      "full_scene_prompt": "A cottage garden on a warm afternoon. A winding stone path leads through mixed flower beds toward a wooden gate in a stone wall covered in ivy. Along the left edge of the path, a single towering bright yellow sunflower stands out dramatically, its large golden head turned toward the sun, its broad green leaves spread wide, vibrant among the muted purples and whites of lavender and daisies surrounding it. A girl of about nine in a white sundress and sandals walks along the path toward the gate, pausing to look at the sunflower. A gray cat sits in the grass to the right of the path, watching a butterfly lazily. Warm golden light bathes the entire garden.",
+      "entities_in_scene": [
+        "sunflower",
+        "girl",
+        "cat"
+      ],
+      "composition_instructions": "Place sunflower along the left edge of the path, towering and bright yellow, head turned toward the sun. Place girl on the path (center-right), walking toward the gate and pausing to look at the sunflower. Place cat in the grass to the right, sitting and watching a butterfly."
+    }
+  ]
+}

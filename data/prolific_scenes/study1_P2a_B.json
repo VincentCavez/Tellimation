@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_P2a_B",
+  "title": "Café table (Emanation-Steam B)",
+  "entities": {
+    "woman": "a woman in a scarf",
+    "coffee": "a large cup of steaming coffee"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Café",
+      "background_prompt": "A sidewalk café with a small round marble table, a wrought-iron chair, a menu board, potted plants, and a cobblestone street. Autumn morning. No people, no drinks.",
+      "full_scene_prompt": "A sidewalk café on a crisp autumn morning. A woman in a burgundy scarf and tan trench coat sits at a small round marble table on a wrought-iron chair. In front of her, a large white ceramic cup of coffee sits on a saucer, with thick curls of steam rising from the dark surface. The woman wraps both hands around the cup for warmth, her breath faintly visible in the cool air. A folded newspaper and a croissant on a small plate sit on the table beside the cup. Potted ferns in terra-cotta pots line the café entrance. A chalkboard menu leans against the doorframe listing specials. The cobblestone street gleams with dampness from early morning drizzle, and fallen leaves in yellow and brown are scattered about.",
+      "entities_in_scene": [
+        "woman",
+        "coffee"
+      ],
+      "composition_instructions": "Place woman at the small marble table, sitting and wrapping both hands around a large white cup of coffee with steam rising. Place the cup on a saucer on the table, with a croissant and newspaper beside it."
+    }
+  ]
+}

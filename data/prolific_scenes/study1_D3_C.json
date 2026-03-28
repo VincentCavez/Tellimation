@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_D3_C",
+  "title": "Toast burning (Alert C)",
+  "entities": {
+    "woman": "a woman on the phone",
+    "toaster": "a toaster with smoke rising"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Kitchen Distraction",
+      "background_prompt": "A kitchen with a counter, a toaster, a coffee maker, a fruit bowl, and a window with morning light. No people.",
+      "full_scene_prompt": "A kitchen in bright morning light. A woman in a bathrobe and slippers stands near the counter, holding a phone to her ear with one hand, laughing at something the caller said, completely absorbed in conversation. She faces away from the counter. Behind her, a chrome toaster sits on the counter with two slices of bread — both have risen well past golden and are turning dark brown, almost black. Thin wisps of gray smoke curl upward from the toaster slots, catching the morning light from the window. The woman is completely unaware. A coffee maker beside the toaster shows a full pot. A fruit bowl with bananas and oranges sits nearby. A wall clock reads 7:45 AM. The smoke is not yet alarming but clearly about to be.",
+      "entities_in_scene": [
+        "woman",
+        "toaster"
+      ],
+      "composition_instructions": "Place woman near the counter, standing with phone to ear, laughing, completely absorbed, facing away from the toaster. Behind her, the toaster has two slices turned dark brown with thin gray smoke curling upward from the slots."
+    }
+  ]
+}

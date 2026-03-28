@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_D2_A",
+  "title": "Library (Thought Bubble)",
+  "entities": {
+    "girl": "a girl with a ponytail looking puzzled",
+    "student": "another student reading"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Library",
+      "background_prompt": "A quiet library with tall wooden bookshelves filled with books, a reading table with a green lamp, a round wall clock showing 4 PM, and soft natural light from tall windows. No people.",
+      "full_scene_prompt": "A quiet library with tall wooden bookshelves lining every wall, packed with books of various colors and sizes. A girl with dark hair pulled into a ponytail sits at a wooden reading table in the center. An open book lies in front of her, and she stares at the pages with a deeply puzzled expression — eyebrows knitted together, one hand on her cheek, her lips pressed in thought. She looks confused and uncertain, as if she cannot understand what she is reading. At another table nearby, a second student — a boy in a green sweater — sits reading a thick book calmly, absorbed in his reading. A round wall clock above the main bookshelf shows 4 PM. A green banker's lamp glows softly on the girl's table. Warm natural light streams through tall arched windows on the right wall, casting long golden rectangles on the wooden floor.",
+      "entities_in_scene": [
+        "girl",
+        "student"
+      ],
+      "composition_instructions": "Place girl at the reading table (center), sitting with open book in front of her, staring at pages with deeply puzzled expression, eyebrows knitted, one hand on cheek. Place student at another table nearby, sitting and reading calmly, absorbed."
+    }
+  ]
+}

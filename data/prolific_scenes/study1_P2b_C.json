@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_P2b_C",
+  "title": "Frozen pond (Emanation-Frost C)",
+  "entities": {
+    "boy": "a boy in a winter hat",
+    "pond": "a frozen pond with visible ice patterns"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Frozen Pond",
+      "background_prompt": "A winter park with a small pond surrounded by bare trees, a wooden railing along the edge, snow-covered ground, and a gray sky. No people, no animals.",
+      "full_scene_prompt": "A winter park under a gray sky. A small round pond is completely frozen over, its surface a sheet of milky white ice with intricate frost patterns radiating like fern fronds from the center. A boy of about ten in a red winter hat with a white pompom, a puffy navy blue jacket, and brown snow boots stands at the wooden railing along the pond's edge, leaning forward and peering down at the ice with fascination. He presses one mittened hand against the railing. Bare trees with snow-dusted branches surround the pond. The ground is covered in a thin layer of fresh white snow with footprints leading to where the boy stands. A park bench nearby has a small pile of snow on its seat.",
+      "entities_in_scene": [
+        "boy",
+        "pond"
+      ],
+      "composition_instructions": "Place boy at the wooden railing along the pond's edge, standing and leaning forward, peering at the ice with one mittened hand on the railing. Place pond as completely frozen, milky white ice with intricate frost fern patterns."
+    }
+  ]
+}

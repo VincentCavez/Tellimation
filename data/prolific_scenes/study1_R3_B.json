@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_R3_B",
+  "title": "Dominoes (Causal Push B)",
+  "entities": {
+    "finger": "a child's finger pushing the first domino",
+    "dominoes": "a long line of standing dominoes"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Domino Chain",
+      "background_prompt": "A wooden table with a long row of colorful dominoes standing upright, a desk lamp, and a ruler. No people.",
+      "full_scene_prompt": "A wooden table under warm lamp light. A long row of colorful wooden dominoes — red, blue, yellow, green, alternating — stand upright in a neat curving line across the entire table surface. At the far left, a child's small index finger is about to push the first domino — the fingertip just barely touching the top edge, the domino starting to lean. The next few dominoes stand close behind, ready to fall in sequence. The line curves in an S-shape across the table. A desk lamp illuminates the scene from above. A ruler and a few spare loose dominoes lie to the side. The tension is palpable — one tiny push will cascade through the entire chain.",
+      "entities_in_scene": [
+        "finger",
+        "dominoes"
+      ],
+      "composition_instructions": "Place dominoes standing upright in a long curving S-shape line across the table. At the far left, position a child's index finger just barely touching the top edge of the first domino, the domino starting to lean."
+    }
+  ]
+}

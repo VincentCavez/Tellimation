@@ -1,0 +1,25 @@
+{
+  "story_id": "study1_C2_D",
+  "title": "Bookshelf (Disintegration D)",
+  "entities": {
+    "book_1": "a thick red book",
+    "book_2": "a blue book",
+    "book_3": "a green book",
+    "mug": "a coffee mug among the books"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Bookshelf",
+      "background_prompt": "A home office with a tall wooden bookshelf against the wall, a desk with a lamp, a leather chair, and framed photos on the wall. No objects on the shelves.",
+      "full_scene_prompt": "A home office with soft lighting. A tall wooden bookshelf stands against the wall, its shelves neatly organized. On the middle shelf, a thick red hardcover book with gold lettering on the spine stands between a blue book of similar size and a slim green paperback. Wedged between the blue and green books, a white ceramic coffee mug with a brown coffee ring stain inside sits on the shelf among the books, clearly out of place in a row of literature. A wooden desk with a brass lamp and a notebook sits to the left. A leather reading chair with a plaid blanket draped over the arm faces the bookshelf. Framed photographs hang on the wall above the desk.",
+      "entities_in_scene": [
+        "book_1",
+        "book_2",
+        "book_3",
+        "mug"
+      ],
+      "composition_instructions": "Place book_1 on the middle shelf (left), standing upright. Place book_2 next to it (center). Place book_3 next to book_2 (right). Place mug wedged between book_2 and book_3 on the shelf, clearly out of place."
+    }
+  ]
+}

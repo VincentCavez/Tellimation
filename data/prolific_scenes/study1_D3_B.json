@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_D3_B",
+  "title": "Cat and fishbowl (Alert B)",
+  "entities": {
+    "cat": "a cat crouching on the table",
+    "fishbowl": "a fishbowl at the edge of the table"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Fishbowl",
+      "background_prompt": "A living room side table with a round glass fishbowl, a lace doily, a lamp, and a couch nearby. Afternoon light from a window. No animals, no fish in the bowl.",
+      "full_scene_prompt": "A living room in quiet afternoon light. A round glass fishbowl sits on a wooden side table covered with a white lace doily. Inside the fishbowl, a small orange goldfish swims in lazy circles. A gray and white cat has silently leapt onto the table and crouches beside the fishbowl in a hunting pose — body low, haunches raised, eyes wide and locked on the fish with predatory intensity, one paw extended slightly toward the bowl. The fishbowl sits dangerously close to the edge of the table. The fish seems oblivious, continuing its loops. A floor lamp with a cream shade casts warm light over the scene. A beige couch with throw pillows sits nearby. The room is peaceful except for this moment of impending mischief.",
+      "entities_in_scene": [
+        "cat",
+        "fishbowl"
+      ],
+      "composition_instructions": "Place cat on the side table next to the fishbowl, crouching in hunting pose, body low, haunches raised, eyes wide and locked on the fish, one paw extended. Place fishbowl near the edge of the table with a small orange goldfish swimming inside."
+    }
+  ]
+}

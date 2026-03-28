@@ -1,0 +1,1126 @@
+{
+  "design": {
+    "n_lists": 8,
+    "n_participants_per_list": 10,
+    "n_participants_total": 80,
+    "n_animations": 25,
+    "n_scenes_per_animation": 4,
+    "n_stimuli_per_participant": 25,
+    "n_views_per_stimulus": 10,
+    "n_views_per_animation_per_condition": 40
+  },
+  "lists": [
+    {
+      "list_id": 1,
+      "participants": "P01-P10",
+      "n_correction": 13,
+      "n_suggestion": 12,
+      "scene_distribution": {
+        "A": 6,
+        "B": 7,
+        "C": 6,
+        "D": 6
+      },
+      "stimuli": [
+        {
+          "animation_id": "I1",
+          "scene": "C",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "I2",
+          "scene": "A",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "C1",
+          "scene": "B",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "C2",
+          "scene": "B",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "C3",
+          "scene": "D",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "P1",
+          "scene": "D",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "P2a",
+          "scene": "D",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "P2b",
+          "scene": "A",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "P2c",
+          "scene": "B",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "P2d",
+          "scene": "B",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "P2e",
+          "scene": "C",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "P2f",
+          "scene": "A",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "A1",
+          "scene": "B",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "A2",
+          "scene": "A",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "S1",
+          "scene": "A",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "S2",
+          "scene": "B",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "T1",
+          "scene": "A",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "T2",
+          "scene": "C",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "R1",
+          "scene": "C",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "R2",
+          "scene": "D",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "R3",
+          "scene": "B",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "D1",
+          "scene": "D",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "D2",
+          "scene": "C",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "D3",
+          "scene": "C",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "D4",
+          "scene": "D",
+          "condition": "correction"
+        }
+      ]
+    },
+    {
+      "list_id": 2,
+      "participants": "P11-P20",
+      "n_correction": 12,
+      "n_suggestion": 13,
+      "scene_distribution": {
+        "A": 6,
+        "B": 7,
+        "C": 6,
+        "D": 6
+      },
+      "stimuli": [
+        {
+          "animation_id": "I1",
+          "scene": "A",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "I2",
+          "scene": "C",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "C1",
+          "scene": "C",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "C2",
+          "scene": "C",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "C3",
+          "scene": "C",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "P1",
+          "scene": "A",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "P2a",
+          "scene": "B",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "P2b",
+          "scene": "D",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "P2c",
+          "scene": "A",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "P2d",
+          "scene": "A",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "P2e",
+          "scene": "B",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "P2f",
+          "scene": "B",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "A1",
+          "scene": "A",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "A2",
+          "scene": "D",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "S1",
+          "scene": "D",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "S2",
+          "scene": "C",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "T1",
+          "scene": "D",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "T2",
+          "scene": "B",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "R1",
+          "scene": "B",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "R2",
+          "scene": "D",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "R3",
+          "scene": "B",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "D1",
+          "scene": "B",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "D2",
+          "scene": "C",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "D3",
+          "scene": "D",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "D4",
+          "scene": "A",
+          "condition": "correction"
+        }
+      ]
+    },
+    {
+      "list_id": 3,
+      "participants": "P21-P30",
+      "n_correction": 13,
+      "n_suggestion": 12,
+      "scene_distribution": {
+        "A": 6,
+        "B": 6,
+        "C": 6,
+        "D": 7
+      },
+      "stimuli": [
+        {
+          "animation_id": "I1",
+          "scene": "B",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "I2",
+          "scene": "D",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "C1",
+          "scene": "A",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "C2",
+          "scene": "D",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "C3",
+          "scene": "B",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "P1",
+          "scene": "D",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "P2a",
+          "scene": "C",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "P2b",
+          "scene": "C",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "P2c",
+          "scene": "A",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "P2d",
+          "scene": "A",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "P2e",
+          "scene": "B",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "P2f",
+          "scene": "A",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "A1",
+          "scene": "A",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "A2",
+          "scene": "D",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "S1",
+          "scene": "C",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "S2",
+          "scene": "C",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "T1",
+          "scene": "C",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "T2",
+          "scene": "D",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "R1",
+          "scene": "D",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "R2",
+          "scene": "B",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "R3",
+          "scene": "D",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "D1",
+          "scene": "A",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "D2",
+          "scene": "B",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "D3",
+          "scene": "C",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "D4",
+          "scene": "B",
+          "condition": "suggestion"
+        }
+      ]
+    },
+    {
+      "list_id": 4,
+      "participants": "P31-P40",
+      "n_correction": 12,
+      "n_suggestion": 13,
+      "scene_distribution": {
+        "A": 6,
+        "B": 6,
+        "C": 7,
+        "D": 6
+      },
+      "stimuli": [
+        {
+          "animation_id": "I1",
+          "scene": "A",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "I2",
+          "scene": "B",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "C1",
+          "scene": "C",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "C2",
+          "scene": "A",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "C3",
+          "scene": "A",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "P1",
+          "scene": "C",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "P2a",
+          "scene": "A",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "P2b",
+          "scene": "D",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "P2c",
+          "scene": "D",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "P2d",
+          "scene": "B",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "P2e",
+          "scene": "C",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "P2f",
+          "scene": "C",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "A1",
+          "scene": "D",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "A2",
+          "scene": "A",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "S1",
+          "scene": "B",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "S2",
+          "scene": "D",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "T1",
+          "scene": "B",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "T2",
+          "scene": "D",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "R1",
+          "scene": "B",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "R2",
+          "scene": "C",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "R3",
+          "scene": "C",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "D1",
+          "scene": "C",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "D2",
+          "scene": "D",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "D3",
+          "scene": "B",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "D4",
+          "scene": "A",
+          "condition": "suggestion"
+        }
+      ]
+    },
+    {
+      "list_id": 5,
+      "participants": "P41-P50",
+      "n_correction": 12,
+      "n_suggestion": 13,
+      "scene_distribution": {
+        "A": 6,
+        "B": 6,
+        "C": 7,
+        "D": 6
+      },
+      "stimuli": [
+        {
+          "animation_id": "I1",
+          "scene": "D",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "I2",
+          "scene": "B",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "C1",
+          "scene": "D",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "C2",
+          "scene": "C",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "C3",
+          "scene": "C",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "P1",
+          "scene": "A",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "P2a",
+          "scene": "D",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "P2b",
+          "scene": "B",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "P2c",
+          "scene": "C",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "P2d",
+          "scene": "C",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "P2e",
+          "scene": "A",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "P2f",
+          "scene": "D",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "A1",
+          "scene": "C",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "A2",
+          "scene": "C",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "S1",
+          "scene": "C",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "S2",
+          "scene": "A",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "T1",
+          "scene": "D",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "T2",
+          "scene": "B",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "R1",
+          "scene": "D",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "R2",
+          "scene": "B",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "R3",
+          "scene": "A",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "D1",
+          "scene": "B",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "D2",
+          "scene": "A",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "D3",
+          "scene": "A",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "D4",
+          "scene": "B",
+          "condition": "correction"
+        }
+      ]
+    },
+    {
+      "list_id": 6,
+      "participants": "P51-P60",
+      "n_correction": 13,
+      "n_suggestion": 12,
+      "scene_distribution": {
+        "A": 7,
+        "B": 6,
+        "C": 6,
+        "D": 6
+      },
+      "stimuli": [
+        {
+          "animation_id": "I1",
+          "scene": "C",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "I2",
+          "scene": "C",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "C1",
+          "scene": "B",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "C2",
+          "scene": "D",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "C3",
+          "scene": "B",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "P1",
+          "scene": "B",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "P2a",
+          "scene": "A",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "P2b",
+          "scene": "C",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "P2c",
+          "scene": "D",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "P2d",
+          "scene": "D",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "P2e",
+          "scene": "D",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "P2f",
+          "scene": "D",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "A1",
+          "scene": "B",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "A2",
+          "scene": "B",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "S1",
+          "scene": "A",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "S2",
+          "scene": "A",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "T1",
+          "scene": "C",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "T2",
+          "scene": "A",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "R1",
+          "scene": "A",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "R2",
+          "scene": "A",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "R3",
+          "scene": "D",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "D1",
+          "scene": "C",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "D2",
+          "scene": "A",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "D3",
+          "scene": "B",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "D4",
+          "scene": "C",
+          "condition": "suggestion"
+        }
+      ]
+    },
+    {
+      "list_id": 7,
+      "participants": "P61-P70",
+      "n_correction": 13,
+      "n_suggestion": 12,
+      "scene_distribution": {
+        "A": 7,
+        "B": 6,
+        "C": 6,
+        "D": 6
+      },
+      "stimuli": [
+        {
+          "animation_id": "I1",
+          "scene": "D",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "I2",
+          "scene": "A",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "C1",
+          "scene": "A",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "C2",
+          "scene": "B",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "C3",
+          "scene": "D",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "P1",
+          "scene": "C",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "P2a",
+          "scene": "B",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "P2b",
+          "scene": "B",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "P2c",
+          "scene": "C",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "P2d",
+          "scene": "D",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "P2e",
+          "scene": "A",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "P2f",
+          "scene": "B",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "A1",
+          "scene": "C",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "A2",
+          "scene": "B",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "S1",
+          "scene": "B",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "S2",
+          "scene": "D",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "T1",
+          "scene": "A",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "T2",
+          "scene": "A",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "R1",
+          "scene": "C",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "R2",
+          "scene": "C",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "R3",
+          "scene": "C",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "D1",
+          "scene": "A",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "D2",
+          "scene": "D",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "D3",
+          "scene": "A",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "D4",
+          "scene": "D",
+          "condition": "suggestion"
+        }
+      ]
+    },
+    {
+      "list_id": 8,
+      "participants": "P71-P80",
+      "n_correction": 12,
+      "n_suggestion": 13,
+      "scene_distribution": {
+        "A": 6,
+        "B": 6,
+        "C": 6,
+        "D": 7
+      },
+      "stimuli": [
+        {
+          "animation_id": "I1",
+          "scene": "B",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "I2",
+          "scene": "D",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "C1",
+          "scene": "D",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "C2",
+          "scene": "A",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "C3",
+          "scene": "A",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "P1",
+          "scene": "B",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "P2a",
+          "scene": "C",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "P2b",
+          "scene": "A",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "P2c",
+          "scene": "B",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "P2d",
+          "scene": "C",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "P2e",
+          "scene": "D",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "P2f",
+          "scene": "C",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "A1",
+          "scene": "D",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "A2",
+          "scene": "C",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "S1",
+          "scene": "D",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "S2",
+          "scene": "B",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "T1",
+          "scene": "B",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "T2",
+          "scene": "C",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "R1",
+          "scene": "A",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "R2",
+          "scene": "A",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "R3",
+          "scene": "A",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "D1",
+          "scene": "D",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "D2",
+          "scene": "B",
+          "condition": "correction"
+        },
+        {
+          "animation_id": "D3",
+          "scene": "D",
+          "condition": "suggestion"
+        },
+        {
+          "animation_id": "D4",
+          "scene": "C",
+          "condition": "correction"
+        }
+      ]
+    }
+  ]
+}

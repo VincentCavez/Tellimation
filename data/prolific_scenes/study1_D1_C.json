@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_D1_C",
+  "title": "Market haggling (Speech Bubble C)",
+  "entities": {
+    "vendor": "a vendor gesturing at his produce",
+    "customer": "a woman shaking her head"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Market Haggle",
+      "background_prompt": "An outdoor market with a produce stall, crates of vegetables, a hanging scale, and a canvas awning. Morning light. No people.",
+      "full_scene_prompt": "An outdoor market on a bright morning. A vendor — a stout man in a rolled-up white shirt and a flat cap — stands behind a wooden produce stall piled with tomatoes, peppers, and eggplants. He holds up three fingers with one hand and gestures broadly at his tomatoes with the other, mouth open mid-pitch, eyebrows raised persuasively. Across the stall, a woman in a green headscarf and a long cardigan shakes her head firmly, one hand raised palm-out in a 'no' gesture, the other hand holding a canvas shopping bag already half full. Their exchange is animated but friendly — a classic haggle. A hanging brass scale dangles from the stall's wooden frame. A canvas awning in tan provides shade. Other stalls with fruits and spices stretch behind them in a colorful row.",
+      "entities_in_scene": [
+        "vendor",
+        "customer"
+      ],
+      "composition_instructions": "Place vendor behind the wooden stall, standing and holding up three fingers with one hand, gesturing at tomatoes with the other, mouth open mid-pitch. Place customer across the stall, standing and shaking her head, one hand raised palm-out in a 'no' gesture, other hand holding a canvas shopping bag."
+    }
+  ]
+}

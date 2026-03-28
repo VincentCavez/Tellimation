@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_A1_C",
+  "title": "Horse meadow (Motion Lines C)",
+  "entities": {
+    "horse": "a white horse galloping",
+    "foal": "a small brown foal"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Meadow",
+      "background_prompt": "A wide green meadow with a wooden post-and-rail fence, wildflowers, rolling hills in the background, and a bright blue sky with white clouds. No animals.",
+      "full_scene_prompt": "A wide green meadow on a bright day. A white horse with a flowing silver mane gallops powerfully across the meadow from left to right, its legs extended in full stride, muscles rippling under its smooth coat, tail streaming behind. A small brown foal with spindly legs stands near the wooden post-and-rail fence to the right, watching the galloping horse with its ears perked forward. Wildflowers in purple and white dot the grass. Rolling green hills extend into the background under a bright blue sky with a few puffy white clouds. The wooden fence runs along the edge of the meadow, its posts casting short shadows in the midday sun.",
+      "entities_in_scene": [
+        "horse",
+        "foal"
+      ],
+      "composition_instructions": "Place horse galloping powerfully across the meadow from left to right, legs extended in full stride, mane flowing, tail streaming. Place foal near the wooden fence (right), standing with ears perked forward, watching."
+    }
+  ]
+}

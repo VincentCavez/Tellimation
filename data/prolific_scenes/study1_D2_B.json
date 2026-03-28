@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_D2_B",
+  "title": "Chess game (Thought Bubble B)",
+  "entities": {
+    "boy": "a boy staring at the chess board",
+    "opponent": "an opponent waiting patiently"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Chess Game",
+      "background_prompt": "A quiet room with a wooden chess table, two chairs, a clock on the wall, and bookshelves. Warm indoor light. No people.",
+      "full_scene_prompt": "A quiet room with warm indoor light. Two boys sit at a wooden chess table. One boy, about eleven, with dark curly hair and a green polo shirt, leans forward staring at the black and white chess board with intense concentration — one hand hovers over a knight piece, hesitating, his brow deeply furrowed in thought. The chess position is complex: pieces are scattered across the board in mid-game. His opponent, a boy in a red sweater, sits back in his chair with arms folded and a patient, slightly amused half-smile, waiting. A chess clock on the table shows time ticking. Bookshelves filled with books and a few chess trophies line the wall behind them. A round wall clock shows 3:30 PM.",
+      "entities_in_scene": [
+        "boy",
+        "opponent"
+      ],
+      "composition_instructions": "Place boy at the chess table, leaning forward and staring at the board, one hand hovering over a knight piece, brow deeply furrowed. Place opponent sitting back with arms folded and a patient half-smile."
+    }
+  ]
+}

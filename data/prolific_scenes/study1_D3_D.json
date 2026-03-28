@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_D3_D",
+  "title": "Baby crawling to stairs (Alert D)",
+  "entities": {
+    "baby": "a baby crawling toward the stairs",
+    "father": "a father reading on the couch"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Living Room",
+      "background_prompt": "A living room with an open staircase, a couch, a coffee table with a mug, a play mat with toys, and a baby gate that is open. No people.",
+      "full_scene_prompt": "A living room in a family home. A baby of about ten months in a white onesie with blue stars crawls energetically across the hardwood floor, heading directly toward an open staircase. The baby gate at the top of the stairs stands open — someone forgot to close it. The baby is only a meter away from the first step, moving with determined speed. On the couch against the far wall, the father in a flannel shirt and jeans is deeply absorbed in reading a thick paperback novel, legs stretched out on the coffee table, a mug of coffee beside him. He does not see the baby. A colorful play mat with scattered toys — blocks, a rattle, a soft ball — lies in the center of the room where the baby was presumably playing moments ago. The scene is charged with quiet urgency.",
+      "entities_in_scene": [
+        "baby",
+        "father"
+      ],
+      "composition_instructions": "Place baby on the hardwood floor, crawling energetically toward the open staircase, about one meter from the first step. Place father on the couch (far wall), deeply absorbed in a thick paperback, legs on coffee table, not seeing the baby."
+    }
+  ]
+}

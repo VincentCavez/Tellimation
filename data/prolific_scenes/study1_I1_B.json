@@ -1,0 +1,23 @@
+{
+  "story_id": "study1_I1_B",
+  "title": "Harbor (Spotlight B)",
+  "entities": {
+    "fisherman": "an old fisherman in a yellow raincoat",
+    "boy": "a boy sitting on a crate",
+    "pelican": "a brown pelican"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Harbor",
+      "background_prompt": "A small fishing harbor with wooden docks, moored boats, coiled ropes, stacked crates, and calm water reflecting the sky. Overcast day. No people, no animals.",
+      "full_scene_prompt": "A small fishing harbor on an overcast day. An old fisherman in a bright yellow raincoat and rubber boots stands on the wooden dock, pulling a thick rope attached to a small blue fishing boat. A boy in a gray hoodie and jeans sits on a wooden crate near the edge of the dock, dangling his legs and looking out at the water with a thoughtful expression. A brown pelican with a large beak perches on a wooden post at the end of the dock, its wings folded. Coiled ropes, lobster traps, and a red bucket sit on the dock. The calm water reflects the gray sky and the hulls of several moored boats. Seagulls circle in the distance.",
+      "entities_in_scene": [
+        "fisherman",
+        "boy",
+        "pelican"
+      ],
+      "composition_instructions": "Place fisherman on the dock (center-left), standing and pulling a rope attached to the blue boat, facing left. Place boy on a wooden crate near the dock edge (right), sitting with legs dangling, looking out at the water. Place pelican on the wooden post at the far end of the dock, wings folded, head tilted."
+    }
+  ]
+}

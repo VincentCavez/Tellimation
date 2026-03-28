@@ -1,0 +1,21 @@
+{
+  "story_id": "study1_R1_B",
+  "title": "Lost child (Magnetism B)",
+  "entities": {
+    "child": "a small child looking around",
+    "mother": "a mother rushing toward the child"
+  },
+  "scenes": [
+    {
+      "scene_number": 1,
+      "title": "The Shopping Mall",
+      "background_prompt": "A busy shopping mall atrium with potted plants, a fountain, tiled floor, store fronts, and bright skylight. No people.",
+      "full_scene_prompt": "A bright shopping mall atrium under a glass skylight. A small child of about four in a yellow raincoat and tiny red boots stands in the middle of the tiled floor near a circular fountain, turning in a slow circle with a worried look — eyes wide, lower lip pushed out, one hand clutching a stuffed dinosaur. A few meters away, a mother in a denim jacket and white sneakers rushes toward the child with both arms outstretched, her face a mix of relief and urgency. They are clearly about to reunite. Potted palm plants in large ceramic pots line the walkway. Store fronts with bright displays stretch on either side. The fountain behind the child sends a gentle spray of water upward, catching the skylight above.",
+      "entities_in_scene": [
+        "child",
+        "mother"
+      ],
+      "composition_instructions": "Place child in the center near the fountain, standing and turning slowly with worried look, one hand clutching a stuffed dinosaur. Place mother a few meters away, rushing toward the child with both arms outstretched, face showing relief and urgency."
+    }
+  ]
+}
