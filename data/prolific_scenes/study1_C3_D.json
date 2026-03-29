@@ -1,23 +1,22 @@
 {
   "story_id": "study1_C3_D",
-  "title": "Classroom desk (Ghost Outline D)",
+  "title": "Workshop (Ghost Outline D)",
   "entities": {
-    "student_1": "a girl writing in a notebook",
-    "student_2": "a boy raising his hand",
-    "empty_desk": "an empty desk with an open textbook and a pencil case"
+    "grandfather": "an old man in denim overalls and a plaid shirt",
+    "dog": "a golden retriever",
+    "boy": "a boy in a red hoodie with messy hair"
   },
   "scenes": [
     {
       "scene_number": 1,
-      "title": "The Empty Desk",
-      "background_prompt": "A classroom with rows of wooden desks, a whiteboard at the front, a world map on the wall, and sunlight from tall windows. No people.",
-      "full_scene_prompt": "A bright classroom with sunlight streaming through tall windows. Rows of wooden desks face a whiteboard at the front. A girl with a long black braid in a white blouse sits at a desk in the front row, writing carefully in a notebook. Behind her, a boy in a blue polo shirt raises his hand high, looking at the front of the room with an eager expression. Between them, one desk is conspicuously empty — but it is not abandoned. An open textbook lies flat on the desk surface, a colorful pencil case sits beside it unzipped with pens visible inside, and a backpack hangs from the chair. Someone was clearly sitting here and has just left. A world map is pinned to the wall beside the whiteboard, and a clock above reads 10:15 AM.",
+      "title": "The Workshop",
+      "background_prompt": "A cozy wooden workshop with a large workbench cluttered with tools, a pegboard on the wall hung with hammers and wrenches, wood shavings on the floor, shelves of paint cans and jars, and a small window letting in warm afternoon light. No people, no animals.",
+      "full_scene_prompt": "A cozy wooden workshop bathed in warm afternoon light from a small window. A large workbench in the center is cluttered with tools — a hand plane, chisels, a mallet, and scattered wood shavings. An old man in denim overalls and a plaid shirt stands at the workbench, carefully sanding a small wooden birdhouse, his brow furrowed in concentration. A golden retriever lies at his feet, chin resting on its front paws, watching him work with calm brown eyes. On the corner of the workbench, a small red hoodie is draped over a stool, and a child-sized pair of safety goggles rests beside it — as if their owner has just stepped out. A pegboard on the wall behind holds hammers, wrenches, and screwdrivers. Shelves along the side wall hold paint cans, jars of nails, and small wooden projects in progress.",
       "entities_in_scene": [
-        "student_1",
-        "student_2",
-        "empty_desk"
+        "grandfather",
+        "dog"
       ],
-      "composition_instructions": "Place student_1 at a front desk, sitting and writing carefully in a notebook. Place student_2 at a desk behind her, sitting and raising his hand eagerly. Leave one desk between them empty but with an open textbook, unzipped pencil case, and a backpack hanging from the chair."
+      "composition_instructions": "Place grandfather at the workbench (center), standing and sanding a small wooden birdhouse. Place dog lying at grandfather's feet, chin on paws, watching. Leave the stool at the corner of the workbench empty with a red hoodie draped over it — the boy (ghost entity) would appear here, standing beside grandfather as usual and helping with the project."
     }
   ]
 }
