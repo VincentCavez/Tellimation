@@ -2,14 +2,13 @@
   "story_id": "study1_S1_D",
   "title": "Man blocking mural (Reveal D)",
   "entities": {
-    "man": "a tall man in a long coat",
-    "mural": "a colorful street mural behind him"
+    "man": "a tall man in a long coat"
   },
   "scenes": [
     {
       "scene_number": 1,
       "title": "The Street Mural",
-      "background_prompt": "A city alleyway with a large painted wall, trash bins to the side, a fire escape above, and cracked pavement. Afternoon light. No people, no mural visible (it's behind the man).",
+      "background_prompt": "A city alleyway with a large painted wall, trash bins to the side, a fire escape above, and cracked pavement. A vibrant, colorful street mural peek through: swirls of bright orange, a painted blue bird's wing on one side, green leaf patterns on the other. Afternoon light. No people.",
       "full_scene_prompt": "A city alleyway in afternoon light. A tall man in a long dark gray overcoat and a black scarf stands in the center of the alley, facing the viewer with his hands in his pockets. He is positioned directly in front of a large wall, almost entirely blocking whatever is behind him. Only at the very edges — above his shoulders and beside his arms — fragments of a vibrant, colorful street mural peek through: swirls of bright orange, a painted blue bird's wing on one side, green leaf patterns on the other, suggesting a large and elaborate artwork hidden behind his figure. A few trash bins sit to the left of the alley. A metal fire escape zigzags up the building above. The cracked pavement has a few scattered puddles reflecting color from the mural's visible edges.",
       "entities_in_scene": [
         "man",
