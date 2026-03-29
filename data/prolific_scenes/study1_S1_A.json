@@ -3,8 +3,7 @@
   "title": "Kitchen - Grandmother (Reveal)",
   "entities": {
     "grandmother": "an elderly grandmother in a floral dress",
-    "cat": "a gray cat",
-    "window": "a window showing snow falling outside"
+    "cat": "a gray cat"
   },
   "scenes": [
     {

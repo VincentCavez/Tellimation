@@ -10,12 +10,12 @@
       "scene_number": 1,
       "title": "The Jewelry Shop",
       "background_prompt": "A small jewelry shop with glass display cases, velvet-lined trays, a brass lamp, and a magnifying glass on the counter. Warm interior lighting. No people, no jewelry on display.",
-      "full_scene_prompt": "A small jewelry shop with warm interior lighting. A woman shopkeeper in a deep purple velvet vest and white blouse stands behind a glass counter, holding a small velvet box open toward the viewer. Inside the box, resting on a tiny satin cushion, a diamond ring catches the light brilliantly — the faceted stone refracts light into tiny rainbows on the velvet surface around it. The ring is immaculate and gleaming. Glass display cases line the walls, showing necklaces and bracelets on velvet-lined trays. A brass desk lamp illuminates the counter, and a jeweler's magnifying glass sits beside a tray of tiny tools. The carpet is a deep burgundy.",
+      "full_scene_prompt": "A small jewelry shop with warm interior lighting. A man shopkeeper in a deep brown velvet vest and white blouse stands behind a glass counter, holding a small velvet box open toward the viewer. Inside the box, resting on a tiny satin cushion, a diamond ring catches the light brilliantly — the faceted stone refracts light into tiny rainbows on the velvet surface around it. The ring is immaculate and gleaming. Glass display cases line the walls, showing necklaces and bracelets on velvet-lined trays. A brass desk lamp illuminates the counter, and a jeweler's magnifying glass sits beside a tray of tiny tools. The carpet is a deep burgundy.",
       "entities_in_scene": [
-        "woman",
+        "man",
         "ring"
       ],
-      "composition_instructions": "Place woman behind the glass counter, standing and holding open a small velvet box. Place ring on the tiny satin cushion inside the box, diamond refracting light into tiny rainbows."
+      "composition_instructions": "Place man behind the glass counter, standing and holding open a small velvet box. Place ring on the tiny satin cushion inside the box, diamond refracting light into tiny rainbows."
     }
   ]
 }
