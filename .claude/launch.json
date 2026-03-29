@@ -7,6 +7,13 @@
       "runtimeArgs": ["-m", "uvicorn", "src.ui.app:app", "--reload", "--port", "8000"],
       "port": 8000,
       "autoPort": false
+    },
+    {
+      "name": "gen-ui",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "scripts.study_gen.gen_ui"],
+      "port": 5555,
+      "autoPort": false
     }
   ]
 }
