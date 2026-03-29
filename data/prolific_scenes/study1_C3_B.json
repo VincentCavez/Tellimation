@@ -2,22 +2,21 @@
   "story_id": "study1_C3_B",
   "title": "Dinner table (Ghost Outline B)",
   "entities": {
-    "father": "a father carving a roast",
-    "mother": "a mother serving salad",
-    "empty_chair": "an empty chair with a placemat and untouched glass"
+    "father": "a father in a collared shirt",
+    "mother": "a mother in a green sweater",
+    "child": "a young girl with red hair and a blue cardigan"
   },
   "scenes": [
     {
       "scene_number": 1,
       "title": "The Dinner Table",
-      "background_prompt": "A dining room with a large wooden table set for four, a chandelier overhead, a window with curtains, and a sideboard with candles. No people.",
-      "full_scene_prompt": "A warm dining room in the evening. A large wooden table is set for four people with white plates, folded napkins, and silver cutlery at each place. A father in a collared shirt stands at the head of the table carving a golden-brown roast with a large knife. A mother in a green sweater sits at the side, serving salad from a wooden bowl onto plates. Two seats are occupied, but a third chair at the far end has a full place setting — a plate, a folded napkin, a filled water glass untouched, and a placemat — but no one sitting in it. The chair is pulled out slightly as if someone was expected. A chandelier with warm bulbs glows overhead. A sideboard along the wall holds candles and a basket of bread rolls.",
+      "background_prompt": "A warm dining room in the evening with a large wooden table fully set for three, a chandelier overhead, a window with curtains showing the night sky, and a sideboard with candles along the wall. No people.",
+      "full_scene_prompt": "A warm dining room in the evening lit by a glowing chandelier. A large wooden table is set for three with white plates, folded napkins, silver cutlery, and filled water glasses. A father in a collared shirt stands at the head of the table, carving a golden-brown roast with a large knife and fork. A mother in a green sweater sits at the side, ladling soup into bowls with a gentle smile. At the far end of the table, a third chair is pulled out slightly from its place — its plate, napkin, and untouched water glass waiting neatly — but no one is sitting there. A sideboard along the wall holds candles and a basket of bread rolls. Outside the window, the night sky is dark blue.",
       "entities_in_scene": [
         "father",
-        "mother",
-        "empty_chair"
+        "mother"
       ],
-      "composition_instructions": "Place father at the head of the table, standing and carving a golden-brown roast. Place mother at the side, sitting and serving salad from a bowl. Leave the far end chair empty with a full place setting: plate, napkin, filled water glass, placemat. Chair pulled out slightly."
+      "composition_instructions": "Place father at the head of the table, standing and carving a golden-brown roast. Place mother at the side, sitting and ladling soup into a bowl. Leave the chair at the far end of the table empty with a full place setting (plate, napkin, filled water glass) and pulled out slightly — the child (ghost entity) would appear here, seated at her usual place."
     }
   ]
 }

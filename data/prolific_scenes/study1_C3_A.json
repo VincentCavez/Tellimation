@@ -2,22 +2,21 @@
   "story_id": "study1_C3_A",
   "title": "Beach (Ghost Outline)",
   "entities": {
-    "girl": "a girl in a pink swimsuit",
-    "seagull": "a white seagull",
-    "towel": "a striped beach towel with sunglasses and a hat"
+    "girl": "a girl in a pink swimsuit with her hair in a ponytail",
+    "seagull": "a white seagull with gray-tipped wings",
+    "boy": "a boy in blue swim trunks and a yellow t-shirt"
   },
   "scenes": [
     {
       "scene_number": 1,
       "title": "The Beach",
-      "background_prompt": "A sunny beach with golden sand, gentle ocean waves, scattered seashells, a large flat rock near the water, and a red cooler. Blue sky with white clouds. No people, no animals.",
-      "full_scene_prompt": "A sunny beach with golden sand. A girl in a pink swimsuit with her hair in a ponytail kneels in the sand in the center, carefully building a tall sandcastle with turrets and a small moat. A white seagull with gray-tipped wings stands on a large flat rock near the water's edge to the left, looking out at the sea. To the right of the girl, a colorful striped beach towel in blue, white, and orange lies flat on the sand. On the towel sit a pair of dark sunglasses and a wide-brimmed straw hat, as if someone has just stepped away. A red cooler sits next to the towel. The towel clearly belongs to someone who is not present. Ocean waves lap gently at the shore in the background, and a few seashells are scattered across the sand. The sky is a vivid blue with puffy white clouds.",
+      "background_prompt": "A sunny beach with golden sand, gentle ocean waves, scattered seashells, a large flat rock near the water, and a red and white striped beach umbrella with a towel beneath it. Blue sky with white clouds. No people, no animals.",
+      "full_scene_prompt": "A sunny beach with golden sand and gentle waves lapping at the shore. A girl in a pink swimsuit with her hair in a ponytail kneels in the center of the beach, carefully building a tall sandcastle with turrets and a small moat using a plastic bucket and shovel. A white seagull with gray-tipped wings stands on a large flat rock near the water's edge to the left, looking out at the sea. To the right, a striped beach umbrella casts shade over a towel laid on the sand, with a second bucket and shovel placed neatly beside it — belonging to someone who has not yet arrived. The sky is a vivid blue with puffy white clouds and a few seashells dot the sand.",
       "entities_in_scene": [
         "girl",
-        "seagull",
-        "towel"
+        "seagull"
       ],
-      "composition_instructions": "Place girl in the center of the beach, kneeling and building a tall sandcastle. Place seagull on the large flat rock near the water (left), standing and looking out. Place towel to the right of the girl, flat on the sand with sunglasses and straw hat on it, as if someone just stepped away."
+      "composition_instructions": "Place girl in the center of the beach, kneeling and building a sandcastle with a bucket and shovel. Place seagull on the large flat rock near the water (left), standing and looking out to sea. Leave the area under the beach umbrella (right) empty — the boy (ghost entity) would appear here, as if sitting or arriving at his usual spot."
     }
   ]
 }
