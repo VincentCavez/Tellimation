@@ -17,7 +17,80 @@
         "boy",
         "apples"
       ],
-      "composition_instructions": "Place woman behind the wooden table, standing and arranging fruit. Place apples as a large pile on the left of the table, bright red and glistening. Place boy in front of the stall, standing and pointing eagerly at the red apples."
+      "composition_instructions": "Place woman behind the wooden table, standing and arranging fruit. Place apples as a large pile on the left of the table, bright red and glistening. Place boy in front of the stall, standing and pointing eagerly at the red apples.",
+      "scene_description": "In the foreground, a cobblestone path composed of various shades of brown and tan stones stretches across the bottom of the scene. Centered in the path is a large, clear puddle that reflects the woman, the boy, and the fruit stand above it. Moving to the middle ground on the left, a boy with short brown hair, wearing a green short-sleeved t-shirt, brown shorts, blue socks, and white and blue sneakers, walks toward the right. He is leaning forward with his right arm extended, pointing his index finger toward the fruit. He stands on a patch of green grass dotted with small yellow and white flowers. Behind him is a large, rounded green bush. In the center of the scene is a wooden fruit stand with a brown frame and a red and white striped fabric awning with scalloped edges. On the stand's wooden surface, several wooden crates are arranged. The leftmost crate is piled high with red apples. To its right is another crate of red apples, followed by a crate of orange-colored citrus fruits. On the right side of the stand's surface are two crates filled with green pears. A woman with brown hair stands on the right side of the stand, facing the boy. She wears a light blue headscarf, a long-sleeved green dress with a white floral pattern, a white apron, and dark brown shoes. She holds a green pear in both hands. To her right, a bunch of yellow bananas hangs from a hook on the side of the stand, and a wooden crate filled with round yellow fruits sits on the ground below them. In the background, the scene is set under a bright blue sky with several fluffy white clouds. On the far left, a light brown silhouette of another market tent is visible in the distance. Large, leafy green trees with thick brown trunks frame the scene on both the left and right sides, situated behind the grassy field that extends behind the fruit stand.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "boy wearing a green t-shirt",
+            "woman in a floral green dress",
+            "woman wearing a blue headscarf"
+          ],
+          "S": [
+            "sunny day at an outdoor market",
+            "cobblestone path with a large puddle",
+            "wooden stand with red striped awning",
+            "grassy field with small colorful flowers"
+          ],
+          "IE": [
+            "boy points at the red apples",
+            "boy walks toward the fruit stand"
+          ],
+          "IR": [
+            "boy looks excited to see fruit",
+            "woman feels happy to help him"
+          ],
+          "P": [
+            "boy wants to pick some fruit",
+            "woman plans to sell a pear"
+          ],
+          "A": [
+            "boy is pointing his index finger",
+            "woman is holding a green pear",
+            "boy is walking on the grass"
+          ],
+          "CO": [
+            "puddle reflects the colorful market scene",
+            "boy reaches the wooden fruit stand"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "red and white striped fabric awning",
+            "wooden crates filled with red apples",
+            "large clear puddle on the path",
+            "bright green short-sleeved t-shirt"
+          ],
+          "ADV": [
+            "curiously",
+            "helpfully",
+            "brightly",
+            "carefully"
+          ],
+          "SC": [
+            "because he wants a snack",
+            "while the sun is shining",
+            "when the boy points his finger"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "wants",
+            "thinks",
+            "likes",
+            "wonders"
+          ],
+          "L": [
+            "asks",
+            "says",
+            "tells",
+            "greets"
+          ]
+        }
+      }
     }
   ]
 }

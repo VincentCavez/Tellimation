@@ -17,7 +17,83 @@
         "girl",
         "juggler"
       ],
-      "composition_instructions": "Place clown near the striped tent (left), standing and waving with one white-gloved hand. Place girl in front of the clown (center), standing and looking up at him, holding cotton candy in one hand. Place juggler to the right, standing and tossing three yellow balls in an arc above his head."
+      "composition_instructions": "Place clown near the striped tent (left), standing and waving with one white-gloved hand. Place girl in front of the clown (center), standing and looking up at him, holding cotton candy in one hand. Place juggler to the right, standing and tossing three yellow balls in an arc above his head.",
+      "scene_description": "In the foreground at the bottom of the scene, a green grassy field is dotted with small purple, white, yellow, and orange flowers, as well as several four-leaf clovers. Moving from left to right in the midground, a large rounded green tree with a brown trunk stands on the far left. To its right, a clown with curly orange hair, a white-painted face, and a red nose stands facing right. The clown wears a jumpsuit with red, yellow, and blue vertical stripes, a blue ruffled collar, white gloves, and large red shoes, and is waving its left hand. Behind the clown is another rounded green tree. To the right of the clown, a girl with brown braided hair tied with blue flowers stands facing left. She wears a yellow dress with orange floral patterns and holds a cone of pink cotton candy. Behind the girl is a large circus tent with red and white vertical stripes and a red flag at its peak. A string of glowing yellow circular lights stretches from the tree on the left, across the front of the tent, and toward the right side of the scene. To the right of the girl and the tent is a wooden booth with a red and white striped awning and a small grey box on its counter. Further to the right, a juggler with short brown hair, wearing a white shirt, a patterned brown vest, and brown pants, stands facing forward while juggling five yellow balls in an arc. Behind the juggler is a smaller red and white striped tent. To the far right is a wooden popcorn cart with large brown wheels and a red and white striped awning, filled with yellow popcorn. The background behind the tents and characters is filled with several large, rounded green trees, and in the far distance, rolling blue and purple hills meet the horizon under a light blue sky filled with fluffy white clouds, indicating a bright, clear day.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "clown with curly orange hair",
+            "girl wearing a yellow floral dress",
+            "juggler in a patterned brown vest"
+          ],
+          "S": [
+            "sunny day at a colorful carnival",
+            "grassy field with small wildflowers",
+            "large red and white circus tent"
+          ],
+          "IE": [
+            "clown waves to the little girl",
+            "juggler begins his outdoor performance",
+            "girl receives a pink cotton candy"
+          ],
+          "IR": [
+            "girl looks happy and excited",
+            "clown appears friendly and cheerful",
+            "juggler seems focused on his task"
+          ],
+          "P": [
+            "girl wants to eat her treat",
+            "juggler tries to catch every ball",
+            "clown intends to welcome the guests"
+          ],
+          "A": [
+            "clown waving a white gloved hand",
+            "girl holding a pink cotton candy",
+            "juggler tossing yellow balls in the air"
+          ],
+          "CO": [
+            "girl enjoys her sweet carnival snack",
+            "juggler successfully keeps the balls moving",
+            "guests feel welcome at the circus"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "fluffy pink cone of cotton candy",
+            "bright red and white striped tent",
+            "colorful jumpsuit with vertical stripes",
+            "small purple and yellow wildflowers"
+          ],
+          "ADV": [
+            "cheerfully",
+            "skillfully",
+            "brightly",
+            "quietly"
+          ],
+          "SC": [
+            "while the juggler tosses the balls",
+            "because she is at the carnival",
+            "when the clown waves his hand"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "feels",
+            "enjoys",
+            "wonders"
+          ],
+          "L": [
+            "greets",
+            "laughs",
+            "says",
+            "cheers"
+          ]
+        }
+      }
     }
   ]
 }

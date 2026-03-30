@@ -15,7 +15,78 @@
         "librarian",
         "garden"
       ],
-      "composition_instructions": "Place librarian standing directly in front of the heavy velvet curtains (back wall), arms behind her back, partially blocking the view. Through a narrow gap in the curtains behind her, a sliver of a secret garden with green plants, stone fountain, and sunlight should be barely visible."
+      "composition_instructions": "Place librarian standing directly in front of the heavy velvet curtains (back wall), arms behind her back, partially blocking the view. Through a narrow gap in the curtains behind her, a sliver of a secret garden with green plants, stone fountain, and sunlight should be barely visible.",
+      "scene_description": "In the foreground, a large, ornate rug with a red center and intricate blue, cream, and orange patterns covers the wooden floor. On the left side of the rug stands a librarian, a young girl with long brown hair tied with a blue ribbon, wearing round glasses, a yellow knit cardigan over a light blue collared shirt, a pleated green skirt, and brown lace-up boots; she stands with her hands behind her back, looking toward the center of the room. Behind her is a doorway framed by heavy green curtains pulled back with gold tie-backs, revealing a garden with a stone path, a small stone fountain, and lush green foliage under a bright sky. To the right of the librarian is a large, dark brown wooden desk. On top of the desk sits a green-shaded banker's lamp with a gold base, an open book with white pages, and a small blue inkwell containing a white feather quill. To the right of the desk is a large, plush armchair upholstered in a beige and brown floral pattern. Behind the desk and armchair are tall wooden bookshelves divided by four decorative wooden pillars; the shelves are filled with numerous books in shades of blue, green, red, yellow, and brown. On the far right, a large arched window looks out onto another part of the garden, featuring a small cottage with a thatched roof, a large tree, and white flowers. The background above the bookshelves shows a light blue sky with soft white clouds and the tops of large green trees.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "Young librarian with glasses and brown hair",
+            "Girl wearing a yellow knit cardigan"
+          ],
+          "S": [
+            "Cozy library with tall wooden bookshelves",
+            "Sunny garden visible through the doorway",
+            "Ornate rug on the wooden floor"
+          ],
+          "IE": [
+            "The librarian enters the quiet room",
+            "Sunlight streams through the open door"
+          ],
+          "IR": [
+            "The librarian feels peaceful and calm",
+            "She looks happy in her library"
+          ],
+          "P": [
+            "She wants to read the open book",
+            "She intends to organize the shelves"
+          ],
+          "A": [
+            "Standing with hands behind her back",
+            "Looking toward the desk and chair"
+          ],
+          "CO": [
+            "The library remains a quiet place",
+            "The book is ready to be read"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "Large ornate rug with red center",
+            "Green-shaded banker's lamp with gold base",
+            "Plush armchair with floral patterns",
+            "Small blue inkwell with white quill"
+          ],
+          "ADV": [
+            "Quietly",
+            "Neatly",
+            "Brightly",
+            "Patiently"
+          ],
+          "SC": [
+            "Because the garden is so bright",
+            "While she stands near the curtains",
+            "When she looks at the books"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "or",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "wonders",
+            "knows",
+            "notices"
+          ],
+          "L": [
+            "whispers",
+            "tells",
+            "explains",
+            "greets"
+          ]
+        }
+      }
     }
   ]
 }

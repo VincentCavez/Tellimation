@@ -15,7 +15,76 @@
         "train",
         "woman"
       ],
-      "composition_instructions": "Place train speeding through the station from left to right, cars a blur of motion. Place woman on the platform behind the yellow safety line, standing and waving her right hand high, coat and scarf fluttering in the wind."
+      "composition_instructions": "Place train speeding through the station from left to right, cars a blur of motion. Place woman on the platform behind the yellow safety line, standing and waving her right hand high, coat and scarf fluttering in the wind.",
+      "scene_description": "In the bottom left foreground, a rectangular wooden planter box is filled with green leaves and several small red and yellow flowers. Behind the planter, the edge of a stone platform is visible, marked by a solid yellow safety line running parallel to the tracks. A small wooden train station shelter stands on the platform, featuring a flat, slightly slanted roof supported by wooden pillars. On the left interior wall of the shelter, a white timetable board with a grid is mounted. Below the timetable, a long wooden bench with rounded ends sits against the back wall. Two hanging baskets filled with green foliage and small orange flowers are suspended from the roof's support beams. Standing on the platform, just outside the shelter and behind the yellow line, is a woman. She has brown hair and is wearing a blue jacket over a yellow and white striped shirt, brown trousers, green shoes with white soles, and a red and white checkered scarf. She is facing right, waving her left hand toward the passing train with a smile on her face. Two parallel metal train tracks run diagonally from the bottom left toward the middle right, laid on dark brown wooden sleepers set into a bed of grey gravel. A red steam train is moving quickly from left to right on the tracks. The locomotive is a deep red color with gold trim and a large black cowcatcher at the front. It has a single large headlight, a gold bell on top, and visible wheels and connecting rods that appear blurred to indicate motion. Several red passenger cars with blue-tinted windows are attached behind the locomotive. Behind the station shelter, there are several large, rounded green and yellow-green trees. To the right of the woman, more bushes with yellow flowers are visible. Further right, beyond the train, is a grassy field filled with small yellow flowers and green bushes. The sky above is a light blue, filled with soft, white, puffy clouds, with the warm light and long shadows suggesting it is either early morning or late afternoon.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "woman with brown hair and blue jacket",
+            "smiling woman wearing a checkered scarf"
+          ],
+          "S": [
+            "small wooden train station shelter",
+            "grassy field with small yellow flowers",
+            "light blue sky with soft clouds"
+          ],
+          "IE": [
+            "red steam train rushing past the station",
+            "woman standing on the stone platform"
+          ],
+          "IR": [
+            "woman looks happy to see the train",
+            "woman feels excited as the train passes"
+          ],
+          "P": [
+            "woman wants to wave at the train",
+            "woman intends to greet the passengers"
+          ],
+          "A": [
+            "woman waving her hand at the train",
+            "train moving quickly along the metal tracks"
+          ],
+          "CO": [
+            "train speeds past the waiting woman",
+            "woman smiles while waving her hand"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "red and white checkered scarf",
+            "small wooden train station shelter",
+            "red steam train with gold trim",
+            "long wooden bench with rounded ends"
+          ],
+          "ADV": [
+            "quickly",
+            "happily",
+            "smoothly",
+            "brightly"
+          ],
+          "SC": [
+            "while the train rushes past",
+            "because she is happy to see it",
+            "as the sun begins to set"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "feels",
+            "knows",
+            "wants"
+          ],
+          "L": [
+            "greets",
+            "calls",
+            "shouts"
+          ]
+        }
+      }
     }
   ]
 }

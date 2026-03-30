@@ -15,7 +15,76 @@
         "chef",
         "waitress"
       ],
-      "composition_instructions": "Place chef at the gas range, standing and holding a skillet with one hand, flipping a golden pancake mid-air above the pan. Place waitress passing behind him, carrying two plates of food toward the pass-through window."
+      "composition_instructions": "Place chef at the gas range, standing and holding a skillet with one hand, flipping a golden pancake mid-air above the pan. Place waitress passing behind him, carrying two plates of food toward the pass-through window.",
+      "scene_description": "In the far left foreground of this children's picture-book kitchen scene, a stainless steel cabinet with a single door sits below a large stainless steel stove. The stove has four burners, one of which is lit with a blue flame, and four circular control knobs on its front panel. A chef stands in front of the stove, facing right in a dynamic posture. He is a man with a cheerful expression, wearing a tall white chef's hat, a white double-breasted jacket with four visible buttons, a yellow and white checkered neckerchief, blue trousers, and brown boots. He holds a black frying pan in his right hand, tossing a golden-brown pancake into the air. Above the stove is a large, dark green ventilation hood. On the white-tiled wall behind the chef, a large silver frying pan, a medium silver pot, a small silver pot, and a ladle hang from a rack. To the right of these, two knives are attached to a magnetic strip, and below them, a ceramic jar holds various kitchen utensils. In the center of the scene, the floor is composed of large, light brown square tiles. Behind the chef is a long stainless steel prep counter where a white bowl with a spoon, a smaller white bowl, and a white jar containing wooden spoons are placed. Behind this counter is a large rectangular pass-through window looking into a dining area with pink booths and a round table. To the right of the prep counter, a waitress walks toward the right side of the frame. She has brown hair tied in a bun with a green hairband and a smiling face, wearing a short-sleeved green dress with a white collar, a white apron with yellow trim and a leaf design, blue and white striped socks, and brown shoes. She carries two white plates, each containing a piece of meat and green vegetables. Behind her, a stainless steel shelving unit contains stacks of bowls and a pot. Further right, a stainless steel counter features several bottles, including a green glass bottle and a brown glass bottle, along with a jar. Above this counter are shelves holding stacks of white bowls and plates and a small yellow bottle. In the far right background, a window reveals a bright blue sky with white clouds and orange-colored trees under a clear daytime sky. The ceiling features a rectangular light fixture that casts a warm glow over the entire setting.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "cheerful chef in a white hat",
+            "smiling waitress in a green dress"
+          ],
+          "S": [
+            "brightly lit commercial kitchen",
+            "stainless steel counters and appliances",
+            "sunny day visible through the window"
+          ],
+          "IE": [
+            "chef tossing a pancake into the air",
+            "waitress carrying two plates of food"
+          ],
+          "IR": [
+            "chef feeling proud of his cooking",
+            "waitress feeling happy to serve guests"
+          ],
+          "P": [
+            "chef trying to flip the pancake perfectly",
+            "waitress aiming to deliver the meals"
+          ],
+          "A": [
+            "flipping a pancake with a frying pan",
+            "walking across the tiled kitchen floor"
+          ],
+          "CO": [
+            "pancake soaring above the hot stove",
+            "meals ready for the hungry customers"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "tall white pleated chef's hat",
+            "golden-brown circular pancake",
+            "stainless steel stove with blue flames",
+            "green dress with a white apron"
+          ],
+          "ADV": [
+            "skillfully",
+            "cheerfully",
+            "steadily",
+            "neatly"
+          ],
+          "SC": [
+            "while the chef flips the pancake",
+            "because the orders are finished",
+            "as the waitress walks to the dining room"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "wants",
+            "knows",
+            "enjoys"
+          ],
+          "L": [
+            "shouts",
+            "tells",
+            "announces"
+          ]
+        }
+      }
     }
   ]
 }

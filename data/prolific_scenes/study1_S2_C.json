@@ -15,7 +15,79 @@
         "keeper",
         "boat"
       ],
-      "composition_instructions": "Place keeper inside the glass lantern room at the very top of the lighthouse, standing with one hand on the railing of the narrow walkway, looking out over the sea. Place boat in the small harbor at the base of the cliff, tied to a bollard, bobbing on choppy water."
+      "composition_instructions": "Place keeper inside the glass lantern room at the very top of the lighthouse, standing with one hand on the railing of the narrow walkway, looking out over the sea. Place boat in the small harbor at the base of the cliff, tied to a bollard, bobbing on choppy water.",
+      "scene_description": "In the lower-left foreground, a curved stone breakwater made of grey blocks extends into the light blue water, with a thick brown rope tied between two wooden bollards. To its right, a grassy hillside is covered in green clovers, white daisies, and small yellow flowers, through which a light brown dirt path with scattered grey stones winds upward. In the harbor area behind the breakwater, a boat with a white hull, a blue trim line, and a wooden cabin is moored near two small wooden piers. Two small brown wooden sheds with gabled roofs sit on the flat stone surface of the harbor; one has a fishing net draped beside it. A set of stone stairs leads from the harbor level up the side of a grassy cliff. Atop the cliff stands a tall white lighthouse with a red conical roof and a black railing around its observation deck. A keeper, dressed in a dark blue coat and hat, stands on the deck looking through a telescope toward the left. A small white building with a red roof is nestled at the base of the lighthouse. To the right of the lighthouse, the dirt path continues toward a stone cottage with a red-tiled roof, a chimney, and a wooden door, which is attached to a smaller wooden outbuilding. Behind the houses, several rounded trees with green, yellow, and orange foliage grow. In the far background, a range of soft blue mountains sits on the horizon under a pale blue sky filled with numerous large, fluffy white and grey clouds. The scene is depicted in a bright, clear daylight setting.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "keeper in a dark blue coat",
+            "keeper wearing a small blue hat"
+          ],
+          "S": [
+            "bright daylight by the seaside",
+            "tall white lighthouse on a cliff",
+            "calm blue harbor with stone breakwater",
+            "fluffy white and grey clouds"
+          ],
+          "IE": [
+            "keeper spots something through his telescope",
+            "boat arrives at the quiet harbor"
+          ],
+          "IR": [
+            "keeper looks focused and curious",
+            "scene feels peaceful and quiet"
+          ],
+          "P": [
+            "keeper wants to watch for ships",
+            "boat captain wants to dock safely"
+          ],
+          "A": [
+            "keeper looking through a telescope",
+            "boat floating in the harbor",
+            "path winding up the grassy hill"
+          ],
+          "CO": [
+            "boat is safely moored",
+            "keeper knows what is happening at sea"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "tall white lighthouse with red roof",
+            "curved stone breakwater with thick rope",
+            "small wooden sheds with gabled roofs",
+            "grassy hillside with white daisies"
+          ],
+          "ADV": [
+            "carefully",
+            "steadily",
+            "peacefully",
+            "high above"
+          ],
+          "SC": [
+            "because he is watching the sea",
+            "while the boat is docked",
+            "when the sun is shining"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "watches",
+            "wonders",
+            "notices",
+            "decides"
+          ],
+          "L": [
+            "signals",
+            "calls",
+            "reports",
+            "describes"
+          ]
+        }
+      }
     }
   ]
 }

@@ -15,7 +15,79 @@
         "child",
         "ornament"
       ],
-      "composition_instructions": "Place child on the carpet in front of the Christmas tree, sitting cross-legged and looking up at the star with wonder. Place ornament (gold star) at the very top of the tree, polished and catching morning light in dazzling rays."
+      "composition_instructions": "Place child on the carpet in front of the Christmas tree, sitting cross-legged and looking up at the star with wonder. Place ornament (gold star) at the very top of the tree, polished and catching morning light in dazzling rays.",
+      "scene_description": "In the bottom left foreground, a decorative rug with a blue and white border sits on a light brown wooden floor. On this rug, several wrapped gifts are clustered around the base of a large green Christmas tree. The gifts include a small blue box with white stars, a green box with a red ribbon, a tall blue box with white stars and a red bow, a green box with a yellow bow, a small white box with a blue ribbon, a purple box with a white ribbon, a red and yellow striped box with a red bow, a round pink box with a green ribbon, and an orange and green striped box with a green ribbon. The Christmas tree, positioned on the left side of the room, is decorated with strings of small glowing yellow lights, which serve as each ornament, and is topped with a large, glowing five-pointed yellow star. In the center foreground, a young child with short brown hair sits cross-legged on the wooden floor, facing left and looking up at the tree with a smile. The child is wearing yellow pajamas patterned with blue stars and crescent moons, along with blue socks. To the right of the child, a stone fireplace built of rounded grey and brown stones occupies the right side of the room. Inside the fireplace, a bright orange and yellow fire burns on a log. Hanging from the dark wood mantle are three stockings: a brown one with a white reindeer, a light blue one with a white snowflake, and a green and white striped one. Behind the fireplace and to its left, a grey armchair is tucked into the corner, with a light blue and pink blanket draped over its back. In the background, centered behind the child, is a large three-paned window with a white frame. Through the window, a bright winter scene is visible, featuring snow-covered pine trees under a pale blue sky with soft white clouds. Bright rays of sunlight stream through the window into the room. The walls of the room are a pale cream color with simple white molding at the top and bottom.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "a young boy with short brown hair",
+            "a child wearing star-patterned pajamas"
+          ],
+          "S": [
+            "a cozy living room on Christmas morning",
+            "snowy pine trees visible through the window",
+            "a warm fire burning in the stone fireplace",
+            "bright sunlight streaming through the large window"
+          ],
+          "IE": [
+            "the child finds presents under the tree",
+            "the sun rises on a snowy Christmas day"
+          ],
+          "IR": [
+            "the boy feels happy and full of wonder",
+            "the child is excited to see the gifts"
+          ],
+          "P": [
+            "the boy wants to open his Christmas presents",
+            "the child plans to admire the glowing star"
+          ],
+          "A": [
+            "sitting cross-legged on the wooden floor",
+            "looking up at the tall Christmas tree",
+            "smiling at the beautiful holiday decorations"
+          ],
+          "CO": [
+            "the room is filled with morning light",
+            "many colorful gifts wait to be opened"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "a large green tree with glowing lights",
+            "a bright yellow star on the top",
+            "yellow pajamas with blue stars and moons",
+            "colorful wrapped gifts with pretty bows",
+            "a stone fireplace with three hanging stockings"
+          ],
+          "ADV": [
+            "happily",
+            "quietly",
+            "brightly",
+            "wonderingly"
+          ],
+          "SC": [
+            "because it is finally Christmas morning",
+            "while the sun shines through the window",
+            "when he looks at the glowing star"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "wonders",
+            "thinks",
+            "feels",
+            "likes"
+          ],
+          "L": [
+            "whispers",
+            "says",
+            "tells"
+          ]
+        }
+      }
     }
   ]
 }

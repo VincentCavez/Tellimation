@@ -17,7 +17,77 @@
         "fence",
         "goat"
       ],
-      "composition_instructions": "Place boulder at the very top of the slope, sitting precariously. Place fence across the base of the hill, simple wooden picket. Place goat on a flat ledge to the right, standing and watching with head turned toward the boulder."
+      "composition_instructions": "Place boulder at the very top of the slope, sitting precariously. Place fence across the base of the hill, simple wooden picket. Place goat on a flat ledge to the right, standing and watching with head turned toward the boulder.",
+      "scene_description": "In the immediate foreground, a wooden fence with vertical brown pickets stretches across the bottom of the frame, featuring a break where two pickets lean toward the right. Clusters of tall green grass and small flowers in red, orange, and yellow hues grow around the base and between the pickets of the fence. Moving into the midground, a grassy hill slopes downward from the upper left toward the center-right. On the high ground to the left, a large, smooth, grey boulder sits nestled among patches of small yellow and red flowers. To the right of the boulder, further down the slope, a white goat stands facing left; it has small grey horns, a brown collar with a yellow bell, and is positioned on all four legs. Behind the hill and the goat, the landscape transitions into rolling green hills and valleys filled with dense clusters of leafy green trees. On the far left and far right, groups of taller green trees frame the scene. In the background, a bright blue sky is populated with several soft, white, fluffy clouds of varying sizes. The entire scene depicts a peaceful, sunny day in a rural countryside.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "a white goat with small horns",
+            "a goat wearing a brown collar"
+          ],
+          "S": [
+            "a grassy hill on a sunny day",
+            "rolling green hills under a blue sky",
+            "peaceful countryside with fluffy clouds"
+          ],
+          "IE": [
+            "the large boulder sitting on the slope",
+            "the goat looking up the hill"
+          ],
+          "IR": [
+            "the goat looks calm and curious",
+            "the goat seems peaceful in the meadow"
+          ],
+          "P": [
+            "the goat might want to climb higher",
+            "the goat wants to eat the flowers"
+          ],
+          "A": [
+            "the goat stands on the grassy slope",
+            "the boulder sits still on the hill"
+          ],
+          "CO": [
+            "the fence keeps the goat in the meadow",
+            "the boulder stays balanced on the grass"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "a large smooth grey boulder",
+            "a white goat with a bell",
+            "a brown wooden picket fence",
+            "bright yellow and red flowers"
+          ],
+          "ADV": [
+            "peacefully standing",
+            "quietly waiting",
+            "steeply sloping",
+            "brightly shining"
+          ],
+          "SC": [
+            "because the hill is very steep",
+            "while the goat stands in the grass",
+            "when the sun shines on the hills"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "wonders",
+            "thinks",
+            "likes",
+            "notices"
+          ],
+          "L": [
+            "bleats",
+            "calls",
+            "says",
+            "tells"
+          ]
+        }
+      }
     }
   ]
 }

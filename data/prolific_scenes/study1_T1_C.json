@@ -15,7 +15,83 @@
         "girl",
         "puddle"
       ],
-      "composition_instructions": "Place girl standing beside a wet puddle on the lawn (center), looking down with wistful expression, hands at sides. Place puddle with remnants: a soggy red scarf in a coil, a carrot on its side, two coal-stone eyes, three dark buttons in a line."
+      "composition_instructions": "Place girl standing beside a wet puddle on the lawn (center), looking down with wistful expression, hands at sides. Place puddle with remnants: a soggy red scarf in a coil, a carrot on its side, two coal-stone eyes, three dark buttons in a line.",
+      "scene_description": "In the bottom left foreground, several long green blades of grass grow near a small green bush dotted with tiny white flowers. To the right, a puddle sits on a patch of green grass that is interspersed with white clover-like flowers and small patches of melting white snow. Inside the puddle are the remnants of a melted snowman, including a red and white striped scarf, a large orange carrot, a smaller carrot tip, and five small black circular buttons or stones. Standing just behind the puddle is a girl with a sad, downward-looking expression. She has brown hair styled in a single braid and wears an orange knit beanie with a pom-pom, a blue winter coat with a yellow zipper, a red and white striped scarf peeking out from the collar, a brown backpack with a small flower detail, green and white striped leggings, and blue boots with orange laces. To the right of the girl, a green metal mailbox with its red flag raised sits atop a textured brown wooden post. On the far right, a gray stone path composed of irregular rectangular blocks curves toward the background. Patches of white snow cover the ground around the path and the grass. In the middle ground, a white picket fence stretches across the width of the scene behind the girl and the mailbox. To the left of the fence stands a large, leafless brown tree with many reaching branches and a smaller, rounded green tree. To the right of the fence, there is another large rounded green tree, a tall, thin dark green evergreen, and a large, dense brown and green bush. The background features soft, rolling green and blue hills under a pale blue sky filled with several large, fluffy white clouds, suggesting a bright day during the transition from winter to spring.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "a young girl with a brown braid",
+            "a girl wearing an orange beanie",
+            "a child in a blue winter coat"
+          ],
+          "S": [
+            "a snowy yard with a white fence",
+            "a bright day with fluffy white clouds",
+            "a stone path leading to a mailbox"
+          ],
+          "IE": [
+            "the snowman has melted into a puddle",
+            "the winter snow is starting to disappear",
+            "the sun has come out to warm the ground"
+          ],
+          "IR": [
+            "the girl feels sad and disappointed",
+            "she looks unhappy about the melted snowman",
+            "the girl feels lonely without her friend"
+          ],
+          "P": [
+            "she wants to pick up the scarf",
+            "she might try to build it again",
+            "she wants to save the carrot nose"
+          ],
+          "A": [
+            "standing quietly by the melting puddle",
+            "looking down at the snowman's remains",
+            "waiting by the green metal mailbox"
+          ],
+          "CO": [
+            "only a puddle and buttons are left",
+            "the snowman's scarf lies in the water",
+            "the grass is showing through the snow"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "a red and white striped scarf",
+            "a large orange carrot nose",
+            "a green metal mailbox with a red flag",
+            "a soft blue winter coat",
+            "a textured brown wooden post"
+          ],
+          "ADV": [
+            "sadly",
+            "quietly",
+            "downward",
+            "completely"
+          ],
+          "SC": [
+            "because the weather got warmer",
+            "when she looked at the ground",
+            "since the snowman is gone"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "feels",
+            "remembers",
+            "wonders",
+            "realizes"
+          ],
+          "L": [
+            "sighs",
+            "whispers",
+            "mutters"
+          ]
+        }
+      }
     }
   ]
 }

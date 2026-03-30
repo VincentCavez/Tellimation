@@ -15,7 +15,78 @@
         "mother",
         "boy"
       ],
-      "composition_instructions": "Place mother propped up against pillows on the bed, sitting and holding open a large illustrated storybook. Place boy snuggled against her side, eyes wide, clutching a stuffed bear."
+      "composition_instructions": "Place mother propped up against pillows on the bed, sitting and holding open a large illustrated storybook. Place boy snuggled against her side, eyes wide, clutching a stuffed bear.",
+      "scene_description": "In the foreground on the left, a small brown wooden nightstand with a single drawer and a round knob rests on a brown wooden plank floor. On top of the nightstand, a small brown teddy bear sits to the left of a glowing lamp with a yellow conical shade and a round brown base. Behind the nightstand is a wooden bed with a curved headboard and footboard. A yellow pillow is propped against the headboard. On the bed, a mother with wavy brown hair, wearing a green sweater with a yellow patterned collar, sits next to a boy. The boy has curly brown hair and wears a light blue shirt; he sits in front of the mother, holding a small brown teddy bear in his arms. The mother holds an open book with illustrated pages, and both characters are looking down at it. The bed is covered with a tan blanket and a blue top blanket featuring wavy light blue stripes. To the right of the bed stands a large brown wooden bookshelf with three shelves filled with various colorful books in shades of blue, red, green, yellow, pink, and purple, some standing upright and others lying flat. In the background on the right wall, a window with a brown frame shows a dark blue night sky with clouds and a sliver of a white moon. The room has blue walls and a sloped ceiling. The ceiling is decorated with numerous glowing yellow and green stars and two yellow crescent moons. The entire scene is illuminated by the warm light of the bedside lamp.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "Mother with wavy brown hair",
+            "Boy with curly brown hair",
+            "Small brown teddy bear"
+          ],
+          "S": [
+            "Cozy bedroom at night",
+            "Sloped ceiling with glowing stars",
+            "Wooden bookshelf filled with books",
+            "Window showing a dark night sky"
+          ],
+          "IE": [
+            "Mother opens a storybook to read",
+            "It is time for bed"
+          ],
+          "IR": [
+            "Boy feels safe and cozy",
+            "Mother feels happy and calm"
+          ],
+          "P": [
+            "Mother wants to finish the story",
+            "Boy wants to listen to the tale"
+          ],
+          "A": [
+            "Mother is holding the open book",
+            "Boy is hugging his teddy bear",
+            "Characters are looking at the pages"
+          ],
+          "CO": [
+            "The boy will fall asleep soon",
+            "The room is filled with warm light"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "Green sweater with yellow patterns",
+            "Blue blanket with wavy stripes",
+            "Glowing lamp with a yellow shade",
+            "Large brown wooden bookshelf"
+          ],
+          "ADV": [
+            "Gently",
+            "Quietly",
+            "Closely",
+            "Warmly"
+          ],
+          "SC": [
+            "While they read together",
+            "Because it is bedtime",
+            "Before the boy falls asleep"
+          ],
+          "CC": [
+            "And",
+            "But",
+            "So"
+          ],
+          "M": [
+            "Imagines",
+            "Wonders",
+            "Remembers"
+          ],
+          "L": [
+            "Whispers",
+            "Reads",
+            "Tells"
+          ]
+        }
+      }
     }
   ],
   "interjection_word": "ran!"

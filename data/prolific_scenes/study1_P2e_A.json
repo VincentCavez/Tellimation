@@ -19,7 +19,77 @@
         "cat",
         "vase"
       ],
-      "composition_instructions": "Place girl in the center of the room, standing with arms tightly crossed, brows furrowed, staring down at the broken vase. Place boy peeking out from behind the couch (left), only wide eyes and top of head visible. Place cat on the windowsill (right), sitting calmly with tail curled. Place vase broken on the rug with water pooled and flowers scattered."
+      "composition_instructions": "Place girl in the center of the room, standing with arms tightly crossed, brows furrowed, staring down at the broken vase. Place boy peeking out from behind the couch (left), only wide eyes and top of head visible. Place cat on the windowsill (right), sitting calmly with tail curled. Place vase broken on the rug with water pooled and flowers scattered.",
+      "scene_description": "In the bottom left corner, a large green leafy plant sits in a terracotta-colored pot, and next to it is a smaller green plant in a grey pot. A colorful geometric rug with patterns of blue, red, yellow, and white lies on the wooden floor, covered in pink and yellow flowers and petals. In the center foreground, a broken green vase with gold patterns lies shattered in a pool of water on the rug. Standing directly behind the broken vase is a girl with long dark hair, wearing a red t-shirt, blue jeans, and red and white sneakers; she has an angry expression with furrowed eyebrows and her arms crossed over her chest. To the right, a wooden side table holds a lamp with a beige shade and a small succulent in a white pot, with more petals scattered on the floor beneath it. Behind the girl is a large beige sofa featuring a yellow pillow on the left and a blue pillow on the right. A boy with curly blonde hair peeks out from behind the left side of the sofa, looking toward the broken vase with a concerned expression. On the top right backrest of the sofa sits an orange tabby cat looking toward the girl with a squinted, knowing expression. In the background on the left, a large arched window reveals a sunny outdoor scene with green trees, bushes, and white clouds against a blue sky. Below the window is a window seat with a blue and white striped cushion and a yellow pillow. The room has peach-colored walls, and a framed blue picture hangs on the wall to the far right.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "girl with long dark hair",
+            "boy with curly blonde hair",
+            "orange tabby cat on the sofa"
+          ],
+          "S": [
+            "sunny living room with peach walls",
+            "large arched window showing green trees",
+            "wooden floor with a colorful rug"
+          ],
+          "IE": [
+            "green vase shattered on the rug",
+            "water and flowers spilled everywhere"
+          ],
+          "IR": [
+            "girl looks angry with furrowed eyebrows",
+            "boy looks worried and concerned",
+            "cat has a knowing, squinted expression"
+          ],
+          "P": [
+            "girl wants to find the culprit",
+            "boy tries to hide behind furniture"
+          ],
+          "A": [
+            "girl stands with her arms crossed",
+            "boy peeks from behind the sofa",
+            "cat sits and watches the girl"
+          ],
+          "CO": [
+            "broken pottery pieces on the floor",
+            "petals scattered across the geometric rug"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "broken green vase with gold patterns",
+            "colorful rug with geometric shapes",
+            "large beige sofa with soft pillows",
+            "bright red t-shirt and blue jeans"
+          ],
+          "ADV": [
+            "standing very angrily",
+            "peeking out worriedly",
+            "sitting there quietly"
+          ],
+          "SC": [
+            "because the vase is broken",
+            "while the boy hides behind the sofa",
+            "when the water spilled out"
+          ],
+          "CC": [
+            "the girl is angry and crossed",
+            "he is hiding but she sees",
+            "it broke so water is everywhere"
+          ],
+          "M": [
+            "the girl feels very angry",
+            "the boy thinks he is hidden",
+            "the cat knows what happened"
+          ],
+          "L": [
+            "the girl scolds the boy",
+            "the boy whispers a secret",
+            "the girl asks who did it"
+          ]
+        }
+      }
     }
   ]
 }

@@ -15,7 +15,84 @@
         "fox",
         "rabbit"
       ],
-      "composition_instructions": "Place fox on the path (center), running energetically to the right at full sprint, legs stretched out, bushy tail behind. Place rabbit ahead of the fox on the path (right), hopping with ears laid back and hind legs pushing off."
+      "composition_instructions": "Place fox on the path (center), running energetically to the right at full sprint, legs stretched out, bushy tail behind. Place rabbit ahead of the fox on the path (right), hopping with ears laid back and hind legs pushing off.",
+      "scene_description": "In the bottom left foreground, a dense cluster of green leafy plants, ferns, and small yellow and blue flowers grows at the edge of a winding brown dirt path. A fox with reddish-orange fur, a white chest, white belly, and a bushy tail with a white tip is captured in a running motion, moving from left to right. The fox has black paws and a smiling expression, with its front legs reaching forward and its hind legs pushing off the ground. Positioned on the path ahead of the fox is a white rabbit, also running towards the right. The rabbit has long ears with pink interiors, a small black eye, and is in mid-leap with its legs extended. Beneath the fox and rabbit, several small brown mushrooms grow in the grass alongside the path. In the bottom right foreground, more green ferns and small blue and yellow flowers are scattered near the path, which contains a few small grey stones. Behind the fox on the left side of the midground, a large tree with a thick brown trunk and a full green canopy rises, with ferns growing at its base. In the center midground, a rolling green hill is dotted with tiny blue, yellow, and white flowers. To the right, a massive, ancient-looking tree with a wide, gnarled brown trunk and thick, spreading roots dominates the midground, its branches covered in green leaves. In the background, a series of green trees forms a dense forest under a clear, light blue sky with soft, puffy white clouds. A bright light emanates from the center background, casting a warm glow across the landscape, indicating it is a sunny day, likely during the morning or late afternoon. The fox is located behind the rabbit, and both animals are positioned in front of the large trees and the distant forest backdrop.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "A reddish-orange fox with a white chest",
+            "A small white rabbit with long ears",
+            "The smiling fox chasing the rabbit"
+          ],
+          "S": [
+            "A sunny forest with a dirt path",
+            "Massive ancient trees with thick roots",
+            "A clear blue sky with white clouds",
+            "Rolling green hills with colorful wildflowers"
+          ],
+          "IE": [
+            "The fox spots the rabbit running",
+            "The rabbit starts to hop away",
+            "The animals begin a game of chase"
+          ],
+          "IR": [
+            "The fox feels playful and excited",
+            "The rabbit feels fast and energetic",
+            "The fox looks happy while running"
+          ],
+          "P": [
+            "The fox wants to catch the rabbit",
+            "The rabbit tries to escape quickly",
+            "The fox intends to follow the path"
+          ],
+          "A": [
+            "The fox is running very fast",
+            "The white rabbit is leaping forward",
+            "The animals are racing through the woods"
+          ],
+          "CO": [
+            "The rabbit stays ahead of the fox",
+            "The animals race past the trees",
+            "The chase continues down the winding path"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "A bushy tail with a white tip",
+            "Tiny blue and yellow wildflowers",
+            "A thick gnarled brown tree trunk",
+            "Long ears with soft pink interiors"
+          ],
+          "ADV": [
+            "Quickly",
+            "Playfully",
+            "Swiftly",
+            "Happily"
+          ],
+          "SC": [
+            "While the fox runs through the grass",
+            "Because the rabbit is very fast",
+            "When they reach the ancient tree"
+          ],
+          "CC": [
+            "And",
+            "But",
+            "So"
+          ],
+          "M": [
+            "Wants",
+            "Thinks",
+            "Likes",
+            "Hopes"
+          ],
+          "L": [
+            "Calls",
+            "Shouts",
+            "Says",
+            "Tells"
+          ]
+        }
+      }
     }
   ]
 }

@@ -23,7 +23,72 @@
         "butterfly",
         "watering_can"
       ],
-      "composition_instructions": "Place tulip_1 at the left edge of the flower bed, leaning slightly toward the sun. Place tulip_2 next to it, standing perfectly upright. Place tulip_3 next, with a dewdrop on one petal. Place tulip_4 at the right, tilting gently right. Place butterfly hovering above the tulips, moving between them. Place watering_can on the stone path in front of the bed."
+      "composition_instructions": "Place tulip_1 at the left edge of the flower bed, leaning slightly toward the sun. Place tulip_2 next to it, standing perfectly upright. Place tulip_3 next, with a dewdrop on one petal. Place tulip_4 at the right, tilting gently right. Place butterfly hovering above the tulips, moving between them. Place watering_can on the stone path in front of the bed.",
+      "scene_description": "In the immediate foreground of this children's picture-book scene, a lush green lawn is scattered with small, four-petaled white flowers and green clovers. A horizontal stone path made of flat, irregular brown stones separates the lawn from the garden area. Moving from left to right in the middle ground, there is a rectangular raised garden bed constructed from dark brown wood. Inside this bed, three red tulips grow from the soil: tulip_1 is on the left, tulip_2 is in the center with a small white droplet on its petal, and tulip_3 is on the right. A yellow butterfly with black wing markings flutters in the air above tulip_1. To the right of this garden bed is a tall, dark brown wooden trellis covered in dense green vines with small leaves and buds. At the base of the trellis, to its right, sits a green watering_can. Further to the right are three additional rectangular raised wooden garden beds, all filled with dark brown soil but currently empty of plants. Behind the garden beds and trellis, a white picket fence with pointed tops spans the width of the image. In the background, rolling green hills and rounded green trees sit under a clear blue sky dotted with several fluffy white clouds. On the far right, a large, full green tree with a thick brown trunk stands behind the fence. The scene is illuminated by bright, even daylight.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "yellow butterfly with black wing markings"
+          ],
+          "S": [
+            "sunny garden with rolling green hills",
+            "white picket fence behind the garden",
+            "raised wooden beds filled with soil",
+            "clear blue sky with fluffy clouds"
+          ],
+          "IE": [
+            "butterfly fluttering near the red tulips",
+            "watering can sitting ready for use"
+          ],
+          "IR": [
+            "butterfly looking curious about the flowers"
+          ],
+          "P": [
+            "butterfly wanting to land on a tulip",
+            "gardener intending to plant more seeds"
+          ],
+          "A": [
+            "butterfly flying over the garden bed",
+            "vines growing up the wooden trellis"
+          ],
+          "CO": [
+            "tulips blooming in the first garden bed",
+            "empty beds waiting for new plants"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "red tulip with a white droplet",
+            "tall trellis covered in green vines",
+            "green watering can on the grass",
+            "white picket fence with pointed tops"
+          ],
+          "ADV": [
+            "brightly",
+            "gently",
+            "quietly"
+          ],
+          "SC": [
+            "because the flowers are blooming",
+            "when the sun comes out",
+            "while the butterfly flies"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "wants",
+            "likes",
+            "notices"
+          ],
+          "L": [
+            "hums",
+            "whispers"
+          ]
+        }
+      }
     }
   ]
 }

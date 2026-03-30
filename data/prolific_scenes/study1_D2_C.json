@@ -15,7 +15,77 @@
         "woman",
         "signpost"
       ],
-      "composition_instructions": "Place woman at the fork in the path, standing and facing the signpost, one hand on chin, head tilted, expression contemplative. Stopped mid-stride."
+      "composition_instructions": "Place woman at the fork in the path, standing and facing the signpost, one hand on chin, head tilted, expression contemplative. Stopped mid-stride.",
+      "scene_description": "In the bottom left foreground, a dense patch of green grass is dotted with small yellow, purple, and white wildflowers. A dirt path begins here and splits into two directions. At the center of this fork stands a wooden signpost with two weathered arrows pointing left and right. To the right of the signpost, a woman stands in a contemplative pose with her right hand to her chin, looking toward the signpost. She has long, wavy brown hair tied with a small blue ribbon and is wearing a mustard-yellow sweater, a rust-colored skirt, brown leggings, and olive-green hiking boots. A brown backpack is strapped to her shoulders. To her right, a low wall made of stacked grey and brown stones, some covered in green moss, runs along the edge of the path. In the midground, the left path winds through a lush green meadow toward a cluster of tall, leafy green trees. The right path curves through rolling hills toward a distant valley. The background features more rolling green hills under a soft blue sky filled with large, fluffy white clouds. On the far right, a group of dark green coniferous trees stands on a hillside, and the sky glows with a warm, pale light from the sun, suggesting early morning or late afternoon.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "woman with long wavy brown hair",
+            "hiker wearing a brown backpack"
+          ],
+          "S": [
+            "rolling green hills under fluffy clouds",
+            "sunny day in a lush meadow",
+            "early morning light over the valley"
+          ],
+          "IE": [
+            "reaching a fork in the dirt path",
+            "encountering a wooden signpost"
+          ],
+          "IR": [
+            "feeling unsure about which way to go",
+            "wondering which path is the right one"
+          ],
+          "P": [
+            "trying to decide which direction to take",
+            "planning her route through the hills"
+          ],
+          "A": [
+            "standing with her hand on her chin",
+            "looking thoughtfully at the wooden signpost"
+          ],
+          "CO": [
+            "pausing her hike to check the signs",
+            "stopping at the crossroads in the meadow"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "weathered wooden signpost with two arrows",
+            "mustard-yellow sweater and rust-colored skirt",
+            "low wall made of mossy grey stones",
+            "dense patch of colorful wildflowers"
+          ],
+          "ADV": [
+            "thoughtfully",
+            "carefully",
+            "quietly",
+            "uncertainly"
+          ],
+          "SC": [
+            "because the path splits in two directions",
+            "while she considers her options",
+            "until she chooses a path"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "or",
+            "so"
+          ],
+          "M": [
+            "wonders",
+            "thinks",
+            "decides",
+            "considers"
+          ],
+          "L": [
+            "asks herself",
+            "sighs",
+            "mutters"
+          ]
+        }
+      }
     }
   ]
 }

@@ -15,7 +15,77 @@
         "cat",
         "dog"
       ],
-      "composition_instructions": "Place cat on the far left armrest of the couch, perching stiffly with back arched slightly, ears flattened, staring right. Place dog on the far right cushion, lying with chin on paws, side-eyeing the cat. Middle cushions completely empty."
+      "composition_instructions": "Place cat on the far left armrest of the couch, perching stiffly with back arched slightly, ears flattened, staring right. Place dog on the far right cushion, lying with chin on paws, side-eyeing the cat. Middle cushions completely empty.",
+      "scene_description": "In this children's picture-book scene of a living room, dark brown wooden floorboards run horizontally across the bottom. On the far left, a long, light blue curtain hangs from the ceiling to the floor next to a large window. A large L-shaped sectional sofa with a yellowish-tan frame and dark green cushions occupies the left and center of the room. A dark green fringed throw blanket is draped over the leftmost arm of the sofa. A small black cat with a grumpy expression and yellow eyes stands on the top backrest of the sofa's left corner, looking toward the right. In the center foreground, a large circular rug with concentric rings of light blue, white, orange, and dark blue sits on the floor. A rectangular wooden coffee table with four thick legs is positioned in the middle of the rug. On the right side of the sofa, a golden-colored dog lies down on a green cushion, resting its head on its paws with a somber expression while looking toward the cat. To the right of the rug, a low wooden TV stand features a small open shelf holding a dark blue electronic console. Above the stand, a large black flat-screen TV is mounted on a light beige wall that has a subtle, repeating pattern of light brown leaves. Bright sunlight enters from the right, casting diagonal highlights across the TV screen and the wall. In the background, large windows reveal a bright outdoor setting under a light blue sky with fluffy white clouds. Outside, there is a green lawn with small white and yellow flowers, and several large, rounded green trees with thick brown trunks. The light blue curtains frame the window on both the left and right sides of the central window pane.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "a grumpy black cat with yellow eyes",
+            "a somber golden dog lying down"
+          ],
+          "S": [
+            "a sunlit living room with large windows",
+            "a bright day with fluffy white clouds",
+            "a cozy room with a wooden floor"
+          ],
+          "IE": [
+            "the cat staring at the dog",
+            "the dog watching the cat from the sofa"
+          ],
+          "IR": [
+            "the cat looking very annoyed",
+            "the dog feeling sad or lonely"
+          ],
+          "P": [
+            "the cat wanting to jump down",
+            "the dog wanting to take a nap"
+          ],
+          "A": [
+            "the cat standing on the sofa backrest",
+            "the dog resting its head on its paws"
+          ],
+          "CO": [
+            "the cat and dog are keeping distance",
+            "the living room stays quiet and still"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "a large L-shaped sectional sofa",
+            "a colorful circular rug with rings",
+            "a dark green fringed throw blanket",
+            "a rectangular wooden coffee table"
+          ],
+          "ADV": [
+            "grumpily",
+            "quietly",
+            "somberly",
+            "patiently"
+          ],
+          "SC": [
+            "because the cat is staring",
+            "while the dog is resting",
+            "when the sun shines through the window"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "feels",
+            "wonders",
+            "notices"
+          ],
+          "L": [
+            "meows",
+            "barks",
+            "sighs",
+            "growls"
+          ]
+        }
+      }
     }
   ]
 }

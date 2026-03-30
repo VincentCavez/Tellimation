@@ -15,7 +15,77 @@
         "woman",
         "cat"
       ],
-      "composition_instructions": "Place woman on a stool at the spinning pottery wheel, hands wet with slip, gently shaping a rising cylinder of clay. Place cat on a high shelf among finished pots, sitting and watching the wheel with lazy curiosity."
+      "composition_instructions": "Place woman on a stool at the spinning pottery wheel, hands wet with slip, gently shaping a rising cylinder of clay. Place cat on a high shelf among finished pots, sitting and watching the wheel with lazy curiosity.",
+      "scene_description": "In the left foreground of this sunlit pottery studio, a sturdy wooden workbench holds a collection of tools and materials. Underneath the bench sit several paint buckets in shades of grey, white, and blue. On the workbench surface, a wooden cup holds several brushes, next to two sponges, three small jars of glaze, and two large lumps of unformed grey clay. Mounted on the wall above the bench is a wooden tool rack containing various sculpting tools, loops, and two round yellow sponges. To the right of the tool rack, a small green jar holds more brushes. Above the workbench, two wooden shelves are filled with finished pottery. The top shelf holds a brown patterned bowl, a tall brown vase, a blue and white vase, a small green cylinder, a blue bowl, and a brown bowl. The shelf below it contains a brown bowl, a blue and white vase with a floral pattern, a blue and white bowl, a green vase, and a white bowl. Moving towards the center foreground, a woman with brown hair tied in a ponytail sits on a three-legged wooden stool. She wears a blue long-sleeved shirt under a green apron and is leaning forward, her hands carefully shaping a wet clay pot on a spinning pottery wheel. The pottery wheel is mounted on a brown wooden base with a foot pedal on the floor to the right. Splashes of blue-grey water and clay are visible on the base of the wheel. Behind the woman, a wooden shelving unit built into the corner displays more pottery, including several vases and bowls in shades of white, blue, and brown. On the floor near the woman's feet are several completed pots, including a large brown one with a blue pattern and a smaller tan one. To the right of the woman, a tall wooden shelf unit stands against the wall. On the very top of this unit, an orange tabby cat sits upright, looking toward the woman. The shelves below the cat hold various small pots and bowls in white, blue, and brown. In the far right foreground, an open doorway reveals a stone path leading out into a lush green garden. The studio has a light-colored wooden floor and walls. In the background, a small window looks out onto a garden with green bushes and pink flowers. Above, large skylight windows built into the sloped ceiling reveal a bright blue sky with fluffy white clouds and the tops of green leafy trees, indicating a clear, sunny day.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "woman with brown hair in a ponytail",
+            "orange tabby cat sitting on a shelf"
+          ],
+          "S": [
+            "sunlit pottery studio with wooden floors",
+            "bright blue sky through large skylights",
+            "lush green garden visible through the window"
+          ],
+          "IE": [
+            "the woman begins to shape the clay",
+            "the cat jumps up to watch"
+          ],
+          "IR": [
+            "the woman feels calm and focused",
+            "the cat looks curious and interested"
+          ],
+          "P": [
+            "the woman wants to finish her pot",
+            "the cat wants to see the wheel spin"
+          ],
+          "A": [
+            "shaping the wet clay with her hands",
+            "sitting quietly on a three-legged stool",
+            "watching the woman from a high shelf"
+          ],
+          "CO": [
+            "a beautiful clay pot begins to form",
+            "water splashes onto the wooden wheel base"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "sturdy wooden workbench with many tools",
+            "blue long-sleeved shirt under a green apron",
+            "large lumps of unformed grey clay",
+            "bright blue sky with fluffy white clouds"
+          ],
+          "ADV": [
+            "carefully",
+            "gently",
+            "patiently",
+            "skillfully"
+          ],
+          "SC": [
+            "while the pottery wheel spins around",
+            "because she wants to make a vase",
+            "as the cat watches from above"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "focuses",
+            "imagines",
+            "wonders"
+          ],
+          "L": [
+            "hums",
+            "purrs",
+            "whispers"
+          ]
+        }
+      }
     }
   ]
 }

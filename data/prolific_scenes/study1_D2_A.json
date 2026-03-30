@@ -15,7 +15,86 @@
         "girl",
         "student"
       ],
-      "composition_instructions": "Place girl at the reading table (center), sitting with open book in front of her, staring at pages with deeply puzzled expression, eyebrows knitted, one hand on cheek. Place student at another table nearby, sitting and reading calmly, absorbed."
+      "composition_instructions": "Place girl at the reading table (center), sitting with open book in front of her, staring at pages with deeply puzzled expression, eyebrows knitted, one hand on cheek. Place student at another table nearby, sitting and reading calmly, absorbed.",
+      "scene_description": "In the lower left foreground, a girl with curly brown hair sits cross-legged on a light blue and white patterned rug. She is wearing a yellow and blue horizontal-striped sweater, green trousers, and brown shoes, and she smiles while holding an open book with a picture on the left page. To her right, a wooden table sits on the wooden floor where a second girl, a student, is seated on a wooden chair. This student has brown hair tied in a ponytail with a red tie, wears a green long-sleeved shirt under yellow overalls and brown boots, and looks grumpy as she rests her chin on her left hand over an open book. To the right of the student is an empty wooden chair, and a green banker's-style desk lamp with a gold base sits on the table. In the bottom right corner, small white flowers and green clover grow from the floor. Behind the characters, four tall wooden bookshelves filled with numerous colorful books in shades of blue, green, red, and yellow line the wall. On top of the leftmost bookshelf is a round green bush in a brown terracotta pot. Above the second bookshelf from the left, a round white clock with a brown frame indicates it is ten o'clock. On top of the fourth bookshelf is a leafy green plant in a brown terracotta pot, and another small potted green bush sits on a ledge behind the student. To the right of the bookshelves, two large arched windows with brown frames reveal a background of green leafy trees under a light blue sky with fluffy white clouds. The room has light beige walls and a polished wooden floor.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "girl with curly brown hair",
+            "student with a brown ponytail",
+            "girl wearing a striped sweater",
+            "student in yellow overalls"
+          ],
+          "S": [
+            "sunny library with tall bookshelves",
+            "bright morning at ten o'clock",
+            "room with large arched windows",
+            "light blue and white patterned rug"
+          ],
+          "IE": [
+            "opening a book to read",
+            "sitting down at the wooden table",
+            "finding a quiet place to study"
+          ],
+          "IR": [
+            "smiling and feeling happy",
+            "looking grumpy and frustrated",
+            "feeling bored with the schoolwork"
+          ],
+          "P": [
+            "wanting to finish the story",
+            "trying to complete a difficult task",
+            "planning to learn something new"
+          ],
+          "A": [
+            "sitting cross-legged on the rug",
+            "resting her chin on her hand",
+            "holding an open picture book",
+            "staring at the pages of a book"
+          ],
+          "CO": [
+            "enjoying a peaceful reading time",
+            "struggling to focus on the lesson",
+            "filling the room with quiet study"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "yellow and blue horizontal-striped sweater",
+            "green banker's-style desk lamp",
+            "four tall wooden bookshelves",
+            "small white flowers and green clover"
+          ],
+          "ADV": [
+            "happily",
+            "grumpily",
+            "quietly",
+            "patiently"
+          ],
+          "SC": [
+            "because the book is interesting",
+            "while the sun shines outside",
+            "since it is ten o'clock"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "feels",
+            "wonders",
+            "imagines"
+          ],
+          "L": [
+            "reads",
+            "sighs",
+            "whispers",
+            "tells"
+          ]
+        }
+      }
     }
   ]
 }

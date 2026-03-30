@@ -15,7 +15,69 @@
         "boy",
         "poster"
       ],
-      "composition_instructions": "Place boy slumped in a blue plastic chair along the wall, staring at the floor with red-rimmed eyes, lower lip trembling, both hands gripping the edge of an empty pet carrier on the chair beside him."
+      "composition_instructions": "Place boy slumped in a blue plastic chair along the wall, staring at the floor with red-rimmed eyes, lower lip trembling, both hands gripping the edge of an empty pet carrier on the chair beside him.",
+      "scene_description": "In the foreground at the bottom of the scene, the tops of three plastic chairs—one blue, one orange, and one green—are partially visible against a light brown tiled floor. Moving to the left middle ground, a curved wooden reception desk features a wooden pamphlet holder with blue, pink, and green brochures and a gold-colored service bell on its surface. Behind the desk on the pale yellow wall is a poster of a light brown cat. To the right of the desk, a row of four chairs is mounted on a metal base. A boy with brown hair sits in the first blue chair, looking sad with downturned eyes and a slight blush. He wears a yellow and green striped long-sleeved shirt, blue denim overalls with bandages on both knees, white socks, and brown shoes. His right hand rests on a gray and white pet carrier placed on the adjacent orange chair. To the right of the carrier are an empty green chair and an empty blue chair. On the wall above the boy and the chairs are several more posters: a poster of a smiling orange cat with paw prints, a large poster of a brown dog with a red collar, a small poster of a blue and orange bird, a small poster of a duck with a duckling, and a poster showing a cat, a guinea pig, a hamster, and a rabbit. Stylized orange leaf shapes decorate the wall behind the desk and around the posters. On the far right, large white-framed glass double doors with silver C-shaped handles look out onto a sunny outdoor scene featuring green grass, small pink, yellow, and blue flowers, and large leafy green trees under a light blue sky with white clouds. The entire scene is brightly lit, suggesting a daytime setting inside a veterinary clinic waiting room.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "sad boy with brown hair",
+            "smiling animals on the posters"
+          ],
+          "S": [
+            "brightly lit veterinary clinic",
+            "sunny garden outside the doors",
+            "waiting room with plastic chairs"
+          ],
+          "IE": [
+            "the boy's pet needs help",
+            "arriving at the vet's office"
+          ],
+          "IR": [
+            "feeling very sad and worried",
+            "looking anxious about his pet"
+          ],
+          "P": [
+            "waiting for the doctor's help",
+            "keeping the pet carrier steady"
+          ],
+          "A": [
+            "sitting on a blue chair",
+            "resting a hand on the carrier",
+            "looking down at the floor"
+          ],
+          "CO": [
+            "waiting patiently for his turn",
+            "the pet is safe inside"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "yellow and green striped shirt",
+            "gray and white pet carrier",
+            "curved wooden reception desk"
+          ],
+          "ADV": [
+            "looking down very sadly",
+            "sitting there very quietly"
+          ],
+          "SC": [
+            "because his pet is sick",
+            "while he waits for help"
+          ],
+          "CC": [
+            "the boy and his carrier",
+            "sad but waiting patiently"
+          ],
+          "M": [
+            "the boy feels very sad",
+            "he worries about his pet"
+          ],
+          "L": [
+            "the boy whispers to his pet",
+            "he asks for some help"
+          ]
+        }
+      }
     }
   ]
 }

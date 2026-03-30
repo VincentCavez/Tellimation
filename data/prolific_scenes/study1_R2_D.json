@@ -15,7 +15,77 @@
         "girl",
         "boy"
       ],
-      "composition_instructions": "Place girl on the far left end of the bench, sitting with arms tightly crossed, body angled away to the left, stubborn scowl. Place boy on the far right end, sitting with arms crossed, body angled away to the right, mirroring her. Wide empty gap in the middle."
+      "composition_instructions": "Place girl on the far left end of the bench, sitting with arms tightly crossed, body angled away to the left, stubborn scowl. Place boy on the far right end, sitting with arms crossed, body angled away to the right, mirroring her. Wide empty gap in the middle.",
+      "scene_description": "In the bottom left foreground, a patch of green grass is dotted with small white, yellow, and pink flowers, alongside several tall, thin leafy plants. A grey stone-paved path curves from the bottom left corner toward the right side of the frame. To the right of the path in the foreground, more green grass contains yellow and white flowers and several clusters of green leafy plants. Moving to the midground on the left, a large, thick tree trunk with visible roots sits on the left, its dense green canopy extending across the top left of the image. Underneath this tree is a wooden bench with a brown metal frame. A girl with shoulder-length brown hair is sitting on the left side of the bench. She wears a yellow sweater, a green skirt, blue leggings, and brown boots. She has her arms crossed and is looking away to the left with a frowning, angry expression. To her right on the same bench sits a boy with curly brown hair. He is wearing a green sweater with yellow stripes on the sleeves, brown vertically-striped pants, and blue shoes. Like the girl, he has his arms crossed and is looking away to the right with a frowning, angry expression. To the right of the bench stands a cylindrical trash can made of vertical wooden slats with a silver metal rim. Behind the bench and the trash can, there are various green bushes and trees. The landscape opens up into rolling green hills under a light blue sky. A single green tree stands on a hill in the mid-right background. Large, fluffy white and grey clouds fill the upper portion of the sky, particularly on the right side. The overall lighting suggests a bright, overcast day in a park setting.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "a girl with shoulder-length brown hair",
+            "a boy with curly brown hair"
+          ],
+          "S": [
+            "a park with rolling green hills",
+            "under a large leafy tree",
+            "on a wooden park bench",
+            "a bright and cloudy sky"
+          ],
+          "IE": [
+            "a disagreement between two friends",
+            "an argument that caused a fight"
+          ],
+          "IR": [
+            "feeling very angry and upset",
+            "looking grumpy and frustrated"
+          ],
+          "P": [
+            "intending to ignore each other",
+            "wanting to stay on opposite sides"
+          ],
+          "A": [
+            "sitting with their arms crossed",
+            "looking away from each other"
+          ],
+          "CO": [
+            "sitting in a tense silence",
+            "not playing together in the park"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "a bright yellow sweater",
+            "a wooden bench with metal legs",
+            "a winding grey stone path",
+            "small white and yellow flowers"
+          ],
+          "ADV": [
+            "angrily",
+            "stubbornly",
+            "silently",
+            "crossly"
+          ],
+          "SC": [
+            "because they are mad",
+            "while they sit apart",
+            "since they had a fight"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "feels",
+            "thinks",
+            "wonders",
+            "remembers"
+          ],
+          "L": [
+            "grumbles",
+            "mutters",
+            "sighs"
+          ]
+        }
+      }
     }
   ]
 }

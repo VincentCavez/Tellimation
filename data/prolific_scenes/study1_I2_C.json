@@ -17,7 +17,79 @@
         "dalmatian",
         "child"
       ],
-      "composition_instructions": "Place firefighter next to the fire truck (center), standing with one hand on the chrome bumper. Place dalmatian at the firefighter's feet, sitting alertly with tongue out. Place child in front of the truck, standing and looking up in awe, wearing oversized red plastic helmet slipping over eyes."
+      "composition_instructions": "Place firefighter next to the fire truck (center), standing with one hand on the chrome bumper. Place dalmatian at the firefighter's feet, sitting alertly with tongue out. Place child in front of the truck, standing and looking up in awe, wearing oversized red plastic helmet slipping over eyes.",
+      "scene_description": "In the bottom left foreground, a patch of green grass is dotted with small pink flowers, bordered by a brick walkway that curves toward the center. To the right of the path stands a grey lamp post with a white spherical globe, situated next to several rounded green bushes. A child stands on the concrete driveway in the center-foreground, facing right; he wears a red safety helmet, a yellow and green striped sweater, blue trousers, and brown shoes, and he holds a small blue and white toy boat in his hands. To the right of the child, a white dalmatian with black spots sits on the driveway, looking up toward the right with its pink tongue hanging out. In the bottom right corner, a green bush is covered in pink flowers. Behind the child on the left, two large leafy green trees with brown trunks stand against a backdrop of rolling green hills. To the right of the trees is an open-fronted grey room attached to a larger building, featuring a vertical brass fire pole that passes through square openings in the ceiling and floor. Further right, a firefighter stands inside a garage with a red roll-up door that is mostly open. The firefighter wears a brown protective suit with red reflective stripes, a brown helmet, tan gloves, and brown boots; he is positioned in profile, pointing his right hand toward a vintage red fire truck parked behind him. The fire truck has a yellow siren on top, a silver grille, and a wooden ladder attached to its side. Inside the garage, fire hoses and helmets hang on the brick wall behind the firefighter. The building itself is made of brown brick with a red tiled roof; it features an arched window on the left and a rectangular window on the right of the second story, along with a small balcony with a black wrought-iron railing. The background consists of a bright blue sky filled with several large, fluffy white clouds, indicating a clear, sunny day.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "firefighter in a brown protective suit",
+            "child wearing a red safety helmet",
+            "white dalmatian with black spots"
+          ],
+          "S": [
+            "sunny day at a brick firehouse",
+            "concrete driveway next to green trees",
+            "bright blue sky with white clouds"
+          ],
+          "IE": [
+            "the firefighter opens the garage door",
+            "a child visits the fire station"
+          ],
+          "IR": [
+            "the child feels curious and interested",
+            "the firefighter feels proud of the truck",
+            "the dog feels happy and excited"
+          ],
+          "P": [
+            "the firefighter wants to show the truck",
+            "the child wants to learn about firemen"
+          ],
+          "A": [
+            "firefighter pointing at the vintage truck",
+            "child holding a small toy boat",
+            "dalmatian sitting and looking up"
+          ],
+          "CO": [
+            "the child sees the big fire truck",
+            "the dog stays close to the firefighter"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "shiny red vintage fire truck",
+            "small blue and white toy boat",
+            "tall brass fire pole",
+            "fluffy white clouds in the sky"
+          ],
+          "ADV": [
+            "proudly pointing",
+            "patiently sitting",
+            "curiously watching"
+          ],
+          "SC": [
+            "because he is visiting the station",
+            "while the firefighter shows the truck",
+            "when the sun is shining brightly"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "wonders",
+            "thinks",
+            "knows",
+            "imagines"
+          ],
+          "L": [
+            "explains",
+            "shows",
+            "tells",
+            "asks"
+          ]
+        }
+      }
     }
   ]
 }

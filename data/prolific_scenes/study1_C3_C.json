@@ -14,7 +14,76 @@
       "entities_in_scene": [
         "old_man"
       ],
-      "composition_instructions": "Place old_man on the left side of the bench, sitting and reading a thick book with reading glasses on. Leave the right side of the bench empty — the old_woman (ghost entity) would appear here, seated beside him as usual, as if she has just stepped away."
+      "composition_instructions": "Place old_man on the left side of the bench, sitting and reading a thick book with reading glasses on. Leave the right side of the bench empty — the old_woman (ghost entity) would appear here, seated beside him as usual, as if she has just stepped away.",
+      "scene_description": "In the bottom-left foreground, a patch of green grass is dotted with small white and pink flowers and green clovers. Moving right across the foreground, a light brown gravel path is scattered with several small, orange and brown fallen leaves. On the far right of the foreground, a large green bush is filled with blooming roses in shades of pink, yellow, and red. Just behind the grass on the left, a circular flowerbed bordered by a low grey stone wall contains several pink and yellow roses. To the right of this flowerbed, a three-tiered grey stone fountain sits in the middle ground, with light blue water spraying from the top tier into the basins below. Further to the right, an old_man with white hair, a white beard, and round glasses sits on a long green wooden bench with curved armrests. He is wearing a brown jacket over a yellow shirt, light blue pinstriped trousers, and brown shoes. He is hunched slightly forward, holding an open brown book in both hands and reading it. The bench is positioned directly beneath a large, thick-trunked tree with a wide canopy of leaves in vibrant autumn colors including red, orange, yellow, and green. Behind the old_man and the bench, another flowerbed filled with pink, yellow, and red roses lines the edge of the path. In the background, the scene opens up to a park setting under a pale blue sky filled with soft, white, rounded clouds. To the left, several rounded trees in shades of green and yellow stand against the horizon. To the right, rolling green hills are dotted with more distant trees under the soft light of a clear day. The entire scene is rendered in a clean, cartoon-style illustration with bold outlines.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "an old man with white hair",
+            "a man wearing round glasses"
+          ],
+          "S": [
+            "a park with colorful autumn trees",
+            "a three-tiered grey stone fountain",
+            "a clear sky with white clouds"
+          ],
+          "IE": [
+            "the man sits down to read",
+            "leaves fall from the large tree"
+          ],
+          "IR": [
+            "the man feels calm and peaceful",
+            "he looks focused on his book"
+          ],
+          "P": [
+            "to enjoy a quiet afternoon",
+            "to read his favorite book"
+          ],
+          "A": [
+            "sitting on a green wooden bench",
+            "holding an open brown book"
+          ],
+          "CO": [
+            "the man is relaxed in nature",
+            "the garden is full of flowers"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "a large tree with colorful leaves",
+            "a long green wooden bench",
+            "blooming pink and yellow roses",
+            "a light brown gravel path"
+          ],
+          "ADV": [
+            "quietly",
+            "peacefully",
+            "intently",
+            "softly"
+          ],
+          "SC": [
+            "while he sits on the bench",
+            "because it is a sunny day",
+            "as the water sprays"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "wonders",
+            "enjoys",
+            "remembers"
+          ],
+          "L": [
+            "reads",
+            "whispers",
+            "tells"
+          ]
+        }
+      }
     }
   ]
 }

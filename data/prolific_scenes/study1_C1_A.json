@@ -21,7 +21,84 @@
         "parrot",
         "shopkeeper"
       ],
-      "composition_instructions": "Place kitten_1 on the wooden shelf (left), sitting and licking its paw. Place kitten_2 on the shelf (center), sitting upright with wide eyes. Place kitten_3 on the shelf (right), curled with tail wrapped around body. Place parrot on the tall wooden stand (far right), tilting head. Place shopkeeper behind the glass counter, standing and smiling."
+      "composition_instructions": "Place kitten_1 on the wooden shelf (left), sitting and licking its paw. Place kitten_2 on the shelf (center), sitting upright with wide eyes. Place kitten_3 on the shelf (right), curled with tail wrapped around body. Place parrot on the tall wooden stand (far right), tilting head. Place shopkeeper behind the glass counter, standing and smiling.",
+      "scene_description": "In the bottom left foreground, two small green bushes sit in grey pots on a polished wooden floor. To their right, a larger green bush in a brown pot stands against the left wall. The left wall is green and features a framed picture and a string of glowing yellow lights. Dominating the center and left midground is a large brown wooden shelving unit. On the top shelf, from left to right, are two potted plants, a blue rectangular box, three green bags of pet food, two yellow bags, several small colorful blocks, a white toy, and three more bags of pet food in green and blue. Below this, on the middle shelf, are four boxes of pet food in yellow, blue, pink, and green. Next to them, kitten_1, an orange tabby, sits on a stack of blue and purple blankets and licks its paw. To the right of kitten_1, kitten_2, another orange tabby, sits upright on a stack of blue blankets. Further right on the same shelf are a white bone toy, two ball toys, kitten_3, a third orange tabby lying down, and a pink bag. The bottom shelf contains three blue bags of pet food, several boxes, and more blankets. The base of the unit has two large drawers with gold knobs. In the right midground, a curved glass counter with a brown base holds a grey cash register and a round fishbowl containing a small orange goldfish and a miniature castle. Behind the counter stands the shopkeeper, a woman with brown curly hair wearing a green headscarf, a green and white striped shirt, and a yellow apron with a green heart. To her right, a parrot with green, yellow, and blue feathers perches on a multi-branched wooden stand. The back wall is yellow, decorated with more string lights and several potted plants on top of the shelving unit. A round green plant hangs from the ceiling above the shopkeeper. The right wall is green and also features string lights. The overall scene is a brightly lit, cozy pet shop during the day.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "a woman with curly brown hair and a green headscarf",
+            "three playful orange tabby kittens on the shelf",
+            "a colorful green, yellow, and blue parrot",
+            "a small orange goldfish in a round bowl"
+          ],
+          "S": [
+            "a brightly lit, cozy pet shop during the day",
+            "a large brown wooden shelving unit filled with supplies",
+            "a curved glass counter with a grey cash register",
+            "polished wooden floors and green walls with glowing lights"
+          ],
+          "IE": [
+            "the kittens are playing on the shelves near the food",
+            "a customer might be approaching the counter to pay",
+            "the shopkeeper is ready to help someone"
+          ],
+          "IR": [
+            "the shopkeeper looks friendly and happy to be working",
+            "the kittens seem content and relaxed in their spots",
+            "the parrot looks curious while watching from its perch"
+          ],
+          "P": [
+            "the shopkeeper wants to ring up a sale",
+            "the kitten wants to clean its paw",
+            "the goldfish wants to swim around its castle"
+          ],
+          "A": [
+            "one orange kitten is licking its paw",
+            "the shopkeeper is standing behind the glass counter",
+            "the parrot is perched on a multi-branched wooden stand",
+            "the goldfish is swimming near a miniature castle"
+          ],
+          "CO": [
+            "the shop is clean and organized for customers",
+            "the kittens are safe and comfortable on the blankets",
+            "the parrot has a high place to watch the shop"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "a yellow apron with a small green heart",
+            "soft blue and purple blankets on the shelf",
+            "a round glass fishbowl with a miniature castle",
+            "glowing yellow string lights on the green wall"
+          ],
+          "ADV": [
+            "patiently",
+            "neatly",
+            "quietly",
+            "happily"
+          ],
+          "SC": [
+            "while the shopkeeper waits for customers",
+            "because the kittens are sleepy",
+            "when the parrot watches the shop"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "wonders",
+            "likes",
+            "knows"
+          ],
+          "L": [
+            "greets",
+            "whistles",
+            "describes"
+          ]
+        }
+      }
     }
   ]
 }

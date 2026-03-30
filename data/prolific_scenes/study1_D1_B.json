@@ -15,7 +15,78 @@
         "girl",
         "librarian"
       ],
-      "composition_instructions": "Place girl at the help desk counter, standing and leaning forward slightly, mouth open mid-sentence, one hand gesturing toward a piece of paper she holds. Place librarian behind the counter, sitting at a computer, looking at the girl attentively over her glasses."
+      "composition_instructions": "Place girl at the help desk counter, standing and leaning forward slightly, mouth open mid-sentence, one hand gesturing toward a piece of paper she holds. Place librarian behind the counter, sitting at a computer, looking at the girl attentively over her glasses.",
+      "scene_description": "In a brightly lit library, a tall wooden bookshelf stands on the far left, filled with rows of books in shades of green, blue, yellow, and brown. In the foreground, a long wooden desk stretches across the scene. On the left side of the desk, a stack of four books sits, including a thick blue book with gold accents, a brown book, and a green book, with a blue book leaning against them. Further right on the desk is another stack of three books with yellow, blue, and white covers. The librarian, an elderly woman with grey hair tied in a bun and wearing round glasses, sits behind the desk. She wears a green cardigan over a light blue collared shirt and is looking towards the right with a gentle smile, her hands resting on a white keyboard. In front of her sits a large, white, rounded computer monitor. To the right of the monitor is a small wooden sign that reads \"NET\". Standing on the right side of the desk is a young girl with curly brown hair styled in two buns with a yellow ribbon. She is wearing a green cardigan over a yellow and blue striped shirt, dark grey pants, and brown lace-up boots. She carries a brown satchel over her shoulder and holds a white piece of paper in her right hand and two books under her left arm. Behind the librarian, an arched doorway reveals another room filled with bookshelves. To the right of the librarian is another green bookshelf. A large window occupies the right side of the background, showing a sunny day with a blue sky and fluffy white clouds. Outside the window are green trees and a garden with small flowers. Below the window, a stone-paved area is visible. The floor inside the library is made of warm-toned wood.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "elderly librarian with grey hair and glasses",
+            "young girl with curly brown hair buns"
+          ],
+          "S": [
+            "brightly lit library with tall bookshelves",
+            "sunny day visible through a large window",
+            "long wooden desk in the foreground"
+          ],
+          "IE": [
+            "the girl approaches the librarian's desk",
+            "the girl holds out a white paper"
+          ],
+          "IR": [
+            "the librarian smiles gently at the girl",
+            "the girl looks eager to talk"
+          ],
+          "P": [
+            "the girl wants to check out books",
+            "the librarian intends to help the student"
+          ],
+          "A": [
+            "librarian typing on a white keyboard",
+            "girl holding books under her left arm",
+            "girl presenting a paper to the librarian"
+          ],
+          "CO": [
+            "the librarian finds the information on screen",
+            "the girl prepares to borrow her books"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "large white rounded computer monitor",
+            "green cardigan over a light blue shirt",
+            "tall wooden bookshelf filled with books",
+            "brown leather satchel over her shoulder"
+          ],
+          "ADV": [
+            "gently",
+            "politely",
+            "patiently",
+            "curiously"
+          ],
+          "SC": [
+            "when the girl approaches the desk",
+            "because she needs to return a book",
+            "while the librarian looks at the screen"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "wonders",
+            "knows",
+            "decides"
+          ],
+          "L": [
+            "asks",
+            "says",
+            "explains",
+            "greets"
+          ]
+        }
+      }
     }
   ]
 }

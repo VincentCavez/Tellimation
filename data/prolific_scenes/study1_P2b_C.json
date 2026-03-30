@@ -15,7 +15,74 @@
         "boy",
         "pond"
       ],
-      "composition_instructions": "Place boy at the wooden railing along the pond's edge, standing and leaning forward, peering at the ice with one mittened hand on the railing. Place pond as completely frozen, milky white ice with intricate frost fern patterns."
+      "composition_instructions": "Place boy at the wooden railing along the pond's edge, standing and leaning forward, peering at the ice with one mittened hand on the railing. Place pond as completely frozen, milky white ice with intricate frost fern patterns.",
+      "scene_description": "In the foreground on the far left, a large, thick brown tree with bare, snow-dusted branches rises from a mound of snow and clumps of tall, dry brown grass. Moving right across the foreground, small green clover-like plants and thin blades of grass emerge from the deep white snow. In the center of the scene, a frozen pond is visible, its surface covered in intricate, white frost patterns shaped like stars and ferns. To the right of the pond, a boy stands on a snow-covered path, leaning his gloved hands on a rustic wooden railing made of horizontal logs and vertical posts. The boy has short black hair, rosy cheeks, and is wearing a green and yellow striped knit hat with a yellow pom-pom, a light blue puffer jacket, dark blue pants, green gloves, and brown boots. He is looking down toward the pond. Behind the boy on the far right, there are more clumps of dry brown grass, small dried tan flowers, and a large green bush partially covered in snow. In the midground, the snow-covered terrain transitions into rolling hills populated by many bare, brown trees and a small cluster of dark green evergreens on the left side. The background consists of more distant, snow-covered hills under a pale blue sky containing several soft, white, puffy clouds. The entire scene is set in a winter landscape during the daytime.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "a young boy with rosy cheeks",
+            "a child wearing a blue jacket"
+          ],
+          "S": [
+            "a snowy winter landscape during daytime",
+            "a frozen pond with frost patterns",
+            "rolling hills with many bare trees"
+          ],
+          "IE": [
+            "the pond freezes over in winter",
+            "the boy walks to the railing"
+          ],
+          "IR": [
+            "feeling curious about the frozen pond",
+            "wondering how the frost patterns formed"
+          ],
+          "P": [
+            "to look closely at the ice",
+            "to stay warm in his winter clothes"
+          ],
+          "A": [
+            "leaning his hands on the railing",
+            "looking down at the frozen water"
+          ],
+          "CO": [
+            "the boy sees stars on the ice",
+            "the railing keeps the boy safe"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "intricate white frost patterns like stars",
+            "a green and yellow striped hat",
+            "a thick brown tree with snow",
+            "a rustic wooden railing made of logs"
+          ],
+          "ADV": [
+            "curiously",
+            "carefully",
+            "quietly"
+          ],
+          "SC": [
+            "because the weather is very cold",
+            "while he stands on the path",
+            "when he looks at the pond"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "notices",
+            "wonders",
+            "thinks"
+          ],
+          "L": [
+            "whispers",
+            "gasps",
+            "exclaims"
+          ]
+        }
+      }
     }
   ]
 }

@@ -15,7 +15,79 @@
         "child",
         "mother"
       ],
-      "composition_instructions": "Place child in the center near the fountain, standing and turning slowly with worried look, one hand clutching a stuffed dinosaur. Place mother a few meters away, rushing toward the child with both arms outstretched, face showing relief and urgency."
+      "composition_instructions": "Place child in the center near the fountain, standing and turning slowly with worried look, one hand clutching a stuffed dinosaur. Place mother a few meters away, rushing toward the child with both arms outstretched, face showing relief and urgency.",
+      "scene_description": "In the bottom left foreground, a large green leafy tree grows from a brown terracotta pot decorated with a wavy line pattern. To its right sits a smaller green plant with long, pointed leaves in a similar terracotta pot. In the center foreground, a small child with short brown hair stands on a checkered floor of alternating light beige and dark brown tiles. The child wears an orange short-sleeved t-shirt, blue shorts, and red sneakers with white soles and laces. The child has a worried expression and is hugging a small green dinosaur plush toy with dark green spots. To the right of the child, a mother with brown hair tied back with a light blue ribbon leans forward with her arms outstretched toward the child. She wears a green sleeveless dress patterned with yellow sunflowers and brown sandals. Behind the mother on the right are a large green tree and a smaller green bush, both in patterned terracotta pots. In the midground, behind the child, is a circular stone fountain with three tiers spraying light blue water. To the left of the fountain, storefronts feature a bright yellow scalloped awning and a light blue scalloped awning. A potted plant with spiky green leaves sits in front of the blue awning. In the background, the lower level continues with storefronts under tan and green awnings, showing colorful displays in their windows. Above the ground floor, a wooden balcony with a railing of vertical balusters runs along the second level, where more storefront windows are visible. The entire scene is enclosed by light beige walls with stone-textured pillars. At the top of the scene, a large, multi-paned glass skylight reveals a bright blue sky filled with soft, white, fluffy clouds, indicating a clear day.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "a small boy with short brown hair",
+            "a mother wearing a green sunflower dress",
+            "a little boy hugging a green dinosaur"
+          ],
+          "S": [
+            "a bright shopping mall with many stores",
+            "a checkered floor with beige and brown tiles",
+            "a large glass skylight showing fluffy clouds",
+            "a circular stone fountain with spraying water"
+          ],
+          "IE": [
+            "the little boy got lost in the mall",
+            "the mother finally finds her missing son"
+          ],
+          "IR": [
+            "the little boy feels scared and worried",
+            "the mother looks very relieved and anxious"
+          ],
+          "P": [
+            "the mother wants to hug her child",
+            "the boy wants to feel safe again"
+          ],
+          "A": [
+            "the mother reaches out with both arms",
+            "the boy hugs his green dinosaur tightly",
+            "water sprays from the three-tiered fountain"
+          ],
+          "CO": [
+            "the mother and child are reunited",
+            "the boy is no longer alone"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "a green dress with yellow sunflowers",
+            "a small spotted green dinosaur plush",
+            "a large multi-paned glass skylight",
+            "brown terracotta pots with wavy patterns"
+          ],
+          "ADV": [
+            "tightly",
+            "anxiously",
+            "softly",
+            "worriedly"
+          ],
+          "SC": [
+            "because he was lost in the mall",
+            "when she saw her son",
+            "while the water sprays"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "wonders",
+            "feels",
+            "recognizes",
+            "hopes"
+          ],
+          "L": [
+            "calls",
+            "whispers",
+            "sobs"
+          ]
+        }
+      }
     }
   ]
 }

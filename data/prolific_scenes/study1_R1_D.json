@@ -15,7 +15,87 @@
         "boy",
         "letters"
       ],
-      "composition_instructions": "Place boy standing on tiptoes in front of the magnetic whiteboard, holding a red letter 'A' in right hand, reaching up toward the gap in 'C_T'. Tongue poking out in concentration."
+      "composition_instructions": "Place boy standing on tiptoes in front of the magnetic whiteboard, holding a red letter 'A' in right hand, reaching up toward the gap in 'C_T'. Tongue poking out in concentration.",
+      "scene_description": "In a brightly lit classroom with light brown wooden floors, a wooden shelving unit stands against the far left wall, holding a green bin on its top shelf and a blue bin on its bottom shelf, both filled with colorful toy blocks. Above this shelf, four children's drawings are pinned to the wall, including a yellow handprint, a green landscape, and two yellow suns. To the right of the shelf, a blue plastic chair sits on the floor. In the foreground, a boy with curly brown hair, wearing a yellow long-sleeved shirt, green pants, and blue and white sneakers, stands on top of a round red table. He reaches his right hand toward a large white whiteboard mounted on the wall to touch a red 'A', which is part of three magnetic letters spelling \"CAT\"; the 'C' and 'T' are blue. The boy has a focused expression with his tongue slightly poking out. Surrounding the red table are two green chairs and one yellow chair. To the right of the red table, a long rectangular wooden table is surrounded by five small chairs in red, green, and yellow. Behind the boy, a long wooden shelving unit runs along the wall, topped with bins of pencils, crayons, and blocks. The shelves are filled with a blue bin of blocks, green and yellow building blocks, an orange basket of toys, a row of colorful books in red, blue, green, and purple, an orange basket of balls, and various other bins. The wall behind the shelves is decorated with framed drawings of a rainbow, a sun, and colorful scribbles. A large arched window in the center of the back wall reveals a sunny outdoor scene with rolling green hills, leafy green trees, and a light blue sky with fluffy white clouds. The room is filled with soft, warm light, indicating a clear daytime.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "a boy with curly brown hair",
+            "a child wearing a yellow shirt",
+            "a student in green pants"
+          ],
+          "S": [
+            "a brightly lit classroom with wooden floors",
+            "a large arched window showing green hills",
+            "shelves filled with colorful toys and books",
+            "a sunny day with fluffy white clouds"
+          ],
+          "IE": [
+            "the boy climbing onto the red table",
+            "reaching up to the high whiteboard"
+          ],
+          "IR": [
+            "focused expression with his tongue out",
+            "feeling determined to reach the letters",
+            "concentrating hard on the magnetic board"
+          ],
+          "P": [
+            "trying to touch the red letter A",
+            "wanting to spell the word cat",
+            "aiming to reach the top of the board"
+          ],
+          "A": [
+            "standing on top of a round table",
+            "reaching his hand toward the whiteboard",
+            "touching a red magnetic letter"
+          ],
+          "CO": [
+            "the letters spelling the word CAT",
+            "standing high above the classroom floor"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "large white magnetic board",
+            "bright red letter A",
+            "small blue and white sneakers",
+            "sunny outdoor scene with rolling hills",
+            "wooden shelves with colorful bins"
+          ],
+          "ADV": [
+            "carefully",
+            "high",
+            "intently",
+            "playfully",
+            "steadily"
+          ],
+          "SC": [
+            "because he is too short",
+            "while he stands on the table",
+            "so that he can reach the letters",
+            "when he touches the board"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so",
+            "or"
+          ],
+          "M": [
+            "thinks",
+            "wants",
+            "knows",
+            "decides",
+            "remembers"
+          ],
+          "L": [
+            "spells",
+            "shows",
+            "points",
+            "reads"
+          ]
+        }
+      }
     }
   ]
 }

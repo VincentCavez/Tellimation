@@ -10,12 +10,89 @@
       "scene_number": 1,
       "title": "The Nursery",
       "background_prompt": "A pastel-colored nursery with a wooden crib, a rocking chair, a mobile with stars and moons, and soft lamp light. No people.",
-      "full_scene_prompt": "A pastel-colored nursery in soft warm lamp light. A mother with gentle features and her hair in a loose ponytail, wearing a cream-colored cardigan, sits in a white wooden rocking chair near the window. She cradles a baby wrapped snugly in a pale yellow blanket, the baby's tiny hand curled around her finger. The mother looks down at the baby with a tender, overwhelmed expression \u2014 her eyes soft and full, her lips parted in a quiet smile. A white wooden crib with a star-patterned bumper stands to the right. A mobile of felt stars and crescent moons in pastel blue and gold hangs above the crib, gently turning. A small bookshelf holds children's board books. The walls are painted a soft mint green.",
+      "full_scene_prompt": "A pastel-colored nursery in soft warm lamp light. A mother with gentle features and her hair in a loose ponytail, wearing a cream-colored cardigan, sits in a white wooden rocking chair near the window. She cradles a baby wrapped snugly in a pale yellow blanket, the baby's tiny hand curled around her finger. The mother looks down at the baby with a tender, overwhelmed expression — her eyes soft and full, her lips parted in a quiet smile. A white wooden crib with a star-patterned bumper stands to the right. A mobile of felt stars and crescent moons in pastel blue and gold hangs above the crib, gently turning. A small bookshelf holds children's board books. The walls are painted a soft mint green.",
       "entities_in_scene": [
         "mother",
         "baby"
       ],
-      "composition_instructions": "Place mother in the white rocking chair near the window, sitting and cradling baby wrapped in pale yellow blanket. Baby's tiny hand curled around her finger. Mother looks down with tender expression, eyes soft, lips in quiet smile."
+      "composition_instructions": "Place mother in the white rocking chair near the window, sitting and cradling baby wrapped in pale yellow blanket. Baby's tiny hand curled around her finger. Mother looks down with tender expression, eyes soft, lips in quiet smile.",
+      "scene_description": "On the far left, a large green tree with rounded foliage stands against a light green wall. In front of the tree, a green rug patterned with small white flowers and green clovers covers the wooden floor. A brown wooden crib sits on the left side of the rug, with a light blue blanket featuring yellow stars draped over its front rail. Above the crib, a wooden mobile hangs from the ceiling, adorned with white clouds, yellow stars, and blue crescent moons. In the center of the scene, a large arched window reveals a background of rolling green hills, scattered trees, and a bright blue sky with white clouds. The mother sits in a dark brown wooden rocking chair positioned in front of the window. She has long brown hair tied back, wears a blue cardigan over a yellow floral dress, and is barefoot. She is cradling the baby, who is wrapped in a green swaddle with yellow patterns and has its eyes closed. To the right of the mother, a second wooden rocking chair with a cream-colored seat and back cushion has a blue and white checkered blanket draped over its right armrest. On the right wall, two wooden shelves are mounted one above the other. The top shelf holds three books in blue, yellow, and green, alongside a small woven basket. The bottom shelf holds three books in green, blue, and pink, next to a white storage bin with a handle. The entire room is bathed in soft, even light, suggesting a peaceful daytime setting.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "a mother with long brown hair",
+            "a tiny baby in a green swaddle",
+            "the mother wearing a blue cardigan"
+          ],
+          "S": [
+            "a cozy nursery with a large window",
+            "rolling green hills under a blue sky",
+            "a wooden crib with a star blanket",
+            "a green rug with small white flowers"
+          ],
+          "IE": [
+            "the baby has fallen fast asleep",
+            "the mother sits down to rock her child",
+            "the sun shines through the arched window"
+          ],
+          "IR": [
+            "the mother feels calm and peaceful",
+            "the baby looks very safe and warm",
+            "the mother loves her new baby"
+          ],
+          "P": [
+            "the mother wants to rock the baby",
+            "she plans to put the baby in the crib",
+            "she wants to read a book later"
+          ],
+          "A": [
+            "the mother is cradling her sleeping baby",
+            "the mother is rocking in the wooden chair",
+            "the baby is sleeping soundly in her arms"
+          ],
+          "CO": [
+            "the baby stays asleep in the quiet room",
+            "the mother rests in the rocking chair",
+            "the nursery remains peaceful and still"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "a light blue blanket with yellow stars",
+            "a dark brown wooden rocking chair",
+            "a green swaddle with yellow patterns",
+            "a large arched window with a view"
+          ],
+          "ADV": [
+            "gently",
+            "quietly",
+            "peacefully",
+            "softly"
+          ],
+          "SC": [
+            "while the baby sleeps in her arms",
+            "because the nursery is very quiet",
+            "when the sun shines through the window"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "loves",
+            "wonders",
+            "remembers",
+            "hopes"
+          ],
+          "L": [
+            "whispers",
+            "hums",
+            "sings",
+            "sighs"
+          ]
+        }
+      }
     }
   ]
 }

@@ -15,7 +15,78 @@
         "knight",
         "frog"
       ],
-      "composition_instructions": "Place knight on the stone bridge, standing firmly with feet planted solidly on the bridge stones, one hand on sword pommel. Place frog on one of the larger lily pads in the moat below, sitting with throat slightly puffed."
+      "composition_instructions": "Place knight on the stone bridge, standing firmly with feet planted solidly on the bridge stones, one hand on sword pommel. Place frog on one of the larger lily pads in the moat below, sitting with throat slightly puffed.",
+      "scene_description": "In the lower-left foreground, there are dark green bushes with clover-shaped leaves situated next to a grassy field dotted with small white, yellow, and purple flowers. A cobblestone path made of irregular grey and tan stones leads from the left edge toward the center of the scene. Behind the path and field are several large, rounded trees with dense foliage in shades of green, yellow, and orange. In the middle foreground, a stone bridge with three arches spans a body of water; the bridge is constructed from irregular grey and brown stones with green ivy trailing down its sides. Underneath the bridge, the water is a murky green color, dotted with green lily pads and brown cattails. A green frog with a light-colored belly sits on a lily pad in the lower-right foreground, facing toward the left. On top of the bridge stands a knight in full silver plate armor. The knight has a red plume on his helmet, a green cape with a yellow lining draped over his shoulders, and a brown scabbard hanging from his waist. He holds a blue shield featuring a yellow lion emblem in his left hand. To the right of the bridge is a stone castle featuring a round tower with crenelated battlements and a small arched window. Atop the tower, a red flag with a yellow lion emblem flies from a brown flagpole. To the right of the tower is a stone wall containing an arched wooden door. The entire scene is set under a pale blue sky filled with large, soft, white and light grey clouds, suggesting a clear, bright day.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "knight in full silver plate armor",
+            "green frog with a light-colored belly"
+          ],
+          "S": [
+            "stone bridge with three arches",
+            "castle with a round tower",
+            "murky green water with lily pads",
+            "pale blue sky with soft clouds"
+          ],
+          "IE": [
+            "the knight reaches the stone bridge",
+            "the frog spots the armored knight"
+          ],
+          "IR": [
+            "the knight feels brave and ready",
+            "the frog feels curious about the visitor"
+          ],
+          "P": [
+            "the knight intends to guard the castle",
+            "the frog wants to stay on its lily pad"
+          ],
+          "A": [
+            "the knight stands tall on the bridge",
+            "the frog sits quietly in the water"
+          ],
+          "CO": [
+            "the castle remains safe and secure",
+            "the frog watches the knight from below"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "shiny silver armor with a red plume",
+            "blue shield with a yellow lion emblem",
+            "green cape with a yellow lining",
+            "old stone bridge with trailing ivy"
+          ],
+          "ADV": [
+            "bravely",
+            "quietly",
+            "patiently",
+            "firmly"
+          ],
+          "SC": [
+            "while the knight stands on the bridge",
+            "because he is guarding the castle gate",
+            "as the frog sits on the lily pad"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "watches",
+            "guards",
+            "notices"
+          ],
+          "L": [
+            "croaks",
+            "shouts",
+            "greets",
+            "commands"
+          ]
+        }
+      }
     }
   ]
 }

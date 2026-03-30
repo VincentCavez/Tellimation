@@ -17,7 +17,69 @@
         "raccoon",
         "backpack"
       ],
-      "composition_instructions": "Place boy on the log next to the campfire, sitting and holding a stick with a marshmallow over the flames, smiling contentedly, back turned to the right. Place raccoon behind him (right), creeping low to the ground toward the open green backpack leaning against a tree."
+      "composition_instructions": "Place boy on the log next to the campfire, sitting and holding a stick with a marshmallow over the flames, smiling contentedly, back turned to the right. Place raccoon behind him (right), creeping low to the ground toward the open green backpack leaning against a tree.",
+      "scene_description": "In the bottom left foreground, a patch of green grass is dotted with small white and yellow flowers, four-leaf clovers, and scattered brown leaves. A large brown pine tree trunk frames the far left edge of the scene. Moving right, a circular campfire pit made of several grey stones contains burning brown logs with vibrant orange and yellow flames. To the right of the fire, a boy with short brown hair sits on a horizontal brown log. He wears a green long-sleeved shirt, a brown utility vest with a small silver compass-like detail, brown pants, and brown boots. He holds a long wooden stick with a white marshmallow on the end over the flames. Behind the boy's log sits a small pile of stacked firewood. To the right of the boy, a raccoon with grey and brown fur, a black eye mask, and a ringed tail walks toward the right edge of the frame. In the bottom right corner, a green backpack with yellow straps and several pockets sits upright on the grass near more small flowers and a cluster of long, pointed green leaves. Behind the boy and the raccoon stands a blue dome-shaped tent with its flap open, revealing a rolled-up yellow sleeping bag inside. The midground is filled with a dense forest of dark blue and green pine trees of various heights. A second large brown pine tree trunk frames the far right edge. The background features a deep blue night sky filled with numerous white stars and several fluffy, light blue-tinted clouds. Three constellations are visible, connected by thin white lines: one resembling the Big Dipper in the upper left, another in the center left, and Orion in the upper right.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "boy with short brown hair",
+            "raccoon with a ringed tail",
+            "child wearing a utility vest"
+          ],
+          "S": [
+            "deep blue night sky with stars",
+            "dense forest of dark pine trees",
+            "blue dome-shaped tent in a clearing"
+          ],
+          "IE": [
+            "the boy prepares a snack",
+            "the raccoon approaches the campsite"
+          ],
+          "IR": [
+            "the boy feels calm and happy",
+            "the raccoon looks curious"
+          ],
+          "P": [
+            "the boy wants to roast marshmallows",
+            "the raccoon hopes to find food"
+          ],
+          "A": [
+            "boy holding a stick over fire",
+            "raccoon walking on the grass"
+          ],
+          "CO": [
+            "the campfire warms the campsite",
+            "the marshmallow begins to toast"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "vibrant orange and yellow flames",
+            "green backpack with yellow straps",
+            "small silver compass on the vest"
+          ],
+          "ADV": [
+            "the fire is burning brightly",
+            "the raccoon is walking slowly"
+          ],
+          "SC": [
+            "while the boy roasts a marshmallow",
+            "because it is a clear night"
+          ],
+          "CC": [
+            "the boy and the raccoon",
+            "the fire is hot but small"
+          ],
+          "M": [
+            "the boy thinks about his snack",
+            "the raccoon wonders about the bag"
+          ],
+          "L": [
+            "the boy whispers to the raccoon",
+            "the boy hums a quiet song"
+          ]
+        }
+      }
     }
   ]
 }

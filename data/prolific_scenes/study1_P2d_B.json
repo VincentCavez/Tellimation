@@ -10,12 +10,84 @@
       "scene_number": 1,
       "title": "The Wedding",
       "background_prompt": "A garden wedding setup with a flower arch, rows of white chairs, rose petals on the ground, and soft evening light. No people.",
-      "full_scene_prompt": "A garden wedding in soft golden evening light. A bride in a flowing white dress with a lace bodice and a short veil stands under a flower arch covered in white roses and trailing ivy. Facing her, a groom in a dark navy suit with a white boutonniere holds both her hands in his, their fingers interlaced. Both beam at each other with radiant smiles \u2014 the bride's eyes glisten, and the groom gazes at her with unmistakable adoration. Rows of white wooden chairs sit on either side of a petal-strewn aisle. Rose petals in pink and white are scattered on the green grass. Soft string lights are woven through the arch and nearby trees, just beginning to glow as the sun dips low.",
+      "full_scene_prompt": "A garden wedding in soft golden evening light. A bride in a flowing white dress with a lace bodice and a short veil stands under a flower arch covered in white roses and trailing ivy. Facing her, a groom in a dark navy suit with a white boutonniere holds both her hands in his, their fingers interlaced. Both beam at each other with radiant smiles — the bride's eyes glisten, and the groom gazes at her with unmistakable adoration. Rows of white wooden chairs sit on either side of a petal-strewn aisle. Rose petals in pink and white are scattered on the green grass. Soft string lights are woven through the arch and nearby trees, just beginning to glow as the sun dips low.",
       "entities_in_scene": [
         "bride",
         "groom"
       ],
-      "composition_instructions": "Place bride under the flower arch (center-left), standing in white dress with lace bodice. Place groom facing her (center-right), standing in dark navy suit, holding both her hands. Both beaming at each other with radiant smiles."
+      "composition_instructions": "Place bride under the flower arch (center-left), standing in white dress with lace bodice. Place groom facing her (center-right), standing in dark navy suit, holding both her hands. Both beaming at each other with radiant smiles.",
+      "scene_description": "In the bottom left foreground of this children's picture-book scene, a patch of green grass is filled with small pink, yellow, white, and purple flowers and green clovers. A large tree with a thick brown trunk and rounded green foliage stands on the far left. Moving right across the foreground, the grass is scattered with small pink and white petals. In the bottom right foreground, there are more clusters of pink, purple, and white flowers and clovers, with another large tree trunk and green foliage on the far right. In the middle ground on the left, there are two rows of light beige wooden chairs; the front row contains three chairs and the row behind it contains three chairs. In the center of the middle ground, a bride and a groom stand facing each other and holding hands under a large circular arch. The bride, positioned on the left, has brown hair styled with a white flower crown and wears a sleeveless white wedding dress. The groom, positioned on the right, has short brown hair and wears a navy blue suit with a green bowtie and a yellow boutonniere. They are both smiling. The floral arch above them is decorated with pink, blue, and peach flowers and green leaves. To the right of the couple, there are two more rows of light beige wooden chairs, with three chairs in the front row and three chairs in the row behind it. In the background, behind the chairs on the left, there are several rounded green trees. The center background features a light blue sky with large, fluffy white clouds and a bright glow behind the floral arch. On the right side of the background, a low stone wall is covered in green climbing vines and small purple flowers, with more green trees and bushes visible behind it. The entire scene depicts a sunny outdoor wedding ceremony in a lush garden.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "bride with brown hair and flower crown",
+            "groom in a navy blue suit"
+          ],
+          "S": [
+            "sunny outdoor garden wedding",
+            "large circular arch with colorful flowers",
+            "rows of light beige wooden chairs",
+            "fluffy white clouds in blue sky"
+          ],
+          "IE": [
+            "wedding ceremony is taking place",
+            "couple stands under the floral arch"
+          ],
+          "IR": [
+            "bride and groom look very happy",
+            "smiling at each other with love"
+          ],
+          "P": [
+            "getting married in the garden",
+            "exchanging their wedding vows"
+          ],
+          "A": [
+            "holding hands and facing each other",
+            "standing together under the floral arch"
+          ],
+          "CO": [
+            "becoming a married couple",
+            "celebrating their love in nature"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "sleeveless white wedding dress",
+            "large circular floral arch",
+            "light beige wooden chairs",
+            "fluffy white clouds",
+            "navy blue suit"
+          ],
+          "ADV": [
+            "happily",
+            "lovingly",
+            "gently",
+            "brightly"
+          ],
+          "SC": [
+            "because they are in love",
+            "while they hold hands",
+            "when the ceremony begins"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "feels",
+            "loves",
+            "thinks",
+            "wants"
+          ],
+          "L": [
+            "says",
+            "promises",
+            "whispers",
+            "tells"
+          ]
+        }
+      }
     }
   ]
 }

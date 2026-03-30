@@ -15,7 +15,68 @@
         "boy",
         "pot"
       ],
-      "composition_instructions": "Place boy on the log beside the campfire, sitting and holding a long wooden spoon. Place pot hanging from a metal tripod over the fire, contents bubbling with thick steam rising."
+      "composition_instructions": "Place boy on the log beside the campfire, sitting and holding a long wooden spoon. Place pot hanging from a metal tripod over the fire, contents bubbling with thick steam rising.",
+      "scene_description": "In the bottom left foreground of this children's picture-book scene, clusters of small yellow and blue five-petaled flowers grow in tall green grass, interspersed with green four-leaf clovers and small white three-petaled flowers that continue across the bottom edge to the right. On the far left, two large, stylized green evergreen trees with brown trunks stand in front of a dense forest of green trees. In the center middle ground, a campfire is contained within a circle of grey, rounded stones, with bright orange and yellow flames rising upward. A tripod made of three thin grey poles stands over the fire, supporting a silver pot by its handle. The lid of the pot is slightly ajar, revealing bubbling orange stew inside, while two wisps of white steam curl into the air. To the right of the campfire, a boy with short brown hair and a smiling face sits on a horizontal brown log. He wears a tan and brown plaid shirt over a white undershirt, blue pants, and brown boots. He sits facing left, holding a large, light-brown wooden spoon with both hands. Behind the boy and the log are more green deciduous and evergreen trees. The background consists of a thick forest of green trees under a twilight sky that transitions from pale yellow and orange at the horizon to a deep blue at the top. Several white, fluffy clouds are scattered across the sky, along with several small, four-pointed white and yellow stars.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "A smiling boy with short brown hair",
+            "A boy wearing a plaid shirt"
+          ],
+          "S": [
+            "A twilight sky with stars and clouds",
+            "A cozy campfire surrounded by grey stones",
+            "A grassy clearing in a thick forest"
+          ],
+          "IE": [
+            "The stew in the pot begins to bubble",
+            "The sun sets behind the green trees"
+          ],
+          "IR": [
+            "The boy feels happy and content",
+            "The boy looks hungry for his dinner"
+          ],
+          "P": [
+            "The boy wants to cook a meal",
+            "The boy intends to stir the stew"
+          ],
+          "A": [
+            "Sitting on a log near the fire",
+            "Holding a large wooden spoon"
+          ],
+          "CO": [
+            "Steam rises from the hot bubbling stew",
+            "The fire provides light in the woods"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "A large light-brown wooden spoon",
+            "Bright orange and yellow campfire flames",
+            "Small yellow and blue five-petaled flowers"
+          ],
+          "ADV": [
+            "Waiting patiently for the food to cook",
+            "Smiling happily at the warm campfire"
+          ],
+          "SC": [
+            "While the stew cooks over the fire",
+            "Because he is hungry for dinner"
+          ],
+          "CC": [
+            "The boy sits and holds a spoon",
+            "The fire is hot but the air is cool"
+          ],
+          "M": [
+            "He thinks the stew smells delicious",
+            "He knows the food is almost ready"
+          ],
+          "L": [
+            "He hums a song to himself",
+            "He tells a story to the trees"
+          ]
+        }
+      }
     }
   ]
 }

@@ -15,7 +15,77 @@
         "woman",
         "coffee"
       ],
-      "composition_instructions": "Place woman at the small marble table, sitting and wrapping both hands around a large white cup of coffee with steam rising. Place the cup on a saucer on the table, with a croissant and newspaper beside it."
+      "composition_instructions": "Place woman at the small marble table, sitting and wrapping both hands around a large white cup of coffee with steam rising. Place the cup on a saucer on the table, with a croissant and newspaper beside it.",
+      "scene_description": "In the lower-left foreground, a cobblestone street composed of rounded grey and brown stones extends toward the center. To the left of the street is a patch of green grass dotted with small white, pink, and yellow flowers. Behind the grass stands a row of three trees with rounded canopies in shades of yellow, orange, and green. Moving right along the sidewalk, two wooden A-frame signs stand near the edge of the street; the left sign displays a menu with illustrations of a coffee cup, a croissant, and a sandwich, while the right sign is blank. Further right, a woman with brown hair tied in a ponytail sits in a black wrought-iron chair at a small, round grey table. She wears a blue long-sleeved shirt, a yellow apron with a front pocket, brown pants, and brown shoes. She is smiling and holding a white cup of hot coffee with a swirl of white steam rising from it. On the table in front of her sits a white plate with a golden-brown croissant and a folded newspaper. To her right is an empty black wrought-iron chair. Several terracotta pots containing green bushes and spiky plants are placed around the seating area, with a few fallen orange leaves scattered on the ground. Behind the woman is the cafe building, featuring large glass windows and a brown wooden door under a striped orange and white awning. To the right of the cafe, a large tree with a thick brown trunk and a canopy of green and orange leaves frames the scene. In the background, simple silhouettes of buildings and houses are visible under a light blue sky filled with soft, fluffy white clouds, suggesting a clear autumn morning or afternoon.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "woman with brown hair in a ponytail",
+            "smiling woman wearing a yellow apron"
+          ],
+          "S": [
+            "cozy outdoor cafe on a cobblestone street",
+            "clear autumn morning with fluffy clouds",
+            "colorful trees with yellow and orange leaves"
+          ],
+          "IE": [
+            "the woman sits down for breakfast",
+            "the coffee is served hot and steaming"
+          ],
+          "IR": [
+            "the woman feels happy and relaxed",
+            "she looks pleased with her warm drink"
+          ],
+          "P": [
+            "to enjoy a quiet morning coffee",
+            "to eat the golden-brown croissant"
+          ],
+          "A": [
+            "holding a white cup of hot coffee",
+            "sitting in a black wrought-iron chair"
+          ],
+          "CO": [
+            "steam rises from the hot coffee cup",
+            "fallen orange leaves scatter on the ground"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "steaming white cup of hot coffee",
+            "golden-brown croissant on a white plate",
+            "striped orange and white awning",
+            "rounded grey and brown cobblestones"
+          ],
+          "ADV": [
+            "peacefully",
+            "warmly",
+            "happily",
+            "quietly"
+          ],
+          "SC": [
+            "because the morning is cool",
+            "while she sits at the table",
+            "when she takes a sip"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "enjoys",
+            "likes",
+            "thinks",
+            "feels"
+          ],
+          "L": [
+            "says",
+            "tells",
+            "describes",
+            "whispers"
+          ]
+        }
+      }
     }
   ]
 }
