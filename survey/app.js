@@ -512,6 +512,7 @@
 
     // Scene image
     const img = document.getElementById('scene-image-1');
+    img.style.display = '';
     img.src = trial.imagePath;
     img.onerror = () => {
       img.style.display = 'none';
@@ -638,6 +639,7 @@
 
     // Scene image
     const img = document.getElementById('scene-image-2');
+    img.style.display = '';
     img.src = trial.imagePath;
     img.onerror = () => {
       img.style.display = 'none';
