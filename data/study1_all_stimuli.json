@@ -4851,7 +4851,7 @@
       "stimulus_id": "study1_R2_C_suggestion",
       "scene_id": "study1_R2_C",
       "condition": "suggestion",
-      "narrator_text": "A red horseshoe magnet and a blue horseshoe magnet sit on a science lab table. Iron filings are scattered on the surface between them.",
+      "narrator_text": "A red horseshoe magnet and a blue horseshoe magnet sit on a science lab table.",
       "target_misl": "CC",
       "options": {
         "T": "Mention that the magnets are pushing apart or repelling each other",
