@@ -15,7 +15,86 @@
         "magnet_red",
         "magnet_blue"
       ],
-      "composition_instructions": "Place magnet_red on the table (left), horseshoe shape with same pole facing right. Place magnet_blue on the table (right), same pole facing left. Clear gap between them. Iron filings between them curving outward in repulsion pattern."
+      "composition_instructions": "Place magnet_red on the table (left), horseshoe shape with same pole facing right. Place magnet_blue on the table (right), same pole facing left. Clear gap between them. Iron filings between them curving outward in repulsion pattern.",
+      "scene_description": "Starting at the far left, outside a window, there is a patch of green grass dotted with small white, yellow, and blue flowers and green clovers. Moving onto the large, solid brown wooden desk that dominates the foreground, a short, sharpened yellow pencil with a dark lead tip lies horizontally on the left side. To the right of the pencil is a light brown wooden ruler with black measurement markings. In the center of the desk, magnet_red, a large red horseshoe magnet with a yellow top tip and a light blue bottom tip, faces toward the right. Facing it from the right is magnet_blue, a large blue horseshoe magnet with grey tips labeled 'N' on the top and 'S' on the bottom. Between the two magnets, grey iron filings are suspended in the air, forming curved lines that illustrate a magnetic field. To the right of magnet_blue lies an open book with white pages and horizontal black lines representing text. At the far right of the desk is a red desk lamp with a circular base and a jointed arm; its red shade is illuminated, casting a warm yellow light onto the book and desk. Behind the desk on the left wall, two wooden shelves hold glass Erlenmeyer flasks; the top shelf has one empty flask and one with blue liquid, while the bottom shelf has one flask with blue liquid. To the right of these shelves is a large window with a light blue frame divided into four panes, showing a background of green leafy trees under a light blue sky with fluffy white clouds, indicating a bright day. Centered behind the magnets is a tall, narrow wooden shelving unit with three levels; the top shelf holds a blue flask, a thin test tube, and a round green flask, while the bottom shelf holds a round yellow flask and a clear Erlenmeyer flask. To the right of this unit, behind the lamp, is a large green chalkboard in a wooden frame with two small white pieces of chalk resting on its bottom ledge. The entire scene is a brightly lit classroom or science lab.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "No characters or animals are visible",
+            "magnet_red and magnet_blue are the focus"
+          ],
+          "S": [
+            "A bright science classroom during day",
+            "A large wooden desk with tools",
+            "Green trees under a cloudy sky",
+            "Shelves holding various glass flasks"
+          ],
+          "IE": [
+            "magnet_red is placed near magnet_blue",
+            "The lamp is turned on for light",
+            "Iron filings react to the magnets"
+          ],
+          "IR": [
+            "A feeling of curiosity and wonder",
+            "Excitement for a science experiment"
+          ],
+          "P": [
+            "To see the invisible magnetic field",
+            "To record findings in the book",
+            "To measure distance with a ruler"
+          ],
+          "A": [
+            "magnet_red pulls on the iron filings",
+            "The lamp shines on the book",
+            "The sun illuminates the entire room"
+          ],
+          "CO": [
+            "A pattern forms between the magnets",
+            "The desk is prepared for learning",
+            "The book is bright enough to read"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "The large red horseshoe magnet",
+            "The blue magnet with grey tips",
+            "A short sharpened yellow pencil",
+            "A light brown wooden ruler",
+            "The glowing red desk lamp"
+          ],
+          "ADV": [
+            "Brightly",
+            "Silently",
+            "Neatly",
+            "Horizontally",
+            "Clearly"
+          ],
+          "SC": [
+            "Because the magnets are close together",
+            "While the sun shines through window",
+            "When the iron filings move",
+            "If the lamp is turned off"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so",
+            "or"
+          ],
+          "M": [
+            "wonders",
+            "discovers",
+            "notices",
+            "knows"
+          ],
+          "L": [
+            "shows",
+            "explains",
+            "tells",
+            "describes"
+          ]
+        }
+      }
     }
   ]
 }

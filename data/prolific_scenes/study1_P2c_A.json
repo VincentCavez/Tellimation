@@ -15,7 +15,77 @@
         "chest",
         "crown"
       ],
-      "composition_instructions": "Place chest in the center of the attic, open with brass hinges. Place crown inside the chest on faded red velvet lining, gleaming brilliantly and catching the beam of light from the window."
+      "composition_instructions": "Place chest in the center of the attic, open with brass hinges. Place crown inside the chest on faded red velvet lining, gleaming brilliantly and catching the beam of light from the window.",
+      "scene_description": "In this attic setting, the scene begins on the far left with a set of wooden shelves built into the wall. On the bottom shelf sit several dark glass bottles and jars, partially obscured by thick, white cobwebs. The middle shelf holds three rolled-up pieces of gray and brown fabric, while the top shelf contains a single glass bottle. Moving right along the floor, two large, dusty cardboard boxes are stacked, with a smaller box positioned next to them. In the center of the room, a large wooden chest with blue metal corner reinforcements and latches sits open. Inside this chest, a golden crown adorned with small blue and red jewels rests on a plush red cushion. A few rolled-up scrolls are tucked into the right side of the chest's interior. A bright beam of light from a round window directly behind the chest illuminates the crown, making it glow. To the right of the central chest, several more cardboard boxes are stacked against the wall, and a tall, flat wooden board leans behind them. On the floor in the lower right, a large, partially unrolled map or scroll lies flat, with another tightly rolled scroll next to it. Further to the right sits a second, smaller chest, which is closed and features a metal lock and curved lid. The room is constructed of heavy wooden floorboards and sloped ceiling beams. Cobwebs are draped across the corners of the ceiling and between the beams throughout the space. On the upper right beam, a small black spider hangs from a single thread of silk. The round window in the center background reveals a bright, sunny day with green trees and a blue sky filled with soft white clouds. The overall atmosphere is dusty and warm, with light particles dancing in the sunbeam hitting the central chest.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "a tiny black spider on a thread"
+          ],
+          "S": [
+            "a dusty attic with wooden beams",
+            "a sunny day outside the window",
+            "cobwebs draped across the ceiling corners",
+            "stacks of boxes and old scrolls"
+          ],
+          "IE": [
+            "the wooden chest has been opened",
+            "a sunbeam strikes the golden crown"
+          ],
+          "IR": [
+            "the spider feels curious about the light",
+            "the room feels mysterious and warm"
+          ],
+          "P": [
+            "the spider wants to spin a web",
+            "someone intends to find the hidden treasure"
+          ],
+          "A": [
+            "the spider is hanging from the ceiling",
+            "light is pouring through the round window",
+            "dust particles are dancing in the air"
+          ],
+          "CO": [
+            "the crown glows in the bright light",
+            "the attic is filled with golden light"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "a golden crown with blue jewels",
+            "a large wooden chest with blue metal",
+            "thick white cobwebs on the beams",
+            "dusty cardboard boxes stacked high"
+          ],
+          "ADV": [
+            "brightly",
+            "quietly",
+            "softly",
+            "neatly"
+          ],
+          "SC": [
+            "when the sun shines through",
+            "because the chest is open",
+            "while the spider hangs there"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "wonders",
+            "knows",
+            "sees",
+            "thinks"
+          ],
+          "L": [
+            "whispers",
+            "tells",
+            "asks"
+          ]
+        }
+      }
     }
   ]
 }

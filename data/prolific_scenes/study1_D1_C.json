@@ -15,7 +15,78 @@
         "vendor",
         "customer"
       ],
-      "composition_instructions": "Place vendor behind the wooden stall, standing and holding up three fingers with one hand, gesturing at tomatoes with the other, mouth open mid-pitch. Place customer across the stall, standing and shaking her head, one hand raised palm-out in a 'no' gesture, other hand holding a canvas shopping bag."
+      "composition_instructions": "Place vendor behind the wooden stall, standing and holding up three fingers with one hand, gesturing at tomatoes with the other, mouth open mid-pitch. Place customer across the stall, standing and shaking her head, one hand raised palm-out in a 'no' gesture, other hand holding a canvas shopping bag.",
+      "scene_description": "In the lower-left foreground, a grassy patch features small yellow, pink, and white flowers. A dirt path with embedded grey stones runs horizontally across the bottom of the scene. On the left side of the path, a customer stands facing right. She is a young woman with shoulder-length brown hair, an angry facial expression with furrowed brows, and a slight frown. She wears a yellow cable-knit sweater, brown trousers, and green ankle boots. In her left hand, she carries a beige tote bag containing a rolled-up white paper, while her right hand is raised with the palm facing outward in a dismissive gesture. To her right, a vendor stands behind a wooden vegetable stall. The vendor is an older man with short grey hair and a full grey beard, wearing a white and grey striped long-sleeved shirt under a beige apron. He has an open-mouthed, cheerful expression, gesturing with his left hand toward his produce and holding up three fingers on his right hand. The stall has a yellow and green striped fabric awning supported by wooden posts. On the stall's wooden counter, from left to right, are a wooden crate of red tomatoes, a crate of green cabbages, a crate of orange carrots, a small pile of purple eggplants, and a wicker basket of red onions. A metal hanging scale hangs from a crossbeam above the carrots. Below the counter on the ground, several wooden crates and burlap sacks hold more produce, including orange carrots in crates to the left of the stall, red onions in a crate, leafy greens in sacks, and small green vegetables in a crate on the right. A large tree with a thick brown trunk and dense green foliage stands directly behind the stall, its branches extending over the roof. To the far right, tall green leafy plants and bushes border the scene. In the midground, rolling green hills and a dense forest of green trees stretch across the horizon. The background features a bright blue sky filled with several soft, white, fluffy clouds, suggesting a clear daytime setting. The customer is positioned in front of the distant hills, while the vendor is framed by the stall and the large tree behind him. Produce crates are stacked neatly on the ground to the left and right of the main stall structure.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "young woman with shoulder-length brown hair",
+            "older man with a full grey beard"
+          ],
+          "S": [
+            "sunny day at an outdoor market",
+            "rolling green hills under a blue sky",
+            "large tree with dense green leaves"
+          ],
+          "IE": [
+            "the vendor offers a specific price",
+            "the customer looks at the fresh produce"
+          ],
+          "IR": [
+            "the woman feels very annoyed",
+            "the vendor feels happy and friendly"
+          ],
+          "P": [
+            "the woman wants to leave quickly",
+            "the vendor wants to make a sale"
+          ],
+          "A": [
+            "raising a hand in a dismissive gesture",
+            "holding up three fingers to show price",
+            "gesturing toward the crates of vegetables"
+          ],
+          "CO": [
+            "the customer walks away empty-handed",
+            "the produce stays on the wooden stall"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "yellow cable-knit sweater",
+            "striped yellow and green awning",
+            "wooden crates filled with orange carrots",
+            "beige tote bag with a paper roll"
+          ],
+          "ADV": [
+            "angrily",
+            "cheerfully",
+            "dismissively",
+            "neatly"
+          ],
+          "SC": [
+            "because she is unhappy",
+            "while the vendor gestures",
+            "since the price is high"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "feels",
+            "wants",
+            "dislikes"
+          ],
+          "L": [
+            "says",
+            "offers",
+            "refuses",
+            "explains"
+          ]
+        }
+      }
     }
   ]
 }

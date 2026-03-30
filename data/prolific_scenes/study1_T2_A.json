@@ -15,7 +15,92 @@
         "children",
         "teacher"
       ],
-      "composition_instructions": "Place children at wooden desks in rows, each hunched over paper, writing with pencils, faces showing concentration. Place teacher at the front near the whiteboard, standing with arms folded, watching calmly."
+      "composition_instructions": "Place children at wooden desks in rows, each hunched over paper, writing with pencils, faces showing concentration. Place teacher at the front near the whiteboard, standing with arms folded, watching calmly.",
+      "scene_description": "In the foreground on the far left, a brown leather satchel with two buckles sits on a light brown wooden plank floor next to a large, rectangular brown wooden teacher's desk. On the desk's surface, a tall stack of white papers sits to the left of two stacked books, one green and one blue. Behind the desk is a matching brown wooden chair. To the left of the desk, a large green chalkboard is mounted on the wall, featuring a small wooden tray at the bottom holding a grey eraser. Above the chalkboard, a small grey speaker is mounted near the ceiling. To the right of the chalkboard, a circular white clock with a blue frame and black numbers hangs on the wall, indicating the time is approximately 2:10. Standing to the right of the clock is the teacher, a man with brown hair, a mustache, and a green sweater vest over a light blue collared shirt and tan trousers. He stands with his arms crossed, looking toward the center of the room. In the main area of the classroom, five children are seated at individual small brown wooden desks, each with a matching chair. In the front row on the left, a boy with curly brown hair, wearing a green long-sleeved shirt, blue pants, and brown shoes, leans over his desk writing on a white paper with a pencil. To his right, a boy with black hair, wearing a blue hooded sweatshirt, tan pants, and grey shoes, is also writing on a white paper. On the far right of the front row, a girl with brown hair tied in pigtails, wearing a pink dress over a white shirt and red sneakers, writes on her paper with a focused expression. In the second row, behind the first boy, a girl with short brown hair, wearing a yellow and white striped shirt and purple pants, is writing. To her right, behind the middle boy, a girl with a blonde ponytail and a yellow shirt sits at her desk. Several empty wooden desks and chairs are positioned in the background on the right side of the room. The back wall is dominated by three large windows with light brown wooden frames. Through the glass, a sunny outdoor scene shows a light blue sky with white clouds, several green leafy trees, a grassy lawn dotted with small yellow and white flowers, and a tan-colored school building in the distance. The entire scene is brightly lit, suggesting cushions of sunlight on the floor, suggesting a clear afternoon.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "teacher with a mustache and green vest",
+            "boy with curly brown hair writing",
+            "girl with a blonde ponytail",
+            "boy wearing a blue hooded sweatshirt",
+            "girl in a pink dress with pigtails"
+          ],
+          "S": [
+            "bright classroom with large windows",
+            "sunny afternoon with green trees outside",
+            "wooden desks on a plank floor",
+            "round clock showing ten past two"
+          ],
+          "IE": [
+            "the teacher assigned a writing task",
+            "the students started their afternoon test",
+            "a quiet study period has begun"
+          ],
+          "IR": [
+            "the children look very focused",
+            "the teacher looks serious and watchful",
+            "some students seem a bit frustrated"
+          ],
+          "P": [
+            "the students want to finish their work",
+            "the teacher intends to monitor the room",
+            "the children hope to go outside soon"
+          ],
+          "A": [
+            "writing carefully with pencils on paper",
+            "standing with arms crossed near the desk",
+            "leaning over the small wooden desks",
+            "looking down at the white papers"
+          ],
+          "CO": [
+            "the papers are being filled with writing",
+            "the classroom remains quiet and orderly",
+            "the school day is nearing its end"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "large rectangular brown wooden desk",
+            "brown leather satchel with two buckles",
+            "tall stack of white papers",
+            "circular white clock with blue frame",
+            "green chalkboard with a wooden tray"
+          ],
+          "ADV": [
+            "quietly",
+            "carefully",
+            "intently",
+            "seriously",
+            "patiently"
+          ],
+          "SC": [
+            "while the students write their papers",
+            "because they are taking a test",
+            "when the clock reaches the hour",
+            "as the sun shines through windows"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so",
+            "or"
+          ],
+          "M": [
+            "thinks",
+            "concentrates",
+            "remembers",
+            "wonders",
+            "knows"
+          ],
+          "L": [
+            "explains",
+            "instructs",
+            "whispers",
+            "tells"
+          ]
+        }
+      }
     }
   ]
 }

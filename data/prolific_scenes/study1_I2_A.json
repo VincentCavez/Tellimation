@@ -19,7 +19,88 @@
         "girl_braids",
         "girl_headband"
       ],
-      "composition_instructions": "Place teacher near the whiteboard (front), standing and gesturing with one hand. Place girl_braids at the left desk, sitting upright. Place boy_glasses at the middle desk, leaning forward over a notebook. Place girl_headband at the right desk, resting chin on hand."
+      "composition_instructions": "Place teacher near the whiteboard (front), standing and gesturing with one hand. Place girl_braids at the left desk, sitting upright. Place boy_glasses at the middle desk, leaning forward over a notebook. Place girl_headband at the right desk, resting chin on hand.",
+      "scene_description": "In this children's picture-book classroom scene, a large whiteboard with a brown wooden frame and stand is positioned on the far left, featuring a white marker, a red marker, a green marker, and a black eraser on its tray. To the right of the whiteboard stands the teacher, a woman with wavy brown hair wearing a light blue long-sleeved shirt, a dark grey skirt, and black heels; she is facing right and pointing her finger toward the students. In the center of the room are three brown wooden desks with attached chairs arranged in a row. At the leftmost desk sits girl_braids, who has long brown hair in two braids and wears a green sweater, a yellow and white striped skirt, and brown boots while looking toward the teacher. At the middle desk, boy_glasses, who has curly brown hair and round glasses, wears a green t-shirt and yellow shorts while writing in an open notebook with a pencil. At the rightmost desk sits girl_headband, who has long brown hair with a red headband and wears a purple sweater, a green skirt, and blue shoes while resting her chin on her hand. Behind the students is a large window with a rounded top showing a sunny outdoor scene with a blue sky, white clouds, green hills, and rounded green trees. To the right of the window is a tall, rounded brown wooden bookshelf filled with colorful books in shades of red, blue, green, and purple. On top of the bookshelf are three potted plants in brown and blue pots. Between the bookshelf and the third desk sits a small wooden table holding a globe on a stand. The room has light orange walls and a floor made of light brown wooden planks that run diagonally across the scene.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "teacher with wavy brown hair",
+            "girl with long brown braids",
+            "boy wearing round black glasses",
+            "girl wearing a red headband"
+          ],
+          "S": [
+            "bright classroom with light orange walls",
+            "sunny day visible through the window",
+            "tall wooden bookshelf filled with books",
+            "wooden floor with diagonal planks"
+          ],
+          "IE": [
+            "the teacher begins the morning lesson",
+            "the boy opens his notebook to write",
+            "the teacher points toward the students"
+          ],
+          "IR": [
+            "the teacher feels focused on teaching",
+            "the boy feels studious while writing",
+            "the girl feels curious about the lesson"
+          ],
+          "P": [
+            "the teacher wants to explain a topic",
+            "the boy intends to finish his notes",
+            "the students aim to listen carefully"
+          ],
+          "A": [
+            "teacher pointing a finger at students",
+            "boy writing in a notebook with a pencil",
+            "girl resting her chin on her hand",
+            "girl looking attentively at the teacher"
+          ],
+          "CO": [
+            "the students are learning their lesson",
+            "the notebook is filled with writing",
+            "the classroom remains quiet and orderly"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "large whiteboard with a brown frame",
+            "light blue long-sleeved shirt",
+            "small green potted plants",
+            "colorful books on the wooden shelves",
+            "round globe on a small table"
+          ],
+          "ADV": [
+            "quietly",
+            "attentively",
+            "clearly",
+            "neatly"
+          ],
+          "SC": [
+            "while the teacher speaks",
+            "because they are in school",
+            "when the boy writes"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "learns",
+            "wonders",
+            "remembers",
+            "understands"
+          ],
+          "L": [
+            "explains",
+            "tells",
+            "asks",
+            "describes"
+          ]
+        }
+      }
     }
   ]
 }

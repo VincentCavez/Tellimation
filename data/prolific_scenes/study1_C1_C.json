@@ -19,7 +19,72 @@
         "car_3",
         "man"
       ],
-      "composition_instructions": "Place car_1 in the left parking space, facing forward, with a small dent on front bumper. Place car_2 in the middle space, facing forward, with a parking sticker on windshield. Place car_3 in the right space, facing forward, with driver-side window slightly open. Place man at the end of the row (right), standing and holding car keys, looking confused."
+      "composition_instructions": "Place car_1 in the left parking space, facing forward, with a small dent on front bumper. Place car_2 in the middle space, facing forward, with a parking sticker on windshield. Place car_3 in the right space, facing forward, with driver-side window slightly open. Place man at the end of the row (right), standing and holding car keys, looking confused.",
+      "scene_description": "In the foreground on the far left, there is a large, rounded green bush. To its right, car_1 is a light blue four-door sedan parked within white lines; it has a noticeable dent on its front right bumper and is facing the right side of the frame. In the bottom right foreground, a patch of green grass is dotted with small white flowers and clovers. Moving to the middle ground, car_2 is another light blue sedan parked in the row behind car_1, featuring a small blue and white sticker on the upper corner of its windshield. To the right of car_2 is car_3, a third light blue sedan of the same make and model. Further to the right, the man stands on the grey asphalt parking lot; he has short brown hair, a worried expression, and is dressed in a green sweater, brown pants, and brown shoes. He holds a set of keys in his raised right hand. A tall, grey street lamp with a curved top stands behind car_2. In the background, a wide yellow field with small flowers stretches across the scene. On the left side of the field are two large green trees with thick brown trunks, while three similar trees stand on the right. The sky is a light blue color with several fluffy white clouds, indicating a bright day.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "a man with short brown hair",
+            "a man wearing a green sweater"
+          ],
+          "S": [
+            "a sunny day in a parking lot",
+            "a wide yellow field behind the lot",
+            "fluffy white clouds in a blue sky"
+          ],
+          "IE": [
+            "the man sees three identical blue cars",
+            "one car has a dent on the bumper"
+          ],
+          "IR": [
+            "the man feels worried and confused",
+            "the man looks unsure about his car"
+          ],
+          "P": [
+            "the man wants to find his car",
+            "the man plans to use his keys"
+          ],
+          "A": [
+            "the man is holding up his keys",
+            "the man is looking at the cars"
+          ],
+          "CO": [
+            "the man is standing still in confusion",
+            "the man cannot tell which car is his"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "a light blue four-door sedan",
+            "a noticeable dent on the front bumper",
+            "a tall grey street lamp",
+            "a small blue and white sticker"
+          ],
+          "ADV": [
+            "worriedly",
+            "confusedly",
+            "uncertainly"
+          ],
+          "SC": [
+            "because all the cars are blue",
+            "when he tries to find his car"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "wonders",
+            "thinks",
+            "remembers"
+          ],
+          "L": [
+            "sighs",
+            "mumbles"
+          ]
+        }
+      }
     }
   ]
 }

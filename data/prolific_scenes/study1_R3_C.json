@@ -15,7 +15,77 @@
         "ball",
         "window"
       ],
-      "composition_instructions": "Place ball mid-air just after impact with the window, a web of cracks radiating from the contact point. A few small shards tumbling through the air. Ball bouncing backward slightly deformed."
+      "composition_instructions": "Place ball mid-air just after impact with the window, a web of cracks radiating from the contact point. A few small shards tumbling through the air. Ball bouncing backward slightly deformed.",
+      "scene_description": "In the bottom left foreground, a green lawn is filled with small yellow flowers and four-leaf clovers. A winding path of irregular grey stones starts at the bottom right and leads toward the center of the scene. Behind the grass on the left, a row of manicured green bushes sits against the base of a tan brick house. The house has a large rectangular window with three vertical panes; the middle pane is heavily cracked in a spiderweb pattern. A multi-colored ball with green, yellow, blue, and brown panels is frozen in the air in front of the shattered window pane. Several small, clear shards of glass are falling through the air between the ball and the bushes below. To the right of the window is a brown wooden door with a simple handle. To the right of the door, more green bushes lead to a large tree with a thick brown trunk and a full, rounded green canopy. In the background, a light brown wooden fence spans the width of the yard. Beyond the fence, the tops of other houses and green foliage are visible. The sky above is a pale blue with several soft, white, fluffy clouds, indicating a clear, sunny day.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "no characters are visible in the scene"
+          ],
+          "S": [
+            "sunny day with a pale blue sky",
+            "tan brick house with a wooden door",
+            "green lawn with yellow flowers",
+            "large tree with a full green canopy"
+          ],
+          "IE": [
+            "the ball hitting the glass window",
+            "the window pane shattering into pieces"
+          ],
+          "IR": [
+            "feeling shocked by the loud noise",
+            "worrying about the broken glass"
+          ],
+          "P": [
+            "trying to play a soccer game",
+            "wanting to catch the ball"
+          ],
+          "A": [
+            "the ball flying through the air",
+            "glass shards falling toward the bushes"
+          ],
+          "CO": [
+            "a spiderweb crack in the window",
+            "glass shards scattered on the bushes"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "multi-colored ball with green and yellow panels",
+            "large window with three vertical panes",
+            "winding path of irregular grey stones",
+            "manicured green bushes under the window"
+          ],
+          "ADV": [
+            "suddenly",
+            "accidentally",
+            "loudly",
+            "sharply"
+          ],
+          "SC": [
+            "because the ball hit the glass",
+            "after the window shattered",
+            "while the ball was in flight"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "realizes",
+            "fears",
+            "wonders",
+            "knows"
+          ],
+          "L": [
+            "gasps",
+            "cries out",
+            "explains",
+            "tells"
+          ]
+        }
+      }
     }
   ]
 }

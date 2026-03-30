@@ -10,12 +10,89 @@
       "scene_number": 1,
       "title": "The Goodbye",
       "background_prompt": "A residential street with houses, a sidewalk, a moving truck parked at the curb, and cardboard boxes on a front lawn. Overcast afternoon. No people.",
-      "full_scene_prompt": "A residential street on an overcast afternoon. A girl of about eight in a pink hoodie stands on the sidewalk, raising one hand in a slow, reluctant wave. Her face is crumpled with sadness \u2014 eyebrows raised in the middle, mouth pressed tight, eyes brimming. She watches another girl of the same age, her best friend, walking away down the sidewalk toward a large white moving truck parked at the curb. The departing girl pulls a small rolling suitcase behind her and looks back over her shoulder with a similarly heartbroken expression. Cardboard boxes labeled 'Kitchen' and 'Toys' sit on the front lawn of the house beside the truck. A 'SOLD' sign stands in the garden. Leaves blow across the empty sidewalk between the two girls.",
+      "full_scene_prompt": "A residential street on an overcast afternoon. A girl of about eight in a pink hoodie stands on the sidewalk, raising one hand in a slow, reluctant wave. Her face is crumpled with sadness — eyebrows raised in the middle, mouth pressed tight, eyes brimming. She watches another girl of the same age, her best friend, walking away down the sidewalk toward a large white moving truck parked at the curb. The departing girl pulls a small rolling suitcase behind her and looks back over her shoulder with a similarly heartbroken expression. Cardboard boxes labeled 'Kitchen' and 'Toys' sit on the front lawn of the house beside the truck. A 'SOLD' sign stands in the garden. Leaves blow across the empty sidewalk between the two girls.",
       "entities_in_scene": [
         "girl",
         "friend"
       ],
-      "composition_instructions": "Place girl on the sidewalk (left), standing and raising one hand in a slow reluctant wave, face crumpled with sadness. Place friend walking away (right) toward the moving truck, pulling a small rolling suitcase, looking back over her shoulder."
+      "composition_instructions": "Place girl on the sidewalk (left), standing and raising one hand in a slow reluctant wave, face crumpled with sadness. Place friend walking away (right) toward the moving truck, pulling a small rolling suitcase, looking back over her shoulder.",
+      "scene_description": "In the bottom foreground, a greyish-brown paved street runs across the width of the scene, bordered by a light grey concrete sidewalk. On the far left, a dark blue moving truck is parked on the street, facing left, with only its rear half visible. The side of the truck features the letters \"OVERS\" in large, light blue, sans-serif capital letters. The back cargo door is open and rolled up, revealing two brown cardboard boxes stacked inside. To the right of the truck, a girl stands on a light grey path leading from the sidewalk to a house. She has short, wavy brown hair adorned with a yellow headband and a single tear on her cheek. She is dressed in a mustard-yellow knit sweater, blue jeans rolled at the ankles, and brown boots. Her right hand is raised in a wave, and her left hand is held against her chest as she looks toward the right. Behind her is a two-story yellow house with a blue shingled roof, white-trimmed windows, and a small front porch with white railings. To the left of this house, a portion of a grey house with a dark grey roof is visible in the background, fronted by a green bush with pink flowers. On the lawn to the right of the yellow house's porch sits a pile of moving supplies, including several brown cardboard boxes of various sizes and furniture draped under a large green tarp. Small green bushes and patches of grass with tiny yellow flowers are scattered around the base of the house. In the foreground on the right, a friend walks along the sidewalk toward the right edge of the frame. She is identical in appearance to the girl, wearing the same yellow headband, mustard-yellow sweater, cuffed blue jeans, and brown boots. She carries a sad expression, looking back over her shoulder toward the left while pulling a small, brown, wheeled suitcase behind her. Behind the friend is a green two-story house with a brown shingled roof and white-trimmed windows. A garden bed in front of the green house is filled with pink and blue hydrangeas, tall yellow sunflowers, and small yellow daisies. A small green bush with pink flowers sits on the lawn to the left of the friend. The background is filled with large, rounded green trees under a pale blue sky dotted with soft, white, puffy clouds, indicating a clear day.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "a young girl with short brown hair",
+            "a sad friend pulling a brown suitcase",
+            "a girl wearing a mustard-yellow knit sweater"
+          ],
+          "S": [
+            "a quiet suburban neighborhood with colorful houses",
+            "a sunny day with soft white clouds",
+            "a yellow two-story house with a blue roof",
+            "a greyish-brown paved street and concrete sidewalk"
+          ],
+          "IE": [
+            "a moving truck parked on the street",
+            "stacks of cardboard boxes piled on the lawn",
+            "the friend leaving with her luggage"
+          ],
+          "IR": [
+            "the girl feels sad to say goodbye",
+            "the friend looks unhappy about leaving",
+            "a single tear rolling down her cheek"
+          ],
+          "P": [
+            "the friend intends to move away",
+            "the girl wants to wave goodbye",
+            "the movers plan to load the boxes"
+          ],
+          "A": [
+            "the girl is waving with one hand",
+            "the friend is walking away slowly",
+            "the girl holds her hand against her chest"
+          ],
+          "CO": [
+            "the neighborhood will be different now",
+            "the boxes are ready for the truck",
+            "the friend is heading toward the street"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "a dark blue moving truck",
+            "large yellow sunflowers in the garden",
+            "a small brown wheeled suitcase",
+            "a mustard-yellow knit sweater"
+          ],
+          "ADV": [
+            "sadly",
+            "slowly",
+            "quietly",
+            "tearfully"
+          ],
+          "SC": [
+            "because she is moving away",
+            "while she waves goodbye",
+            "when the truck is full"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "feels",
+            "remembers",
+            "wishes",
+            "wonders"
+          ],
+          "L": [
+            "whispers",
+            "sighs",
+            "calls out",
+            "says"
+          ]
+        }
+      }
     }
   ]
 }

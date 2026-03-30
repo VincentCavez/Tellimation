@@ -15,7 +15,77 @@
         "birdbath",
         "robin"
       ],
-      "composition_instructions": "Place birdbath in the center of the garden, frozen over with a thick layer of ice and frost patterns on the pedestal. Place robin on the top rail of the wooden fence (right), perched with head tilted."
+      "composition_instructions": "Place birdbath in the center of the garden, frozen over with a thick layer of ice and frost patterns on the pedestal. Place robin on the top rail of the wooden fence (right), perched with head tilted.",
+      "scene_description": "In the bottom left foreground, clumps of frosted grass and clover-like leaves grow alongside dried, spindly seed heads. Moving across the foreground to the right, the ground is covered in a thick layer of brown, dried leaves, mostly oak-shaped, with patches of white frost and light snow scattered between them. On the far right of the foreground, more frosted grass and dried plants are visible. In the midground on the far left, a large, thick-trunked leafless tree with many twisting branches stands in front of a wooden picket fence. To its right is a smaller leafless tree. In the center of the yard, a light brown stone birdbath sits on a pedestal. The birdbath is covered in a thick layer of white snow and ice that forms several icicles hanging from its rim, and the water inside the basin is frozen. A robin is perched on the right edge of the birdbath, facing left; it has a brown back and wings, a bright orange-red breast, and a small dark eye. To the right of the birdbath stands another leafless tree. Further right, a small wooden garden shed features a snow-covered gabled roof, a brown door with a small four-pane window, and a larger four-pane window on its side. Bare, twiggy bushes are situated next to the shed. A wooden fence with vertical slats runs horizontally across the scene behind the trees and birdbath. Behind this fence, the tops of more bare trees are visible. The background consists of a pale blue sky filled with numerous soft, rounded white clouds, suggesting a cold, clear winter day.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "a small robin with a bright orange breast",
+            "a bird perched on the frozen birdbath"
+          ],
+          "S": [
+            "a cold winter garden covered in frost",
+            "a yard filled with crunchy brown leaves",
+            "a pale blue sky with soft white clouds",
+            "a small wooden shed with a snowy roof"
+          ],
+          "IE": [
+            "the water in the birdbath has frozen solid",
+            "the robin lands on the icy rim"
+          ],
+          "IR": [
+            "the robin looks curious about the ice",
+            "the bird might feel cold in the winter"
+          ],
+          "P": [
+            "the robin wants to find a drink",
+            "the bird is looking for something to eat"
+          ],
+          "A": [
+            "the robin is perching on the birdbath",
+            "the bird looks at the frozen water"
+          ],
+          "CO": [
+            "the robin cannot drink the icy water",
+            "the garden stays still and quiet"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "a bright orange-red breasted robin",
+            "a stone birdbath with hanging icicles",
+            "crunchy brown oak-shaped leaves",
+            "a small wooden shed with a snowy roof"
+          ],
+          "ADV": [
+            "quietly",
+            "patiently",
+            "coldly",
+            "curiously"
+          ],
+          "SC": [
+            "because the water is frozen solid",
+            "when the robin landed on the rim",
+            "while the garden is covered in frost"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "wonders",
+            "notices",
+            "wants"
+          ],
+          "L": [
+            "chirps",
+            "whistles",
+            "calls"
+          ]
+        }
+      }
     }
   ]
 }

@@ -17,7 +17,77 @@
         "rabbit",
         "train"
       ],
-      "composition_instructions": "Place bear on the far left end of the shelf, sitting upright and leaning slightly against wall. Place rabbit on the far right end, sitting and facing opposite direction. Wide deliberate gap between them with books in the center as divider. Place train on the carpeted floor below the shelf."
+      "composition_instructions": "Place bear on the far left end of the shelf, sitting upright and leaning slightly against wall. Place rabbit on the far right end, sitting and facing opposite direction. Wide deliberate gap between them with books in the center as divider. Place train on the carpeted floor below the shelf.",
+      "scene_description": "In the far left foreground of this children's picture-book scene, an open doorway or window reveals an outdoor landscape featuring green rolling hills, several rounded green trees, and small white and pink flowers in the grass under a light blue sky with fluffy white clouds. Inside the room, the floor is covered in a light beige, textured carpet. On the carpet in the lower right foreground, a toy train sits on a circular wooden track. The train is composed of a yellow and green steam locomotive followed by three rectangular cars in yellow, blue, and green, with the final green car carrying a pile of small, colorful blocks. Above the train, a thick, light brown wooden shelf is mounted horizontally against a wall. The wall is covered in wallpaper with a repeating pattern of five-pointed yellow stars and small blue dots on a cream-colored background. On the left side of the shelf, a brown bear with a red bow tie sits upright, facing toward the right. In the center of the shelf is a stack of five books; from top to bottom, the book covers are red, blue, green, yellow, and red. On the right side of the shelf, a white rabbit with pink inner ears sits upright, facing toward the left. The scene is brightly and evenly lit, indicating a clear daytime setting.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "a brown teddy bear with a red bow tie",
+            "a white rabbit with long pink ears"
+          ],
+          "S": [
+            "a child's bedroom with star-patterned wallpaper",
+            "a sunny day visible through the open doorway",
+            "a thick wooden shelf holding toys and books",
+            "a soft beige carpet on the floor"
+          ],
+          "IE": [
+            "the toys are waiting for someone to play",
+            "the train is set up on its track"
+          ],
+          "IR": [
+            "the bear looks happy and friendly",
+            "the rabbit seems curious about the books"
+          ],
+          "P": [
+            "the toys want to play with the train",
+            "the rabbit wants to read a book"
+          ],
+          "A": [
+            "the bear sits quietly on the shelf",
+            "the train rests on the circular track"
+          ],
+          "CO": [
+            "the room is neat and organized",
+            "the toys are ready for a new adventure"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "a stack of five colorful books",
+            "a toy train with four different cars",
+            "a circular wooden train track",
+            "small white and pink flowers in the grass"
+          ],
+          "ADV": [
+            "quietly",
+            "neatly",
+            "brightly",
+            "patiently"
+          ],
+          "SC": [
+            "because the sun is shining",
+            "while the toys wait on the shelf",
+            "when the train starts to move"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "wants",
+            "wishes",
+            "knows"
+          ],
+          "L": [
+            "says",
+            "whispers",
+            "calls"
+          ]
+        }
+      }
     }
   ]
 }

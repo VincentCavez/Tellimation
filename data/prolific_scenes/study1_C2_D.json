@@ -19,7 +19,81 @@
         "book_3",
         "mug"
       ],
-      "composition_instructions": "Place book_1 on the middle shelf (left), standing upright. Place book_2 next to it (center). Place book_3 next to book_2 (right). Place mug wedged between book_2 and book_3 on the shelf, clearly out of place."
+      "composition_instructions": "Place book_1 on the middle shelf (left), standing upright. Place book_2 next to it (center). Place book_3 next to book_2 (right). Place mug wedged between book_2 and book_3 on the shelf, clearly out of place.",
+      "scene_description": "In this children's picture-book scene, the room features a light green wall on the left adorned with four framed pictures of various shapes and sizes depicting landscapes and abstract art. A large, five-tier wooden bookshelf stands against the center wall. On its third shelf from the top, from left to right, are book_1, which is red, book_2, which is blue, a brown mug with a handle, and book_3, which is green; the remaining shelves are empty. To the right of the bookshelf, four more framed pictures are hung on the green wall, including an oval landscape and several square frames. The floor is composed of light brown wooden planks, partially covered by a large rug with a green border, yellow triangular patterns, and a central yellow diamond with a light blue square. A dark brown leather armchair with a buttoned cushion sits on the rug, positioned next to a wooden desk. On the desk sits a brass-colored desk lamp with a glowing yellow bulb. To the right, a large four-pane window with a wooden frame looks out onto a sunny daytime landscape. The view through the window includes two large green trees, rolling green hills, and a grassy field filled with small white and yellow flowers under a light blue sky with white clouds.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "no characters are visible in the room"
+          ],
+          "S": [
+            "sunny daytime view through the window",
+            "cozy study with light green walls",
+            "rolling green hills under white clouds",
+            "large wooden bookshelf against the wall"
+          ],
+          "IE": [
+            "the desk lamp has been turned on",
+            "a mug was placed on the shelf",
+            "the sun began to shine brightly"
+          ],
+          "IR": [
+            "the room feels peaceful and quiet",
+            "the scene looks calm and inviting"
+          ],
+          "P": [
+            "to sit in the leather armchair",
+            "to read the blue book",
+            "to look out at the trees"
+          ],
+          "A": [
+            "the lamp is glowing on the desk",
+            "the sun is shining through the window",
+            "the books are sitting on the shelf"
+          ],
+          "CO": [
+            "the room is filled with light",
+            "the books are ready to be read"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "a dark brown leather armchair",
+            "a large five-tier wooden bookshelf",
+            "a red book on the shelf",
+            "a brown mug with a handle",
+            "a rug with a yellow diamond"
+          ],
+          "ADV": [
+            "brightly",
+            "neatly",
+            "peacefully",
+            "warmly"
+          ],
+          "SC": [
+            "because the sun is shining",
+            "when the lamp is turned on",
+            "while the room is quiet"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "wants",
+            "knows",
+            "imagines"
+          ],
+          "L": [
+            "reads",
+            "tells",
+            "describes",
+            "whispers"
+          ]
+        }
+      }
     }
   ]
 }

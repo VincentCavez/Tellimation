@@ -16,7 +16,74 @@
         "father",
         "mother"
       ],
-      "composition_instructions": "Place father at the head of the table, standing and carving a golden-brown roast. Place mother at the side, sitting and ladling soup into a bowl. Leave the chair at the far end of the table empty with a full place setting (plate, napkin, filled water glass) and pulled out slightly."
+      "composition_instructions": "Place father at the head of the table, standing and carving a golden-brown roast. Place mother at the side, sitting and ladling soup into a bowl. Leave the chair at the far end of the table empty with a full place setting (plate, napkin, filled water glass) and pulled out slightly.",
+      "scene_description": "In a cozy dining room at night, a wooden floor with a patterned rug edge supports a large rectangular wooden dining table. Six wooden chairs with vertical slats and green seat cushions are arranged around the table: three in the foreground facing away, one on the left end, one on the right end, and one in the background facing forward. On the left side of the table, the father stands facing right, carving a whole roasted turkey on a white platter. He has short brown hair and wears a light blue long-sleeved button-down shirt with tan trousers. To his right, the table is set with several place settings on yellow placemats. The first empty setting has a white plate, a fork, a knife, two spoons, and a glass of water. In the center of the table sits a brown ceramic vase holding green stems with pink and yellow flowers, next to another glass of water. To the right of the vase is another empty place setting with a white plate, a fork, a knife, two spoons, and a glass of water. Further right, a wooden bowl is filled with bread. The mother sits at the next place setting, facing left; she has shoulder-length brown hair and wears a green cable-knit sweater over a yellow collared shirt. She uses a spoon to eat from a white bowl of soup. On the far right end of the table is a final place setting with a white plate, a white napkin, a fork, a knife, two spoons, and a glass of water. Behind the father, a wooden sideboard features two drawers and two cabinets, topped with three lit white candles in holders. Above the sideboard hangs a framed picture of three green trees, and to its right are two smaller framed pictures of flowers and a landscape. An ornate bronze chandelier with five glowing shades hangs from the ceiling in the center. To the right, a large wooden-framed window with green curtains shows a dark blue night sky with a white crescent moon and clouds. The room is finished with light-colored mottled walls and dark brown wooden ceiling beams.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "father in a light blue shirt",
+            "mother in a green cable-knit sweater"
+          ],
+          "S": [
+            "cozy dining room at night",
+            "window showing a crescent moon",
+            "large rectangular wooden dining table"
+          ],
+          "IE": [
+            "the roasted turkey is served",
+            "the family gathers for dinner"
+          ],
+          "IR": [
+            "father looks happy to serve",
+            "mother feels content eating soup"
+          ],
+          "P": [
+            "father intends to slice the turkey",
+            "mother wants to enjoy her meal"
+          ],
+          "A": [
+            "father carving the roasted turkey",
+            "mother eating soup with a spoon"
+          ],
+          "CO": [
+            "the family is ready to eat",
+            "the table is fully prepared"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "large rectangular wooden dining table",
+            "green cable-knit sweater",
+            "ornate bronze chandelier",
+            "whole roasted turkey"
+          ],
+          "ADV": [
+            "carving the turkey very carefully",
+            "eating the soup quite slowly",
+            "glowing warmly from the chandelier"
+          ],
+          "SC": [
+            "while the father carves turkey",
+            "because it is night time",
+            "when the food is ready"
+          ],
+          "CC": [
+            "the father and the mother",
+            "the moon and the clouds",
+            "eating soup but not turkey"
+          ],
+          "M": [
+            "the father feels very happy",
+            "the mother enjoys her soup",
+            "thinks the food looks delicious"
+          ],
+          "L": [
+            "the father says dinner is ready",
+            "the mother asks for bread",
+            "tells a story about his day"
+          ]
+        }
+      }
     }
   ]
 }

@@ -17,7 +17,85 @@
         "boy",
         "mother"
       ],
-      "composition_instructions": "Place baker behind the glass display counter, standing and smiling. Place boy in front of the counter, standing on tiptoes and pointing excitedly at the chocolate cake, mouth open as if speaking. Place mother behind the boy, standing and holding an open brown leather wallet, looking amused."
+      "composition_instructions": "Place baker behind the glass display counter, standing and smiling. Place boy in front of the counter, standing on tiptoes and pointing excitedly at the chocolate cake, mouth open as if speaking. Place mother behind the boy, standing and holding an open brown leather wallet, looking amused.",
+      "scene_description": "In the foreground of this children's picture-book scene, the floor is composed of large, irregular brown stone tiles that stretch across the bottom of the frame. On the far left, a wooden shelving unit holds two woven wicker baskets on its top shelf and two green plastic bowls on its bottom shelf. A grey cash register sits on top of this unit, next to a large glass display case with a wooden base. Inside the display case, the top shelf holds a small chocolate cake on the left and a pie in a tin on the right. The bottom shelf of the case features a white frosted cake topped with strawberries, a large dark chocolate cake, and a tray of six colorful cupcakes in shades of blue, pink, purple, and yellow. Behind the counter, the baker stands facing right; he has a thick brown mustache and wears a tall white chef's hat, a white long-sleeved shirt, and a brown apron. He holds a wooden spoon in his left hand and gestures with his right hand toward the customers. Behind the baker is a large, empty rectangular blackboard with a wooden frame, and to his right are two wall-mounted wooden shelves holding six brown ceramic jars of various sizes. Hanging from the dark wooden ceiling beams are three pendant lights with round glass shades and glowing yellow bulbs. In the center-right midground, the boy stands facing the counter; he has messy brown hair and wears a red hooded sweatshirt, brown cargo pants, and yellow sneakers with blue laces. He is smiling and pointing his right index finger toward the cupcakes in the display case. Standing just behind and to the right of the boy is the mother, who has brown hair tied in a bun and wears a long grey coat, a green patterned scarf, and brown boots. She is smiling down at the boy while holding an open brown leather wallet in her hands. To the left of the baker, two more wooden wall shelves hold six decorative ceramic jars in shades of brown, red, and green. In the background on the right, a wooden door with a glass pane and a brass handle is set into the wall, with a dark metal bell hanging above it. To the right of the door, a large arched window reveals a bright outdoor scene with a green rolling hill dotted with small flowers, two leafy green trees, and a blue sky filled with soft white clouds.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "baker with a thick brown mustache",
+            "boy with messy brown hair",
+            "mother wearing a long grey coat",
+            "baker in a tall white chef's hat"
+          ],
+          "S": [
+            "inside a cozy, warm bakery shop",
+            "large window showing green rolling hills",
+            "bright sunny day with white clouds",
+            "irregular brown stone tiles on the floor"
+          ],
+          "IE": [
+            "the boy sees the colorful cupcakes",
+            "the mother opens her brown wallet",
+            "the baker gestures toward the treats"
+          ],
+          "IR": [
+            "the boy feels excited about cupcakes",
+            "the mother looks happy and patient",
+            "the baker seems friendly and welcoming"
+          ],
+          "P": [
+            "the boy wants to choose a cupcake",
+            "the mother intends to buy a treat",
+            "the baker wants to help the customers"
+          ],
+          "A": [
+            "the boy points at the cupcakes",
+            "the mother holds her open wallet",
+            "the baker holds a wooden spoon",
+            "the baker gestures with his hand"
+          ],
+          "CO": [
+            "the boy picks out a favorite dessert",
+            "the mother prepares to pay the baker",
+            "the baker waits for their final order"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "white frosted cake topped with strawberries",
+            "large dark chocolate cake",
+            "six colorful cupcakes on a tray",
+            "tall white chef's hat",
+            "brown leather wallet"
+          ],
+          "ADV": [
+            "happily pointing at the cupcakes",
+            "patiently waiting for the boy",
+            "kindly gesturing toward the display",
+            "brightly glowing yellow pendant lights"
+          ],
+          "SC": [
+            "because the cupcakes look very delicious",
+            "while the mother looks in her wallet",
+            "when the boy points at the tray"
+          ],
+          "CC": [
+            "the boy points and the mother smiles",
+            "there is cake and there are cupcakes",
+            "the baker is friendly but the boy is shy"
+          ],
+          "M": [
+            "the boy decides which one he wants",
+            "the mother knows what the boy likes",
+            "the baker wonders what they will choose"
+          ],
+          "L": [
+            "the boy asks for a cupcake",
+            "the baker tells them about the cakes",
+            "the mother says it is time to choose"
+          ]
+        }
+      }
     }
   ]
 }

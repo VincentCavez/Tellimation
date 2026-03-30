@@ -15,7 +15,77 @@
         "cat",
         "fishbowl"
       ],
-      "composition_instructions": "Place cat on the side table next to the fishbowl, crouching in hunting pose, body low, haunches raised, eyes wide and locked on the fish, one paw extended. Place fishbowl near the edge of the table with a small orange goldfish swimming inside."
+      "composition_instructions": "Place cat on the side table next to the fishbowl, crouching in hunting pose, body low, haunches raised, eyes wide and locked on the fish, one paw extended. Place fishbowl near the edge of the table with a small orange goldfish swimming inside.",
+      "scene_description": "In the bottom left corner of the foreground, a small patch of green grass and clover grows, featuring tiny white, yellow, and purple flowers. The floor is made of polished light brown wooden planks that run diagonally toward the right. A rectangular tan woven rug with a fringed border sits on the floor, partially tucked under a dark brown wooden side table. Moving to the middle ground on the left, a window with a white frame is framed by a cream-colored curtain adorned with a green leaf pattern. A ginger tabby cat with orange stripes and green eyes is positioned behind the window sill, leaning its front paws onto the left edge of the wooden table and looking intently toward the center. The dark brown wooden table is covered with a white lace doily. On top of the doily sits a round glass fishbowl filled with clear blue water, containing a single small orange goldfish swimming to the right, a sprig of green seaweed, and several small, multi-colored pebbles at the bottom. To the right of the fishbowl stands a table lamp with a dark brown, tiered base and a flared, cream-colored lampshade decorated with a golden scroll pattern; the lamp is illuminated, casting a warm yellow light. To the right of the table is a large, plush blue armchair with two matching blue cushions resting against its backrest. In the background, visible through the window, the scene depicts a bright, sunny day under a light blue sky with several fluffy white clouds. Large, rounded green trees with brown trunks are visible outdoors. The interior wall is a neutral beige color, and another matching patterned curtain hangs to the right of the window, partially obscured by the table and the lamp.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "a ginger tabby cat with orange stripes",
+            "a small orange goldfish in the bowl"
+          ],
+          "S": [
+            "a cozy living room during the day",
+            "a sunny view through the window",
+            "a wooden table with a lace doily"
+          ],
+          "IE": [
+            "the cat notices the swimming goldfish",
+            "the cat reaches up toward the table"
+          ],
+          "IR": [
+            "the cat feels very curious",
+            "the cat looks focused on the fish"
+          ],
+          "P": [
+            "the cat wants to reach the fishbowl",
+            "the cat plans to climb the table"
+          ],
+          "A": [
+            "the cat is peeking over the edge",
+            "the goldfish is swimming in circles",
+            "the lamp is glowing with warm light"
+          ],
+          "CO": [
+            "the goldfish might swim away",
+            "the fishbowl could tip over"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "a round glass fishbowl with blue water",
+            "a large plush blue armchair",
+            "a white lace doily",
+            "a ginger cat with green eyes"
+          ],
+          "ADV": [
+            "quietly",
+            "intently",
+            "curiously",
+            "brightly"
+          ],
+          "SC": [
+            "because the fish is swimming",
+            "while the cat watches",
+            "if the cat jumps"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "notices",
+            "wants",
+            "wonders",
+            "stares"
+          ],
+          "L": [
+            "meows",
+            "purrs",
+            "bubbles"
+          ]
+        }
+      }
     }
   ]
 }

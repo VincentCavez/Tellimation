@@ -17,7 +17,78 @@
         "daughter",
         "dog"
       ],
-      "composition_instructions": "Place mother on the picnic blanket (left side), sitting and holding one half of a sandwich, smiling. Place daughter right next to her, practically shoulder to shoulder, sitting cross-legged and holding the other half, smiling at the mother. Place dog curled up in the grass just off the blanket, dozing."
+      "composition_instructions": "Place mother on the picnic blanket (left side), sitting and holding one half of a sandwich, smiling. Place daughter right next to her, practically shoulder to shoulder, sitting cross-legged and holding the other half, smiling at the mother. Place dog curled up in the grass just off the blanket, dozing.",
+      "scene_description": "In the bottom left foreground, a cluster of green plants and flowers in shades of purple, yellow, and pink grows near a large orange and black monarch-style butterfly perched on a blade of grass. Moving right across the foreground, a red and white checkered picnic blanket is spread over the green grass. On the left side of the blanket, a mother with brown hair sits facing right; she wears a wide-brimmed straw hat with a blue ribbon, a green sleeveless dress patterned with yellow sunflowers, and brown sandals. She holds half of a sandwich, offering it to her daughter. The daughter sits on the right side of the blanket, facing her mother; she has brown hair tied in a ponytail with a pink bow and wears a white short-sleeved t-shirt under blue denim overalls with blue and white sneakers. She reaches out with both hands to take the sandwich. To the right of the daughter on the blanket sits a brown wicker picnic basket with a handle; inside are a red-lidded container, a green juice box with a white straw, a red apple, and a long baguette. Further to the right, off the blanket, a small white dog sleeps curled up on the grass surrounded by more purple and yellow flowers. In the midground, a large tree with a thick brown trunk and green leaves stands on the far left. Behind the mother and daughter, two more large trees with rounded canopies—one green and one yellowish-orange—frame the scene. A small purple butterfly flutters in the air near the mother's head. The background features rolling green hills under a bright blue sky filled with several large, fluffy white clouds, suggesting a clear, sunny day. Low green bushes and additional trees are scattered across the distant landscape.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "mother wearing a sunflower patterned dress",
+            "young girl in blue denim overalls",
+            "small white dog sleeping in the grass"
+          ],
+          "S": [
+            "bright sunny day in a grassy park",
+            "rolling green hills under a blue sky",
+            "red and white checkered picnic blanket"
+          ],
+          "IE": [
+            "mother offering a sandwich to her daughter",
+            "family setting up a picnic outdoors"
+          ],
+          "IR": [
+            "mother and daughter feeling very happy",
+            "sleeping dog looking calm and peaceful"
+          ],
+          "P": [
+            "mother wanting to share a meal",
+            "daughter intending to eat her sandwich"
+          ],
+          "A": [
+            "handing a sandwich to the young girl",
+            "reaching out to take the food",
+            "sleeping soundly near the picnic basket"
+          ],
+          "CO": [
+            "daughter getting ready to eat her lunch",
+            "family enjoying a beautiful day together"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "wide-brimmed straw hat with blue ribbon",
+            "green dress with bright yellow sunflowers",
+            "red and white checkered picnic blanket",
+            "small white dog curled up asleep"
+          ],
+          "ADV": [
+            "happily",
+            "gently",
+            "peacefully",
+            "carefully"
+          ],
+          "SC": [
+            "while they sit on the blanket",
+            "because they are having a picnic",
+            "when the sun shines brightly"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "enjoys",
+            "wants",
+            "thinks",
+            "loves"
+          ],
+          "L": [
+            "says",
+            "asks",
+            "tells"
+          ]
+        }
+      }
     }
   ]
 }

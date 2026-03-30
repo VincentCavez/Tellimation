@@ -15,7 +15,81 @@
         "bear",
         "bird"
       ],
-      "composition_instructions": "Place bear at the muddy edge of the river bank (left), standing and facing left, leaning forward with one paw extended toward the water where fish jump. Place bird on the large flat rock near the water (right), perched and watching calmly."
+      "composition_instructions": "Place bear at the muddy edge of the river bank (left), standing and facing left, leaning forward with one paw extended toward the water where fish jump. Place bird on the large flat rock near the water (right), perched and watching calmly.",
+      "scene_description": "In the bottom left foreground, a patch of green grass is filled with small white, yellow, and purple flowers. Moving right along the bottom edge, a brown dirt path follows the shoreline of a blue river. On the left side of the scene, a large brown bear stands on the dirt bank, facing right. The bear has thick brown fur and is positioned on all fours, with its front left paw slightly raised over a small grey stone in the water. In the center, three silver fish are leaping out of the blue water in front of a cluster of tall green reeds. One fish is high in the air, another is slightly lower to the left, and the third is near the bottom right of the group. To the right of the reeds, a large, flat, brownish-grey rock sits on the dirt bank. A small blue bird is perched on top of this rock, facing left toward the bear. Behind the rock and extending to the right edge of the image is a green meadow dotted with white, yellow, and purple flowers. In the background, a dense forest of stylized evergreen trees with brown trunks and green needles spans the horizon. Above the forest, the sky is a light blue color with several soft, rounded white and pale yellow clouds. The lighting is bright and even, suggesting a clear day in a peaceful wilderness setting.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "large brown bear with thick fur",
+            "small blue bird with bright feathers",
+            "three silver fish leaping from water"
+          ],
+          "S": [
+            "sunny day in a green forest",
+            "blue river flowing through the woods",
+            "grassy meadow with colorful flowers",
+            "bright sky with soft white clouds"
+          ],
+          "IE": [
+            "silver fish jumping out of the water",
+            "bear reaching out with its front paw"
+          ],
+          "IR": [
+            "bear looking hungry and very determined",
+            "bird watching the bear with curiosity"
+          ],
+          "P": [
+            "bear trying to catch a silver fish",
+            "bird waiting to see what happens next"
+          ],
+          "A": [
+            "bear standing on the muddy bank",
+            "fish leaping high into the air",
+            "bird sitting still on a flat rock"
+          ],
+          "CO": [
+            "bear might catch a tasty meal",
+            "fish escaping back into the deep river"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "large brown bear with thick fur",
+            "small blue bird with bright feathers",
+            "silver fish jumping from the water",
+            "tall green reeds by the river"
+          ],
+          "ADV": [
+            "hungrily",
+            "carefully",
+            "suddenly",
+            "peacefully",
+            "brightly"
+          ],
+          "SC": [
+            "because the fish are jumping",
+            "while the bird watches",
+            "when the bear reaches out"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "wants",
+            "wonders",
+            "notices"
+          ],
+          "L": [
+            "chirps",
+            "growls",
+            "calls",
+            "sings"
+          ]
+        }
+      }
     }
   ]
 }

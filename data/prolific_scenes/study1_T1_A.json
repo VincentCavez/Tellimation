@@ -15,7 +15,72 @@
         "baker",
         "girl"
       ],
-      "composition_instructions": "Place baker outside his shop, standing and holding a wooden tray piled with freshly baked golden-brown loaves, faint steam rising. Place girl walking toward the baker from the right, looking at the bread with interest."
+      "composition_instructions": "Place baker outside his shop, standing and holding a wooden tray piled with freshly baked golden-brown loaves, faint steam rising. Place girl walking toward the baker from the right, looking at the bread with interest.",
+      "scene_description": "In the foreground on the left, a portion of a timber-framed house with yellow walls and a brown roof is visible, with small white flowers and green grass at its base. Standing on the sidewalk in front of a bakery is a baker, a man with brown hair and a friendly smile. He wears a tall white chef's hat, a light blue long-sleeved shirt, and a white apron with green trim and a green spoon tucked into a pocket. He also wears dark brown trousers and brown shoes. The baker holds a wooden tray containing three loaves of golden-brown bread with steam rising from them. To the right of the baker, scattered across the grey cobblestone street, are numerous orange and brown autumn leaves. On the right side of the foreground, a girl with brown hair in braids walks toward the left. She wears an orange beanie, a blue jacket, a red and white striped scarf, green and white striped leggings, and blue boots with red laces. She carries a brown backpack with a yellow flower patch on it and looks toward the baker. In the midground, behind the baker, is a small wooden bakery shop with a red and yellow striped awning over a blue door. A black chalkboard sign stands on the sidewalk to the right of the shop's entrance. Further back and to the right of the bakery is a tall, brown clock tower with a pointed grey roof; the clock face indicates the time is approximately 3:00. To the right of the clock tower are several more timber-framed houses with yellow or tan walls and red-tiled roofs. In the background, large trees with dense foliage in shades of orange, yellow, and green fill the spaces between and behind the buildings. The scene is set outdoors during a clear autumn afternoon under a light blue sky dotted with several soft, white clouds.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "a friendly baker in a white hat",
+            "a young girl with brown braids"
+          ],
+          "S": [
+            "a cobblestone street in autumn",
+            "a tall clock tower showing 3:00",
+            "colorful trees with orange and yellow leaves"
+          ],
+          "IE": [
+            "the baker brings out fresh hot bread",
+            "the girl walks toward the bakery"
+          ],
+          "IR": [
+            "the baker feels proud of his bread",
+            "the girl feels curious about the smell"
+          ],
+          "P": [
+            "the baker wants to sell his bread",
+            "the girl plans to walk home"
+          ],
+          "A": [
+            "the baker holds a wooden tray",
+            "the girl walks on the cobblestones"
+          ],
+          "CO": [
+            "steam rises from the warm bread",
+            "fallen leaves cover the ground"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "three loaves of golden-brown bread",
+            "a red and yellow striped awning",
+            "a blue jacket and orange beanie"
+          ],
+          "ADV": [
+            "happily",
+            "carefully",
+            "curiously"
+          ],
+          "SC": [
+            "because the bread is fresh",
+            "when she sees the baker"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "wants",
+            "notices"
+          ],
+          "L": [
+            "says",
+            "greets",
+            "offers"
+          ]
+        }
+      }
     }
   ]
 }

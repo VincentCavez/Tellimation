@@ -15,7 +15,75 @@
         "boy",
         "girl"
       ],
-      "composition_instructions": "Place boy kneeling on one side of the puzzle, holding a puzzle piece (left half of sun) in right hand. Place girl kneeling on the opposite side, holding the matching piece (right half of sun). Both looking at each other with excited recognition."
+      "composition_instructions": "Place boy kneeling on one side of the puzzle, holding a puzzle piece (left half of sun) in right hand. Place girl kneeling on the opposite side, holding the matching piece (right half of sun). Both looking at each other with excited recognition.",
+      "scene_description": "In the bottom left foreground, four loose jigsaw puzzle pieces lie scattered on a textured brown carpet; one piece depicts a blue sky with a cloud, another shows white flowers on grass, and two others show parts of a landscape. In the center foreground, a large, rectangular jigsaw puzzle is partially assembled on the carpet, showing a scene with trees, flowers, and a blue sky. A boy with curly brown hair, wearing a yellow long-sleeved shirt, green pants, and blue sneakers with white soles, is kneeling on the left side of the puzzle. He is smiling and holding a puzzle piece featuring a bright yellow sun. To his right, a girl with long, wavy brown hair, wearing a green long-sleeved dress with a white collar and blue socks, is kneeling on the carpet. She is smiling and holding a puzzle piece that shows a yellow crescent moon. To the right of the girl, three large, plush pillows are stacked on the carpet: a yellow-and-tan striped pillow, a reddish-orange pillow, and a blue striped pillow in the bottom right corner. Behind the children, the floor is made of light brown wood. On the far left, a large open doorway or window reveals an outdoor scene with green rolling hills, several leafy green trees with brown trunks, a light blue sky with soft white clouds, and a grassy field with small white and yellow flowers. In the center background, a tall floor lamp with a thin brown stand and a large, flared beige lampshade stands behind the girl. On the light-colored wall behind the lamp, a small wooden shelf holds several books with red, blue, and green spines. To the right of the lamp, a low wooden bench sits against the wall, and the bottom corner of a dark-framed picture is visible on the wall above it. The entire scene is bathed in warm, soft light, indicating a bright daytime setting indoors.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "a boy with curly brown hair",
+            "a girl with long wavy hair"
+          ],
+          "S": [
+            "a cozy room with a brown carpet",
+            "a sunny day visible through the doorway",
+            "a tall floor lamp in the background"
+          ],
+          "IE": [
+            "the children started a large jigsaw puzzle",
+            "only a few puzzle pieces are left"
+          ],
+          "IR": [
+            "the children look happy and focused",
+            "they feel excited to finish the picture"
+          ],
+          "P": [
+            "they want to complete the whole puzzle",
+            "the boy wants to place the sun"
+          ],
+          "A": [
+            "kneeling on the soft textured carpet",
+            "holding up a puzzle piece with a sun",
+            "smiling at each other while they play"
+          ],
+          "CO": [
+            "the puzzle is almost entirely finished",
+            "the sun and moon pieces are ready"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "a bright yellow sun puzzle piece",
+            "a green dress with a white collar",
+            "large plush pillows on the floor",
+            "a yellow long-sleeved shirt"
+          ],
+          "ADV": [
+            "carefully holding the puzzle pieces",
+            "happily playing together on the floor",
+            "quietly working on the big project"
+          ],
+          "SC": [
+            "because they are working together",
+            "while they sit on the carpet",
+            "when they find the right spot"
+          ],
+          "CC": [
+            "the boy and the girl",
+            "the sun but not the moon",
+            "it is big so they help"
+          ],
+          "M": [
+            "thinks about where the piece fits",
+            "knows how to finish the puzzle",
+            "wants to see the final picture"
+          ],
+          "L": [
+            "shows the piece to his friend",
+            "laughs while they play together",
+            "tells her where the sun goes"
+          ]
+        }
+      }
     }
   ]
 }

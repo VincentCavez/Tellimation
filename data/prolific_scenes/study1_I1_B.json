@@ -17,7 +17,85 @@
         "boy",
         "pelican"
       ],
-      "composition_instructions": "Place fisherman on the dock (center-left), standing and pulling a rope attached to the blue boat, facing left. Place boy on a wooden crate near the dock edge (right), sitting with legs dangling, looking out at the water. Place pelican on the wooden post at the far end of the dock, wings folded, head tilted."
+      "composition_instructions": "Place fisherman on the dock (center-left), standing and pulling a rope attached to the blue boat, facing left. Place boy on a wooden crate near the dock edge (right), sitting with legs dangling, looking out at the water. Place pelican on the wooden post at the far end of the dock, wings folded, head tilted.",
+      "scene_description": "In the bottom left corner of the scene, a grassy bank is covered with small white flowers and green clover. On the adjacent wooden dock, a stack of three wooden crates sits with one crate positioned on top of two others. To the right of these crates, a fisherman stands on the wooden planks. He has a full grey beard and mustache and is dressed in a reddish-brown knit beanie, a thick brown textured sweater, dark green trousers, and grey rubber boots. He is leaning back, pulling a thick rope that is attached to a green rowboat floating in the water. Near his feet on the dock lies a large, neat coil of rope. Further to the right on the dock, a boy sits on a single wooden crate. The boy has brown hair and wears a blue baseball cap, a sweater with horizontal yellow, green, and blue stripes, brown pants, and brown boots. He wears a small brown backpack and is looking toward the right side of the image. In the bottom right corner, three wooden barrels with metal bands are grouped together. Behind the boy, a green rowboat containing two wooden oars and a net floats in the water. To the left of this boat, a blue rowboat is tied to the dock with a rope. Further out in the water, there are two more green rowboats, one of which has a single oar resting across its seats. In the background on the left, several quaint houses with stone and timber-frame walls, brown shingled roofs, and small windows are nestled among a dense forest of green and orange-brown trees. A long wooden pier extends from the shore on the right side of the image into the blue water. At the far end of this pier, a pelican with white and grey feathers and a large orange beak stands facing left. In the far distance, rolling green hills and blue mountains are visible under a light blue sky filled with soft, fluffy white clouds, indicating a clear, bright day.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "a bearded fisherman in a brown sweater",
+            "a young boy wearing a striped sweater",
+            "a white pelican with a large orange beak"
+          ],
+          "S": [
+            "a sunny day at a wooden dock",
+            "quaint stone houses nestled near a forest",
+            "rolling green hills and blue mountains far away",
+            "a calm lake with several rowboats floating"
+          ],
+          "IE": [
+            "the fisherman pulls a boat toward the dock",
+            "the boy sits and waits on a crate",
+            "a pelican lands at the end of the pier"
+          ],
+          "IR": [
+            "the fisherman looks focused on his hard work",
+            "the boy appears curious about the water",
+            "the pelican seems calm while watching the scene"
+          ],
+          "P": [
+            "the fisherman wants to secure the green boat",
+            "the boy plans to go for a ride",
+            "the pelican hopes to find some fish"
+          ],
+          "A": [
+            "pulling a thick rope with both hands",
+            "sitting quietly on a single wooden crate",
+            "standing still on the long wooden pier"
+          ],
+          "CO": [
+            "the green boat moves closer to the dock",
+            "the rope is coiled neatly on the planks",
+            "the boats are safely tied to the pier"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "a thick brown textured sweater",
+            "a reddish-brown knit beanie",
+            "a sweater with yellow and green stripes",
+            "three wooden barrels with metal bands",
+            "soft fluffy white clouds in the sky"
+          ],
+          "ADV": [
+            "steadily",
+            "quietly",
+            "patiently",
+            "tightly"
+          ],
+          "SC": [
+            "while the fisherman pulls the rope",
+            "because the boat needs to be tied",
+            "as the sun shines on the water"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "wonders",
+            "notices",
+            "remembers",
+            "decides"
+          ],
+          "L": [
+            "calls",
+            "whispers",
+            "shouts",
+            "greets"
+          ]
+        }
+      }
     }
   ]
 }

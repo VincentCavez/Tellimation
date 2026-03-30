@@ -15,7 +15,84 @@
         "girl",
         "desk"
       ],
-      "composition_instructions": "Place girl at the desk by the window, sitting and holding an opened letter in both hands, lips slightly parted, eyes unfocused as if processing. Torn envelope on the desk."
+      "composition_instructions": "Place girl at the desk by the window, sitting and holding an opened letter in both hands, lips slightly parted, eyes unfocused as if processing. Torn envelope on the desk.",
+      "scene_description": "In the foreground, dark brown wooden floorboards run horizontally across the bottom of the scene, partially covered by a colorful striped rug with red, blue, green, and yellow bands and dark tassels. On the left side of the room, a rectangular corkboard with a wooden frame is mounted on a light green wall. The corkboard is decorated with several small square photographs, a postcard, a yellow sticky note, and a drawing of a tree, all held in place by colorful pushpins. A string of glowing yellow fairy lights is draped around the top and sides of the corkboard. In the center of the room, a wooden desk sits against the wall. On the left side of the desk, there is a stack of three books: a thick brown book on the bottom, a blue book in the middle, and a thinner brown book on top. Behind the books, a dark grey laptop is partially visible. To the right of the laptop sits a white mug and a small terracotta pot containing a green succulent plant. An open white envelope lies on the desk next to the plant. A young girl with light skin and brown hair tied in a high ponytail sits on a small wooden chair at the desk. She is wearing a green long-sleeved shirt under yellow corduroy overalls and brown lace-up boots. She holds a white rectangular piece of paper with both hands, looking at it with a wide-eyed, surprised expression. Behind the desk is a large white-framed window with a string of yellow fairy lights draped across the top curtain rod. Through the window, a bright outdoor scene is visible under a light blue sky with fluffy white clouds, featuring lush green trees, a grassy meadow with small pink and yellow flowers, and a distant wooden fence. On the right side of the room, a tall five-shelf wooden bookshelf stands against the green wall. The shelves are filled with many colorful books in shades of red, blue, green, yellow, and brown. On the middle shelf, there is a small framed picture and a light brown storage box. On the very top of the bookshelf sit two storage boxes: a smaller light green one on the left and a larger brown one on the right.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "young girl with a brown ponytail",
+            "girl wearing yellow corduroy overalls",
+            "child in a green long-sleeved shirt"
+          ],
+          "S": [
+            "cozy room with light green walls",
+            "sunny day visible through the window",
+            "tall wooden bookshelf filled with books",
+            "corkboard decorated with photos and lights"
+          ],
+          "IE": [
+            "opening a white envelope on the desk",
+            "receiving a mysterious letter in the mail",
+            "finding a message on the desk"
+          ],
+          "IR": [
+            "wide-eyed and surprised expression",
+            "feeling curious about the message",
+            "looking shocked by what she reads"
+          ],
+          "P": [
+            "trying to read the whole letter",
+            "wanting to know what the paper says",
+            "planning to respond to the message"
+          ],
+          "A": [
+            "sitting on a small wooden chair",
+            "holding a white piece of paper",
+            "staring at the letter with surprise"
+          ],
+          "CO": [
+            "learning something unexpected from the paper",
+            "reacting to the news she just read",
+            "discovering a secret in the letter"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "bright yellow corduroy overalls",
+            "tall wooden bookshelf with many books",
+            "large window showing a green meadow",
+            "glowing yellow fairy lights on the wall"
+          ],
+          "ADV": [
+            "curiously",
+            "intently",
+            "quietly",
+            "suddenly"
+          ],
+          "SC": [
+            "because she opened the letter",
+            "while she sits at her desk",
+            "when she looks at the paper"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "wonders",
+            "thinks",
+            "notices",
+            "remembers"
+          ],
+          "L": [
+            "reads",
+            "gasps",
+            "whispers",
+            "tells"
+          ]
+        }
+      }
     }
   ]
 }

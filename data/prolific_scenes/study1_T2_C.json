@@ -17,7 +17,68 @@
         "puppy_photo",
         "dog"
       ],
-      "composition_instructions": "Place woman standing in front of the fireplace mantel, looking at the row of framed photos. Place dog on the soft rug at her feet, lying with chin on paws, looking up at her."
+      "composition_instructions": "Place woman standing in front of the fireplace mantel, looking at the row of framed photos. Place dog on the soft rug at her feet, lying with chin on paws, looking up at her.",
+      "scene_description": "In the foreground on the left, a woman with curly brown hair stands in profile facing right; she wears a green long-sleeved sweater, yellow-tan trousers, and brown ankle boots, holding a pair of black-rimmed glasses in her left hand while pointing her right index finger toward the fireplace. To her right, a golden-furred dog lies on a large brown patterned rug with a dark brown fringed border, looking up at the woman with a pleasant expression. Behind the woman, a large fireplace constructed of grey stones contains glowing orange and yellow flames behind a black metal grate holding wooden logs. The fireplace is topped with a thick, light-brown wooden mantel. On the far left of the mantel sits a small green plant in a white patterned pot, followed by a framed photo of a mountain, a larger framed photo of a family of four, a smaller framed puppy_photo featuring two dogs, two stacked books in blue and green, and a small lit candle in a round glass holder. Above the mantel on the light-patterned wallpapered wall hangs a large, empty brown picture frame. To the right of the fireplace stands a small dark-brown wooden side table with a single drawer, upon which sits a lamp with a tan base and a blue lampshade emitting a warm yellow glow. To the right of the side table, a large brown-framed window reveals a sunny outdoor scene featuring a green lawn with small white and pink flowers, a large green tree, and a blue sky filled with fluffy white clouds.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "woman with curly brown hair",
+            "golden-furred dog lying down"
+          ],
+          "S": [
+            "living room with a stone fireplace",
+            "sunny day outside the window",
+            "warm lamp on a side table"
+          ],
+          "IE": [
+            "the woman points at the fire",
+            "the dog watches the woman"
+          ],
+          "IR": [
+            "the woman looks happy and calm",
+            "the dog feels safe and relaxed"
+          ],
+          "P": [
+            "the woman wants to show the fire",
+            "the dog wants to stay close"
+          ],
+          "A": [
+            "pointing at the glowing orange flames",
+            "holding a pair of black glasses"
+          ],
+          "CO": [
+            "the room feels warm and cozy",
+            "the dog is listening very carefully"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "thick light-brown wooden mantel",
+            "framed puppy_photo featuring two dogs",
+            "blue lampshade with a warm glow"
+          ],
+          "ADV": [
+            "standing calmly by the fireplace",
+            "looking up attentively at the woman"
+          ],
+          "SC": [
+            "because the fire is very warm",
+            "while the dog rests on the rug"
+          ],
+          "CC": [
+            "the woman and her golden dog",
+            "the fire is bright but quiet"
+          ],
+          "M": [
+            "the woman thinks about the fire",
+            "the dog knows its owner well"
+          ],
+          "L": [
+            "the woman tells the dog a story",
+            "the woman explains about the fireplace"
+          ]
+        }
+      }
     }
   ]
 }

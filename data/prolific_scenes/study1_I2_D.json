@@ -17,7 +17,86 @@
         "violinist",
         "cellist"
       ],
-      "composition_instructions": "Place conductor on the raised podium (center), standing with one arm lifted holding a baton mid-gesture. Place violinist in the front row to his left, seated, holding violin under chin with bow on strings, eyes on conductor. Place cellist to the right, seated behind a large cello, left hand on fingerboard, right hand drawing bow."
+      "composition_instructions": "Place conductor on the raised podium (center), standing with one arm lifted holding a baton mid-gesture. Place violinist in the front row to his left, seated, holding violin under chin with bow on strings, eyes on conductor. Place cellist to the right, seated behind a large cello, left hand on fingerboard, right hand drawing bow.",
+      "scene_description": "In the foreground on the left side of a wooden stage, a violinist with black hair tied in a ponytail sits on a brown wooden chair, wearing a long-sleeved black dress with a white collar and black shoes. She holds a brown violin against her shoulder and a bow in her right hand, positioned behind a music stand holding open sheet music. To her left and behind her are several empty brown wooden chairs and another music stand. In the center of the stage, a conductor with short brown hair stands on a small rectangular wooden podium. He is dressed in a black tuxedo with tails, a white dress shirt, and a black bowtie. He holds a thin wooden baton in his raised right hand while his left hand is open and raised in a conducting gesture. To his left and right are more empty brown wooden chairs and music stands. On the right side of the stage, a cellist with curly brown hair sits on a brown wooden chair, wearing a black suit, white shirt, and black tie. He holds a large brown cello between his knees and a bow in his right hand, with a music stand holding sheet music in front of him. Behind him are additional empty brown wooden chairs and a music stand. The stage floor is light brown wood with a dark brown curved edge at the very front. In the midground, the stage is framed by large ornate green and brown pillars on the left and right. Behind the performers, heavy red and orange curtains are draped in an archway, revealing light blue vertical panels in the very back. In the background, on both the left and right sides, there are elevated wooden balconies with green trim. Behind these balconies and in the far distance, rows of theater seating are filled with colorful, simplified silhouettes of an audience in shades of red, blue, and purple. The architecture of the theater features ornate brown and green moldings and a dark ceiling, creating the atmosphere of an indoor evening concert hall.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "A conductor in a black tuxedo",
+            "A violinist with a black ponytail",
+            "A cellist with curly brown hair",
+            "The colorful audience in the distance"
+          ],
+          "S": [
+            "A grand wooden stage with pillars",
+            "An indoor concert hall with curtains",
+            "Rows of empty brown wooden chairs",
+            "Elevated balconies on both sides"
+          ],
+          "IE": [
+            "The conductor raises his wooden baton",
+            "The musicians prepare their instruments",
+            "The audience waits for the music"
+          ],
+          "IR": [
+            "The conductor looks focused and confident",
+            "The violinist appears very concentrated",
+            "The cellist feels ready to play"
+          ],
+          "P": [
+            "To perform a beautiful musical piece",
+            "To follow the conductor's lead",
+            "To entertain the people in the theater"
+          ],
+          "A": [
+            "The conductor waves his thin baton",
+            "The violinist holds her brown bow",
+            "The cellist sits with his instrument",
+            "The musicians read their sheet music"
+          ],
+          "CO": [
+            "Music fills the large concert hall",
+            "The audience watches from their seats",
+            "The orchestra plays in perfect harmony"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "A long-sleeved black dress",
+            "A small rectangular wooden podium",
+            "Large ornate green and brown pillars",
+            "A thin wooden baton"
+          ],
+          "ADV": [
+            "Gracefully",
+            "Attentively",
+            "Carefully",
+            "Quietly"
+          ],
+          "SC": [
+            "While the conductor leads the group",
+            "Because they are performing a concert",
+            "When the music begins to play"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so",
+            "or"
+          ],
+          "M": [
+            "Remembers",
+            "Hopes",
+            "Knows",
+            "Feels"
+          ],
+          "L": [
+            "Signals",
+            "Guides",
+            "Directs"
+          ]
+        }
+      }
     }
   ]
 }

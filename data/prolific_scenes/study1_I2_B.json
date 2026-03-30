@@ -19,7 +19,84 @@
         "friend_2",
         "mother"
       ],
-      "composition_instructions": "Place birthday_girl at the head of the table, standing, wearing paper crown and pink dress. Place friend_1 to her left, sitting and clapping. Place friend_2 across the table, sitting and blowing a party horn. Place mother in the kitchen doorway (right), carrying a round chocolate cake with lit candles toward the table."
+      "composition_instructions": "Place birthday_girl at the head of the table, standing, wearing paper crown and pink dress. Place friend_1 to her left, sitting and clapping. Place friend_2 across the table, sitting and blowing a party horn. Place mother in the kitchen doorway (right), carrying a round chocolate cake with lit candles toward the table.",
+      "scene_description": "In the immediate foreground, horizontal light-brown wooden floorboards stretch across the bottom of the frame. On the far left, a large green balloon and a large yellow balloon are tied together, partially obscuring a smaller green balloon, an orange balloon, and a light blue balloon further back. To the right of these balloons, friend_1, a young boy with short brown hair, sits on a wooden chair; he wears a yellow long-sleeved shirt, a green bowtie, and blue overalls, and he is smiling while clapping his hands. In front of him is a table draped with a multi-colored tablecloth featuring segments of yellow, red, and blue. On the table sits a stack of colorful plates in shades of red, yellow, and blue, a stack of blue and orange cups, a single blue and yellow cup, a light-blue cake stand with a scalloped edge, and a blue and yellow party horn. Behind the table stands the birthday_girl, a young girl with brown hair tied in a braid; she wears a golden crown decorated with colorful jewels and a pink dress with a white collar, looking toward the right with a smile. To her right, friend_2, a girl with voluminous curly red hair, sits on another wooden chair; she wears a blue jacket over a green and yellow striped shirt and is blowing into a blue and yellow party horn. Above the children, two banners are strung across a yellow-striped wall; the top banner consists of colorful pennants spelling \"Happy\" with heart-decorated pennants at each end, while the bottom banner spells \"Birthday\" in similar colorful pennants. To the right of friend_2, several wrapped gifts are stacked on and around a tan armchair; the gifts are wrapped in various colors including blue, orange, green, red, and purple, each tied with a contrasting ribbon. Behind the gifts, another cluster of balloons in shades of orange, yellow, and light blue floats near the ceiling. Further right, mother, a woman with curly brown hair tied back with a yellow bow, walks into the scene from the right; she wears a green jacket over a blue dress with white polka dots and brown boots, and she is holding a two-layer chocolate cake topped with several lit white candles on a white plate. Behind mother, a large bunch of balloons in green, yellow, orange, red, and blue is visible. The scene transitions from the indoor room to an outdoor area through a large opening, showing a bright day with a clear blue sky, fluffy white clouds, green trees, and a grassy lawn dotted with small flowers.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "young girl wearing a golden crown",
+            "boy in a yellow shirt and bowtie",
+            "girl with voluminous curly red hair",
+            "woman carrying a chocolate birthday cake"
+          ],
+          "S": [
+            "indoor room with yellow striped wallpaper",
+            "bright sunny day visible through the window",
+            "party table with a colorful tablecloth",
+            "outdoor area with green trees and grass"
+          ],
+          "IE": [
+            "the mother brings in the birthday cake",
+            "the children gather for the party",
+            "the birthday girl waits for her cake"
+          ],
+          "IR": [
+            "the boy feels happy and excited",
+            "the birthday girl looks pleased and expectant",
+            "the mother feels proud and joyful"
+          ],
+          "P": [
+            "to celebrate the girl's birthday",
+            "to blow out the candles on the cake",
+            "to open the stack of colorful presents"
+          ],
+          "A": [
+            "the boy is clapping his hands",
+            "the girl is blowing a party horn",
+            "the mother is walking with the cake"
+          ],
+          "CO": [
+            "the party is ready to begin",
+            "the room is filled with festive decorations",
+            "the children are having a fun time"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "a two-layer chocolate cake with candles",
+            "a golden crown with colorful jewels",
+            "a stack of brightly wrapped presents",
+            "large green and yellow balloons"
+          ],
+          "ADV": [
+            "happily clapping",
+            "carefully carrying",
+            "loudly blowing",
+            "brightly decorated"
+          ],
+          "SC": [
+            "when the mother brings the cake",
+            "because it is her birthday",
+            "while the boy claps his hands"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "wants",
+            "hopes",
+            "knows",
+            "likes"
+          ],
+          "L": [
+            "cheer",
+            "sing",
+            "wish"
+          ]
+        }
+      }
     }
   ]
 }

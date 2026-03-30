@@ -16,7 +16,78 @@
         "girl",
         "seagull"
       ],
-      "composition_instructions": "Place girl in the center of the beach, kneeling and building a sandcastle with a bucket and shovel. Place seagull on the large flat rock near the water (left), standing and looking out to sea. Leave the area under the beach umbrella (right) empty."
+      "composition_instructions": "Place girl in the center of the beach, kneeling and building a sandcastle with a bucket and shovel. Place seagull on the large flat rock near the water (left), standing and looking out to sea. Leave the area under the beach umbrella (right) empty.",
+      "scene_description": "In the bottom left foreground of this beach scene, a small, ridged, light-purple seashell sits on the tan sand. To its right is a spiral-shaped, light-brown seashell, followed by a small, dark-grey pebble. Further right, near the water's edge, lies a small, ridged, light-pink seashell and another tiny dark-grey pebble. The right foreground shows the edge of the blue ocean with white, wavy lines representing foam. Moving to the middle ground on the far left, there is a small, pink spiral seashell and a dark-grey pebble. To the right of these, a large beach umbrella with alternating red and white panels and a brown pole stands tilted, casting a soft shadow on the sand. Beneath the umbrella lies a blue and yellow striped beach towel. In the center of the scene, a girl with brown hair tied in two braids and wearing a yellow swimsuit with a floral pattern is kneeling on the sand. She faces left, holding a small red shovel in her right hand and a blue bucket in her left hand. Directly in front of her is a sandcastle with four distinct towers. To the right of the girl, a large, flat, grey rock sits at the edge of the water. On top of this rock, a white seagull with grey wings, a yellow beak, and orange legs stands facing left. The background consists of a vast expanse of tan sand that meets a light blue sky filled with large, fluffy white clouds, suggesting a bright, clear day. The ocean water on the right is a deep blue with lighter blue ripples and white lines indicating the shoreline.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "girl with brown hair in braids",
+            "white seagull with a yellow beak"
+          ],
+          "S": [
+            "sunny beach with tan sand",
+            "blue ocean with white wavy lines",
+            "bright sky with fluffy white clouds"
+          ],
+          "IE": [
+            "girl begins building a sandcastle",
+            "seagull lands on a large rock"
+          ],
+          "IR": [
+            "girl looks focused on her work",
+            "seagull appears calm and observant"
+          ],
+          "P": [
+            "girl wants to complete her castle",
+            "seagull intends to watch the ocean"
+          ],
+          "A": [
+            "girl is kneeling on the sand",
+            "girl holds a small red shovel",
+            "seagull stands on a grey rock"
+          ],
+          "CO": [
+            "sandcastle with four distinct towers",
+            "soft shadow under the beach umbrella"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "large red and white beach umbrella",
+            "yellow swimsuit with a floral pattern",
+            "spiral-shaped light-brown seashell",
+            "small blue bucket filled with sand"
+          ],
+          "ADV": [
+            "carefully",
+            "quietly",
+            "patiently",
+            "nearby"
+          ],
+          "SC": [
+            "while she builds the sandcastle",
+            "because it is a sunny day",
+            "when the seagull watches the water"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "wonders",
+            "decides",
+            "imagines"
+          ],
+          "L": [
+            "chirps",
+            "whispers",
+            "calls",
+            "sings"
+          ]
+        }
+      }
     }
   ]
 }

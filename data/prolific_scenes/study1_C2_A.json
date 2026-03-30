@@ -19,7 +19,86 @@
         "chicken",
         "tractor"
       ],
-      "composition_instructions": "Place cow in the green field (left), grazing and pulling at tall grass, wearing a brass bell. Place pig near the mud puddle in front of the barn, resting with snout on the ground. Place chicken near the pig, walking and pecking at seeds. Place tractor beside the barn (right), parked with engine off."
+      "composition_instructions": "Place cow in the green field (left), grazing and pulling at tall grass, wearing a brass bell. Place pig near the mud puddle in front of the barn, resting with snout on the ground. Place chicken near the pig, walking and pecking at seeds. Place tractor beside the barn (right), parked with engine off.",
+      "scene_description": "In the bottom left foreground, rounded green bushes sit next to a light brown dirt path that stretches horizontally across the entire width of the scene. Below the path, the green grass is dotted with small white and pink flowers and green clovers, with more rounded green bushes on the bottom right. Behind the path on the left, a wooden fence with brown posts and rails runs horizontally. In the green field behind this fence, a black and white cow with a pink udder and a yellow bell around its neck stands facing right, grazing on the grass. A large tree with a thick brown trunk and rounded green foliage stands to the left of the cow, while a small green bush sits in front of the cow's legs. A dirt path curves from the foreground towards the center-right, where a brown chicken with a red comb and wattle is positioned, leaning forward to peck at the ground. To the right of the chicken, a pink pig with a curly tail and a smiling expression lies on its belly in a dark brown mud puddle. Behind the pig, another section of the wooden fence continues horizontally. To the right of the mud puddle, a green tractor with large yellow wheels, a brown seat, and a black exhaust pipe is parked facing left. Behind the tractor and the mud puddle stands a large red barn with a yellow-orange roof. The barn features a hayloft window with yellow hay, several small square windows on its side, and a black weather vane shaped like a rooster on its peak. A small green tree stands to the left of the barn, and a large tree with a thick brown trunk and green leaves frames the scene on the far right. In the background, rolling green hills and light blue mountains stretch across the horizon under a light blue sky filled with large, fluffy white and light purple clouds, indicating a bright, sunny day.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "spotted black and white cow",
+            "happy pink pig in the mud",
+            "brown chicken pecking the ground",
+            "green tractor parked by the barn"
+          ],
+          "S": [
+            "sunny day on a colorful farm",
+            "large red barn with a weather vane",
+            "rolling green hills in the distance",
+            "fluffy white clouds in the blue sky"
+          ],
+          "IE": [
+            "the cow finds some tasty green grass",
+            "the pig sees a cool mud puddle",
+            "the chicken spots seeds on the path"
+          ],
+          "IR": [
+            "the pig feels happy and content",
+            "the cow feels calm while eating",
+            "the chicken feels hungry for a snack"
+          ],
+          "P": [
+            "the cow wants to fill its belly",
+            "the pig intends to stay cool",
+            "the chicken hopes to find more seeds"
+          ],
+          "A": [
+            "cow grazing in the green meadow",
+            "pig resting in the dark mud puddle",
+            "chicken pecking at the dirt path",
+            "tractor sitting still near the barn"
+          ],
+          "CO": [
+            "the cow will have a full belly",
+            "the pig is covered in brown mud",
+            "the chicken finds a delicious meal"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "spotted black and white cow",
+            "large red barn with yellow roof",
+            "happy pink pig with curly tail",
+            "shiny green tractor with yellow wheels"
+          ],
+          "ADV": [
+            "happily",
+            "calmly",
+            "hungrily",
+            "quietly"
+          ],
+          "SC": [
+            "because the sun is shining brightly",
+            "while the cow eats the green grass",
+            "since the pig found a mud puddle"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "feels",
+            "wants",
+            "enjoys"
+          ],
+          "L": [
+            "moos",
+            "oinks",
+            "clucks",
+            "calls"
+          ]
+        }
+      }
     }
   ]
 }

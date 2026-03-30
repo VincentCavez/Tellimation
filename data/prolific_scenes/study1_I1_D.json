@@ -17,7 +17,90 @@
         "teenager",
         "cat"
       ],
-      "composition_instructions": "Place woman on the metal bench under the glass shelter (left), sitting with legs crossed, reading a folded newspaper. Place teenager leaning against the shelter wall beside her, wearing headphones, scrolling on a phone. Place cat on the sidewalk near the lamppost base (right), sitting and grooming its paw."
+      "composition_instructions": "Place woman on the metal bench under the glass shelter (left), sitting with legs crossed, reading a folded newspaper. Place teenager leaning against the shelter wall beside her, wearing headphones, scrolling on a phone. Place cat on the sidewalk near the lamppost base (right), sitting and grooming its paw.",
+      "scene_description": "In the foreground on the left, there are green bushes with small yellow and white flowers growing from the ground next to a grey sidewalk that contains several blue puddles. A brown rectangular display board on a post stands to the left of a bus stop shelter. The shelter features a brown frame, a curved roof, and transparent glass panels. Inside the shelter, a woman with brown hair in a bun and a yellow headband sits on a wooden bench; she wears a green sweater, brown pants, and blue shoes while reading a newspaper. To the right of the shelter, a teenager with brown hair leans against a support post, wearing blue headphones, a green hoodie, blue jeans, and brown shoes while looking at a smartphone. Next to the teenager is a tall brown lamp post with a glowing light. On the sidewalk to the right of the lamp post, an orange tabby cat sits near a puddle and licks its paw. The far right foreground contains more green foliage and yellow flowers. Behind the bus stop, a row of large, leafy green trees with brown trunks fills the midground. To the right of the trees, a grassy area with clovers and flowers sits beside a grey road that curves into the distance. In the far background, several tan and pink city buildings stand under a bright blue sky filled with large, white, fluffy clouds, indicating a clear day following a rain shower.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "a woman with brown hair in a bun",
+            "a teenager wearing blue headphones",
+            "an orange tabby cat licking its paw"
+          ],
+          "S": [
+            "a bus stop shelter after a rain shower",
+            "a grey sidewalk with several blue puddles",
+            "a sunny day with large white clouds",
+            "tall city buildings in the far background"
+          ],
+          "IE": [
+            "the rain has recently stopped falling",
+            "the bus is expected to arrive soon",
+            "the cat found a spot near a puddle"
+          ],
+          "IR": [
+            "the woman feels relaxed while reading",
+            "the teenager seems focused on his phone",
+            "the cat appears calm and content"
+          ],
+          "P": [
+            "waiting for the bus to arrive",
+            "reading the news to pass the time",
+            "listening to music while checking messages"
+          ],
+          "A": [
+            "sitting on a wooden bench reading",
+            "leaning against a brown support post",
+            "looking down at a small smartphone",
+            "grooming a paw next to a puddle"
+          ],
+          "CO": [
+            "the ground remains wet from the storm",
+            "the characters are waiting at the stop",
+            "the lamp post glows in the daylight"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "a bright yellow headband",
+            "a cozy green hoodie",
+            "a tall brown lamp post",
+            "small yellow and white flowers",
+            "a curved brown shelter roof"
+          ],
+          "ADV": [
+            "patiently",
+            "quietly",
+            "calmly",
+            "intently",
+            "softly"
+          ],
+          "SC": [
+            "while she reads the newspaper",
+            "because the rain has stopped",
+            "as they wait for the bus",
+            "since the sun came out"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so",
+            "yet"
+          ],
+          "M": [
+            "thinks",
+            "wonders",
+            "enjoys",
+            "listens",
+            "knows"
+          ],
+          "L": [
+            "reads",
+            "tells",
+            "shows",
+            "describes"
+          ]
+        }
+      }
     }
   ]
 }

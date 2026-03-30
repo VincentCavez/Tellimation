@@ -15,7 +15,79 @@
         "player",
         "referee"
       ],
-      "composition_instructions": "Place player in the center circle, standing with fists clenched at sides, face flushed red, scowling intensely. Place referee facing him at arm's length, standing and holding up a yellow card at head height, expression stern."
+      "composition_instructions": "Place player in the center circle, standing with fists clenched at sides, face flushed red, scowling intensely. Place referee facing him at arm's length, standing and holding up a yellow card at head height, expression stern.",
+      "scene_description": "In the immediate foreground at the bottom left, there are clusters of green leafy bushes and grass. Moving right along the bottom edge, there are small white and yellow flowers on thin stems, several three-leaf clovers, and various tufts of grass. Above this foreground foliage lies a green soccer field marked with white lines. On the far left corner of the field stands a small red flag on a white pole, and behind it sits a soccer goal with a white frame and white netting. The white lines on the left side of the field delineate the corner arc and the penalty area. In the center of the field, a player and a referee stand facing each other across a vertical white halfway line. The player is a young boy with brown hair and a bright red, angry face with furrowed brows. He wears a red short-sleeved shirt with two horizontal white stripes, dark blue shorts, white socks with red stripes, and brown and white sneakers. He stands rigidly with his fists clenched at his sides. The referee is a man with brown hair and a stern expression, wearing a black and white vertically striped shirt, black shorts, black socks with white stripes, and black shoes. He stands upright, holding a small yellow card aloft in his right hand toward the player. To the right of the the referee, the field continues with white lines marking the center circle and the right-side penalty area. Another soccer goal with a white frame and netting is positioned on the right side of the field. Two more red flags on white poles mark the far back corners of the field, and a fourth red flag stands at the front right corner. Surrounding the field is a dense border of rounded, stylized green trees and bushes in various shades of green. Through a gap in the trees behind the characters, a distant yellow-green hill is visible. The sky above is light blue and filled with large, puffy white and light grey clouds, suggesting a bright day.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "a young boy with a red face",
+            "a stern referee in a striped shirt"
+          ],
+          "S": [
+            "a green soccer field with white lines",
+            "a bright day with puffy white clouds",
+            "lush green trees surrounding the field",
+            "white soccer goals at each end"
+          ],
+          "IE": [
+            "the player committed a foul during play",
+            "the referee stopped the soccer game"
+          ],
+          "IR": [
+            "the player feels very angry and frustrated",
+            "the referee feels stern and serious"
+          ],
+          "P": [
+            "the referee wants to penalize the player",
+            "the boy wants to argue the call"
+          ],
+          "A": [
+            "the referee holds up a yellow card",
+            "the boy clenches his fists tightly",
+            "the characters stand on the halfway line"
+          ],
+          "CO": [
+            "the player receives a yellow card warning",
+            "the game is paused for a penalty"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "small red flags on white poles",
+            "a bright yellow penalty card",
+            "a red shirt with white stripes",
+            "large puffy white and grey clouds"
+          ],
+          "ADV": [
+            "sternly",
+            "angrily",
+            "firmly",
+            "rigidly"
+          ],
+          "SC": [
+            "because he broke the rules",
+            "while they stand on the field",
+            "after the foul was committed"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "feels",
+            "knows",
+            "decides"
+          ],
+          "L": [
+            "warns",
+            "explains",
+            "argues",
+            "tells"
+          ]
+        }
+      }
     }
   ]
 }

@@ -17,7 +17,82 @@
         "girl",
         "cat"
       ],
-      "composition_instructions": "Place sunflower along the left edge of the path, towering and bright yellow, head turned toward the sun. Place girl on the path (center-right), walking toward the gate and pausing to look at the sunflower. Place cat in the grass to the right, sitting and watching a butterfly."
+      "composition_instructions": "Place sunflower along the left edge of the path, towering and bright yellow, head turned toward the sun. Place girl on the path (center-right), walking toward the gate and pausing to look at the sunflower. Place cat in the grass to the right, sitting and watching a butterfly.",
+      "scene_description": "In the bottom-left foreground, a variety of small yellow, white, and purple flowers grow amidst lush green grass and clover. A path composed of irregular, flat grey stepping stones begins in this area and winds across the center toward the right side of the frame. In the bottom-right foreground, more white daisies and small purple blossoms are scattered throughout the grass. Moving to the midground on the far left, a dense cluster of garden plants features tall brown seed heads, spires of blue bell-shaped flowers, and small yellow blossoms. Standing prominently behind these plants is a large sunflower with a dark brown textured center and vibrant yellow petals, supported by a thick green stalk with broad, pointed leaves. To the right of the sunflower, a low stone wall is heavily draped in green ivy. In the center of the scene, a young girl with brown hair tied in pigtails with yellow ribbons walks to the right along the stone path. She wears a long-sleeved green sweater, a yellow skirt with a small brown floral pattern, white socks with blue stripes, and brown shoes. She carries a brown backpack and is looking back toward the sunflower. Directly behind her is a closed wooden garden gate with a rounded top, integrated into the ivy-covered stone wall. To the right of the gate, a rose bush with yellow flowers grows against the wall. Further right, a grey cat sits on the grass, looking upward at a small pink and blue butterfly fluttering near a large, rounded green bush. In the background, large green trees with thick brown trunks frame the scene on both the left and right sides. Rolling green hills are visible in the distance behind the garden wall. The sky above is a pale blue, filled with soft, white, rounded clouds, illuminated by the warm, golden light of a low sun, suggesting either early morning or late afternoon.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "A young girl with brown pigtails",
+            "A small grey cat sitting on grass",
+            "A pink and blue fluttering butterfly"
+          ],
+          "S": [
+            "A lush garden with a stone path",
+            "A wooden gate in an ivy wall",
+            "Rolling green hills under a soft sky",
+            "A sunny afternoon in a flowery garden"
+          ],
+          "IE": [
+            "The girl spots a giant sunflower",
+            "A butterfly flutters near the cat",
+            "The girl begins her walk home"
+          ],
+          "IR": [
+            "The girl feels curious about the flower",
+            "The cat feels playful watching the butterfly",
+            "The girl looks happy and peaceful"
+          ],
+          "P": [
+            "The girl wants to explore the garden",
+            "The cat intends to catch the butterfly",
+            "The girl plans to walk through the gate"
+          ],
+          "A": [
+            "Walking along the grey stepping stones",
+            "Looking back at the tall sunflower",
+            "Sitting quietly near the green bush"
+          ],
+          "CO": [
+            "The girl reaches the middle of the path",
+            "The cat stays near the rose bush",
+            "The garden gate remains closed behind her"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "A large sunflower with yellow petals",
+            "A brown backpack with a small flower",
+            "Irregular flat grey stepping stones",
+            "A long-sleeved green knitted sweater"
+          ],
+          "ADV": [
+            "Carefully",
+            "Curiously",
+            "Quietly",
+            "Brightly"
+          ],
+          "SC": [
+            "While she walks along the path",
+            "Because she sees a giant sunflower",
+            "When the cat watches the butterfly"
+          ],
+          "CC": [
+            "And",
+            "But",
+            "So"
+          ],
+          "M": [
+            "Wonders",
+            "Notices",
+            "Remembers"
+          ],
+          "L": [
+            "Whispers",
+            "Greets",
+            "Hums"
+          ]
+        }
+      }
     }
   ]
 }

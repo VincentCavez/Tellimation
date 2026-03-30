@@ -10,12 +10,78 @@
       "scene_number": 1,
       "title": "The Kitchen Argument",
       "background_prompt": "A modern kitchen with a granite island counter, a sink with dishes piled up, a fridge with magnets, and overhead pendant lights. No people.",
-      "full_scene_prompt": "A modern kitchen with cool overhead pendant lighting. A man in a gray henley shirt stands behind a granite island counter, both hands gripping the counter edge, knuckles white, his jaw clenched and his brows drawn tight in visible frustration. Across the island, a woman in a striped apron stands with both hands planted firmly on her hips, her chin lifted and her eyes narrowed. Between them on the counter, a burnt casserole dish sits with smoke still faintly rising from its blackened surface \u2014 the apparent source of the tension. Dirty dishes are piled in the sink behind the man. Fridge magnets and a child's crayon drawing are visible on the refrigerator to the side. Despite the anger, neither person is shouting \u2014 the tension is taut and silent.",
+      "full_scene_prompt": "A modern kitchen with cool overhead pendant lighting. A man in a gray henley shirt stands behind a granite island counter, both hands gripping the counter edge, knuckles white, his jaw clenched and his brows drawn tight in visible frustration. Across the island, a woman in a striped apron stands with both hands planted firmly on her hips, her chin lifted and her eyes narrowed. Between them on the counter, a burnt casserole dish sits with smoke still faintly rising from its blackened surface — the apparent source of the tension. Dirty dishes are piled in the sink behind the man. Fridge magnets and a child's crayon drawing are visible on the refrigerator to the side. Despite the anger, neither person is shouting — the tension is taut and silent.",
       "entities_in_scene": [
         "man",
         "woman"
       ],
-      "composition_instructions": "Place man behind the granite island counter, standing with both hands gripping the counter edge, knuckles white, jaw clenched. Place woman across the island, standing with both hands on hips, chin lifted, eyes narrowed. Place burnt casserole on the counter between them with faint smoke rising."
+      "composition_instructions": "Place man behind the granite island counter, standing with both hands gripping the counter edge, knuckles white, jaw clenched. Place woman across the island, standing with both hands on hips, chin lifted, eyes narrowed. Place burnt casserole on the counter between them with faint smoke rising.",
+      "scene_description": "In the left foreground, a wooden deck leads to a grassy yard filled with small yellow and white flowers and green bushes. Two large green trees stand against a bright blue sky with fluffy white clouds. Moving to the center foreground, a man with brown hair and a beard, wearing a green sweater over a yellow collared shirt, blue jeans, and brown shoes, leans forward with his hands on a large kitchen island. The island has a speckled green countertop and a brown wooden base. On top of the island sits a dark rectangular baking pan containing burnt food, with grey steam rising from it. To the right of the island, a woman with brown hair in a bun, wearing a yellow sweater, green pants, and brown boots, stands with her hands on her hips, glaring at the man. Behind the man on the left is a stainless steel refrigerator decorated with colorful magnets, including stars, hearts, and houses. Above the refrigerators are brown wooden cabinets. Three pendant lights with gold shades and glowing yellow bulbs hang from the ceiling over the island. In the background to the right, a second stainless steel refrigerator also has magnets and notes attached. Between the right refrigerator and a wooden-framed window is a white sink area with a stack of dirty dishes, including white and blue plates and bowls, and a blue mug. More brown wooden cabinets and a section of the speckled green countertop are visible on the far right. The scene is set indoors in a well-lit kitchen during the daytime.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "man with a brown beard",
+            "woman with hair in a bun"
+          ],
+          "S": [
+            "sunny kitchen during the daytime",
+            "grassy yard with yellow flowers",
+            "wooden deck outside the kitchen"
+          ],
+          "IE": [
+            "burnt food in a baking pan",
+            "smoke rising from the ruined meal"
+          ],
+          "IR": [
+            "man looking very angry",
+            "woman feeling frustrated and cross"
+          ],
+          "P": [
+            "deciding what to do about dinner",
+            "blaming each other for the mess"
+          ],
+          "A": [
+            "leaning forward on the kitchen island",
+            "standing with hands on hips"
+          ],
+          "CO": [
+            "dinner is completely black and burnt",
+            "stack of dirty dishes in sink"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "speckled green kitchen island",
+            "bright yellow glowing pendant lights",
+            "stainless steel refrigerator with magnets"
+          ],
+          "ADV": [
+            "angrily",
+            "sternly",
+            "silently"
+          ],
+          "SC": [
+            "because the food is burnt",
+            "while they stand in the kitchen",
+            "since the meal is ruined"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "feels",
+            "thinks",
+            "wonders"
+          ],
+          "L": [
+            "argues",
+            "scolds",
+            "shouts"
+          ]
+        }
+      }
     }
   ]
 }
