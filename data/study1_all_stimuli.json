@@ -1074,7 +1074,7 @@
       "stimulus_id": "study1_C3_B_correction",
       "scene_id": "study1_C3_B",
       "condition": "correction",
-      "narrator_text": "The father and mother are having dinner. Everyone is seated and all the chairs are taken.",
+      "narrator_text": "The father and mother are having dinner alone this evening.",
       "errors_description": "(1) everyone seated→one chair empty [Count] (2) all chairs taken→one has untouched place setting [Count] (3) no detail about the food. Targets empty chair.",
       "target_animation": "C3",
       "target_entities": [
@@ -1082,7 +1082,7 @@
       ],
       "target_category": "Count",
       "options": {
-        "T": "Correct the claim that all chairs are taken — one seat is empty",
+        "T": "Correct the claim that they are alone — one chair is empty",
         "E1": "Correct the description of the food being served",
         "E2": "Correct how many people are at the table",
         "D1": "Mention the chandelier overhead",
@@ -2746,7 +2746,7 @@
         "D2": "Describe the other children in the background"
       },
       "narrator_text_block2": "The happy boy is sitting on the school yard while the teacher walks toward him.",
-      "pipeline_intent": "The system detected that you described the boy as being happy when he is actually upset and scared, so it decided to show symbols of distress around him to highlight his true feelings.",
+      "pipeline_intent": "The system detected that you described the boy as happy when he is actually feeling sad and upset, so it decided to show symbols of distress around him to highlight his true feelings.",
       "pipeline_animation_id": "P2f",
       "pipeline_target_entities": [
         "boy"
@@ -2808,7 +2808,7 @@
         "D2": "Describe the stuffed rabbit on the window seat"
       },
       "narrator_text_block2": "The sad girl in the yellow sweater watches the rain fall from the window sill.",
-      "pipeline_intent": "The system detected that you misidentified the girl's emotion as sadness and decided to display an animation that shows she is actually feeling fearful or worried.",
+      "pipeline_intent": "The system detected that you described the girl as cheerful when she is actually feeling sad, so it decided to show an animation highlighting her true emotional state.",
       "pipeline_animation_id": "P2f",
       "pipeline_target_entities": [
         "girl"
@@ -2869,7 +2869,7 @@
         "D2": "Describe the reception desk"
       },
       "narrator_text_block2": "The happy boy in his striped shirt and overalls sits in the vet clinic holding a pet carrier.",
-      "pipeline_intent": "The system detected that you described the boy as being happy when he actually looks worried, so it decided to show an animation that highlights his feelings of anxiety.",
+      "pipeline_intent": "The system detected that you described the boy as excited when he is actually feeling sad and upset, so it decided to show an animation highlighting his true emotional state.",
       "pipeline_animation_id": "P2f",
       "pipeline_target_entities": [
         "boy"
@@ -2930,7 +2930,7 @@
         "D2": "Describe the SOLD sign in the garden"
       },
       "narrator_text_block2": "The happy girl in a yellow sweater waves at her friend leaving with a suitcase.",
-      "pipeline_intent": "The system detected that you described the girl as happy when she is actually feeling anxious or worried and decided to display symbols of fear around her to clarify her emotion.",
+      "pipeline_intent": "The system detected that you described the girl as happy when she is actually feeling sad, so it decided to show symbols of distress around her to highlight her true emotional state.",
       "pipeline_animation_id": "P2f",
       "pipeline_target_entities": [
         "girl"
