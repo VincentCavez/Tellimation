@@ -649,7 +649,7 @@
     };
 
     // Narrator text
-    document.getElementById('narrator-text-2').textContent = trial.narrator_text;
+    document.getElementById('narrator-text-2').textContent = trial.narrator_text_block2 || trial.narrator_text;
 
     // Intent text
     const intentText = trial.pipeline_intent || 'Intent not available';
