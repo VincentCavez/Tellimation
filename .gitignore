@@ -6,3 +6,6 @@ __pycache__/
 .venv/
 stt-credentials.json
 data/users/
+data/prolific_gen/**/*.png
+!data/prolific_gen/**/scene_1_full.png
+data/prolific_gen/**/*.mp4
