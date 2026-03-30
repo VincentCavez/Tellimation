@@ -1,21 +1,21 @@
 {
   "story_id": "study1_P2f_B",
-  "title": "Kitchen argument (Emanation-Anger B)",
+  "title": "Rainy window (Emanation-Tears B)",
   "entities": {
-    "man": "a man gripping the counter",
-    "woman": "a woman with hands on hips"
+    "girl": "a girl pressing her forehead against the glass",
+    "window": "a rain-streaked window"
   },
   "scenes": [
     {
       "scene_number": 1,
-      "title": "The Kitchen Argument",
-      "background_prompt": "A modern kitchen with a granite island counter, a sink with dishes piled up, a fridge with magnets, and overhead pendant lights. No people.",
-      "full_scene_prompt": "A modern kitchen with cool overhead pendant lighting. A man in a gray henley shirt stands behind a granite island counter, both hands gripping the counter edge, knuckles white, his jaw clenched and his brows drawn tight in visible frustration. Across the island, a woman in a striped apron stands with both hands planted firmly on her hips, her chin lifted and her eyes narrowed. Between them on the counter, a burnt casserole dish sits with smoke still faintly rising from its blackened surface — the apparent source of the tension. Dirty dishes are piled in the sink behind the man. Fridge magnets and a child's crayon drawing are visible on the refrigerator to the side. Despite the anger, neither person is shouting — the tension is taut and silent.",
+      "title": "The Rainy Window",
+      "background_prompt": "A child's bedroom with a large window showing heavy rain outside, a window seat with cushions, a bookshelf, and a desk with homework. No people.",
+      "full_scene_prompt": "A child's bedroom on a rainy afternoon. A girl of about nine with straight brown hair and a blue sweater sits on a window seat with floral cushions, pressing her forehead against the cold glass of a large window. Heavy rain streams down the outside of the glass in thick rivulets. Her eyes are downcast and glistening, her lips turned down, and one hand rests flat against the pane. Through the blurred rain on the glass, a gray street with parked cars and swaying trees is faintly visible. A bookshelf filled with children's books stands against the adjacent wall. On a small desk nearby, an open math workbook and a pencil case sit untouched. A stuffed rabbit lies on its side on the window seat beside the girl.",
       "entities_in_scene": [
-        "man",
-        "woman"
+        "girl",
+        "window"
       ],
-      "composition_instructions": "Place man behind the granite island counter, standing with both hands gripping the counter edge, knuckles white, jaw clenched. Place woman across the island, standing with both hands on hips, chin lifted, eyes narrowed. Place burnt casserole on the counter between them with faint smoke rising."
+      "composition_instructions": "Place girl on the window seat, sitting and pressing her forehead against the glass, eyes downcast and glistening, lips turned down, one hand flat on the pane."
     }
   ]
 }

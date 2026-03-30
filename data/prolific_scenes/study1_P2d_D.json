@@ -1,21 +1,21 @@
 {
   "story_id": "study1_P2d_D",
-  "title": "Playground goodbye (Emanation-Tears D)",
+  "title": "Boy and his dog (Emanation-Hearts D)",
   "entities": {
-    "girl": "a girl waving goodbye",
-    "friend": "another girl walking away with a suitcase"
+    "boy": "a boy sitting in the grass",
+    "dog": "a golden retriever resting its head on the boy's lap"
   },
   "scenes": [
     {
       "scene_number": 1,
-      "title": "The Goodbye",
-      "background_prompt": "A residential street with houses, a sidewalk, a moving truck parked at the curb, and cardboard boxes on a front lawn. Overcast afternoon. No people.",
-      "full_scene_prompt": "A residential street on an overcast afternoon. A girl of about eight in a pink hoodie stands on the sidewalk, raising one hand in a slow, reluctant wave. Her face is crumpled with sadness — eyebrows raised in the middle, mouth pressed tight, eyes brimming. She watches another girl of the same age, her best friend, walking away down the sidewalk toward a large white moving truck parked at the curb. The departing girl pulls a small rolling suitcase behind her and looks back over her shoulder with a similarly heartbroken expression. Cardboard boxes labeled 'Kitchen' and 'Toys' sit on the front lawn of the house beside the truck. A 'SOLD' sign stands in the garden. Leaves blow across the empty sidewalk between the two girls.",
+      "title": "The Backyard",
+      "background_prompt": "A suburban backyard with a mowed lawn, a wooden fence, a tire swing hanging from a tree, and a garden shed. Warm summer afternoon. No people, no animals.",
+      "full_scene_prompt": "A suburban backyard on a warm summer afternoon. A boy of about eleven in a green t-shirt and cargo shorts sits cross-legged on the mowed lawn under the shade of a large oak tree. A golden retriever with a thick, shiny coat lies beside him with its head resting on the boy's lap, eyes half-closed in contentment. The boy gently strokes the dog's ear with one hand and rests the other on the dog's back. His face shows pure, quiet happiness \u2014 a soft smile, relaxed eyes, completely at peace. A tire swing hangs from a thick branch above them, swaying slightly in the breeze. A wooden fence encloses the yard, and a small garden shed with a blue door sits in the back corner. Dandelions dot the grass.",
       "entities_in_scene": [
-        "girl",
-        "friend"
+        "boy",
+        "dog"
       ],
-      "composition_instructions": "Place girl on the sidewalk (left), standing and raising one hand in a slow reluctant wave, face crumpled with sadness. Place friend walking away (right) toward the moving truck, pulling a small rolling suitcase, looking back over her shoulder."
+      "composition_instructions": "Place boy under the oak tree, sitting cross-legged on the lawn. Place dog beside him with head resting on his lap, eyes half-closed. Boy gently strokes the dog's ear, face showing soft smile and quiet happiness."
     }
   ]
 }

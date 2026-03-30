@@ -178,7 +178,12 @@
 <div class="family-label">P — Property</div>
 <div class="controls">
   <button onclick="playT('color_pop')">color_pop</button>
-  <button onclick="playT('emanation')">emanation</button>
+  <button onclick="playT('emanation_shame')">shame</button>
+  <button onclick="playT('emanation_cold')">cold</button>
+  <button onclick="playT('emanation_joy')">joy</button>
+  <button onclick="playT('emanation_love')">love</button>
+  <button onclick="playT('emanation_anger')">anger</button>
+  <button onclick="playT('emanation_fear')">fear</button>
 </div>
 
 <div class="family-label">T — Time</div>
@@ -657,7 +662,8 @@ function reloadScene() {
 var TEMPLATE_ORDER = [
   'spotlight', 'nametag',
   'reveal', 'stamp',
-  'color_pop', 'emanation',
+  'color_pop',
+  'emanation_shame', 'emanation_cold', 'emanation_joy', 'emanation_love', 'emanation_anger', 'emanation_fear',
   'flashback', 'timelapse',
   'motion_lines', 'flip',
   'magnetism', 'repel', 'causal_push',
@@ -671,7 +677,12 @@ var TEMPLATE_CONFIG = {
   stamp:         { duration: 3000 },
   color_pop:     { duration: 3000 },
   reveal:        { duration: 3000 },
-  emanation:     { duration: 3000, useParticle: true },
+  emanation_shame:  { duration: 3000 },
+  emanation_cold:   { duration: 3000 },
+  emanation_joy:    { duration: 3000 },
+  emanation_love:   { duration: 3000 },
+  emanation_anger:  { duration: 3000 },
+  emanation_fear:   { duration: 3000 },
   flashback:     { duration: 3000 },
   ghost_outline: { duration: 3000, useGhost: true },
   disintegration:{ duration: 3000 },

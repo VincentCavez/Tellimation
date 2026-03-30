@@ -2,7 +2,7 @@
   "story_id": "study1_P2c_B",
   "title": "Jewelry shop (Emanation-Sparkles B)",
   "entities": {
-    "woman": "a shopkeeper in a velvet vest",
+    "man": "a shopkeeper in a velvet vest",
     "ring": "a diamond ring on a display cushion"
   },
   "scenes": [

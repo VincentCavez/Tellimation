@@ -163,7 +163,12 @@
     <div class="family-label">P — Property</div>
     <div class="controls">
       <button onclick="playT('color_pop')">color_pop</button>
-      <button onclick="playT('emanation')">emanation</button>
+      <button onclick="playT('emanation_shame')">shame</button>
+      <button onclick="playT('emanation_cold')">cold</button>
+      <button onclick="playT('emanation_joy')">joy</button>
+      <button onclick="playT('emanation_love')">love</button>
+      <button onclick="playT('emanation_anger')">anger</button>
+      <button onclick="playT('emanation_fear')">fear</button>
     </div>
 
     <div class="family-label">T — Time</div>
@@ -377,7 +382,8 @@ var ENTITY_LIST = ['fox_01', 'owl_01', 'mushroom_01'];
 var TEMPLATE_ORDER = [
   'spotlight', 'nametag',
   'reveal', 'settle',
-  'color_pop', 'emanation',
+  'color_pop',
+  'emanation_shame', 'emanation_cold', 'emanation_joy', 'emanation_love', 'emanation_anger', 'emanation_fear',
   'flashback', 'timelapse',
   'motion_lines', 'flip',
   'magnetism', 'repel', 'causal_push',
@@ -392,7 +398,12 @@ var TEMPLATE_CONFIG = {
   settle:        { duration: 1200 },
   color_pop:     { duration: 1200 },
   reveal:        { duration: 1500 },
-  emanation:     { duration: 1500, useParticle: true },
+  emanation_shame:  { duration: 1500 },
+  emanation_cold:   { duration: 1500 },
+  emanation_joy:    { duration: 1500 },
+  emanation_love:   { duration: 1500 },
+  emanation_anger:  { duration: 1500 },
+  emanation_fear:   { duration: 1500 },
   flashback:     { duration: 1500 },
   ghost_outline: { duration: 1500 },
   alert:         { duration: 1200 },
