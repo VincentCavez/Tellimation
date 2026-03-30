@@ -2708,7 +2708,7 @@
       ],
       "error_type": "Property",
       "description": "The child described the boy as 'happy,' whereas the scene depicts him crying on the ground with a scraped knee and a pained expression.",
-      "pipeline_intent": "The system detected that you described the boy as being happy when he is actually upset and scared, so it decided to show symbols of distress around him to highlight his true feelings.",
+      "pipeline_intent": "The system detected that you described the boy as happy when he is actually feeling sad and upset, so it decided to show symbols of distress around him to highlight his true feelings.",
       "validation": {
         "animation_match": true,
         "entity_match": true,
@@ -2718,7 +2718,7 @@
       "raw_discrepancies": [
         {
           "description": "The child described the boy as 'happy,' whereas the scene depicts him crying on the ground with a scraped knee and a pained expression.",
-          "pipeline_intent": "The system detected that you described the boy as being happy when he is actually upset and scared, so it decided to show symbols of distress around him to highlight his true feelings."
+          "pipeline_intent": "The system detected that you described the boy as happy when he is actually feeling sad and upset, so it decided to show symbols of distress around him to highlight his true feelings."
         }
       ],
       "condition": "correction",
@@ -2803,7 +2803,7 @@
       ],
       "error_type": "Property",
       "description": "The child described the girl as being sad, but her expression and the corrective animation indicate she is actually feeling scared or anxious.",
-      "pipeline_intent": "The system detected that you misidentified the girl's emotion as sadness and decided to display an animation that shows she is actually feeling fearful or worried.",
+      "pipeline_intent": "The system detected that you described the girl as cheerful when she is actually feeling sad, so it decided to show an animation highlighting her true emotional state.",
       "validation": {
         "animation_match": true,
         "entity_match": true,
@@ -2813,7 +2813,7 @@
       "raw_discrepancies": [
         {
           "description": "The child described the girl as being sad, but her expression and the corrective animation indicate she is actually feeling scared or anxious.",
-          "pipeline_intent": "The system detected that you misidentified the girl's emotion as sadness and decided to display an animation that shows she is actually feeling fearful or worried."
+          "pipeline_intent": "The system detected that you described the girl as cheerful when she is actually feeling sad, so it decided to show an animation highlighting her true emotional state."
         }
       ],
       "condition": "correction",
@@ -2830,7 +2830,7 @@
       ],
       "error_type": "Property",
       "description": "The child described the boy as 'happy,' but the scene depicts him with downturned eyes and a sad, worried expression. The boy is actually feeling anxious or scared while waiting at the vet clinic.",
-      "pipeline_intent": "The system detected that you described the boy as being happy when he actually looks worried, so it decided to show an animation that highlights his feelings of anxiety.",
+      "pipeline_intent": "The system detected that you described the boy as excited when he is actually feeling sad and upset, so it decided to show an animation highlighting his true emotional state.",
       "validation": {
         "animation_match": true,
         "entity_match": true,
@@ -2840,7 +2840,7 @@
       "raw_discrepancies": [
         {
           "description": "The child described the boy as 'happy,' but the scene depicts him with downturned eyes and a sad, worried expression. The boy is actually feeling anxious or scared while waiting at the vet clinic.",
-          "pipeline_intent": "The system detected that you described the boy as being happy when he actually looks worried, so it decided to show an animation that highlights his feelings of anxiety."
+          "pipeline_intent": "The system detected that you described the boy as excited when he is actually feeling sad and upset, so it decided to show an animation highlighting his true emotional state."
         }
       ],
       "condition": "correction",
@@ -2923,7 +2923,7 @@
       ],
       "error_type": "Property",
       "description": "The child described the girl as 'happy,' but the scene shows her with a tear on her cheek and a worried expression as she waves goodbye.",
-      "pipeline_intent": "The system detected that you described the girl as happy when she is actually feeling anxious or worried and decided to display symbols of fear around her to clarify her emotion.",
+      "pipeline_intent": "The system detected that you described the girl as happy when she is actually feeling sad, so it decided to show symbols of distress around her to highlight her true emotional state.",
       "validation": {
         "animation_match": true,
         "entity_match": true,
@@ -2933,7 +2933,7 @@
       "raw_discrepancies": [
         {
           "description": "The child described the girl as 'happy,' but the scene shows her with a tear on her cheek and a worried expression as she waves goodbye.",
-          "pipeline_intent": "The system detected that you described the girl as happy when she is actually feeling anxious or worried and decided to display symbols of fear around her to clarify her emotion."
+          "pipeline_intent": "The system detected that you described the girl as happy when she is actually feeling sad, so it decided to show symbols of distress around her to highlight her true emotional state."
         }
       ],
       "condition": "correction",
