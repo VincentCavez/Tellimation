@@ -30,5 +30,5 @@
   ],
   "code_template": "disintegration({target}, {driftAmount}, {fallSpeed})",
   "correction_intent": "Child over-mentioned an entity or a setting",
-  "suggestion_intent": null
+  "suggestion_intent": "Child mentioned an entity or a setting that may soon move or disappear"
 }

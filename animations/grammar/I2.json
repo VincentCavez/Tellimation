@@ -63,6 +63,6 @@
     }
   ],
   "code_template": "nametag({target}, {bgColor}, {textColor}, {stringColor})",
-  "correction_intent": "Child described an entity with an incorrect name",
+  "correction_intent": "Child used the WRONG TITLE, ROLE, or PROFESSION for a character (e.g. said 'teacher' when it's actually a 'conductor', said 'the boy' when the scene shows 'the fireman', called a 'doctor' a 'nurse'). The entity itself IS present in the scene — the child sees the right person but labels them with the wrong name/role/profession. This is NOT about confusing two different entities (use I1 for that). I2 is specifically about mislabeling a character's identity/role.",
   "suggestion_intent": "Child could give a name to an entity to enrich their narrative"
 }

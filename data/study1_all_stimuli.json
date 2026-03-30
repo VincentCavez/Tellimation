@@ -23,7 +23,13 @@
         "E2": "Correct the animal under the slide — it is not a cat",
         "D1": "Mention the sandbox and its toys",
         "D2": "Describe where the bench is located in the playground"
-      }
+      },
+      "narrator_text_block2": "The girl in the yellow and green shirt is sitting on the bench watching the dog.",
+      "pipeline_intent": "The system detected that you mistakenly identified the boy on the bench as a girl and decided to shine a spotlight on him to clarify who is actually sitting there.",
+      "pipeline_animation_id": "I1",
+      "pipeline_target_entities": [
+        "boy"
+      ]
     },
     {
       "stimulus_id": "study1_I1_A_suggestion",
@@ -54,7 +60,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You talked about the girl swinging and the dog resting, but you could also describe the boy sitting on the bench nearby.",
+      "pipeline_animation_id": "I1",
+      "pipeline_target_entities": [
+        "boy"
+      ]
     },
     {
       "stimulus_id": "study1_I1_B_correction",
@@ -73,7 +84,13 @@
         "E2": "Correct where the pelican is perched",
         "D1": "Mention the fishing boats in the water",
         "D2": "Describe the weather at the harbor"
-      }
+      },
+      "narrator_text_block2": "The boy in the brown sweater is pulling the rope on the dock near the crates.",
+      "pipeline_intent": "The system detected that you confused the boy with the fisherman who is actually pulling the rope, so it decided to shine a spotlight on the fisherman to show you who is performing that action.",
+      "pipeline_animation_id": "I1",
+      "pipeline_target_entities": [
+        "fisherman"
+      ]
     },
     {
       "stimulus_id": "study1_I1_B_suggestion",
@@ -104,7 +121,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You've pointed out the harbor and the pelican, but you could also talk about the bearded fisherman in the brown sweater who is pulling on the rope.",
+      "pipeline_animation_id": "I1",
+      "pipeline_target_entities": [
+        "fisherman"
+      ]
     },
     {
       "stimulus_id": "study1_I1_C_correction",
@@ -123,7 +145,13 @@
         "E2": "Correct who is waving — it is a different person",
         "D1": "Mention the popcorn cart",
         "D2": "Describe the string lights overhead"
-      }
+      },
+      "narrator_text_block2": "At the circus, there is only a clown and a girl.",
+      "pipeline_intent": "The system detected that you forgot to mention the juggler and decided to shine a spotlight on him to show you where he is.",
+      "pipeline_animation_id": "I1",
+      "pipeline_target_entities": [
+        "clown"
+      ]
     },
     {
       "stimulus_id": "study1_I1_C_suggestion",
@@ -154,7 +182,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You described the girl with her cotton candy and the juggler, but you could also mention the clown with curly orange hair who is waving at everyone.",
+      "pipeline_animation_id": "I1",
+      "pipeline_target_entities": [
+        "clown"
+      ]
     },
     {
       "stimulus_id": "study1_I1_D_correction",
@@ -173,7 +206,13 @@
         "E2": "Correct the animal near the lamppost — it is not a dog",
         "D1": "Mention the puddles on the pavement",
         "D2": "Describe the bus schedule posted on the shelter"
-      }
+      },
+      "narrator_text_block2": "The teenager in the green sweater is reading a newspaper at the bus stop near the orange cat.",
+      "pipeline_intent": "The system detected that you confused the teenager with the woman sitting on the bench and decided to shine a spotlight on the woman to show who is actually reading the newspaper.",
+      "pipeline_animation_id": "I1",
+      "pipeline_target_entities": [
+        "woman"
+      ]
     },
     {
       "stimulus_id": "study1_I1_D_suggestion",
@@ -204,14 +243,19 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You've talked about the teenager and the cat, but you could also mention the woman sitting on the bench reading her newspaper.",
+      "pipeline_animation_id": "I1",
+      "pipeline_target_entities": [
+        "woman"
+      ]
     },
     {
       "stimulus_id": "study1_I2_A_correction",
       "scene_id": "study1_I2_A",
       "condition": "correction",
       "narrator_text": "The teacher is sitting at a desk talking to the girl with glasses near the bookshelf.",
-      "errors_description": "(1) sitting→standing [Action] (2) girl with glasses→boy [Identity] (3) near bookshelf→near whiteboard [Space]. Targets #2.",
+      "errors_description": "(1) boy_glasses is called 'student teacher' instead of 'boy with glasses' [Identity/Role]. Targets boy_glasses.",
       "target_animation": "I2",
       "target_entities": [
         "boy_glasses"
@@ -223,7 +267,13 @@
         "E2": "Correct where the teacher is standing — not near the bookshelf",
         "D1": "Mention the globe in the background",
         "D2": "Describe the other students at their desks"
-      }
+      },
+      "narrator_text_block2": "The teacher in the blue blouse is talking to the little student teacher near the whiteboard.",
+      "pipeline_intent": "The system detected that you used the wrong title for the boy with glasses and decided to display a nametag over him to clarify his identity.",
+      "pipeline_animation_id": "I2",
+      "pipeline_target_entities": [
+        "boy_glasses"
+      ]
     },
     {
       "stimulus_id": "study1_I2_A_suggestion",
@@ -254,14 +304,19 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You've mentioned the teacher and the students, but you could give a name to the girl with the red headband sitting near the bookshelf.",
+      "pipeline_animation_id": "I2",
+      "pipeline_target_entities": [
+        "girl_headband"
+      ]
     },
     {
       "stimulus_id": "study1_I2_B_correction",
       "scene_id": "study1_I2_B",
       "condition": "correction",
       "narrator_text": "The boy in the bow tie is wearing the paper crown at the birthday party. The father brings a cake.",
-      "errors_description": "(1) boy→girl wears crown [Identity] (2) father→mother [Identity] (3) boy has bow tie but no crown. Targets #1.",
+      "errors_description": "(1) birthday_girl is called 'the little queen' instead of 'the birthday girl' [Identity/Role]. Targets birthday_girl.",
       "target_animation": "I2",
       "target_entities": [
         "birthday_girl"
@@ -273,7 +328,13 @@
         "E2": "Correct what the boy in the bow tie is doing",
         "D1": "Mention the pile of wrapped presents",
         "D2": "Describe the party decorations"
-      }
+      },
+      "narrator_text_block2": "The little queen is celebrating with her friends. The mother brings a cake.",
+      "pipeline_intent": "The system detected that you used the wrong title for the girl wearing the crown and decided to highlight her name to show she is the birthday girl.",
+      "pipeline_animation_id": "I2",
+      "pipeline_target_entities": [
+        "birthday_girl"
+      ]
     },
     {
       "stimulus_id": "study1_I2_B_suggestion",
@@ -304,14 +365,19 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You've described the party and the cake, but you could give a special name to the young girl wearing the golden crown.",
+      "pipeline_animation_id": "I2",
+      "pipeline_target_entities": [
+        "birthday_girl"
+      ]
     },
     {
       "stimulus_id": "study1_I2_C_correction",
       "scene_id": "study1_I2_C",
       "condition": "correction",
       "narrator_text": "The child in the black helmet stands next to a white fire truck with a spotted dog.",
-      "errors_description": "(1) black→red helmet [Property] (2) white→red fire truck [Property] (3) spotted dog is correct but child's helmet is wrong. Targets: misidentification of child's helmet.",
+      "errors_description": "(1) child is called 'junior firefighter' when they are just a visiting child [Identity/Role]. Targets child.",
       "target_animation": "I2",
       "target_entities": [
         "child"
@@ -323,7 +389,13 @@
         "E2": "Correct what the firefighter is doing",
         "D1": "Mention the fire hoses on the wall",
         "D2": "Describe the brass pole in the corner"
-      }
+      },
+      "narrator_text_block2": "The junior firefighter in the red helmet stands next to the fire truck with the dalmatian.",
+      "pipeline_intent": "The system detected that you used the wrong title for the boy and decided to highlight him with a nametag to clarify his identity.",
+      "pipeline_animation_id": "I2",
+      "pipeline_target_entities": [
+        "child"
+      ]
     },
     {
       "stimulus_id": "study1_I2_C_suggestion",
@@ -354,14 +426,19 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned the firefighter standing by the red truck, but you could give him a name to help tell your story.",
+      "pipeline_animation_id": "I2",
+      "pipeline_target_entities": [
+        "firefighter"
+      ]
     },
     {
       "stimulus_id": "study1_I2_D_correction",
       "scene_id": "study1_I2_D",
       "condition": "correction",
       "narrator_text": "The cellist in the white bow tie conducts the orchestra while a boy plays violin.",
-      "errors_description": "(1) cellist→conductor [Identity] (2) white bow tie belongs to conductor not cellist (3) boy→young woman [Identity]. Targets #1.",
+      "errors_description": "(1) conductor is called 'pianist' instead of 'conductor' [Identity/Role]. Targets conductor.",
       "target_animation": "I2",
       "target_entities": [
         "conductor"
@@ -373,7 +450,13 @@
         "E2": "Correct what the cellist is actually doing",
         "D1": "Mention the red velvet curtains",
         "D2": "Describe the music stands and other instruments"
-      }
+      },
+      "narrator_text_block2": "The pianist in the black tuxedo leads the orchestra while a young woman plays violin.",
+      "pipeline_intent": "The system detected that you used the wrong professional title for the person leading the orchestra and decided to display a nametag to clarify that he is a conductor.",
+      "pipeline_animation_id": "I2",
+      "pipeline_target_entities": [
+        "conductor"
+      ]
     },
     {
       "stimulus_id": "study1_I2_D_suggestion",
@@ -404,7 +487,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned the people playing the violin and the cello, but you could give a name to the conductor standing in the middle of the stage.",
+      "pipeline_animation_id": "I2",
+      "pipeline_target_entities": [
+        "conductor"
+      ]
     },
     {
       "stimulus_id": "study1_C1_A_correction",
@@ -425,7 +513,15 @@
         "E2": "Correct the color of the parrot",
         "D1": "Mention the shopkeeper behind the register",
         "D2": "Describe what the fishbowl looks like"
-      }
+      },
+      "narrator_text_block2": "The orange kitten is sitting on the shelf near the colorful parrot.",
+      "pipeline_intent": "The system detected that you mentioned only one orange kitten when there are actually three, so it decided to make each of the kittens glow one after another to show all the different ones on the shelf.",
+      "pipeline_animation_id": "C1",
+      "pipeline_target_entities": [
+        "kitten_1",
+        "kitten_2",
+        "kitten_3"
+      ]
     },
     {
       "stimulus_id": "study1_C1_A_suggestion",
@@ -456,7 +552,14 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned a kitten, but you could describe how there are actually three orange kittens sitting together on the shelf.",
+      "pipeline_animation_id": "C1",
+      "pipeline_target_entities": [
+        "kitten_1",
+        "kitten_2",
+        "kitten_3"
+      ]
     },
     {
       "stimulus_id": "study1_C1_B_correction",
@@ -478,7 +581,16 @@
         "E2": "Correct the number of tulips visible",
         "D1": "Mention the climbing roses on the trellis",
         "D2": "Describe the white picket fence"
-      }
+      },
+      "narrator_text_block2": "Four red tulips stand in the garden near the yellow butterfly and the green watering can.",
+      "pipeline_intent": "The system detected that you miscounted the tulips and decided to make each one glow one after another to help you see exactly how many there are.",
+      "pipeline_animation_id": "C1",
+      "pipeline_target_entities": [
+        "tulip_1",
+        "tulip_2",
+        "tulip_3",
+        "tulip_4"
+      ]
     },
     {
       "stimulus_id": "study1_C1_B_suggestion",
@@ -509,7 +621,15 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned the tulip and the watering can, but you could describe the other tulips or the yellow butterfly fluttering above them.",
+      "pipeline_animation_id": "C1",
+      "pipeline_target_entities": [
+        "tulip_1",
+        "tulip_2",
+        "tulip_3",
+        "butterfly"
+      ]
     },
     {
       "stimulus_id": "study1_C1_C_correction",
@@ -530,7 +650,15 @@
         "E2": "Correct the man's expression or posture",
         "D1": "Mention the lamppost in the parking lot",
         "D2": "Describe the hedge along the edge"
-      }
+      },
+      "narrator_text_block2": "The blue sedan is parked in the lot and the man is standing there with his keys.",
+      "pipeline_intent": "The system detected that you mentioned only one blue sedan when there are actually three, so it decided to highlight each car one after another to show that it is unclear which one you are talking about.",
+      "pipeline_animation_id": "C1",
+      "pipeline_target_entities": [
+        "car_1",
+        "car_2",
+        "car_3"
+      ]
     },
     {
       "stimulus_id": "study1_C1_C_suggestion",
@@ -561,7 +689,14 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned the blue car and the man with his keys, but you could also point out that there are three different blue cars parked in the lot.",
+      "pipeline_animation_id": "C1",
+      "pipeline_target_entities": [
+        "car_1",
+        "car_2",
+        "car_3"
+      ]
     },
     {
       "stimulus_id": "study1_C1_D_correction",
@@ -582,7 +717,15 @@
         "E2": "Correct the baker's description",
         "D1": "Mention the chalkboard menu on the wall",
         "D2": "Describe the other pastries in the display"
-      }
+      },
+      "narrator_text_block2": "A pink cupcake sits on the shelf in the bakery. The baker holds some tongs.",
+      "pipeline_intent": "The system detected that you mentioned only one pink cupcake when there are actually three, so it decided to highlight each of the cupcakes one after another to show that it is unclear which one you are talking about.",
+      "pipeline_animation_id": "C1",
+      "pipeline_target_entities": [
+        "cupcake_1",
+        "cupcake_2",
+        "cupcake_3"
+      ]
     },
     {
       "stimulus_id": "study1_C1_D_suggestion",
@@ -613,7 +756,14 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned a cupcake on the shelf, but you could also describe the three different cupcakes that the smiling baker wearing a white apron is selling.",
+      "pipeline_animation_id": "C1",
+      "pipeline_target_entities": [
+        "cupcake_1",
+        "cupcake_2",
+        "cupcake_3"
+      ]
     },
     {
       "stimulus_id": "study1_C2_A_correction",
@@ -632,7 +782,13 @@
         "E2": "Remove the horse — there is no horse in the scene",
         "D1": "Mention the chicken that was not listed",
         "D2": "Describe where the animals are relative to each other"
-      }
+      },
+      "narrator_text_block2": "On the farm there is a red barn with a cow, a pig, and two tractors.",
+      "pipeline_intent": "The system detected that you said there were two tractors instead of one, so it used an animation to make the extra tractor vanish to show the correct number.",
+      "pipeline_animation_id": "C2",
+      "pipeline_target_entities": [
+        "tractor"
+      ]
     },
     {
       "stimulus_id": "study1_C2_A_suggestion",
@@ -663,7 +819,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You described the cow, pig, and tractor well, but you could also mention that the green tractor is about to drive away from the barn.",
+      "pipeline_animation_id": "C2",
+      "pipeline_target_entities": [
+        "tractor"
+      ]
     },
     {
       "stimulus_id": "study1_C2_B_correction",
@@ -682,7 +843,13 @@
         "E2": "Correct where the block tower is — it is not inside the box",
         "D1": "Mention the crayons and coloring book on the floor",
         "D2": "Describe the colorful rug"
-      }
+      },
+      "narrator_text_block2": "In the toy box there is a teddy bear, and on the rug there is a doll, a block tower, and two shoes.",
+      "pipeline_intent": "The system detected that you mentioned two shoes instead of one and decided to make the extra shoe crumble away to show the correct amount.",
+      "pipeline_animation_id": "C2",
+      "pipeline_target_entities": [
+        "shoe"
+      ]
     },
     {
       "stimulus_id": "study1_C2_B_suggestion",
@@ -713,7 +880,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned the teddy bear sitting in the chest, but you could add that he doesn't belong there and might be taken out.",
+      "pipeline_animation_id": "C2",
+      "pipeline_target_entities": [
+        "teddy"
+      ]
     },
     {
       "stimulus_id": "study1_C2_C_correction",
@@ -732,7 +904,13 @@
         "E2": "Correct the number of fruits in the bowl",
         "D1": "Mention the vase of daisies beside the bowl",
         "D2": "Describe the morning light through the window"
-      }
+      },
+      "narrator_text_block2": "In the fruit bowl there is an apple, a banana, and two tennis balls.",
+      "pipeline_intent": "The system detected that you counted too many tennis balls and decided to make the extra one crumble away to show there is actually only one.",
+      "pipeline_animation_id": "C2",
+      "pipeline_target_entities": [
+        "tennis_ball"
+      ]
     },
     {
       "stimulus_id": "study1_C2_C_suggestion",
@@ -763,7 +941,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned the apple, banana, and the green ball, but you could explain that the tennis ball doesn't belong in the fruit bowl and should be removed.",
+      "pipeline_animation_id": "C2",
+      "pipeline_target_entities": [
+        "tennis_ball"
+      ]
     },
     {
       "stimulus_id": "study1_C2_D_correction",
@@ -782,7 +965,13 @@
         "E2": "Correct the description of the books",
         "D1": "Mention the desk with the brass lamp",
         "D2": "Describe the leather reading chair"
-      }
+      },
+      "narrator_text_block2": "On the shelf there is a red book, a blue book, a green book, and two coffee mugs.",
+      "pipeline_intent": "The system detected that you counted two coffee mugs instead of one, so it decided to make the extra mug disintegrate to show the correct number.",
+      "pipeline_animation_id": "C2",
+      "pipeline_target_entities": [
+        "mug"
+      ]
     },
     {
       "stimulus_id": "study1_C2_D_suggestion",
@@ -813,7 +1002,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You described the books and the mug on the shelf, but you could mention that the brown mug doesn't really belong there and should be taken away.",
+      "pipeline_animation_id": "C2",
+      "pipeline_target_entities": [
+        "mug"
+      ]
     },
     {
       "stimulus_id": "study1_C3_A_correction",
@@ -832,7 +1026,13 @@
         "E2": "Correct the type of bird on the rock",
         "D1": "Mention the cooler near the towel",
         "D2": "Describe the ocean waves"
-      }
+      },
+      "narrator_text_block2": "The girl came alone to the beach to build a sand house near the pelican.",
+      "pipeline_intent": "The system detected that you said the girl was alone and decided to show a ghost outline of a child that isn't in this scene to remind you that she has company.",
+      "pipeline_animation_id": "C3",
+      "pipeline_target_entities": [
+        "towel"
+      ]
     },
     {
       "stimulus_id": "study1_C3_A_suggestion",
@@ -863,7 +1063,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned the girl and the towel, but you could also mention that the towel might belong to a boy who has gone for a swim.",
+      "pipeline_animation_id": "C3",
+      "pipeline_target_entities": [
+        "scene"
+      ]
     },
     {
       "stimulus_id": "study1_C3_B_correction",
@@ -882,7 +1087,13 @@
         "E2": "Correct how many people are at the table",
         "D1": "Mention the chandelier overhead",
         "D2": "Describe the candles on the sideboard"
-      }
+      },
+      "narrator_text_block2": "The father is standing to carve the turkey while the mother eats her soup, they are alone this evening.",
+      "pipeline_intent": "The system detected that you incorrectly claimed all the father and mother were alone this evening, so it will show a ghost outline of their child who will be joining them.",
+      "pipeline_animation_id": "C3",
+      "pipeline_target_entities": [
+        "empty_chair"
+      ]
     },
     {
       "stimulus_id": "study1_C3_B_suggestion",
@@ -913,7 +1124,13 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You described the father carving the roast and the mother eating her soup, but you could also mention that one place setting is untouched, as if someone is missing from the table.",
+      "pipeline_animation_id": "C3",
+      "pipeline_target_entities": [
+        "father",
+        "mother"
+      ]
     },
     {
       "stimulus_id": "study1_C3_C_correction",
@@ -932,13 +1149,19 @@
         "E2": "Correct the type of tree — it is not an oak",
         "D1": "Mention the rose bushes behind the bench",
         "D2": "Describe the fountain in the distance"
-      }
+      },
+      "narrator_text_block2": "The old man has been sitting alone on the bench all day, reading under the maple tree.",
+      "pipeline_intent": "The system detected that you mentioned a maple tree that isn't in this scene and decided to highlight an empty spot with a ghost outline to show that the tree you're talking about is missing.",
+      "pipeline_animation_id": "C3",
+      "pipeline_target_entities": [
+        "empty_spot"
+      ]
     },
     {
       "stimulus_id": "study1_C3_C_suggestion",
       "scene_id": "study1_C3_C",
       "condition": "suggestion",
-      "narrator_text": "An old man reads a book on a park bench under a maple tree. Autumn leaves cover the ground. A jacket and glasses case sit on the bench beside him.",
+      "narrator_text": "An old man reads a book on a park bench under a maple tree. Autumn leaves cover the ground.",
       "target_misl": "CH",
       "options": {
         "T": "Mention that someone seems to be missing — the jacket suggests another person",
@@ -963,7 +1186,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You've described the old man reading his book, but you could mention that his wife might be joining him soon.",
+      "pipeline_animation_id": "C3",
+      "pipeline_target_entities": [
+        "old_man"
+      ]
     },
     {
       "stimulus_id": "study1_C3_D_correction",
@@ -982,7 +1210,13 @@
         "E2": "Correct what the dog is doing — it is not asleep under the workbench",
         "D1": "Mention the tools hanging on the pegboard behind him",
         "D2": "Describe the small wooden projects on the shelves along the wall"
-      }
+      },
+      "narrator_text_block2": "The grandpa in denim overalls works alone in the workshop, building a little wooden birdhouse. The golden dog is lying on the floor watching him.",
+      "pipeline_intent": "The system detected that you mentioned your belongings from a different scene and decided to show a ghost outline of them since they aren't in the workshop.",
+      "pipeline_animation_id": "C3",
+      "pipeline_target_entities": [
+        "child_belongings"
+      ]
     },
     {
       "stimulus_id": "study1_C3_D_suggestion",
@@ -1013,7 +1247,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You've described the grandfather and his dog, but you could also mention that a boy might have been helping him, since there is a red hoodie left on the stool.",
+      "pipeline_animation_id": "C3",
+      "pipeline_target_entities": [
+        "scene"
+      ]
     },
     {
       "stimulus_id": "study1_P1_A_correction",
@@ -1032,7 +1271,13 @@
         "E2": "Correct who is behind the stall — it is not a man",
         "D1": "Mention the puddle reflecting the stall",
         "D2": "Describe the striped awning"
-      }
+      },
+      "narrator_text_block2": "The boy in the green t-shirt is pointing at the green apples at the fruit stall.",
+      "pipeline_intent": "The system detected that you incorrectly described the apples as being green and decided to make the red color of the apples pop to highlight the mistake.",
+      "pipeline_animation_id": "P1",
+      "pipeline_target_entities": [
+        "apples"
+      ]
     },
     {
       "stimulus_id": "study1_P1_A_suggestion",
@@ -1063,7 +1308,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned the boy at the fruit stall, but you could describe the bright green color of his t-shirt.",
+      "pipeline_animation_id": "P1",
+      "pipeline_target_entities": [
+        "boy"
+      ]
     },
     {
       "stimulus_id": "study1_P1_B_correction",
@@ -1082,7 +1332,13 @@
         "E2": "Correct who is at the end of the aisle — it is not a customer",
         "D1": "Describe the other toys on the shelf",
         "D2": "Describe the store lighting"
-      }
+      },
+      "narrator_text_block2": "The boy in the green shirt points at the yellow fire truck on the shelf.",
+      "pipeline_intent": "The system detected that you misidentified the color of the firetruck and decided to make the toy's actual color pop to help you see the mistake.",
+      "pipeline_animation_id": "P1",
+      "pipeline_target_entities": [
+        "firetruck"
+      ]
     },
     {
       "stimulus_id": "study1_P1_B_suggestion",
@@ -1113,7 +1369,13 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned the boy looking at the firetruck, but you could describe the bright red color of the truck or the green t-shirt the boy is wearing.",
+      "pipeline_animation_id": "P1",
+      "pipeline_target_entities": [
+        "boy",
+        "firetruck"
+      ]
     },
     {
       "stimulus_id": "study1_P1_C_correction",
@@ -1132,7 +1394,13 @@
         "E2": "Correct the color of the cat",
         "D1": "Mention the wooden gate in the stone wall",
         "D2": "Describe the lavender and daisies in the garden"
-      }
+      },
+      "narrator_text_block2": "The girl in the green sweater walks past the white sunflower near the gray cat.",
+      "pipeline_intent": "The system detected that you described the sunflower as white instead of yellow and decided to make its color pop to highlight the correct property.",
+      "pipeline_animation_id": "P1",
+      "pipeline_target_entities": [
+        "sunflower"
+      ]
     },
     {
       "stimulus_id": "study1_P1_C_suggestion",
@@ -1163,7 +1431,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned the sunflower by the path, but you could describe its bright yellow petals and large brown center.",
+      "pipeline_animation_id": "P1",
+      "pipeline_target_entities": [
+        "sunflower"
+      ]
     },
     {
       "stimulus_id": "study1_P1_D_correction",
@@ -1182,7 +1455,13 @@
         "E2": "Correct the description of how the turtle moves",
         "D1": "Describe the coral formations in the tank",
         "D2": "Mention the informational plaques on the wall"
-      }
+      },
+      "narrator_text_block2": "The child in the green sweater watches the blue clownfish in the tank near the swimming turtle.",
+      "pipeline_intent": "The system detected that you called the clownfish blue when it is actually orange and white, so it decided to make the fish's colors pop to help you see its true appearance.",
+      "pipeline_animation_id": "P1",
+      "pipeline_target_entities": [
+        "clownfish"
+      ]
     },
     {
       "stimulus_id": "study1_P1_D_suggestion",
@@ -1213,7 +1492,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned the child looking at the fish and turtle, but you could also describe the green textured sweater the child is wearing.",
+      "pipeline_animation_id": "P1",
+      "pipeline_target_entities": [
+        "child"
+      ]
     },
     {
       "stimulus_id": "study1_P2a_A_correction",
@@ -1232,7 +1516,13 @@
         "E2": "Correct the weather outside — it is not sunny",
         "D1": "Mention the loaf of bread on the counter",
         "D2": "Describe where the woman is standing relative to the stove"
-      }
+      },
+      "narrator_text_block2": "The woman in the apron is cooking something cold in the pot. Outside the window it is raining.",
+      "pipeline_intent": "The system detected that you described the pot's temperature incorrectly and decided to use an animation to highlight the steam and heat rising from it.",
+      "pipeline_animation_id": "P2a",
+      "pipeline_target_entities": [
+        "pot"
+      ]
     },
     {
       "stimulus_id": "study1_P2a_A_suggestion",
@@ -1263,7 +1553,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned the woman cooking and the pot, but you could describe the large steaming silver pot to show how hot the food inside is.",
+      "pipeline_animation_id": "P2a",
+      "pipeline_target_entities": [
+        "pot"
+      ]
     },
     {
       "stimulus_id": "study1_P2a_B_correction",
@@ -1282,7 +1577,13 @@
         "E2": "Correct the weather — it is not a warm day",
         "D1": "Mention the croissant on the plate",
         "D2": "Describe the cobblestone street"
-      }
+      },
+      "narrator_text_block2": "The woman in the yellow apron drinks a cold iced coffee at the café table on a cool day.",
+      "pipeline_intent": "The system detected that you incorrectly described the coffee's temperature as cold and decided to use an animation to emphasize the steam rising from the cup to show it is actually hot.",
+      "pipeline_animation_id": "P2a",
+      "pipeline_target_entities": [
+        "coffee"
+      ]
     },
     {
       "stimulus_id": "study1_P2a_B_suggestion",
@@ -1313,7 +1614,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You noticed the woman's coffee, but you could describe the steaming white cup of hot coffee she is holding.",
+      "pipeline_animation_id": "P2a",
+      "pipeline_target_entities": [
+        "coffee"
+      ]
     },
     {
       "stimulus_id": "study1_P2a_C_correction",
@@ -1332,7 +1638,13 @@
         "E2": "Correct the temperature of the evening air",
         "D1": "Mention the sleeping bag and backpack",
         "D2": "Describe the stars appearing in the sky"
-      }
+      },
+      "narrator_text_block2": "The boy in a brown flannel stirs a cold pot of stew over the campfire on a cool evening.",
+      "pipeline_intent": "The system detected that you described the pot of stew as being cold when it is actually hot and steaming, so it chose an animation to draw attention to the heat of the pot.",
+      "pipeline_animation_id": "P2a",
+      "pipeline_target_entities": [
+        "pot"
+      ]
     },
     {
       "stimulus_id": "study1_P2a_C_suggestion",
@@ -1363,7 +1675,13 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You've described the boy and the pot, but you could mention the temperature of the bubbling orange stew inside the pot.",
+      "pipeline_animation_id": "P2a",
+      "pipeline_target_entities": [
+        "boy",
+        "pot"
+      ]
     },
     {
       "stimulus_id": "study1_P2a_D_correction",
@@ -1382,7 +1700,13 @@
         "E2": "Correct how she is using the iron",
         "D1": "Mention the washing machine humming",
         "D2": "Describe the clothesline with socks"
-      }
+      },
+      "narrator_text_block2": "The woman irons clothes using a happy iron on the ironing board in the bright laundry room.",
+      "pipeline_intent": "The system detected that you described the iron's emotion incorrectly and decided to show it feeling ashamed instead.",
+      "pipeline_animation_id": "P2a",
+      "pipeline_target_entities": [
+        "iron"
+      ]
     },
     {
       "stimulus_id": "study1_P2a_D_suggestion",
@@ -1413,7 +1737,13 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You've described the woman ironing the shirt, but you could also mention how hot the iron is.",
+      "pipeline_animation_id": "P2a",
+      "pipeline_target_entities": [
+        "woman",
+        "iron"
+      ]
     },
     {
       "stimulus_id": "study1_P2b_A_correction",
@@ -1432,7 +1762,13 @@
         "E2": "Correct where the bird is perched — it is not a gate",
         "D1": "Mention the dead leaves on the ground",
         "D2": "Describe the shed in the corner"
-      }
+      },
+      "narrator_text_block2": "The robin sits on the warm birdbath in the garden.",
+      "pipeline_intent": "The system detected that you described the birdbath's temperature incorrectly and decided to show cold frost and icy air coming off it to highlight that it is actually freezing.",
+      "pipeline_animation_id": "P2b",
+      "pipeline_target_entities": [
+        "birdbath"
+      ]
     },
     {
       "stimulus_id": "study1_P2b_A_suggestion",
@@ -1463,7 +1799,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned the birdbath in the garden, but you could describe the cold icicles hanging from its rim.",
+      "pipeline_animation_id": "P2b",
+      "pipeline_target_entities": [
+        "birdbath"
+      ]
     },
     {
       "stimulus_id": "study1_P2b_B_correction",
@@ -1482,7 +1823,13 @@
         "E2": "Correct the number of scoops",
         "D1": "Mention the neon OPEN sign in the window",
         "D2": "Describe the chalkboard with today's flavors"
-      }
+      },
+      "narrator_text_block2": "The girl in the green sweater eats a warm ice cream cone with three scoops outside the ice cream stand.",
+      "pipeline_intent": "The system detected that you described the ice cream's temperature incorrectly and chose to show cold vapor rising from the scoops to highlight that it is actually frozen.",
+      "pipeline_animation_id": "P2b",
+      "pipeline_target_entities": [
+        "ice_cream"
+      ]
     },
     {
       "stimulus_id": "study1_P2b_B_suggestion",
@@ -1513,7 +1860,13 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You described the girl holding her ice cream cone, but you could mention how cold and chilly the three scoops of ice cream feel as she licks them.",
+      "pipeline_animation_id": "P2b",
+      "pipeline_target_entities": [
+        "ice_cream",
+        "girl"
+      ]
     },
     {
       "stimulus_id": "study1_P2b_C_correction",
@@ -1532,7 +1885,13 @@
         "E2": "Correct the season — it is not summer",
         "D1": "Describe the frost patterns on the ice",
         "D2": "Mention the snow-covered bench nearby"
-      }
+      },
+      "narrator_text_block2": "The boy in a green hat stands near the pond of clear flowing water in the winter park.",
+      "pipeline_intent": "The system detected that you described the pond as having flowing water instead of being frozen and decided to show cold frost patterns on the surface to highlight its actual temperature.",
+      "pipeline_animation_id": "P2b",
+      "pipeline_target_entities": [
+        "pond"
+      ]
     },
     {
       "stimulus_id": "study1_P2b_C_suggestion",
@@ -1563,7 +1922,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned the boy looking at the pond's surface, but you could describe the intricate white frost patterns shaped like stars and ferns covering the ice.",
+      "pipeline_animation_id": "P2b",
+      "pipeline_target_entities": [
+        "pond"
+      ]
     },
     {
       "stimulus_id": "study1_P2b_D_correction",
@@ -1582,7 +1946,13 @@
         "E2": "Correct where she is reaching — it is not the oven",
         "D1": "Describe the fruit bowl on the counter",
         "D2": "Mention the cold mist spilling from the freezer"
-      }
+      },
+      "narrator_text_block2": "The mother in a green sweater puts a warm box of food into the fridge in the kitchen.",
+      "pipeline_intent": "The system detected that you incorrectly described the temperature of the food and decided to highlight the cold vapor rising from the frozen container.",
+      "pipeline_animation_id": "P2b",
+      "pipeline_target_entities": [
+        "frozen_food"
+      ]
     },
     {
       "stimulus_id": "study1_P2b_D_suggestion",
@@ -1613,7 +1983,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned the mother pulling out a pizza box, but you could describe the rectangular container of frozen food as being icy or very cold.",
+      "pipeline_animation_id": "P2b",
+      "pipeline_target_entities": [
+        "frozen_food"
+      ]
     },
     {
       "stimulus_id": "study1_P2c_A_correction",
@@ -1632,7 +2007,13 @@
         "E2": "Correct the chest — it is not closed",
         "D1": "Mention the cobweb on the ceiling",
         "D2": "Describe the light coming through the window"
-      }
+      },
+      "narrator_text_block2": "In the attic, there is an old open chest with a dusty crown inside.",
+      "pipeline_intent": "The system detected that you described the crown as being dusty and decided to make it sparkle and glow to show its true, brilliant appearance.",
+      "pipeline_animation_id": "P2c",
+      "pipeline_target_entities": [
+        "crown"
+      ]
     },
     {
       "stimulus_id": "study1_P2c_A_suggestion",
@@ -1663,7 +2044,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You've mentioned the golden crown inside the chest, but you could describe how it sparkles with its blue and red jewels.",
+      "pipeline_animation_id": "P2c",
+      "pipeline_target_entities": [
+        "crown"
+      ]
     },
     {
       "stimulus_id": "study1_P2c_B_correction",
@@ -1682,7 +2068,13 @@
         "E2": "Correct the type of box — it is not plastic",
         "D1": "Describe the other jewelry on display",
         "D2": "Mention the magnifying glass on the counter"
-      }
+      },
+      "narrator_text_block2": "The shopkeeper in a brown vest shows a sad gold ring in a velvet box.",
+      "pipeline_intent": "The system detected that you described the ring as sad when it is actually bright and sparkling, so it decided to show a joyful glow emanating from the diamond to highlight its beauty.",
+      "pipeline_animation_id": "P2c",
+      "pipeline_target_entities": [
+        "ring"
+      ]
     },
     {
       "stimulus_id": "study1_P2c_B_suggestion",
@@ -1713,7 +2105,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned the ring in the box, but you could describe the sparkling white diamond to show how beautiful it is.",
+      "pipeline_animation_id": "P2c",
+      "pipeline_target_entities": [
+        "ring"
+      ]
     },
     {
       "stimulus_id": "study1_P2c_C_correction",
@@ -1732,7 +2129,13 @@
         "E2": "Correct the color of the car",
         "D1": "Mention the rack of towels",
         "D2": "Describe the reflections on the car's surface"
-      }
+      },
+      "narrator_text_block2": "The man in a striped sweater admires his dirty red car covered in mud at the car wash.",
+      "pipeline_intent": "The system detected that you described the car as being dirty and decided to make the vehicle gleam and sparkle to show that it is actually clean and shiny.",
+      "pipeline_animation_id": "P2c",
+      "pipeline_target_entities": [
+        "car"
+      ]
     },
     {
       "stimulus_id": "study1_P2c_C_suggestion",
@@ -1763,7 +2166,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You noticed the water on the car, but you could also describe how the shiny red car with its rear spoiler looks now that it's all clean.",
+      "pipeline_animation_id": "P2c",
+      "pipeline_target_entities": [
+        "car"
+      ]
     },
     {
       "stimulus_id": "study1_P2c_D_correction",
@@ -1782,7 +2190,13 @@
         "E2": "Correct where the tree is — it is in the corner",
         "D1": "Mention the presents under the tree",
         "D2": "Describe the stockings on the fireplace"
-      }
+      },
+      "narrator_text_block2": "The child in yellow pajamas looks at the old tarnished star on the Christmas tree in the corner.",
+      "pipeline_intent": "The system detected that you described the star as being dull and old instead of bright and shining, and decided to use an animation to show how much it actually glows.",
+      "pipeline_animation_id": "P2c",
+      "pipeline_target_entities": [
+        "ornament"
+      ]
     },
     {
       "stimulus_id": "study1_P2c_D_suggestion",
@@ -1813,7 +2227,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned the gold star at the top, but you could describe it as a bright yellow star that glows with light.",
+      "pipeline_animation_id": "P2c",
+      "pipeline_target_entities": [
+        "ornament"
+      ]
     },
     {
       "stimulus_id": "study1_P2d_A_correction",
@@ -1832,7 +2251,13 @@
         "E2": "Correct the animal — it is not a kitten",
         "D1": "Mention the ducks in the pond",
         "D2": "Describe the trees surrounding the bench"
-      }
+      },
+      "narrator_text_block2": "The grumpy old man is sitting on a bench holding a puppy.",
+      "pipeline_intent": "The system detected that you described the man as grumpy when he is actually feeling affectionate, so it decided to show symbols of love around him to highlight his true emotion.",
+      "pipeline_animation_id": "P2d",
+      "pipeline_target_entities": [
+        "man"
+      ]
     },
     {
       "stimulus_id": "study1_P2d_A_suggestion",
@@ -1863,7 +2288,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You described the man and the puppy, but you could also mention how happy and peaceful the man feels while the puppy licks his hand.",
+      "pipeline_animation_id": "P2d",
+      "pipeline_target_entities": [
+        "man"
+      ]
     },
     {
       "stimulus_id": "study1_P2d_B_correction",
@@ -1883,7 +2313,14 @@
         "E2": "Correct the setting — it is not indoors",
         "D1": "Describe the flower arch and roses",
         "D2": "Mention the string lights in the trees"
-      }
+      },
+      "narrator_text_block2": "The nervous bride and the bored groom are holding hands under the flower arch in the garden.",
+      "pipeline_intent": "The system detected that you described the couple's emotions incorrectly and decided to show symbols of love around them to highlight how they actually feel.",
+      "pipeline_animation_id": "P2d",
+      "pipeline_target_entities": [
+        "bride",
+        "groom"
+      ]
     },
     {
       "stimulus_id": "study1_P2d_B_suggestion",
@@ -1914,7 +2351,13 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You described the bride and groom holding hands under the floral arch, but you could also mention how happy they look as they smile at each other with love.",
+      "pipeline_animation_id": "P2d",
+      "pipeline_target_entities": [
+        "bride",
+        "groom"
+      ]
     },
     {
       "stimulus_id": "study1_P2d_C_correction",
@@ -1933,7 +2376,13 @@
         "E2": "Correct where she is sitting — it is not on the bed",
         "D1": "Describe the mobile above the crib",
         "D2": "Describe the nursery's pastel colors"
-      }
+      },
+      "narrator_text_block2": "The grumpy mother in a blue sweater holds the baby gently in the rocking chair in the bright room.",
+      "pipeline_intent": "The system detected that you described the mother's mood incorrectly and decided to show symbols of love and affection around her to highlight her true feelings.",
+      "pipeline_animation_id": "P2d",
+      "pipeline_target_entities": [
+        "mother"
+      ]
     },
     {
       "stimulus_id": "study1_P2d_C_suggestion",
@@ -1964,7 +2413,13 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You described the mother rocking the baby and the baby's tiny hand, but you could also mention how much the mother loves her new baby.",
+      "pipeline_animation_id": "P2d",
+      "pipeline_target_entities": [
+        "mother",
+        "baby"
+      ]
     },
     {
       "stimulus_id": "study1_P2d_D_correction",
@@ -1983,7 +2438,13 @@
         "E2": "Correct the location — it is the backyard, not the front yard",
         "D1": "Describe the tire swing in the tree",
         "D2": "Mention the dandelions in the grass"
-      }
+      },
+      "narrator_text_block2": "The bored boy in his green striped t-shirt is petting his sleeping dog in the backyard.",
+      "pipeline_intent": "The system detected that you described the boy as being bored when he is actually feeling affectionate, and decided to show floating hearts around him to highlight his love for the dog.",
+      "pipeline_animation_id": "P2d",
+      "pipeline_target_entities": [
+        "boy"
+      ]
     },
     {
       "stimulus_id": "study1_P2d_D_suggestion",
@@ -2014,7 +2475,13 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You've described the boy and the golden retriever sitting together, but you could also mention how happy and calm the boy feels while he pets his dog.",
+      "pipeline_animation_id": "P2d",
+      "pipeline_target_entities": [
+        "boy",
+        "dog"
+      ]
     },
     {
       "stimulus_id": "study1_P2e_A_correction",
@@ -2033,7 +2500,13 @@
         "E2": "Correct where the brother is hiding",
         "D1": "Mention the cat on the windowsill",
         "D2": "Describe the flowers scattered on the floor"
-      }
+      },
+      "narrator_text_block2": "The calm girl is looking at a broken vase on the floor while her brother hides behind the couch.",
+      "pipeline_intent": "The system detected that you described the girl as being calm and decided to display an animation of anger around her to show how she is actually feeling.",
+      "pipeline_animation_id": "P2e",
+      "pipeline_target_entities": [
+        "girl"
+      ]
     },
     {
       "stimulus_id": "study1_P2e_A_suggestion",
@@ -2064,7 +2537,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You described the girl looking at the broken vase, but you could mention that she looks very angry with her arms crossed and furrowed eyebrows.",
+      "pipeline_animation_id": "P2e",
+      "pipeline_target_entities": [
+        "girl"
+      ]
     },
     {
       "stimulus_id": "study1_P2e_B_correction",
@@ -2083,7 +2561,13 @@
         "E2": "Correct the kitchen — it is not tidy, there are dirty dishes",
         "D1": "Mention the child's drawing on the fridge",
         "D2": "Describe the pendant lights over the counter"
-      }
+      },
+      "narrator_text_block2": "The happy man is leaning on the counter next to the burnt food and the angry lady.",
+      "pipeline_intent": "The system detected that you described the man as happy instead of angry and decided to show symbols of frustration around him to clarify his true mood.",
+      "pipeline_animation_id": "P2e",
+      "pipeline_target_entities": [
+        "man"
+      ]
     },
     {
       "stimulus_id": "study1_P2e_B_suggestion",
@@ -2114,7 +2598,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You've pointed out the man and the woman by the burnt casserole, but you could also describe how the man is feeling right now.",
+      "pipeline_animation_id": "P2e",
+      "pipeline_target_entities": [
+        "man"
+      ]
     },
     {
       "stimulus_id": "study1_P2e_C_correction",
@@ -2133,7 +2622,13 @@
         "E2": "Correct the player's reaction — he does not accept it calmly",
         "D1": "Mention the yellow card being held up",
         "D2": "Describe the scoreboard on the sideline"
-      }
+      },
+      "narrator_text_block2": "The happy player in the red jersey is looking at the referee's yellow card.",
+      "pipeline_intent": "The system detected that you described the player as happy when he is actually angry, so it chose to show symbols of anger around him to highlight his true emotion.",
+      "pipeline_animation_id": "P2e",
+      "pipeline_target_entities": [
+        "player"
+      ]
     },
     {
       "stimulus_id": "study1_P2e_C_suggestion",
@@ -2164,7 +2659,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You've described the referee giving the yellow card, but you could also mention how angry and frustrated the boy in the red jersey looks right now.",
+      "pipeline_animation_id": "P2e",
+      "pipeline_target_entities": [
+        "player"
+      ]
     },
     {
       "stimulus_id": "study1_P2e_D_correction",
@@ -2183,7 +2683,13 @@
         "E2": "Correct the location — it is a city street, not a highway",
         "D1": "Mention the navigation app on the dashboard",
         "D2": "Describe the time shown on the clock"
-      }
+      },
+      "narrator_text_block2": "The happy driver is waiting in the long line of cars on the city street.",
+      "pipeline_intent": "The system detected that you described the driver's mood incorrectly and decided to show symbols of anger around him to highlight his frustration.",
+      "pipeline_animation_id": "P2e",
+      "pipeline_target_entities": [
+        "driver"
+      ]
     },
     {
       "stimulus_id": "study1_P2e_D_suggestion",
@@ -2214,7 +2720,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You've described the man stuck in traffic, but you could also mention that the driver is feeling very frustrated or looking quite angry.",
+      "pipeline_animation_id": "P2e",
+      "pipeline_target_entities": [
+        "driver"
+      ]
     },
     {
       "stimulus_id": "study1_P2f_A_correction",
@@ -2233,7 +2744,13 @@
         "E2": "Correct what the teacher is doing — the teacher is not sitting",
         "D1": "Mention the ball on the ground",
         "D2": "Describe the other children in the background"
-      }
+      },
+      "narrator_text_block2": "The happy boy is sitting on the school yard while the teacher walks toward him.",
+      "pipeline_intent": "The system detected that you described the boy as being happy when he is actually upset and scared, so it decided to show symbols of distress around him to highlight his true feelings.",
+      "pipeline_animation_id": "P2f",
+      "pipeline_target_entities": [
+        "boy"
+      ]
     },
     {
       "stimulus_id": "study1_P2f_A_suggestion",
@@ -2264,7 +2781,13 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned the boy's scraped knee and the teacher walking over, but you could also describe how sad the boy feels or that the teacher looks worried.",
+      "pipeline_animation_id": "P2f",
+      "pipeline_target_entities": [
+        "boy",
+        "teacher"
+      ]
     },
     {
       "stimulus_id": "study1_P2f_B_correction",
@@ -2283,7 +2806,13 @@
         "E2": "Correct the weather — it is not snowing",
         "D1": "Mention the math workbook on the desk",
         "D2": "Describe the stuffed rabbit on the window seat"
-      }
+      },
+      "narrator_text_block2": "The sad girl in the yellow sweater watches the rain fall from the window sill.",
+      "pipeline_intent": "The system detected that you misidentified the girl's emotion as sadness and decided to display an animation that shows she is actually feeling fearful or worried.",
+      "pipeline_animation_id": "P2f",
+      "pipeline_target_entities": [
+        "girl"
+      ]
     },
     {
       "stimulus_id": "study1_P2f_B_suggestion",
@@ -2314,7 +2843,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You've described the girl sitting by the window during the storm, but you could also mention that she is feeling sad about the rainy weather and hoping for it to stop.",
+      "pipeline_animation_id": "P2f",
+      "pipeline_target_entities": [
+        "girl"
+      ]
     },
     {
       "stimulus_id": "study1_P2f_C_correction",
@@ -2333,7 +2867,13 @@
         "E2": "Correct the carrier — it is not full",
         "D1": "Mention the pet adoption poster on the wall",
         "D2": "Describe the reception desk"
-      }
+      },
+      "narrator_text_block2": "The happy boy in his striped shirt and overalls sits in the vet clinic holding a pet carrier.",
+      "pipeline_intent": "The system detected that you described the boy as being happy when he actually looks worried, so it decided to show an animation that highlights his feelings of anxiety.",
+      "pipeline_animation_id": "P2f",
+      "pipeline_target_entities": [
+        "boy"
+      ]
     },
     {
       "stimulus_id": "study1_P2f_C_suggestion",
@@ -2364,7 +2904,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned the boy and the pet carrier, but you could also describe how he is feeling very sad and worried while he waits.",
+      "pipeline_animation_id": "P2f",
+      "pipeline_target_entities": [
+        "boy"
+      ]
     },
     {
       "stimulus_id": "study1_P2f_D_correction",
@@ -2383,7 +2928,13 @@
         "E2": "Correct the direction — the friend is leaving, not arriving",
         "D1": "Mention the moving truck at the curb",
         "D2": "Describe the SOLD sign in the garden"
-      }
+      },
+      "narrator_text_block2": "The happy girl in a yellow sweater waves at her friend leaving with a suitcase.",
+      "pipeline_intent": "The system detected that you described the girl as happy when she is actually feeling anxious or worried and decided to display symbols of fear around her to clarify her emotion.",
+      "pipeline_animation_id": "P2f",
+      "pipeline_target_entities": [
+        "girl"
+      ]
     },
     {
       "stimulus_id": "study1_P2f_D_suggestion",
@@ -2414,7 +2965,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You noticed the girl waving and her friend walking away, but you could also mention how the girl feels or the single tear on her cheek as she says goodbye.",
+      "pipeline_animation_id": "P2f",
+      "pipeline_target_entities": [
+        "girl"
+      ]
     },
     {
       "stimulus_id": "study1_A1_A_correction",
@@ -2433,7 +2989,13 @@
         "E2": "Correct the number of rabbits",
         "D1": "Mention the mushrooms growing along the path",
         "D2": "Say what the fox might be thinking or feeling"
-      }
+      },
+      "narrator_text_block2": "The red fox is sitting on the path looking at the rabbit.",
+      "pipeline_intent": "The system detected that you described the fox as sitting when it is actually running and chose to add motion lines to highlight its movement.",
+      "pipeline_animation_id": "A1",
+      "pipeline_target_entities": [
+        "fox"
+      ]
     },
     {
       "stimulus_id": "study1_A1_A_suggestion",
@@ -2464,7 +3026,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You've introduced the fox and the rabbit, but you could also mention that the fox is running very fast down the forest path.",
+      "pipeline_animation_id": "A1",
+      "pipeline_target_entities": [
+        "fox"
+      ]
     },
     {
       "stimulus_id": "study1_A1_B_correction",
@@ -2483,7 +3050,13 @@
         "E2": "Correct where the girl is sitting — it is not a swing",
         "D1": "Describe the graffiti on the half-pipe walls",
         "D2": "Mention what the girl is drinking"
-      }
+      },
+      "narrator_text_block2": "The boy in the striped shirt is standing still on his skateboard on the wooden ramp.",
+      "pipeline_intent": "The system detected that you said the boy was standing still when he is actually moving, so it added motion lines to highlight his skateboarding action.",
+      "pipeline_animation_id": "A1",
+      "pipeline_target_entities": [
+        "boy"
+      ]
     },
     {
       "stimulus_id": "study1_A1_B_suggestion",
@@ -2514,7 +3087,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You've pointed out the boy at the skatepark, but you could describe how he is skateboarding on the curved wooden ramp.",
+      "pipeline_animation_id": "A1",
+      "pipeline_target_entities": [
+        "boy"
+      ]
     },
     {
       "stimulus_id": "study1_A1_C_correction",
@@ -2533,7 +3111,13 @@
         "E2": "Correct the color of the foal",
         "D1": "Describe the wildflowers in the meadow",
         "D2": "Describe the rolling hills in the background"
-      }
+      },
+      "narrator_text_block2": "The white horse stands quietly in the meadow near the brown foal by the wooden fence.",
+      "pipeline_intent": "The system detected that you said the horse was standing still instead of running and chose to show motion lines to highlight its actual movement.",
+      "pipeline_animation_id": "A1",
+      "pipeline_target_entities": [
+        "horse"
+      ]
     },
     {
       "stimulus_id": "study1_A1_C_suggestion",
@@ -2564,7 +3148,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You've mentioned the white horse in the meadow, but you could also describe how it is galloping across the grassy field.",
+      "pipeline_animation_id": "A1",
+      "pipeline_target_entities": [
+        "horse"
+      ]
     },
     {
       "stimulus_id": "study1_A1_D_correction",
@@ -2583,7 +3172,13 @@
         "E2": "Correct who is waving — it is not a man",
         "D1": "Describe the flower boxes on the platform",
         "D2": "Mention the timetable board"
-      }
+      },
+      "narrator_text_block2": "The red train is parked at the station. The woman waves from the platform.",
+      "pipeline_intent": "The system detected that you described the train as being stationary when it is actually traveling quickly, so it added motion lines to the train to emphasize its movement.",
+      "pipeline_animation_id": "A1",
+      "pipeline_target_entities": [
+        "train"
+      ]
     },
     {
       "stimulus_id": "study1_A1_D_suggestion",
@@ -2614,7 +3209,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned the red train and the woman on the platform, but you could also describe how the train is moving quickly along the metal tracks.",
+      "pipeline_animation_id": "A1",
+      "pipeline_target_entities": [
+        "train"
+      ]
     },
     {
       "stimulus_id": "study1_A2_A_correction",
@@ -2633,7 +3233,13 @@
         "E2": "Correct the animal on the rock — it is not a frog",
         "D1": "Mention the fish jumping in the water",
         "D2": "Describe the tall reeds along the bank"
-      }
+      },
+      "narrator_text_block2": "The brown bear is sleeping on the river bank near the bird.",
+      "pipeline_intent": "The system detected that you said the bear was sleeping when it is actually standing and active, so it decided to flip the bear's image to highlight its true position.",
+      "pipeline_animation_id": "A2",
+      "pipeline_target_entities": [
+        "bear"
+      ]
     },
     {
       "stimulus_id": "study1_A2_A_suggestion",
@@ -2664,7 +3270,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned the bear standing by the river, but you could also describe how he is standing on the muddy bank with his paw raised over a stone.",
+      "pipeline_animation_id": "A2",
+      "pipeline_target_entities": [
+        "bear"
+      ]
     },
     {
       "stimulus_id": "study1_A2_B_correction",
@@ -2683,7 +3294,13 @@
         "E2": "Correct who is carrying plates — it is not a waiter",
         "D1": "Describe the ticket rail above the pass-through",
         "D2": "Mention the copper pots on the rack"
-      }
+      },
+      "narrator_text_block2": "The chef in his white coat stirs a pot on the stove while the waitress carries plates.",
+      "pipeline_intent": "The system detected that you described the chef stirring a pot instead of tossing a pancake and chose to flip the character's image to highlight his actual movement.",
+      "pipeline_animation_id": "A2",
+      "pipeline_target_entities": [
+        "chef"
+      ]
     },
     {
       "stimulus_id": "study1_A2_B_suggestion",
@@ -2714,7 +3331,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned the chef at the gas range, but you could also describe how he is flipping a pancake in his frying pan.",
+      "pipeline_animation_id": "A2",
+      "pipeline_target_entities": [
+        "chef"
+      ]
     },
     {
       "stimulus_id": "study1_A2_C_correction",
@@ -2733,7 +3355,13 @@
         "E2": "Correct the animal — it is not a dog",
         "D1": "Describe the finished pots on the shelves",
         "D2": "Mention the clay tools on the worktable"
-      }
+      },
+      "narrator_text_block2": "The woman in a clay-splattered apron reads a book while the cat sits on the shelf of the bright studio.",
+      "pipeline_intent": "The system detected that you described the woman as reading a book instead of working with clay and decided to flip her image to draw your attention to her actual activity.",
+      "pipeline_animation_id": "A2",
+      "pipeline_target_entities": [
+        "woman"
+      ]
     },
     {
       "stimulus_id": "study1_A2_C_suggestion",
@@ -2764,7 +3392,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned the woman sitting at the pottery wheel, but you could also describe how she is using her hands to carefully shape the wet clay pot.",
+      "pipeline_animation_id": "A2",
+      "pipeline_target_entities": [
+        "woman"
+      ]
     },
     {
       "stimulus_id": "study1_A2_D_correction",
@@ -2783,7 +3416,13 @@
         "E2": "Correct who is dropping the coin — it is not a girl",
         "D1": "Describe the lamppost lighting the scene",
         "D2": "Mention the café awning down the street"
-      }
+      },
+      "narrator_text_block2": "The man in the yellow shirt holds the guitar case closed while the boy drops a coin in the hat.",
+      "pipeline_intent": "The system detected that you described the musician holding a case instead of playing his guitar and decided to highlight him to show what he is actually doing.",
+      "pipeline_animation_id": "A2",
+      "pipeline_target_entities": [
+        "musician"
+      ]
     },
     {
       "stimulus_id": "study1_A2_D_suggestion",
@@ -2814,7 +3453,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned the man sitting with his guitar, but you could also describe how he is strumming the strings to make music.",
+      "pipeline_animation_id": "A2",
+      "pipeline_target_entities": [
+        "musician"
+      ]
     },
     {
       "stimulus_id": "study1_S1_A_correction",
@@ -2833,7 +3477,13 @@
         "E2": "Correct the animal on the chair — it is not a dog",
         "D1": "Describe the pot on the stove",
         "D2": "Describe the grandmother's appearance or clothing"
-      }
+      },
+      "narrator_text_block2": "The grandmother is stirring a pot in the kitchen. The cat sleeps on a chair. Outside the window, it is sunny.",
+      "pipeline_intent": "The system detected that you described the weather outside as sunny when it is actually snowing and decided to draw your attention to the view through the window to show the winter scene.",
+      "pipeline_animation_id": "S1",
+      "pipeline_target_entities": [
+        "window"
+      ]
     },
     {
       "stimulus_id": "study1_S1_A_suggestion",
@@ -2864,7 +3514,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You've talked about the grandmother and the cat, but you could also mention the copper pans hanging on the wall behind her.",
+      "pipeline_animation_id": "S1",
+      "pipeline_target_entities": [
+        "scene"
+      ]
     },
     {
       "stimulus_id": "study1_S1_B_correction",
@@ -2883,7 +3538,13 @@
         "E2": "Correct where the librarian is standing",
         "D1": "Describe the reading desk with the green lamp",
         "D2": "Mention the Persian rug on the floor"
-      }
+      },
+      "narrator_text_block2": "The librarian in a yellow cardigan stands in front of the curtains. There is nothing behind the curtains.",
+      "pipeline_intent": "The system detected that you said there was nothing behind the curtains and chose to reveal the garden and stone path that are actually there.",
+      "pipeline_animation_id": "S1",
+      "pipeline_target_entities": [
+        "garden"
+      ]
     },
     {
       "stimulus_id": "study1_S1_B_suggestion",
@@ -2914,7 +3575,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You've introduced the librarian and the heavy curtains, but you could also describe the sunny garden and stone fountain that can be seen through the doorway.",
+      "pipeline_animation_id": "S1",
+      "pipeline_target_entities": [
+        "scene"
+      ]
     },
     {
       "stimulus_id": "study1_S1_C_correction",
@@ -2933,7 +3599,13 @@
         "E2": "Correct the number of boxes on display",
         "D1": "Mention the NEW sign on the shelf",
         "D2": "Describe the price tags on the boxes"
-      }
+      },
+      "narrator_text_block2": "The shelf has lots of different toy boxes with little price tags on the wood, but there is nothing special hidden behind them.",
+      "pipeline_intent": "The system detected that you said there was nothing hidden behind the boxes and decided to reveal the secret toy inside the music box to show you it is there.",
+      "pipeline_animation_id": "S1",
+      "pipeline_target_entities": [
+        "hidden_toy"
+      ]
     },
     {
       "stimulus_id": "study1_S1_C_suggestion",
@@ -2964,7 +3636,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You've described the toy store and the large race car box, but you could also mention the small ballerina hidden inside the music box next to it.",
+      "pipeline_animation_id": "S1",
+      "pipeline_target_entities": [
+        "scene"
+      ]
     },
     {
       "stimulus_id": "study1_S1_D_correction",
@@ -2983,7 +3660,13 @@
         "E2": "Correct what is visible at the edges of the man's figure",
         "D1": "Mention the trash bins in the alley",
         "D2": "Describe the fire escape above"
-      }
+      },
+      "narrator_text_block2": "The man in the green coat stands in an alley with brick walls and nothing behind him.",
+      "pipeline_intent": "The system detected that you said there was nothing behind the man and decided to reveal the colorful mural on the wall to show what is actually there.",
+      "pipeline_animation_id": "S1",
+      "pipeline_target_entities": [
+        "mural"
+      ]
     },
     {
       "stimulus_id": "study1_S1_D_suggestion",
@@ -3014,7 +3697,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You've described the man standing in the alley, but you could also mention the colorful mural with the blue wing and swirling patterns on the wall behind him.",
+      "pipeline_animation_id": "S1",
+      "pipeline_target_entities": [
+        "scene"
+      ]
     },
     {
       "stimulus_id": "study1_S2_A_correction",
@@ -3033,7 +3721,13 @@
         "E2": "Correct the animal on the lily pad — it is not a turtle",
         "D1": "Mention the flag on the tower",
         "D2": "Say what the knight might be guarding"
-      }
+      },
+      "narrator_text_block2": "The knight in armor is standing in the moat near the frog on the lily pad.",
+      "pipeline_intent": "The system detected that you described the knight's location incorrectly and decided to highlight the knight's actual position on the bridge.",
+      "pipeline_animation_id": "S2",
+      "pipeline_target_entities": [
+        "knight"
+      ]
     },
     {
       "stimulus_id": "study1_S2_A_suggestion",
@@ -3064,7 +3758,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned the knight is on a bridge, but you could describe the stone bridge with its three arches that he is standing on.",
+      "pipeline_animation_id": "S2",
+      "pipeline_target_entities": [
+        "knight"
+      ]
     },
     {
       "stimulus_id": "study1_S2_B_correction",
@@ -3083,7 +3782,13 @@
         "E2": "Correct the description of the platform — it is not empty",
         "D1": "Mention the KEEP OUT sign on the treehouse",
         "D2": "Describe the bicycle on the grass"
-      }
+      },
+      "narrator_text_block2": "The boy in a red and white striped shirt stands on the ground under the treehouse looking down at the flowers.",
+      "pipeline_intent": "The system detected that you described the boy as being on the ground and decided to highlight his actual location on the treehouse platform.",
+      "pipeline_animation_id": "S2",
+      "pipeline_target_entities": [
+        "boy"
+      ]
     },
     {
       "stimulus_id": "study1_S2_B_suggestion",
@@ -3114,7 +3819,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned the boy is at the treehouse, but you could describe how he is standing on the wooden platform of the massive tree.",
+      "pipeline_animation_id": "S2",
+      "pipeline_target_entities": [
+        "boy"
+      ]
     },
     {
       "stimulus_id": "study1_S2_C_correction",
@@ -3133,7 +3843,13 @@
         "E2": "Correct where the boat is relative to the keeper",
         "D1": "Describe the rocky cliff and crashing waves",
         "D2": "Mention the winding stone path"
-      }
+      },
+      "narrator_text_block2": "The lighthouse keeper stands at the base of the lighthouse high above the boat in the harbor.",
+      "pipeline_intent": "The system detected that you described the lighthouse keeper as being at the bottom of the tower instead of the top and decided to highlight his actual location on the observation deck.",
+      "pipeline_animation_id": "S2",
+      "pipeline_target_entities": [
+        "keeper"
+      ]
     },
     {
       "stimulus_id": "study1_S2_C_suggestion",
@@ -3164,7 +3880,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned the keeper at the top of the lighthouse, but you could describe how he is standing outside on the observation deck looking through his telescope.",
+      "pipeline_animation_id": "S2",
+      "pipeline_target_entities": [
+        "keeper"
+      ]
     },
     {
       "stimulus_id": "study1_S2_D_correction",
@@ -3183,7 +3904,13 @@
         "E2": "Correct the woman's posture — her eyes are closed, she is not reading",
         "D1": "Describe the hibiscus flowers around the hammock",
         "D2": "Mention the dappled sunlight through the palms"
-      }
+      },
+      "narrator_text_block2": "The woman lies on the grass between two palm trees. She has an open book on her stomach while she sleeps.",
+      "pipeline_intent": "The system detected that you described the woman's location as being on the grass instead of in the hammock and decided to highlight her correct position with a stamp animation.",
+      "pipeline_animation_id": "S2",
+      "pipeline_target_entities": [
+        "woman"
+      ]
     },
     {
       "stimulus_id": "study1_S2_D_suggestion",
@@ -3214,7 +3941,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned the woman sleeping in the hammock, but you could also describe the open book resting on her stomach.",
+      "pipeline_animation_id": "S2",
+      "pipeline_target_entities": [
+        "book"
+      ]
     },
     {
       "stimulus_id": "study1_T1_A_correction",
@@ -3233,7 +3965,13 @@
         "E2": "Correct the season — it is not summer",
         "D1": "Mention the fallen leaves on the ground",
         "D2": "Describe the baker's shop"
-      }
+      },
+      "narrator_text_block2": "The baker is about to start baking the bread. A girl approaches the shop. It is autumn.",
+      "pipeline_intent": "The system detected that you spoke as if the baking was just beginning and decided to show a flashback to remind you that the bread is already out of the oven.",
+      "pipeline_animation_id": "T1",
+      "pipeline_target_entities": [
+        "baker"
+      ]
     },
     {
       "stimulus_id": "study1_T1_A_suggestion",
@@ -3264,7 +4002,12 @@
         "L": 3,
         "G": 3,
         "T": 0
-      }
+      },
+      "pipeline_intent": "You mentioned the baker holding the tray, but you could also say that he has just finished baking those warm loaves of bread.",
+      "pipeline_animation_id": "T1",
+      "pipeline_target_entities": [
+        "scene"
+      ]
     },
     {
       "stimulus_id": "study1_T1_B_correction",
@@ -3283,7 +4026,13 @@
         "E2": "Correct the cake — it is not freshly set",
         "D1": "Describe the deflated balloons",
         "D2": "Mention the lopsided birthday banner"
-      }
+      },
+      "narrator_text_block2": "The boy is about to open his presents at the end of his birthday party. The cake is all gone and there are only crumbs on the table.",
+      "pipeline_intent": "The system detected that you described the boy as being about to open his presents when he has already finished opening them and decided to show a flashback to clarify the order of events.",
+      "pipeline_animation_id": "T1",
+      "pipeline_target_entities": [
+        "boy"
+      ]
     },
     {
       "stimulus_id": "study1_T1_B_suggestion",
@@ -3314,7 +4063,12 @@
         "L": 3,
         "G": 3,
         "T": 0
-      }
+      },
+      "pipeline_intent": "You mentioned the boy and the scattered paper, but you could also say that he has just finished unwrapping his new toy robot.",
+      "pipeline_animation_id": "T1",
+      "pipeline_target_entities": [
+        "scene"
+      ]
     },
     {
       "stimulus_id": "study1_T1_C_correction",
@@ -3333,7 +4087,13 @@
         "E2": "Correct the season details",
         "D1": "Describe the SOLD sign in the garden",
         "D2": "Mention the patches of old snow by the fence"
-      }
+      },
+      "narrator_text_block2": "The girl is about to build a snowman in the yard on a mild late winter day.",
+      "pipeline_intent": "The system detected that you described the girl preparing to build a snowman when the puddle shows that one has already melted, so it decided to show a flashback of the snowman that used to be there.",
+      "pipeline_animation_id": "T1",
+      "pipeline_target_entities": [
+        "puddle"
+      ]
     },
     {
       "stimulus_id": "study1_T1_C_suggestion",
@@ -3364,7 +4124,12 @@
         "L": 3,
         "G": 3,
         "T": 0
-      }
+      },
+      "pipeline_intent": "You described the scarf and carrot in the puddle, but you could mention that a snowman used to be standing there before it melted away.",
+      "pipeline_animation_id": "T1",
+      "pipeline_target_entities": [
+        "scene"
+      ]
     },
     {
       "stimulus_id": "study1_T1_D_correction",
@@ -3383,7 +4148,13 @@
         "E2": "Correct the scoreboard — it is not blank",
         "D1": "Describe the confetti on the steps",
         "D2": "Mention the janitor sweeping the stands"
-      }
+      },
+      "narrator_text_block2": "The stadium is empty while the man cleans up, but the scoreboard shows the game is just starting.",
+      "pipeline_intent": "The system detected that you described the game as just beginning when the messy stadium shows it is already over, and decided to use a flashback animation on the scoreboard to show the event occurred in the past.",
+      "pipeline_animation_id": "T1",
+      "pipeline_target_entities": [
+        "scoreboard"
+      ]
     },
     {
       "stimulus_id": "study1_T1_D_suggestion",
@@ -3414,7 +4185,12 @@
         "L": 3,
         "G": 3,
         "T": 0
-      }
+      },
+      "pipeline_intent": "You've described the janitor cleaning up the litter, but you could mention that the exciting game is already over and the fans have all gone home.",
+      "pipeline_animation_id": "T1",
+      "pipeline_target_entities": [
+        "scene"
+      ]
     },
     {
       "stimulus_id": "study1_T2_A_correction",
@@ -3433,7 +4209,13 @@
         "E2": "Correct who is at the front — it is not the principal",
         "D1": "Describe what is written on the whiteboard",
         "D2": "Describe what the children are doing at their desks"
-      }
+      },
+      "narrator_text_block2": "The children have already received their grades in the classroom. The teacher stands at the front.",
+      "pipeline_intent": "The system detected that you described the children as having already finished their work when they are still busy writing, so it decided to use a timelapse to show the passage of time until they actually receive their grades.",
+      "pipeline_animation_id": "T2",
+      "pipeline_target_entities": [
+        "children"
+      ]
     },
     {
       "stimulus_id": "study1_T2_A_suggestion",
@@ -3464,7 +4246,12 @@
         "L": 3,
         "G": 3,
         "T": 0
-      }
+      },
+      "pipeline_intent": "You mentioned the children are taking their final exam, but you could add that they will have to wait for the teacher to grade the papers before they find out their results.",
+      "pipeline_animation_id": "T2",
+      "pipeline_target_entities": [
+        "scene"
+      ]
     },
     {
       "stimulus_id": "study1_T2_B_correction",
@@ -3483,7 +4270,13 @@
         "E2": "Correct the time of day",
         "D1": "Describe the crane behind the structure",
         "D2": "Mention the sign on the fence"
-      }
+      },
+      "narrator_text_block2": "The worker looks at the building being built. It was built instantly today.",
+      "pipeline_intent": "The system detected that you described the building as being finished already, so it decided to show a timelapse to demonstrate the long process of it being built over time.",
+      "pipeline_animation_id": "T2",
+      "pipeline_target_entities": [
+        "building"
+      ]
     },
     {
       "stimulus_id": "study1_T2_B_suggestion",
@@ -3514,7 +4307,12 @@
         "L": 3,
         "G": 3,
         "T": 0
-      }
+      },
+      "pipeline_intent": "You've described the worker and the current state of the construction site, but you could mention that it will take quite a while before the building is finally finished.",
+      "pipeline_animation_id": "T2",
+      "pipeline_target_entities": [
+        "scene"
+      ]
     },
     {
       "stimulus_id": "study1_T2_C_correction",
@@ -3533,7 +4331,13 @@
         "E2": "Correct the description of the photos",
         "D1": "Describe the fire crackling in the fireplace",
         "D2": "Mention the dog lying at the woman's feet"
-      }
+      },
+      "narrator_text_block2": "The woman is standing by the fireplace with her dog that grew over time.",
+      "pipeline_intent": "The system detected that you spoke about the dog's growth as if it had already happened and decided to show a timelapse of the dog growing to illustrate the passage of time.",
+      "pipeline_animation_id": "T2",
+      "pipeline_target_entities": [
+        "dog"
+      ]
     },
     {
       "stimulus_id": "study1_T2_C_suggestion",
@@ -3564,7 +4368,12 @@
         "L": 3,
         "G": 3,
         "T": 0
-      }
+      },
+      "pipeline_intent": "You've mentioned the woman looking at the photos with her dog, but you could also talk about what she will do with the dog tomorrow morning.",
+      "pipeline_animation_id": "T2",
+      "pipeline_target_entities": [
+        "scene"
+      ]
     },
     {
       "stimulus_id": "study1_T2_D_correction",
@@ -3583,7 +4392,13 @@
         "E2": "Correct the sky — it shifts from warm to cool",
         "D1": "Describe the fallen leaves around the bench",
         "D2": "Mention the rolling fields below the hilltop"
-      }
+      },
+      "narrator_text_block2": "The girl draws the colorful tree on a sunny summer day on the hilltop.",
+      "pipeline_intent": "The system detected that you described the girl drawing the tree as happening right now and decided to show the tree changing over time to illustrate that the scene takes place in the future.",
+      "pipeline_animation_id": "T2",
+      "pipeline_target_entities": [
+        "tree"
+      ]
     },
     {
       "stimulus_id": "study1_T2_D_suggestion",
@@ -3614,7 +4429,12 @@
         "L": 3,
         "G": 3,
         "T": 0
-      }
+      },
+      "pipeline_intent": "You described the girl sketching under the oak tree, but you could mention how she might stay there until the sun begins to set over the rolling fields.",
+      "pipeline_animation_id": "T2",
+      "pipeline_target_entities": [
+        "scene"
+      ]
     },
     {
       "stimulus_id": "study1_R1_A_correction",
@@ -3634,7 +4454,14 @@
         "E2": "Correct the food — they are not eating cake",
         "D1": "Mention the butterfly near the flowers",
         "D2": "Describe the dog in the grass"
-      }
+      },
+      "narrator_text_block2": "The mother and the daughter are sitting far apart on the blanket, eating a sandwich.",
+      "pipeline_intent": "The system detected that you described the mother and daughter as being far apart when they are actually sitting close together, so it decided to pull their figures toward each other to show their correct positions.",
+      "pipeline_animation_id": "R1",
+      "pipeline_target_entities": [
+        "mother",
+        "daughter"
+      ]
     },
     {
       "stimulus_id": "study1_R1_A_suggestion",
@@ -3665,7 +4492,13 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned the mother and the girl on the blanket, but you could say that the mother and her daughter are having a picnic together.",
+      "pipeline_animation_id": "R1",
+      "pipeline_target_entities": [
+        "mother",
+        "daughter"
+      ]
     },
     {
       "stimulus_id": "study1_R1_B_correction",
@@ -3685,7 +4518,14 @@
         "E2": "Correct what the woman is doing — she is not sitting",
         "D1": "Describe the fountain",
         "D2": "Mention the store fronts in the mall"
-      }
+      },
+      "narrator_text_block2": "The worried child in the orange shirt hugs his dinosaur near the fountain. A woman is standing far away from him.",
+      "pipeline_intent": "The system detected that you described the woman as being far away from you when she is actually reaching out to you, and decided to use an animation that brings you both together to highlight your close relationship.",
+      "pipeline_animation_id": "R1",
+      "pipeline_target_entities": [
+        "child",
+        "mother"
+      ]
     },
     {
       "stimulus_id": "study1_R1_B_suggestion",
@@ -3716,7 +4556,13 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You've pointed out the child and the woman, but you could mention that they are together or that she is his mother.",
+      "pipeline_animation_id": "R1",
+      "pipeline_target_entities": [
+        "child",
+        "mother"
+      ]
     },
     {
       "stimulus_id": "study1_R1_C_correction",
@@ -3736,7 +4582,14 @@
         "E2": "Correct the children's expressions — they are excited, not disinterested",
         "D1": "Describe the nearly complete puzzle on the floor",
         "D2": "Mention the couch cushions on the floor"
-      }
+      },
+      "narrator_text_block2": "The boy and girl are smiling as they each hold a puzzle piece on the carpet. They have no idea their pieces are related and look away from each other.",
+      "pipeline_intent": "The system detected that you described the boy and girl as being disconnected from each other and decided to use an animation that pulls them together to show they are actually working as a team.",
+      "pipeline_animation_id": "R1",
+      "pipeline_target_entities": [
+        "boy",
+        "girl"
+      ]
     },
     {
       "stimulus_id": "study1_R1_C_suggestion",
@@ -3767,7 +4620,13 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned the boy and girl holding their puzzle pieces, but you could also say that the boy and the girl are working together to finish the puzzle.",
+      "pipeline_animation_id": "R1",
+      "pipeline_target_entities": [
+        "boy",
+        "girl"
+      ]
     },
     {
       "stimulus_id": "study1_R1_D_correction",
@@ -3787,7 +4646,14 @@
         "E2": "Correct the classroom — it is not empty",
         "D1": "Describe the other magnetic letters scattered on the board",
         "D2": "Mention the bins of crayons and blocks"
-      }
+      },
+      "narrator_text_block2": "The boy holds the letter A and looks at the C and T on the whiteboard in the classroom full of toys.",
+      "pipeline_intent": "The system detected that you described the boy holding the letter instead of just touching it on the wall, so it decided to show how the letters are magnetically attached to the whiteboard.",
+      "pipeline_animation_id": "R1",
+      "pipeline_target_entities": [
+        "boy",
+        "letters"
+      ]
     },
     {
       "stimulus_id": "study1_R1_D_suggestion",
@@ -3818,7 +4684,13 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned the boy holding a letter near the board, but you could explain that the letter and the gap go together to complete the word.",
+      "pipeline_animation_id": "R1",
+      "pipeline_target_entities": [
+        "boy",
+        "letters"
+      ]
     },
     {
       "stimulus_id": "study1_R2_A_correction",
@@ -3838,7 +4710,14 @@
         "E2": "Correct the furniture — it is not a table",
         "D1": "Mention the toy train on the floor",
         "D2": "Describe the books between the toys"
-      }
+      },
+      "narrator_text_block2": "The stuffed bear and the stuffed rabbit are best friends sitting close together on the shelf.",
+      "pipeline_intent": "The system detected that you described the bear and rabbit as being right next to each other and chose to push them away from one another to show the space between them.",
+      "pipeline_animation_id": "R2",
+      "pipeline_target_entities": [
+        "bear",
+        "rabbit"
+      ]
     },
     {
       "stimulus_id": "study1_R2_A_suggestion",
@@ -3869,7 +4748,13 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned the bear and the rabbit on the shelf, but you could point out that they are sitting on opposite sides of the stack of books.",
+      "pipeline_animation_id": "R2",
+      "pipeline_target_entities": [
+        "bear",
+        "rabbit"
+      ]
     },
     {
       "stimulus_id": "study1_R2_B_correction",
@@ -3889,7 +4774,14 @@
         "E2": "Correct their body language — they are tense, not relaxed",
         "D1": "Mention the nature documentary paused on the TV",
         "D2": "Describe the coffee table and magazines"
-      }
+      },
+      "narrator_text_block2": "The black cat and the golden dog cuddle together on the far ends of the couch.",
+      "pipeline_intent": "The system detected that you described the cat and dog as cuddling and decided to move them further apart to show they are actually separated on the couch.",
+      "pipeline_animation_id": "R2",
+      "pipeline_target_entities": [
+        "cat",
+        "dog"
+      ]
     },
     {
       "stimulus_id": "study1_R2_B_suggestion",
@@ -3920,7 +4812,13 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You've pointed out where the cat and dog are sitting, but you could mention how they are staying apart or keeping their distance from each other.",
+      "pipeline_animation_id": "R2",
+      "pipeline_target_entities": [
+        "cat",
+        "dog"
+      ]
     },
     {
       "stimulus_id": "study1_R2_C_correction",
@@ -3940,7 +4838,14 @@
         "E2": "Correct the iron filings pattern — it shows repulsion",
         "D1": "Mention the ruler on the table",
         "D2": "Describe the notebook with the child's notes"
-      }
+      },
+      "narrator_text_block2": "The two horseshoe magnets are touching each other and repelling on the science table.",
+      "pipeline_intent": "The system detected that you incorrectly described the magnets as touching and decided to show an animation of them pushing away from each other to highlight the space between them.",
+      "pipeline_animation_id": "R2",
+      "pipeline_target_entities": [
+        "magnet_red",
+        "magnet_blue"
+      ]
     },
     {
       "stimulus_id": "study1_R2_C_suggestion",
@@ -3971,7 +4876,13 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned the magnets and the iron filings, but you could also say that the red and blue magnets are pushing apart from each other.",
+      "pipeline_animation_id": "R2",
+      "pipeline_target_entities": [
+        "magnet_red",
+        "magnet_blue"
+      ]
     },
     {
       "stimulus_id": "study1_R2_D_correction",
@@ -3991,7 +4902,14 @@
         "E2": "Correct their body language — arms crossed, scowling",
         "D1": "Mention the crumpled paper between them on the bench",
         "D2": "Describe the pigeons on the path"
-      }
+      },
+      "narrator_text_block2": "The girl in the yellow sweater and the boy in the green sweater sit close together on the bench, frowning and looking away.",
+      "pipeline_intent": "The system detected that you described the boy and girl as sitting close to each other and decided to push their figures apart to show the distance between them.",
+      "pipeline_animation_id": "R2",
+      "pipeline_target_entities": [
+        "girl",
+        "boy"
+      ]
     },
     {
       "stimulus_id": "study1_R2_D_suggestion",
@@ -4022,7 +4940,13 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned the girl and boy sitting on the bench, but you could add that they are angry and looking away from each other.",
+      "pipeline_animation_id": "R2",
+      "pipeline_target_entities": [
+        "girl",
+        "boy"
+      ]
     },
     {
       "stimulus_id": "study1_R3_A_correction",
@@ -4042,7 +4966,14 @@
         "E2": "Correct the fence's material — it is not metal",
         "D1": "Mention the goat watching from the side",
         "D2": "Describe the flowers on the slope"
-      }
+      },
+      "narrator_text_block2": "A round boulder and a wooden fence are on a hill. The fence knocked over the boulder.",
+      "pipeline_intent": "The system detected that you incorrectly described the fence pushing the boulder over and decided to use an animation to highlight the actual relationship between these two objects.",
+      "pipeline_animation_id": "R3",
+      "pipeline_target_entities": [
+        "boulder",
+        "fence"
+      ]
     },
     {
       "stimulus_id": "study1_R3_A_suggestion",
@@ -4073,7 +5004,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You pointed out the wooden fence at the bottom, but you could add that it broke because the hill is very steep.",
+      "pipeline_animation_id": "R3",
+      "pipeline_target_entities": [
+        "fence"
+      ]
     },
     {
       "stimulus_id": "study1_R3_B_correction",
@@ -4093,7 +5029,14 @@
         "E2": "Correct the claim that no one is touching them",
         "D1": "Describe the curved line of dominoes",
         "D2": "Mention the desk lamp and spare dominoes"
-      }
+      },
+      "narrator_text_block2": "The finger is touching the standing dominoes as they fall over all by themselves.",
+      "pipeline_intent": "The system detected that you described the dominoes falling over by themselves and decided to show the finger pushing them to highlight what is causing the movement.",
+      "pipeline_animation_id": "R3",
+      "pipeline_target_entities": [
+        "finger",
+        "dominoes"
+      ]
     },
     {
       "stimulus_id": "study1_R3_B_suggestion",
@@ -4124,7 +5067,13 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You've described the long row of colorful dominoes and the finger waiting to push, but you could explain what will happen to the whole line when the finger pushes the green domino.",
+      "pipeline_animation_id": "R3",
+      "pipeline_target_entities": [
+        "finger",
+        "dominoes"
+      ]
     },
     {
       "stimulus_id": "study1_R3_C_correction",
@@ -4144,7 +5093,14 @@
         "E2": "Correct the claim that there is no reason for the crack",
         "D1": "Describe the makeshift goal made of backpacks",
         "D2": "Mention the red front door"
-      }
+      },
+      "narrator_text_block2": "The window cracked by itself for no reason. The soccer ball is flying in the air right in front of the window.",
+      "pipeline_intent": "The system detected that you said the window broke for no reason and decided to highlight the connection between the ball and the cracked glass to show what caused the damage.",
+      "pipeline_animation_id": "R3",
+      "pipeline_target_entities": [
+        "ball",
+        "window"
+      ]
     },
     {
       "stimulus_id": "study1_R3_C_suggestion",
@@ -4175,7 +5131,13 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You've described the ball and the cracked window, but you could explain that the glass shattered because the ball hit it.",
+      "pipeline_animation_id": "R3",
+      "pipeline_target_entities": [
+        "ball",
+        "window"
+      ]
     },
     {
       "stimulus_id": "study1_R3_D_correction",
@@ -4195,7 +5157,14 @@
         "E2": "Correct the sky — it is not clear",
         "D1": "Describe the splinters of wood on the grass",
         "D2": "Mention the dirt path across the field"
-      }
+      },
+      "narrator_text_block2": "The tree split in half for no apparent reason during the big storm with the dark clouds.",
+      "pipeline_intent": "The system detected that you missed the cause of the tree splitting and decided to emphasize the lightning bolt hitting the trunk to show why it happened.",
+      "pipeline_animation_id": "R3",
+      "pipeline_target_entities": [
+        "lightning",
+        "tree"
+      ]
     },
     {
       "stimulus_id": "study1_R3_D_suggestion",
@@ -4226,7 +5195,13 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You've described the lightning hitting the oak tree and the split trunk, but you could explain that the tree split because the lightning struck it.",
+      "pipeline_animation_id": "R3",
+      "pipeline_target_entities": [
+        "lightning",
+        "tree"
+      ]
     },
     {
       "stimulus_id": "study1_D1_A_correction",
@@ -4245,7 +5220,13 @@
         "E2": "Correct the parent — it is not his father",
         "D1": "Describe the cakes on display",
         "D2": "Mention the bell above the door"
-      }
+      },
+      "narrator_text_block2": "The boy silently points at the cupcakes while his mother watches.",
+      "pipeline_intent": "The system detected that you described the boy as being silent and decided to show a speech bubble to highlight that he is actually talking.",
+      "pipeline_animation_id": "D1",
+      "pipeline_target_entities": [
+        "boy"
+      ]
     },
     {
       "stimulus_id": "study1_D1_A_suggestion",
@@ -4276,7 +5257,12 @@
         "L": 0,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You've mentioned the boy pointing at the display case, but you could also describe what he is asking the baker for.",
+      "pipeline_animation_id": "D1",
+      "pipeline_target_entities": [
+        "boy"
+      ]
     },
     {
       "stimulus_id": "study1_D1_B_correction",
@@ -4295,7 +5281,13 @@
         "E2": "Correct what the girl is doing with the paper",
         "D1": "Describe the QUIET PLEASE sign",
         "D2": "Mention the stacked books on the cart"
-      }
+      },
+      "narrator_text_block2": "The girl in the striped shirt asks the librarian in the green cardigan for a toy while showing her a paper.",
+      "pipeline_intent": "The system detected that you attributed the wrong request to the girl and decided to show a speech bubble to highlight what she is actually saying.",
+      "pipeline_animation_id": "D1",
+      "pipeline_target_entities": [
+        "girl"
+      ]
     },
     {
       "stimulus_id": "study1_D1_B_suggestion",
@@ -4326,7 +5318,13 @@
         "L": 0,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You've described the girl standing at the desk with her paper, but you could also mention what she is saying or asking the librarian.",
+      "pipeline_animation_id": "D1",
+      "pipeline_target_entities": [
+        "girl",
+        "librarian"
+      ]
     },
     {
       "stimulus_id": "study1_D1_C_correction",
@@ -4345,7 +5343,13 @@
         "E2": "Correct what the woman is doing — she is shaking her head",
         "D1": "Describe the produce on the stall",
         "D2": "Mention the hanging brass scale"
-      }
+      },
+      "narrator_text_block2": "The vendor and the woman stand silently at the produce stall, gesturing and shaking their heads.",
+      "pipeline_intent": "The system detected that you described the vendor as being silent when he is actually speaking and decided to show a speech bubble to highlight his dialogue.",
+      "pipeline_animation_id": "D1",
+      "pipeline_target_entities": [
+        "vendor"
+      ]
     },
     {
       "stimulus_id": "study1_D1_C_suggestion",
@@ -4376,7 +5380,12 @@
         "L": 0,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned the vendor and the woman with her bag, but you could describe what the cheerful man is saying as he gestures toward his vegetables.",
+      "pipeline_animation_id": "D1",
+      "pipeline_target_entities": [
+        "vendor"
+      ]
     },
     {
       "stimulus_id": "study1_D1_D_correction",
@@ -4395,7 +5404,13 @@
         "E2": "Correct the doctor's expression — it is encouraging",
         "D1": "Mention the jar of lollipops on the counter",
         "D2": "Describe the poster on the wall"
-      }
+      },
+      "narrator_text_block2": "The doctor in the white coat tells the concerned boy on the exam table that he is looking at a cartoon.",
+      "pipeline_intent": "The system detected that you attributed the wrong dialogue to the doctor regarding the computer screen and decided to display a speech bubble to show what he is actually saying.",
+      "pipeline_animation_id": "D1",
+      "pipeline_target_entities": [
+        "doctor"
+      ]
     },
     {
       "stimulus_id": "study1_D1_D_suggestion",
@@ -4426,7 +5441,12 @@
         "L": 0,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You've described the doctor and the boy on the exam table, but you could also mention what the doctor is explaining to the boy while he points at the computer screen.",
+      "pipeline_animation_id": "D1",
+      "pipeline_target_entities": [
+        "doctor"
+      ]
     },
     {
       "stimulus_id": "study1_D2_A_correction",
@@ -4445,7 +5465,13 @@
         "E2": "Correct who is nearby — it is not a teacher",
         "D1": "Mention the clock on the wall",
         "D2": "Describe the bookshelves lining the walls"
-      }
+      },
+      "narrator_text_block2": "She thinks this book is too easy. She is sitting in the library. A girl reads nearby.",
+      "pipeline_intent": "The system detected that you described the girl's thoughts about her book incorrectly and decided to show a thought bubble above her head to clarify how she is actually feeling.",
+      "pipeline_animation_id": "D2",
+      "pipeline_target_entities": [
+        "girl"
+      ]
     },
     {
       "stimulus_id": "study1_D2_A_suggestion",
@@ -4476,7 +5502,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You've described the girl and the student reading in the library, but you could mention what the grumpy student might be thinking as she rests her chin on her hand.",
+      "pipeline_animation_id": "D2",
+      "pipeline_target_entities": [
+        "student"
+      ]
     },
     {
       "stimulus_id": "study1_D2_B_correction",
@@ -4495,7 +5526,13 @@
         "E2": "Correct the opponent's expression — he is not just relaxed",
         "D1": "Mention the chess clock on the table",
         "D2": "Describe the trophies on the bookshelf"
-      }
+      },
+      "narrator_text_block2": "The boy in the green sweater moves his piece quickly without hesitation, not thinking at all. His amused opponent waits.",
+      "pipeline_intent": "The system detected that you described the boy as not thinking about his move and decided to show a thought bubble to highlight his actual focus and concentration.",
+      "pipeline_animation_id": "D2",
+      "pipeline_target_entities": [
+        "boy"
+      ]
     },
     {
       "stimulus_id": "study1_D2_B_suggestion",
@@ -4526,7 +5563,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You've described the boy and his opponent at the chess table, but you could also mention what the boy is thinking or wondering as he reaches for the yellow knight.",
+      "pipeline_animation_id": "D2",
+      "pipeline_target_entities": [
+        "boy"
+      ]
     },
     {
       "stimulus_id": "study1_D2_C_correction",
@@ -4545,7 +5587,13 @@
         "E2": "Correct her expression — she is contemplative, not confident",
         "D1": "Describe the two paths and signpost",
         "D2": "Mention the wildflowers and stone wall"
-      }
+      },
+      "narrator_text_block2": "The woman stops at the signpost and thinks she is already at her house.",
+      "pipeline_intent": "The system detected that you attributed the wrong thought to the woman at the fork in the road and decided to display a thought bubble to highlight her actual state of mind.",
+      "pipeline_animation_id": "D2",
+      "pipeline_target_entities": [
+        "woman"
+      ]
     },
     {
       "stimulus_id": "study1_D2_C_suggestion",
@@ -4576,7 +5624,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You've described the woman standing at the fork in the path, but you could also mention what she might be thinking or wondering about as she looks at the signpost.",
+      "pipeline_animation_id": "D2",
+      "pipeline_target_entities": [
+        "woman"
+      ]
     },
     {
       "stimulus_id": "study1_D2_D_correction",
@@ -4595,7 +5648,13 @@
         "E2": "Correct the desk — it is not empty",
         "D1": "Describe the bulletin board with photos",
         "D2": "Mention the fairy lights and untouched tea"
-      }
+      },
+      "narrator_text_block2": "The girl holds the letter at her desk with the books and the little plant, but she is completely uninterested in its contents.",
+      "pipeline_intent": "The system detected that you misidentified the girl's feelings about the letter and decided to use a thought bubble to highlight her true reaction.",
+      "pipeline_animation_id": "D2",
+      "pipeline_target_entities": [
+        "girl"
+      ]
     },
     {
       "stimulus_id": "study1_D2_D_suggestion",
@@ -4626,7 +5685,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You've described the girl sitting at her desk with the letter, but you could also mention what she thinks or wonders about the news she just read.",
+      "pipeline_animation_id": "D2",
+      "pipeline_target_entities": [
+        "girl"
+      ]
     },
     {
       "stimulus_id": "study1_D3_A_correction",
@@ -4645,7 +5709,13 @@
         "E2": "Correct the structure nearby — it is not a cabin",
         "D1": "Describe the stars in the sky",
         "D2": "Describe the campfire in more detail"
-      }
+      },
+      "narrator_text_block2": "The boy is roasting a marshmallow at the campsite. Nothing else is happening. A tent stands nearby.",
+      "pipeline_intent": "The system detected that you claimed nothing else was occurring and decided to alert you to the raccoon moving through the campsite.",
+      "pipeline_animation_id": "D3",
+      "pipeline_target_entities": [
+        "raccoon"
+      ]
     },
     {
       "stimulus_id": "study1_D3_A_suggestion",
@@ -4676,7 +5746,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned the raccoon is behind the boy, but you could describe how it is approaching the campsite.",
+      "pipeline_animation_id": "D3",
+      "pipeline_target_entities": [
+        "raccoon"
+      ]
     },
     {
       "stimulus_id": "study1_D3_B_correction",
@@ -4695,7 +5770,13 @@
         "E2": "Correct the fishbowl's position — it is not in the center",
         "D1": "Describe the goldfish swimming in the bowl",
         "D2": "Mention the floor lamp and couch"
-      }
+      },
+      "narrator_text_block2": "The cat is leaning on the edge of the table. The fishbowl sits safely on the table. Nothing is about to happen.",
+      "pipeline_intent": "The system detected that you described the scene as peaceful with nothing about to happen and decided to highlight the cat's alert posture to show that the fish might actually be in danger.",
+      "pipeline_animation_id": "D3",
+      "pipeline_target_entities": [
+        "cat"
+      ]
     },
     {
       "stimulus_id": "study1_D3_B_suggestion",
@@ -4726,7 +5807,13 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You've described the cat and the fishbowl on the table, but you could mention that the cat has just noticed the goldfish swimming and is watching it very closely.",
+      "pipeline_animation_id": "D3",
+      "pipeline_target_entities": [
+        "cat",
+        "fishbowl"
+      ]
     },
     {
       "stimulus_id": "study1_D3_C_correction",
@@ -4745,7 +5832,13 @@
         "E2": "Correct the phone — she is still on the call",
         "D1": "Mention the coffee maker with a full pot",
         "D2": "Describe the time shown on the wall clock"
-      }
+      },
+      "narrator_text_block2": "The woman is looking away from the toaster while holding her phone to her ear. Everything in the kitchen is fine.",
+      "pipeline_intent": "The system detected that you said everything in the kitchen is okay and decided to point out the smoking toaster to show that something is burning.",
+      "pipeline_animation_id": "D3",
+      "pipeline_target_entities": [
+        "toaster"
+      ]
     },
     {
       "stimulus_id": "study1_D3_C_suggestion",
@@ -4776,7 +5869,12 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned the woman on the phone and the toaster, but you could also describe how the toast is burning and smoke is curling up from it.",
+      "pipeline_animation_id": "D3",
+      "pipeline_target_entities": [
+        "toaster"
+      ]
     },
     {
       "stimulus_id": "study1_D3_D_correction",
@@ -4795,7 +5893,13 @@
         "E2": "Correct the baby gate — it is not closed",
         "D1": "Describe the scattered toys on the play mat",
         "D2": "Mention the father's book and coffee"
-      }
+      },
+      "narrator_text_block2": "The father is reading a book on the couch. The baby gate at the stairs is open. Everything is safe.",
+      "pipeline_intent": "The system detected that you described the situation as safe when it is actually dangerous for the baby, so it decided to highlight the baby to show the risk of them crawling toward the open stairs.",
+      "pipeline_animation_id": "D3",
+      "pipeline_target_entities": [
+        "baby"
+      ]
     },
     {
       "stimulus_id": "study1_D3_D_suggestion",
@@ -4826,7 +5930,13 @@
         "L": 3,
         "G": 3,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned the baby crawling and the father reading his book, but you could point out that the baby is heading right for the open stairs while the father isn't looking.",
+      "pipeline_animation_id": "D3",
+      "pipeline_target_entities": [
+        "baby",
+        "father"
+      ]
     },
     {
       "stimulus_id": "study1_D4_A_correction",
@@ -4846,7 +5956,14 @@
         "E2": "Correct the animal — it is not a cat",
         "D1": "Mention the kite in the sky",
         "D2": "Describe where the seesaw is located in the park"
-      }
+      },
+      "narrator_text_block2": "The two children is playing on the seesaw while the dog watches.",
+      "pipeline_intent": "The system detected that you used the wrong verb form for the two children and decided to highlight them to help you notice the mistake.",
+      "pipeline_animation_id": "D4",
+      "pipeline_target_entities": [
+        "child_1",
+        "child_2"
+      ]
     },
     {
       "stimulus_id": "study1_D4_A_suggestion",
@@ -4877,7 +5994,13 @@
         "L": 3,
         "G": 0,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You've noticed the children playing, but you could describe more specifically how they are moving up and down or balancing each other on the wooden seesaw.",
+      "pipeline_animation_id": "D4",
+      "pipeline_target_entities": [
+        "child_1",
+        "child_2"
+      ]
     },
     {
       "stimulus_id": "study1_D4_B_correction",
@@ -4896,7 +6019,13 @@
         "E2": "Correct what the teacher is doing — pointing, not writing",
         "D1": "Describe the educational posters on the walls",
         "D2": "Mention the other students at their desks"
-      }
+      },
+      "narrator_text_block2": "The student him is raising his hand to talk to the teacher.",
+      "pipeline_intent": "The system detected that you used an incorrect word to describe the student and decided to highlight him to help you fix your sentence.",
+      "pipeline_animation_id": "D4",
+      "pipeline_target_entities": [
+        "student"
+      ]
     },
     {
       "stimulus_id": "study1_D4_B_suggestion",
@@ -4927,7 +6056,13 @@
         "L": 3,
         "G": 0,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned the teacher pointing at the whiteboard, but you could use a more specific word to describe how she is highlighting the mistake in the sentence about the dogs.",
+      "pipeline_animation_id": "D4",
+      "pipeline_target_entities": [
+        "teacher",
+        "whiteboard"
+      ]
     },
     {
       "stimulus_id": "study1_D4_C_correction",
@@ -4946,7 +6081,13 @@
         "E2": "Correct what the mother is doing with the text",
         "D1": "Describe the glow-in-the-dark stars on the ceiling",
         "D2": "Mention the stuffed bear the boy holds"
-      }
+      },
+      "narrator_text_block2": "The mother holds an open book for the boy, and him loves the story.",
+      "pipeline_intent": "The system detected that you used the wrong word to refer to the boy and decided to highlight him to help you correct your sentence.",
+      "pipeline_animation_id": "D4",
+      "pipeline_target_entities": [
+        "boy"
+      ]
     },
     {
       "stimulus_id": "study1_D4_C_suggestion",
@@ -4977,7 +6118,13 @@
         "L": 3,
         "G": 0,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You mentioned the mother reading to the boy, but you could use a more expressive word to describe how they are sharing the storybook together.",
+      "pipeline_animation_id": "D4",
+      "pipeline_target_entities": [
+        "mother",
+        "boy"
+      ]
     },
     {
       "stimulus_id": "study1_D4_D_correction",
@@ -4996,7 +6143,13 @@
         "E2": "Correct the girl's emotion — she is not proud",
         "D1": "Describe the pencil case and textbook on the desk",
         "D2": "Mention the empty schoolyard through the window"
-      }
+      },
+      "narrator_text_block2": "The girl look at the paper with all the red marks on it.",
+      "pipeline_intent": "The system detected that you used the wrong form of the action word when describing what the girl is doing and decided to pause the story to highlight the mistake.",
+      "pipeline_animation_id": "D4",
+      "pipeline_target_entities": [
+        "girl"
+      ]
     },
     {
       "stimulus_id": "study1_D4_D_suggestion",
@@ -5027,7 +6180,13 @@
         "L": 3,
         "G": 0,
         "T": 3
-      }
+      },
+      "pipeline_intent": "You've described how the girl is looking at her graded paper, but you could use a more precise word like 'scrutinizing' or 'evaluating' to capture her expression as she reads the red ink.",
+      "pipeline_animation_id": "D4",
+      "pipeline_target_entities": [
+        "girl",
+        "essay"
+      ]
     }
   ]
 }
