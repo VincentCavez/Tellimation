@@ -206,14 +206,19 @@ def api_scene_data(story_id: str):
     parts = story_id.split("_")
     anim_type = parts[1] if len(parts) >= 3 else "unknown"
 
-    return jsonify({
+    result = {
         "story_id": story_id,
         "title": data.get("title", story_id),
         "anim_type": anim_type,
         "bg_url": f"/image/{story_id}/hd/scene_1_bg.png",
         "full_url": f"/image/{story_id}/hd/scene_1_full.png",
         "entities": entities,
-    })
+    }
+    # Pass through optional scene-level params (e.g. interjection_word for D4)
+    if "interjection_word" in data:
+        result["interjection_word"] = data["interjection_word"]
+
+    return jsonify(result)
 
 
 @app.route("/image/<story_id>/<path:subpath>")
