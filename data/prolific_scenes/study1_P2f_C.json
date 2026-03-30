@@ -1,21 +1,21 @@
 {
   "story_id": "study1_P2f_C",
-  "title": "Soccer field (Emanation-Anger C)",
+  "title": "Vet waiting room (Emanation-Tears C)",
   "entities": {
-    "player": "a boy in a red jersey scowling",
-    "referee": "a referee holding a yellow card"
+    "boy": "a boy holding an empty pet carrier",
+    "poster": "a pet adoption poster on the wall"
   },
   "scenes": [
     {
       "scene_number": 1,
-      "title": "The Red Card",
-      "background_prompt": "A soccer field with painted white lines, two goals, grass slightly worn in the center, corner flags, and an overcast sky. No people.",
-      "full_scene_prompt": "A soccer field on an overcast afternoon. A boy of about twelve in a red jersey with the number 7, white shorts, and muddy cleats stands in the center circle, scowling intensely. His fists are clenched at his sides, his face flushed red, and his shoulders are raised in barely contained fury. Facing him at arm's length, a referee in a black shirt and shorts holds up a yellow card at head height, expression stern and impartial. Other players in the background are blurred, some standing with hands on their hips. The soccer ball sits on the worn grass between them. Corner flags in bright yellow flutter in the breeze. A scoreboard on the sideline reads 2-1.",
+      "title": "The Vet Waiting Room",
+      "background_prompt": "A veterinary clinic waiting room with plastic chairs along the wall, pet posters, a reception desk with a bell, and a tiled floor. No people, no animals.",
+      "full_scene_prompt": "A veterinary clinic waiting room with bright fluorescent lighting. A boy of about ten in a gray sweatshirt and sneakers sits slumped in a blue plastic chair along the wall, an empty pet carrier with its door hanging open resting on the chair beside him. The carrier has a small blanket inside but nothing else. The boy stares at the floor with red-rimmed eyes, his lower lip trembling, both hands gripping the edge of the carrier. On the wall above him, a colorful poster shows smiling puppies and kittens with the text 'Give a pet a forever home.' A reception desk with a small bell and a computer monitor is visible to the right. The tiled floor is spotlessly clean. Other plastic chairs along the wall are empty.",
       "entities_in_scene": [
-        "player",
-        "referee"
+        "boy",
+        "poster"
       ],
-      "composition_instructions": "Place player in the center circle, standing with fists clenched at sides, face flushed red, scowling intensely. Place referee facing him at arm's length, standing and holding up a yellow card at head height, expression stern."
+      "composition_instructions": "Place boy slumped in a blue plastic chair along the wall, staring at the floor with red-rimmed eyes, lower lip trembling, both hands gripping the edge of an empty pet carrier on the chair beside him."
     }
   ]
 }

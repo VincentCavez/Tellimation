@@ -297,7 +297,12 @@
       <div class="family">
         <span class="family-label">P: Property</span>
         <span class="anim-pair"><button class="anim-btn" onclick="playTemplate('color_pop')">color_pop</button><button class="dl-btn" onclick="downloadAnimation('color_pop')" title="Download video">&#x2193;</button></span>
-        <span class="anim-pair"><button class="anim-btn" onclick="playTemplate('emanation')">emanation</button><button class="dl-btn" onclick="downloadAnimation('emanation')" title="Download video">&#x2193;</button></span>
+        <span class="anim-pair"><button class="anim-btn" onclick="playTemplate('emanation_shame')">shame</button><button class="dl-btn" onclick="downloadAnimation('emanation_shame')" title="Download video">&#x2193;</button></span>
+        <span class="anim-pair"><button class="anim-btn" onclick="playTemplate('emanation_cold')">cold</button><button class="dl-btn" onclick="downloadAnimation('emanation_cold')" title="Download video">&#x2193;</button></span>
+        <span class="anim-pair"><button class="anim-btn" onclick="playTemplate('emanation_joy')">joy</button><button class="dl-btn" onclick="downloadAnimation('emanation_joy')" title="Download video">&#x2193;</button></span>
+        <span class="anim-pair"><button class="anim-btn" onclick="playTemplate('emanation_love')">love</button><button class="dl-btn" onclick="downloadAnimation('emanation_love')" title="Download video">&#x2193;</button></span>
+        <span class="anim-pair"><button class="anim-btn" onclick="playTemplate('emanation_anger')">anger</button><button class="dl-btn" onclick="downloadAnimation('emanation_anger')" title="Download video">&#x2193;</button></span>
+        <span class="anim-pair"><button class="anim-btn" onclick="playTemplate('emanation_fear')">fear</button><button class="dl-btn" onclick="downloadAnimation('emanation_fear')" title="Download video">&#x2193;</button></span>
       </div>
       <div class="family">
         <span class="family-label">T: Time</span>
@@ -637,7 +642,8 @@
     // =====================================================================
     var SINGLE_ENTITY = [
       'spotlight', 'nametag', 'stamp', 'color_pop', 'reveal',
-      'emanation', 'motion_lines', 'flip',
+      'emanation_shame', 'emanation_cold', 'emanation_joy', 'emanation_love', 'emanation_anger', 'emanation_fear',
+      'motion_lines', 'flip',
       'disintegration', 'ghost_outline', 'speech_bubble', 'thought_bubble', 'alert', 'interjection'
     ];
     var TWO_ENTITY = ['magnetism', 'repel', 'causal_push'];
@@ -669,7 +675,6 @@
         params.isIndoor = !!(bg && bg.environment_type === 'indoor');
       }
       if (WORD_ONLY.indexOf(templateName) >= 0) params.word = document.getElementById('paramWord').value || 'Wow!';
-      if (templateName === 'emanation') params.particleType = document.getElementById('paramParticles').value;
       if (templateName === 'motion_lines') params.direction = document.getElementById('paramDirection').value;
       if (templateName === 'speech_bubble' || templateName === 'thought_bubble')
         params.text = document.getElementById('paramText').value || 'Hello!';
@@ -701,7 +706,9 @@
     // =====================================================================
     var ALL_TEMPLATES = [
       'spotlight', 'nametag', 'reveal', 'stamp',
-      'color_pop', 'emanation', 'flashback', 'timelapse',
+      'color_pop', 'emanation_shame', 'emanation_cold', 'emanation_joy',
+      'emanation_love', 'emanation_anger', 'emanation_fear',
+      'flashback', 'timelapse',
       'motion_lines', 'flip',
       'magnetism', 'repel', 'causal_push',
       'sequential_glow', 'disintegration', 'ghost_outline',
@@ -711,7 +718,7 @@
     async function playAll() {
       if (!currentScene) { log('Load a scene first', 'log-warn'); return; }
       stopPlayAll = false;
-      log('--- Playing all 20 animations sequentially ---');
+      log('--- Playing all 25 animations sequentially ---');
       for (var i = 0; i < ALL_TEMPLATES.length; i++) {
         if (stopPlayAll) { log('Play All stopped by user'); break; }
         var name = ALL_TEMPLATES[i];

@@ -1,21 +1,25 @@
 {
   "story_id": "study1_P2e_A",
-  "title": "Park Bench (Emanation-Hearts)",
+  "title": "Living Room (Emanation-Anger)",
   "entities": {
-    "man": "an elderly man in a flat cap",
-    "puppy": "a small golden puppy"
+    "girl": "an older girl with crossed arms",
+    "boy": "a younger boy hiding",
+    "cat": "an orange tabby cat",
+    "vase": "a broken ceramic vase"
   },
   "scenes": [
     {
       "scene_number": 1,
-      "title": "The Park Bench",
-      "background_prompt": "A peaceful park with a green wooden bench, large oak trees with dappled light, a small pond with lily pads and ducks in the background, and a gravel path. Warm afternoon light. No people, no animals.",
-      "full_scene_prompt": "A peaceful park on a warm afternoon. An elderly man with kind wrinkled features, wearing a brown flat cap, a beige cardigan over a plaid shirt, and brown trousers, sits on a green wooden bench. On his lap, a small golden puppy with floppy ears and a wagging tail licks the man's weathered hand. The man's face beams with a wide, gentle smile, his eyes crinkled with warmth. Large oak trees surround the bench, their leaves casting dappled golden light across the scene. Behind the bench, a small pond is visible with green lily pads floating on the surface and two white ducks gliding across the water. A gravel path curves past the bench and disappears behind the trees. Fallen leaves in orange and gold are scattered on the grass.",
+      "title": "The Living Room",
+      "background_prompt": "A cozy living room with a large beige couch, a wooden side table, a windowsill with a cushion, a patterned rug on the floor, and scattered flower petals. No people, no animals.",
+      "full_scene_prompt": "A cozy living room. An older girl of about ten with long dark hair, wearing a red t-shirt and jeans, stands in the center of the room with her arms tightly crossed over her chest and her brows furrowed in a stern expression. She stares down at the floor where a broken white ceramic vase lies in several pieces on a patterned rug, with water pooled around it and pink and yellow flowers scattered among the shards. To the left, a younger boy of about six with curly blond hair peeks out nervously from behind a large beige couch, only his wide eyes and the top of his head visible above the armrest. An orange tabby cat sits calmly on the windowsill to the right, its tail curled around its paws, watching the scene with half-closed eyes. A wooden side table stands where the vase presumably fell from, now empty.",
       "entities_in_scene": [
-        "man",
-        "puppy"
+        "girl",
+        "boy",
+        "cat",
+        "vase"
       ],
-      "composition_instructions": "Place man on the green wooden bench, sitting and holding a small puppy on his lap. The puppy licks his hand. The man beams with a wide gentle smile, eyes crinkled with warmth."
+      "composition_instructions": "Place girl in the center of the room, standing with arms tightly crossed, brows furrowed, staring down at the broken vase. Place boy peeking out from behind the couch (left), only wide eyes and top of head visible. Place cat on the windowsill (right), sitting calmly with tail curled. Place vase broken on the rug with water pooled and flowers scattered."
     }
   ]
 }

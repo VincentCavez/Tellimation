@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Video Preview — Tellimations</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #1a1a2e; color: #eee; display: flex; height: 100vh; overflow: hidden; }
+
+/* Sidebar */
+#sidebar { width: 300px; background: #16213e; overflow-y: auto; border-right: 1px solid #333; flex-shrink: 0; }
+#sidebar h2 { padding: 16px; font-size: 14px; color: #aaa; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #333; }
+.anim-group { border-bottom: 1px solid #222; }
+.anim-group-header { padding: 10px 16px; background: #1a1a3e; cursor: pointer; font-weight: 600; font-size: 13px; color: #7faaff; display: flex; justify-content: space-between; align-items: center; }
+.anim-group-header:hover { background: #222255; }
+.anim-group-header .badge { background: #334; padding: 2px 8px; border-radius: 10px; font-size: 11px; color: #aaa; }
+.scene-list { display: none; }
+.scene-list.open { display: block; }
+.scene-item { padding: 8px 16px 8px 24px; cursor: pointer; font-size: 13px; color: #ccc; border-bottom: 1px solid #1a1a2e; display: flex; justify-content: space-between; align-items: center; }
+.scene-item:hover { background: #1f2f5a; }
+.scene-item.active { background: #2a4080; color: #fff; }
+.scene-item .variant { font-size: 11px; color: #888; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+.status-dot.ready { background: #4caf50; }
+.status-dot.missing { background: #f44336; }
+
+/* Main */
+#main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+#toolbar { padding: 12px 20px; background: #16213e; border-bottom: 1px solid #333; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+#toolbar h3 { font-size: 15px; color: #7faaff; margin-right: auto; }
+#toolbar select, #toolbar button { font-size: 13px; padding: 6px 14px; border-radius: 6px; border: 1px solid #444; background: #222; color: #eee; cursor: pointer; }
+#toolbar button { background: #2a5298; border-color: #2a5298; }
+#toolbar button:hover { background: #3a6ab8; }
+#toolbar button:disabled { opacity: 0.4; cursor: not-allowed; }
+#toolbar button.recording { background: #c62828; border-color: #c62828; animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+#canvas-wrap { flex: 1; display: flex; align-items: center; justify-content: center; background: #111; overflow: hidden; position: relative; }
+#scene-canvas { max-width: 100%; max-height: 100%; background: #000; }
+
+#info-bar { padding: 8px 20px; background: #16213e; border-top: 1px solid #333; font-size: 12px; color: #888; display: flex; gap: 20px; }
+
+/* Empty state */
+.empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #666; }
+.empty-state h2 { font-size: 24px; margin-bottom: 8px; }
+.empty-state p { font-size: 14px; }
+
+/* Batch panel */
+#batch-panel { display: none; padding: 20px; background: #16213e; border-top: 1px solid #333; max-height: 200px; overflow-y: auto; }
+#batch-panel.open { display: block; }
+.batch-row { display: flex; align-items: center; gap: 10px; padding: 4px 0; font-size: 13px; }
+.batch-row .name { flex: 1; }
+.batch-row .st { width: 80px; text-align: center; }
+.batch-row .st.done { color: #4caf50; }
+.batch-row .st.recording { color: #ff9800; }
+.batch-row .st.pending { color: #666; }
+
+/* Layer order panel */
+#layer-panel { display: none; }
+#layer-panel.open { display: block; position: absolute; right: 20px; top: 50px; background: #1e2a4a; border: 1px solid #444; border-radius: 8px; padding: 12px; z-index: 10; min-width: 200px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+#layer-panel h4 { font-size: 12px; color: #aaa; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; }
+#layer-list { list-style: none; }
+#layer-list li { padding: 6px 10px; margin: 3px 0; background: #253050; border-radius: 4px; cursor: grab; font-size: 13px; display: flex; align-items: center; gap: 8px; user-select: none; }
+#layer-list li:active { cursor: grabbing; }
+#layer-list li.dragging { opacity: 0.4; }
+#layer-list li .grip { color: #555; font-size: 16px; }
+#layer-list li .layer-name { flex: 1; }
+#layer-list li .layer-eye { cursor: pointer; font-size: 14px; opacity: 0.6; }
+#layer-list li .layer-eye:hover { opacity: 1; }
+#layer-list li .layer-eye.hidden { opacity: 0.2; }
+.layer-arrow { background: none; border: none; color: #7faaff; cursor: pointer; font-size: 16px; padding: 0 2px; }
+.layer-arrow:hover { color: #fff; }
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+  <h2>Scenes</h2>
+  <div id="scene-list-container">Loading...</div>
+</div>
+
+<div id="main">
+  <div id="toolbar">
+    <h3 id="scene-title">Select a scene</h3>
+    <label style="font-size:13px;color:#aaa;">Target:
+      <select id="target-select"><option value="">—</option></select>
+    </label>
+    <button id="btn-play" disabled>▶ Play</button>
+    <button id="btn-record" disabled>⏺ Record</button>
+    <button id="btn-download" disabled style="display:none;">⬇ Download</button>
+    <button id="btn-layers">Layers</button>
+    <button id="btn-batch">Batch All</button>
+  </div>
+
+  <div id="canvas-wrap">
+    <canvas id="scene-canvas" width="1376" height="768"></canvas>
+    <div id="layer-panel">
+      <h4>Layer Order (bottom → top)</h4>
+      <ul id="layer-list"></ul>
+    </div>
+  </div>
+
+  <div id="info-bar">
+    <span id="info-anim">—</span>
+    <span id="info-time">0.0s / 4.0s</span>
+    <span id="info-status">Ready</span>
+  </div>
+
+  <div id="batch-panel"></div>
+</div>
+
+<!-- Pixel buffer animation system -->
+<script src="/static_js/engine.js"></script>
+<script src="/static_js/animation_helpers.js"></script>
+<script src="/static_js/animation_templates.js"></script>
+<script src="/static_js/animations.js"></script>
+
+<script>
+// ─── State ───
+let allScenes = [];
+let currentScene = null;
+let loadedImages = {};      // name → Image
+let isPlaying = false;
+let isRecording = false;
+let recordedBlob = null;
+let layerOrder = [];        // entity names in draw order (bottom → top)
+let layerVisible = {};      // entity name → boolean
+
+// Pixel buffer animation state
+let buf = null;
+let renderer = null;
+let runner = null;
+let hdEntityData = {};
+window.hdEntityData = hdEntityData;
+let scene_entity_order = [];
+window.scene_entity_order = scene_entity_order;
+
+const HD_SCALE = 1;  // full resolution
+const CANVAS_W = 1376, CANVAS_H = 768;
+const canvas = document.getElementById('scene-canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = CANVAS_W;
+canvas.height = CANVAS_H;
+const DURATION = 4000;
+const BLANK_IN = 500;
+const ANIM_DUR = 3000;
+const BLANK_OUT = 500;
+const FPS = 30;
+
+// ─── Anim type → template name ───
+const ANIM_TYPE_TO_TEMPLATE = {
+  A1: 'motion_lines', A2: 'flip',
+  C1: 'sequential_glow', C2: 'disintegration', C3: 'ghost_outline',
+  D1: 'speech_bubble', D2: 'thought_bubble', D3: 'alert', D4: 'interjection',
+  I1: 'spotlight', I2: 'nametag',
+  P1: 'color_pop',
+  P2a: 'emanation_shame', P2b: 'emanation_cold', P2c: 'emanation_joy',
+  P2d: 'emanation_love', P2e: 'emanation_anger', P2f: 'emanation_fear',
+  R1: 'magnetism', R2: 'repel', R3: 'causal_push',
+  S1: 'reveal', S2: 'stamp',
+  T1: 'flashback', T2: 'timelapse',
+};
+
+const ANIM_NAMES = {
+  A1: 'Motion Lines', A2: 'Flip',
+  C1: 'Sequential Glow', C2: 'Disintegration', C3: 'Ghost Outline',
+  D1: 'Speech Bubble', D2: 'Thought Bubble', D3: 'Alert', D4: 'Interjection',
+  I1: 'Spotlight', I2: 'Nametag',
+  P1: 'Color Pop',
+  P2a: 'Emanation (Shame)', P2b: 'Emanation (Cold)', P2c: 'Emanation (Joy)',
+  P2d: 'Emanation (Love)', P2e: 'Emanation (Anger)', P2f: 'Emanation (Fear)',
+  R1: 'Magnetism', R2: 'Repel', R3: 'Causal Push',
+  S1: 'Reveal', S2: 'Stamp',
+  T1: 'Flashback', T2: 'Timelapse',
+};
+
+// ─── Load scenes list ───
+async function init() {
+  const resp = await fetch('/api/scenes');
+  allScenes = await resp.json();
+  renderSidebar();
+}
+
+function renderSidebar() {
+  const groups = {};
+  for (const s of allScenes) {
+    if (!groups[s.anim_type]) groups[s.anim_type] = [];
+    groups[s.anim_type].push(s);
+  }
+  let html = '';
+  for (const [atype, scenes] of Object.entries(groups).sort((a,b) => a[0].localeCompare(b[0]))) {
+    const name = ANIM_NAMES[atype] || atype;
+    html += `<div class="anim-group">
+      <div class="anim-group-header" data-group="${atype}">
+        ${atype} — ${name}
+        <span class="badge">${scenes.length}</span>
+      </div>
+      <div class="scene-list" id="group-${atype}">`;
+    for (const s of scenes) {
+      const allReady = s.entities.filter(e => e.in_scene).every(e => e.has_asset);
+      html += `<div class="scene-item" data-sid="${s.story_id}">
+        <span><span class="status-dot ${allReady ? 'ready' : 'missing'}"></span>${s.story_id}</span>
+        <span class="variant">${s.variant}</span>
+      </div>`;
+    }
+    html += `</div></div>`;
+  }
+  document.getElementById('scene-list-container').innerHTML = html;
+
+  document.querySelectorAll('.anim-group-header').forEach(el => {
+    el.addEventListener('click', () => {
+      document.getElementById('group-' + el.dataset.group).classList.toggle('open');
+    });
+  });
+
+  document.querySelectorAll('.scene-item').forEach(el => {
+    el.addEventListener('click', () => loadScene(el.dataset.sid));
+  });
+}
+
+// ─── Load a scene ───
+async function loadScene(storyId) {
+  if (runner) runner.stop();
+  isPlaying = false;
+  document.getElementById('btn-play').textContent = '▶ Play';
+
+  document.querySelectorAll('.scene-item').forEach(el => el.classList.toggle('active', el.dataset.sid === storyId));
+  document.getElementById('info-status').textContent = 'Loading...';
+
+  const resp = await fetch(`/api/scene_data/${storyId}`);
+  currentScene = await resp.json();
+
+  document.getElementById('scene-title').textContent = currentScene.title;
+  document.getElementById('info-anim').textContent = `${currentScene.anim_type} — ${ANIM_NAMES[currentScene.anim_type] || '?'}`;
+
+  // Populate target selector
+  const sel = document.getElementById('target-select');
+  sel.innerHTML = '';
+  for (const e of currentScene.entities) {
+    if (e.asset_url) {
+      const opt = document.createElement('option');
+      opt.value = e.name;
+      opt.textContent = `${e.name} ${e.in_scene ? '' : '(ghost)'}`;
+      sel.appendChild(opt);
+    }
+  }
+  autoSelectTarget();
+
+  // Init layer order: in-scene entities in JSON order
+  layerOrder = currentScene.entities.filter(e => e.in_scene && e.asset_url).map(e => e.name);
+  layerVisible = {};
+  for (const e of currentScene.entities) { layerVisible[e.name] = true; }
+  renderLayerPanel();
+
+  // Load images
+  loadedImages = {};
+  hdEntityData = {};
+  window.hdEntityData = hdEntityData;
+
+  const promises = [];
+  // Background
+  promises.push(loadImg('__bg__', currentScene.bg_url));
+  // Entity assets
+  for (const e of currentScene.entities) {
+    if (e.asset_url) {
+      promises.push(loadImg(e.name, e.asset_url));
+    }
+  }
+  await Promise.all(promises);
+
+  // Set up entity order for pixel buffer
+  scene_entity_order = layerOrder.slice();
+  window.scene_entity_order = scene_entity_order;
+
+  // Draw background first, then compute bg pixels, then add entities
+  ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+  if (loadedImages['__bg__']) ctx.drawImage(loadedImages['__bg__'], 0, 0, CANVAS_W, CANVAS_H);
+
+  // Capture bg-only pixels BEFORE drawing entities
+  const bgOnlyPixels = captureBgPixels(CANVAS_W, CANVAS_H);
+
+  // Compute entity contours and draw entities
+  for (const ename of layerOrder) {
+    if (!loadedImages[ename]) continue;
+    computeEntityContour(ename, loadedImages[ename], CANVAS_W, CANVAS_H);
+    const ed = hdEntityData[ename];
+    ctx.drawImage(ed && ed.cleanCanvas ? ed.cleanCanvas : loadedImages[ename], 0, 0, CANVAS_W, CANVAS_H);
+  }
+
+  // Also process ghost entities (not in scene but have assets)
+  for (const e of currentScene.entities) {
+    if (!e.in_scene && e.asset_url && loadedImages[e.name]) {
+      computeEntityContour(e.name, loadedImages[e.name], CANVAS_W, CANVAS_H);
+    }
+  }
+
+  // Build pixel buffer and renderer
+  setupAnimations(CANVAS_W, CANVAS_H, bgOnlyPixels);
+
+  document.getElementById('btn-play').disabled = false;
+  document.getElementById('btn-record').disabled = false;
+  document.getElementById('info-status').textContent = 'Ready';
+}
+
+// ─── HD Pixel Buffer Setup ───
+
+function computeEntityContour(entityId, img, w, h) {
+  var off = document.createElement('canvas');
+  off.width = w;
+  off.height = h;
+  var offCtx = off.getContext('2d');
+  offCtx.drawImage(img, 0, 0, w, h);
+  var imgData = offCtx.getImageData(0, 0, w, h);
+  var px = imgData.data;
+  var total = w * h;
+
+  var mask = new Uint8Array(total);
+  var x1 = w, y1 = h, x2 = -1, y2 = -1;
+  for (var i = 0; i < total; i++) {
+    var a = px[i * 4 + 3];
+    if (a <= 10) continue;
+    var r = px[i * 4], g = px[i * 4 + 1], b = px[i * 4 + 2];
+    if (a < 200 && r > 200 && g > 200 && b > 200) {
+      px[i * 4 + 3] = 0;
+      continue;
+    }
+    mask[i] = 1;
+    var mx = i % w, my = (i - mx) / w;
+    if (mx < x1) x1 = mx;
+    if (mx > x2) x2 = mx;
+    if (my < y1) y1 = my;
+    if (my > y2) y2 = my;
+  }
+
+  var contour = [];
+  for (var i = 0; i < total; i++) {
+    if (!mask[i]) continue;
+    var cx = i % w, cy = (i - cx) / w;
+    if ((cx > 0     && !mask[i - 1]) ||
+        (cx < w - 1 && !mask[i + 1]) ||
+        (cy > 0     && !mask[i - w]) ||
+        (cy < h - 1 && !mask[i + w])) {
+      contour.push({ x: cx, y: cy, idx: i });
+    }
+  }
+
+  var maxDist = 20;
+  var distField = new Uint8Array(total);
+  distField.fill(255);
+  for (var i = 0; i < total; i++) {
+    if (mask[i]) distField[i] = 0;
+  }
+  var queue = [];
+  for (var c = 0; c < contour.length; c++) {
+    var ci = contour[c].idx;
+    var cx = ci % w, cy = (ci - cx) / w;
+    if (cx > 0     && distField[ci - 1] === 255) { distField[ci - 1] = 1; queue.push(ci - 1); }
+    if (cx < w - 1 && distField[ci + 1] === 255) { distField[ci + 1] = 1; queue.push(ci + 1); }
+    if (cy > 0     && distField[ci - w] === 255) { distField[ci - w] = 1; queue.push(ci - w); }
+    if (cy < h - 1 && distField[ci + w] === 255) { distField[ci + w] = 1; queue.push(ci + w); }
+  }
+  var dist = 1;
+  while (queue.length > 0 && dist < maxDist) {
+    dist++;
+    var next = [];
+    for (var q = 0; q < queue.length; q++) {
+      var ci = queue[q];
+      var cx = ci % w, cy = (ci - cx) / w;
+      if (cx > 0     && distField[ci - 1] === 255) { distField[ci - 1] = dist; next.push(ci - 1); }
+      if (cx < w - 1 && distField[ci + 1] === 255) { distField[ci + 1] = dist; next.push(ci + 1); }
+      if (cy > 0     && distField[ci - w] === 255) { distField[ci - w] = dist; next.push(ci - w); }
+      if (cy < h - 1 && distField[ci + w] === 255) { distField[ci + w] = dist; next.push(ci + w); }
+    }
+    queue = next;
+  }
+
+  offCtx.putImageData(imgData, 0, 0);
+
+  hdEntityData[entityId] = {
+    mask: mask,
+    contour: contour,
+    bounds: { x1: x1, y1: y1, x2: x2, y2: y2 },
+    distField: distField,
+    width: w,
+    height: h,
+    cleanCanvas: off,
+  };
+}
+
+function captureBgPixels(fullW, fullH) {
+  var aw = Math.ceil(fullW / HD_SCALE);
+  var ah = Math.ceil(fullH / HD_SCALE);
+  var off = document.createElement('canvas');
+  off.width = aw;
+  off.height = ah;
+  var offCtx = off.getContext('2d');
+  offCtx.imageSmoothingEnabled = true;
+  offCtx.drawImage(canvas, 0, 0, aw, ah);
+  return offCtx.getImageData(0, 0, aw, ah).data;
+}
+
+function buildHDPixelBuffer(fullW, fullH, bgPixels) {
+  var aw = Math.ceil(fullW / HD_SCALE);
+  var ah = Math.ceil(fullH / HD_SCALE);
+
+  var off = document.createElement('canvas');
+  off.width = aw;
+  off.height = ah;
+  var offCtx = off.getContext('2d');
+  offCtx.imageSmoothingEnabled = true;
+  offCtx.drawImage(canvas, 0, 0, aw, ah);
+  var imgData = offCtx.getImageData(0, 0, aw, ah);
+  var px = imgData.data;
+  var total = aw * ah;
+
+  var hdBuf = new PixelBuffer(aw, ah);
+
+  for (var i = 0; i < total; i++) {
+    var p = hdBuf.data[i];
+    p.r = px[i * 4];
+    p.g = px[i * 4 + 1];
+    p.b = px[i * 4 + 2];
+    p.e = 'bg';
+  }
+
+  var entityIds = scene_entity_order;
+  var downMasks = {};
+  for (var ei = 0; ei < entityIds.length; ei++) {
+    var eid = entityIds[ei];
+    var ed = hdEntityData[eid];
+    if (!ed) continue;
+    var dm = new Uint8Array(total);
+    for (var y = 0; y < ah; y++) {
+      for (var x = 0; x < aw; x++) {
+        var sx = x * HD_SCALE, sy = y * HD_SCALE;
+        var hit = false;
+        for (var dy = 0; dy < HD_SCALE && !hit; dy++) {
+          for (var dx = 0; dx < HD_SCALE && !hit; dx++) {
+            var fi = (sy + dy) * fullW + (sx + dx);
+            if (fi < ed.mask.length && ed.mask[fi]) hit = true;
+          }
+        }
+        if (hit) {
+          var di = y * aw + x;
+          dm[di] = 1;
+          hdBuf.data[di].e = eid;
+        }
+      }
+    }
+    downMasks[eid] = dm;
+  }
+
+  // Distance fields
+  hdBuf.distFields = {};
+  for (var eid in downMasks) {
+    var mask = downMasks[eid];
+    var field = new Uint8Array(total);
+    field.fill(255);
+    for (var i = 0; i < total; i++) { if (mask[i]) field[i] = 0; }
+    var edgeQueue = [];
+    for (var i = 0; i < total; i++) {
+      if (field[i] !== 0) continue;
+      var cx = i % aw, cy = (i - cx) / aw;
+      if ((cx > 0      && field[i - 1]  !== 0) ||
+          (cx < aw - 1 && field[i + 1]  !== 0) ||
+          (cy > 0      && field[i - aw] !== 0) ||
+          (cy < ah - 1 && field[i + aw] !== 0)) {
+        edgeQueue.push(i);
+      }
+    }
+    var queue = [];
+    for (var q = 0; q < edgeQueue.length; q++) {
+      var ci = edgeQueue[q], cx = ci % aw, cy = (ci - cx) / aw;
+      if (cx > 0      && field[ci - 1]  === 255) { field[ci - 1]  = 1; queue.push(ci - 1); }
+      if (cx < aw - 1 && field[ci + 1]  === 255) { field[ci + 1]  = 1; queue.push(ci + 1); }
+      if (cy > 0      && field[ci - aw] === 255) { field[ci - aw] = 1; queue.push(ci - aw); }
+      if (cy < ah - 1 && field[ci + aw] === 255) { field[ci + aw] = 1; queue.push(ci + aw); }
+    }
+    var dist = 1, maxDist = 20;
+    while (queue.length > 0 && dist < maxDist) {
+      dist++;
+      var next = [];
+      for (var q = 0; q < queue.length; q++) {
+        var ci = queue[q], cx = ci % aw, cy = (ci - cx) / aw;
+        if (cx > 0      && field[ci - 1]  === 255) { field[ci - 1]  = dist; next.push(ci - 1); }
+        if (cx < aw - 1 && field[ci + 1]  === 255) { field[ci + 1]  = dist; next.push(ci + 1); }
+        if (cy > 0      && field[ci - aw] === 255) { field[ci - aw] = dist; next.push(ci - aw); }
+        if (cy < ah - 1 && field[ci + aw] === 255) { field[ci + aw] = dist; next.push(ci + aw); }
+      }
+      queue = next;
+    }
+    hdBuf.distFields[eid] = field;
+  }
+  hdBuf.data._distFields = hdBuf.distFields;
+
+  // Entity layers — use each entity's own image
+  for (var ei = 0; ei < entityIds.length; ei++) {
+    var eid = entityIds[ei];
+    var dm = downMasks[eid];
+    var ed = hdEntityData[eid];
+    if (!dm || !ed) continue;
+    var entOff = document.createElement('canvas');
+    entOff.width = aw; entOff.height = ah;
+    var entCtx = entOff.getContext('2d');
+    entCtx.imageSmoothingEnabled = true;
+    entCtx.drawImage(ed.cleanCanvas, 0, 0, aw, ah);
+    var entPx = entCtx.getImageData(0, 0, aw, ah).data;
+    var layer = [];
+    for (var i = 0; i < total; i++) {
+      if (dm[i]) {
+        var pi = i * 4;
+        var er = entPx[pi], eg = entPx[pi + 1], eb = entPx[pi + 2], ea = entPx[pi + 3];
+        if (ea > 10) {
+          layer.push({ idx: i, r: er, g: eg, b: eb, e: eid });
+        } else {
+          layer.push({ idx: i, r: hdBuf.data[i].r, g: hdBuf.data[i].g, b: hdBuf.data[i].b, e: eid });
+        }
+      }
+    }
+    hdBuf.entityLayers[eid] = layer;
+  }
+  hdBuf.data._entityLayers = hdBuf.entityLayers;
+
+  // Set background snapshot from bg-only pixels
+  if (bgPixels) {
+    for (var i = 0; i < total; i++) {
+      var p = hdBuf.data[i];
+      p._br = bgPixels[i * 4];
+      p._bg = bgPixels[i * 4 + 1];
+      p._bb = bgPixels[i * 4 + 2];
+      p._be = 'bg';
+    }
+  } else {
+    hdBuf.snapshotBackground();
+  }
+
+  return hdBuf;
+}
+
+function createHDRenderer(fullW, fullH) {
+  var aw = Math.ceil(fullW / HD_SCALE);
+  var ah = Math.ceil(fullH / HD_SCALE);
+  var offCanvas = document.createElement('canvas');
+  offCanvas.width = aw;
+  offCanvas.height = ah;
+  var offCtx = offCanvas.getContext('2d');
+  var offImgData = offCtx.createImageData(aw, ah);
+
+  return {
+    canvas: canvas,
+    buf: null,
+    render: function() {
+      var b = this.buf;
+      if (!b) return;
+      var out = offImgData.data;
+      var n = aw * ah;
+      for (var i = 0; i < n; i++) {
+        var p = b.data[i];
+        out[i * 4]     = p.r;
+        out[i * 4 + 1] = p.g;
+        out[i * 4 + 2] = p.b;
+        out[i * 4 + 3] = 255;
+      }
+      offCtx.putImageData(offImgData, 0, 0);
+      var mainCtx = canvas.getContext('2d');
+      mainCtx.imageSmoothingEnabled = true;
+      mainCtx.drawImage(offCanvas, 0, 0, fullW, fullH);
+    }
+  };
+}
+
+function setupAnimations(w, h, bgPixels) {
+  buf = buildHDPixelBuffer(w, h, bgPixels);
+  renderer = createHDRenderer(w, h);
+  renderer.buf = buf;
+  runner = new AnimationRunner(buf, renderer);
+  runner.frameInterval = 1000 / FPS;
+  console.log('Pixel buffer ready:', Math.ceil(w/HD_SCALE), 'x', Math.ceil(h/HD_SCALE),
+    'entities:', scene_entity_order.join(', '));
+}
+
+function rebuildPixelBuffer() {
+  // Called when layer order or visibility changes — redraw and rebuild
+  if (!currentScene) return;
+  scene_entity_order = layerOrder.filter(n => layerVisible[n] !== false);
+  window.scene_entity_order = scene_entity_order;
+
+  ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+  if (loadedImages['__bg__']) ctx.drawImage(loadedImages['__bg__'], 0, 0, CANVAS_W, CANVAS_H);
+  const bgOnlyPixels = captureBgPixels(CANVAS_W, CANVAS_H);
+
+  for (const ename of scene_entity_order) {
+    if (!loadedImages[ename]) continue;
+    const ed = hdEntityData[ename];
+    ctx.drawImage(ed && ed.cleanCanvas ? ed.cleanCanvas : loadedImages[ename], 0, 0, CANVAS_W, CANVAS_H);
+  }
+
+  setupAnimations(CANVAS_W, CANVAS_H, bgOnlyPixels);
+}
+
+// ─── Layer panel ───
+function renderLayerPanel() {
+  const list = document.getElementById('layer-list');
+  list.innerHTML = '';
+  for (let i = 0; i < layerOrder.length; i++) {
+    const name = layerOrder[i];
+    const vis = layerVisible[name] !== false;
+    const li = document.createElement('li');
+    li.dataset.name = name;
+    li.innerHTML = `
+      <span class="grip">⠿</span>
+      <span class="layer-name">${name}</span>
+      <button class="layer-arrow" data-dir="up" data-idx="${i}" title="Move up (front)">▲</button>
+      <button class="layer-arrow" data-dir="down" data-idx="${i}" title="Move down (back)">▼</button>
+      <span class="layer-eye ${vis ? '' : 'hidden'}" data-name="${name}">${vis ? '👁' : '👁‍🗨'}</span>
+    `;
+    list.appendChild(li);
+  }
+
+  list.querySelectorAll('.layer-arrow').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const idx = parseInt(btn.dataset.idx);
+      const dir = btn.dataset.dir;
+      if (dir === 'up' && idx < layerOrder.length - 1) {
+        [layerOrder[idx], layerOrder[idx+1]] = [layerOrder[idx+1], layerOrder[idx]];
+      } else if (dir === 'down' && idx > 0) {
+        [layerOrder[idx], layerOrder[idx-1]] = [layerOrder[idx-1], layerOrder[idx]];
+      }
+      renderLayerPanel();
+      if (!isPlaying) rebuildPixelBuffer();
+    });
+  });
+
+  list.querySelectorAll('.layer-eye').forEach(eye => {
+    eye.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const name = eye.dataset.name;
+      layerVisible[name] = !layerVisible[name];
+      renderLayerPanel();
+      if (!isPlaying) rebuildPixelBuffer();
+    });
+  });
+}
+
+function autoSelectTarget() {
+  const sel = document.getElementById('target-select');
+  const atype = currentScene.anim_type;
+  const inScene = currentScene.entities.filter(e => e.in_scene && e.asset_url);
+  const ghost = currentScene.entities.find(e => !e.in_scene && e.asset_url);
+
+  if (atype === 'C3' && ghost) {
+    sel.value = ghost.name;
+  } else if (inScene.length > 0) {
+    sel.value = inScene[0].name;
+  }
+}
+
+function loadImg(key, url) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => { loadedImages[key] = img; resolve(); };
+    img.onerror = () => { resolve(); };
+    img.src = url;
+  });
+}
+
+// ─── Draw static scene (for initial display and after animation) ───
+function drawStaticScene() {
+  ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+  if (loadedImages['__bg__']) ctx.drawImage(loadedImages['__bg__'], 0, 0, CANVAS_W, CANVAS_H);
+  for (const name of layerOrder) {
+    if (layerVisible[name] !== false && loadedImages[name]) {
+      const ed = hdEntityData[name];
+      ctx.drawImage(ed && ed.cleanCanvas ? ed.cleanCanvas : loadedImages[name], 0, 0, CANVAS_W, CANVAS_H);
+    }
+  }
+}
+
+// ─── Build animation spec from current scene ───
+function buildAnimSpec() {
+  if (!currentScene) return null;
+  const atype = currentScene.anim_type;
+  const templateName = ANIM_TYPE_TO_TEMPLATE[atype];
+  if (!templateName) return null;
+
+  const sel = document.getElementById('target-select');
+  const targetName = sel.value;
+  const inScene = layerOrder.filter(n => layerVisible[n] !== false);
+
+  const params = {};
+
+  // Two-entity templates
+  if (['magnetism', 'repel', 'causal_push'].includes(templateName)) {
+    if (inScene.length >= 2) {
+      params.entityPrefixA = inScene[0];
+      params.entityPrefixB = inScene[1];
+    }
+  }
+  // All-entities template
+  else if (templateName === 'sequential_glow') {
+    params.entityPrefixes = inScene.slice();
+  }
+  // Scene-wide templates (no entity prefix needed)
+  else if (['flashback', 'timelapse'].includes(templateName)) {
+    // no entity params
+  }
+  // Ghost outline needs ghostImageUrl
+  else if (templateName === 'ghost_outline') {
+    params.entityPrefix = targetName;
+    const ghost = currentScene.entities.find(e => !e.in_scene && e.asset_url);
+    if (ghost) {
+      params.ghostImageUrl = ghost.asset_url;
+    }
+  }
+  // Text-based templates
+  else if (['speech_bubble', 'thought_bubble'].includes(templateName)) {
+    params.entityPrefix = targetName;
+    params.text = '...';
+  }
+  else if (templateName === 'interjection') {
+    params.entityPrefix = targetName;
+    params.word = '?!';
+  }
+  // Single-entity templates
+  else {
+    params.entityPrefix = targetName;
+  }
+
+  return { template: templateName, params: params, duration_ms: ANIM_DUR };
+}
+
+// ─── Play animation with bookends ───
+async function playAnimation(onComplete) {
+  if (!runner || !currentScene) return;
+  const spec = buildAnimSpec();
+  if (!spec) {
+    console.warn('No animation spec for', currentScene.anim_type);
+    if (onComplete) onComplete();
+    return;
+  }
+
+  isPlaying = true;
+  document.getElementById('btn-play').textContent = '⏹ Stop';
+  document.getElementById('info-status').textContent = 'Playing';
+
+  // Static bookend IN
+  drawStaticScene();
+  await new Promise(r => setTimeout(r, BLANK_IN));
+
+  // Play animation via pixel buffer system
+  const startMs = performance.now();
+  const updateTimer = setInterval(() => {
+    const elapsed = performance.now() - startMs + BLANK_IN;
+    document.getElementById('info-time').textContent =
+      `${(elapsed/1000).toFixed(1)}s / ${(DURATION/1000).toFixed(1)}s`;
+  }, 100);
+
+  await runner.play(spec);
+  clearInterval(updateTimer);
+
+  // Static bookend OUT
+  drawStaticScene();
+  await new Promise(r => setTimeout(r, BLANK_OUT));
+
+  isPlaying = false;
+  document.getElementById('btn-play').textContent = '▶ Play';
+  document.getElementById('info-status').textContent = 'Done';
+  document.getElementById('info-time').textContent = `${(DURATION/1000).toFixed(1)}s / ${(DURATION/1000).toFixed(1)}s`;
+
+  if (onComplete) onComplete();
+}
+
+function stopAnimation() {
+  if (runner) runner.stop();
+  isPlaying = false;
+  document.getElementById('btn-play').textContent = '▶ Play';
+  drawStaticScene();
+}
+
+// ─── Controls ───
+document.getElementById('btn-play').addEventListener('click', () => {
+  if (isPlaying) { stopAnimation(); } else { playAnimation(); }
+});
+
+document.getElementById('btn-record').addEventListener('click', () => {
+  if (isRecording) return;
+  recordVideo();
+});
+
+document.getElementById('btn-download').addEventListener('click', () => {
+  if (!recordedBlob) return;
+  downloadBlob(recordedBlob, `${currentScene.story_id}.mp4`);
+});
+
+document.getElementById('btn-batch').addEventListener('click', () => {
+  startBatch();
+});
+
+document.getElementById('btn-layers').addEventListener('click', () => {
+  document.getElementById('layer-panel').classList.toggle('open');
+});
+
+// ─── Recording helpers ───
+function captureWebm() {
+  return new Promise(resolve => {
+    const stream = canvas.captureStream(FPS);
+    const chunks = [];
+    const mr = new MediaRecorder(stream, { mimeType: 'video/webm; codecs=vp9', videoBitsPerSecond: 8000000 });
+    mr.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+    mr.onstop = () => resolve(new Blob(chunks, { type: 'video/webm' }));
+    mr.start();
+    playAnimation(() => { mr.stop(); });
+  });
+}
+
+async function convertToMp4(webmBlob, filename) {
+  const form = new FormData();
+  form.append('video', webmBlob, 'input.webm');
+  form.append('filename', filename);
+  const resp = await fetch('/api/convert_mp4', { method: 'POST', body: form });
+  if (!resp.ok) {
+    const err = await resp.json();
+    throw new Error(err.detail || err.error || 'conversion failed');
+  }
+  return resp.blob();
+}
+
+function downloadBlob(blob, filename) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ─── Record single scene ───
+async function recordVideo() {
+  if (!currentScene) return;
+  isRecording = true;
+
+  const btn = document.getElementById('btn-record');
+  btn.classList.add('recording');
+  btn.textContent = '⏺ Recording...';
+  btn.disabled = true;
+  document.getElementById('btn-download').style.display = 'none';
+  document.getElementById('info-status').textContent = 'Recording...';
+
+  try {
+    const webm = await captureWebm();
+    document.getElementById('info-status').textContent = 'Converting to MP4...';
+    const mp4 = await convertToMp4(webm, currentScene.story_id);
+    recordedBlob = mp4;
+
+    document.getElementById('btn-download').style.display = '';
+    document.getElementById('btn-download').disabled = false;
+    document.getElementById('info-status').textContent = `MP4 ready (${(mp4.size/1024).toFixed(0)} KB)`;
+  } catch (e) {
+    document.getElementById('info-status').textContent = `Error: ${e.message}`;
+  }
+
+  btn.classList.remove('recording');
+  btn.textContent = '⏺ Record';
+  btn.disabled = false;
+  isRecording = false;
+}
+
+// ─── Batch recording ───
+async function startBatch() {
+  const panel = document.getElementById('batch-panel');
+  panel.classList.add('open');
+
+  const scenesToRecord = allScenes.filter(s => s.entities.some(e => e.has_asset));
+
+  let html = '';
+  for (const s of scenesToRecord) {
+    html += `<div class="batch-row" id="batch-${s.story_id}">
+      <span class="name">${s.story_id}</span>
+      <span class="st pending" id="bst-${s.story_id}">pending</span>
+    </div>`;
+  }
+  panel.innerHTML = `<h3 style="margin-bottom:10px;color:#7faaff;">Batch Recording: ${scenesToRecord.length} scenes</h3>` + html;
+
+  for (const s of scenesToRecord) {
+    const stEl = document.getElementById('bst-' + s.story_id);
+    try {
+      stEl.textContent = 'loading'; stEl.className = 'st recording';
+      await loadScene(s.story_id);
+
+      stEl.textContent = 'recording';
+      const webm = await captureWebm();
+
+      stEl.textContent = 'converting';
+      const mp4 = await convertToMp4(webm, s.story_id);
+      downloadBlob(mp4, `${s.story_id}.mp4`);
+
+      stEl.textContent = 'done'; stEl.className = 'st done';
+    } catch (e) {
+      stEl.textContent = 'error'; stEl.className = 'st';
+      stEl.style.color = '#f44';
+    }
+
+    await new Promise(r => setTimeout(r, 200));
+  }
+
+  document.getElementById('info-status').textContent = 'Batch complete!';
+}
+
+// ─── Init ───
+init();
+</script>
+</body>
+</html>
