@@ -4,6 +4,5 @@ __pycache__/
 .pytest_cache/
 .env
 .venv/
-prolific_gen/
 stt-credentials.json
 data/users/
