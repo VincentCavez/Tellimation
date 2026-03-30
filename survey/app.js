@@ -9,7 +9,7 @@
 
   const CONFIG = {
     // Google Apps Script deployment URL — replace before launch
-    API_BASE: 'https://script.google.com/macros/s/YOUR_DEPLOY_ID/exec',
+    API_BASE: 'https://script.google.com/macros/s/AKfycbyo0lTC_PxehUguHl0fpl_hEfZleL8Lp3YqBoeGEWjU9hLZAU4vJlGCz6GOo-fsNmlb/exec',
 
     // Asset path templates (relative to survey/index.html)
     imagePath: (sceneId) => `../data/prolific_gen/${sceneId}/hd/scene_1_full.png`,
@@ -23,8 +23,8 @@
     },
 
     // Prolific
-    completionCode: 'TELL2026X',
-    prolificReturnUrl: 'https://app.prolific.com/submissions/complete?cc=TELL2026X',
+    completionCode: 'CS9JSJR2',
+    prolificReturnUrl: 'https://app.prolific.com/submissions/complete?cc=CS9JSJR2',
 
     // Retry
     retryIntervalMs: 5000,
