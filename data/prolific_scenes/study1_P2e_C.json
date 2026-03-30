@@ -1,21 +1,21 @@
 {
   "story_id": "study1_P2e_C",
-  "title": "Mother and baby (Emanation-Hearts C)",
+  "title": "Soccer field (Emanation-Anger C)",
   "entities": {
-    "mother": "a mother in a rocking chair",
-    "baby": "a baby wrapped in a blanket"
+    "player": "a boy in a red jersey scowling",
+    "referee": "a referee holding a yellow card"
   },
   "scenes": [
     {
       "scene_number": 1,
-      "title": "The Nursery",
-      "background_prompt": "A pastel-colored nursery with a wooden crib, a rocking chair, a mobile with stars and moons, and soft lamp light. No people.",
-      "full_scene_prompt": "A pastel-colored nursery in soft warm lamp light. A mother with gentle features and her hair in a loose ponytail, wearing a cream-colored cardigan, sits in a white wooden rocking chair near the window. She cradles a baby wrapped snugly in a pale yellow blanket, the baby's tiny hand curled around her finger. The mother looks down at the baby with a tender, overwhelmed expression — her eyes soft and full, her lips parted in a quiet smile. A white wooden crib with a star-patterned bumper stands to the right. A mobile of felt stars and crescent moons in pastel blue and gold hangs above the crib, gently turning. A small bookshelf holds children's board books. The walls are painted a soft mint green.",
+      "title": "The Red Card",
+      "background_prompt": "A soccer field with painted white lines, two goals, grass slightly worn in the center, corner flags, and an overcast sky. No people.",
+      "full_scene_prompt": "A soccer field on an overcast afternoon. A boy of about twelve in a red jersey with the number 7, white shorts, and muddy cleats stands in the center circle, scowling intensely. His fists are clenched at his sides, his face flushed red, and his shoulders are raised in barely contained fury. Facing him at arm's length, a referee in a black shirt and shorts holds up a yellow card at head height, expression stern and impartial. Other players in the background are blurred, some standing with hands on their hips. The soccer ball sits on the worn grass between them. Corner flags in bright yellow flutter in the breeze. A scoreboard on the sideline reads 2-1.",
       "entities_in_scene": [
-        "mother",
-        "baby"
+        "player",
+        "referee"
       ],
-      "composition_instructions": "Place mother in the white rocking chair near the window, sitting and cradling baby wrapped in pale yellow blanket. Baby's tiny hand curled around her finger. Mother looks down with tender expression, eyes soft, lips in quiet smile."
+      "composition_instructions": "Place player in the center circle, standing with fists clenched at sides, face flushed red, scowling intensely. Place referee facing him at arm's length, standing and holding up a yellow card at head height, expression stern."
     }
   ]
 }

@@ -1,21 +1,21 @@
 {
   "story_id": "study1_P2e_D",
-  "title": "Boy and his dog (Emanation-Hearts D)",
+  "title": "Traffic jam (Emanation-Anger D)",
   "entities": {
-    "boy": "a boy sitting in the grass",
-    "dog": "a golden retriever resting its head on the boy's lap"
+    "driver": "a driver gripping the steering wheel",
+    "car": "a car stuck in traffic"
   },
   "scenes": [
     {
       "scene_number": 1,
-      "title": "The Backyard",
-      "background_prompt": "A suburban backyard with a mowed lawn, a wooden fence, a tire swing hanging from a tree, and a garden shed. Warm summer afternoon. No people, no animals.",
-      "full_scene_prompt": "A suburban backyard on a warm summer afternoon. A boy of about eleven in a green t-shirt and cargo shorts sits cross-legged on the mowed lawn under the shade of a large oak tree. A golden retriever with a thick, shiny coat lies beside him with its head resting on the boy's lap, eyes half-closed in contentment. The boy gently strokes the dog's ear with one hand and rests the other on the dog's back. His face shows pure, quiet happiness — a soft smile, relaxed eyes, completely at peace. A tire swing hangs from a thick branch above them, swaying slightly in the breeze. A wooden fence encloses the yard, and a small garden shed with a blue door sits in the back corner. Dandelions dot the grass.",
+      "title": "The Traffic Jam",
+      "background_prompt": "A city street packed with cars bumper to bumper, traffic lights showing red, buildings on both sides, and a crosswalk. Dull overcast light. No people visible from this angle, no visible car interiors.",
+      "full_scene_prompt": "A city street in dull overcast light. A car \u2014 a silver sedan \u2014 is stuck in a long line of bumper-to-bumper traffic. Through the windshield, the driver is visible: a man in a white dress shirt with the sleeves rolled up, gripping the steering wheel with both hands so tightly his knuckles are pale. His face is contorted with frustration \u2014 brows furrowed deeply, mouth pressed into a hard line, eyes glaring at the line of brake lights stretching ahead. On the dashboard, a phone shows a navigation app with a sea of red indicating heavy traffic. The clock on the dashboard reads 8:47 AM. Other cars pack the lanes in both directions. Traffic lights ahead glow red. Tall office buildings line both sides of the street. A pedestrian crosswalk is just visible ahead, empty.",
       "entities_in_scene": [
-        "boy",
-        "dog"
+        "driver",
+        "car"
       ],
-      "composition_instructions": "Place boy under the oak tree, sitting cross-legged on the lawn. Place dog beside him with head resting on his lap, eyes half-closed. Boy gently strokes the dog's ear, face showing soft smile and quiet happiness."
+      "composition_instructions": "Place driver in the car (visible through windshield), gripping the steering wheel with both hands, knuckles pale, face contorted with frustration. Place car in a long line of bumper-to-bumper traffic."
     }
   ]
 }

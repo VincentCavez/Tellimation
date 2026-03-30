@@ -29,14 +29,14 @@ logger = logging.getLogger(__name__)
 
 # Default durations per template (matching JS registration)
 _DEFAULT_DURATIONS: Dict[str, int] = {
-    "spotlight": 3000, "nametag": 2000, "color_pop": 3000, "emanation": 2500,
+    "spotlight": 3000, "nametag": 2000, "color_pop": 3000,
     "emanation_shame": 2500, "emanation_cold": 2500, "emanation_joy": 2500,
     "emanation_love": 2500, "emanation_anger": 2500, "emanation_fear": 2500,
     "motion_lines": 2000, "flip": 2000, "reveal": 2500, "stamp": 3000,
     "flashback": 3000, "timelapse": 4000, "magnetism": 2500, "repel": 2000,
     "causal_push": 2000, "sequential_glow": 3000, "disintegration": 2000,
     "ghost_outline": 2500, "speech_bubble": 1500, "thought_bubble": 1500,
-    "alert": 1200, "interjection": 2000, "decomposition": 2500,
+    "alert": 1200, "interjection": 2000,
 }
 
 

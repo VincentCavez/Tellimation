@@ -696,7 +696,7 @@
     { text: "When I want you to describe how someone is moving, I show lines of movement!", audio: "/oral-instructions/tutorial_05.wav", animFn: function() { return { template: 'motion_lines', params: { entityPrefix: _ent(2), direction: 'right' } }; } },
     { text: "I can also flip them around to show they are in action!", audio: "/oral-instructions/tutorial_06.wav", animFn: function() { return { template: 'flip', params: { entityPrefix: _ent(0) } }; } },
     { text: "If I want you to describe what something looks like, I will make its colors pop!", audio: "/oral-instructions/tutorial_07.wav", animFn: function() { return { template: 'color_pop', params: { entityPrefix: _ent(1) } }; } },
-    { text: "When I want you to tell me how someone is feeling, I show little particles around them!", audio: "/oral-instructions/tutorial_08.wav", animFn: function() { return { template: 'emanation', params: { entityPrefix: _ent(1), particleType: 'hearts' } }; } },
+    { text: "When I want you to tell me how someone is feeling, I show little particles around them!", audio: "/oral-instructions/tutorial_08.wav", animFn: function() { return { template: 'emanation_love', params: { entityPrefix: _ent(1) } }; } },
     { text: "If something is hiding behind another thing, I can make it see-through so you can see!", audio: "/oral-instructions/tutorial_09.wav", animFn: function() { return { template: 'reveal', params: { entityPrefix: _ent(1) } }; } },
     { text: "I can also stamp a character to show where they are standing!", audio: "/oral-instructions/tutorial_10.wav", animFn: function() { return { template: 'stamp', params: { entityPrefix: _ent(0) } }; } },
     { text: "If I want you to use the past tense, the picture will look like an old movie!", audio: "/oral-instructions/tutorial_11.wav", animFn: function() { return { template: 'flashback', params: { isIndoor: false } }; } },
@@ -895,10 +895,12 @@
     });
   }
 
-  // --- Test: play all 20 animations sequentially ---
+  // --- Test: play all 25 animations sequentially ---
   var ALL_TEMPLATES = [
     'spotlight', 'nametag', 'reveal', 'stamp',
-    'color_pop', 'emanation', 'flashback', 'timelapse',
+    'color_pop', 'emanation_shame', 'emanation_cold', 'emanation_joy',
+    'emanation_love', 'emanation_anger', 'emanation_fear',
+    'flashback', 'timelapse',
     'motion_lines', 'flip',
     'magnetism', 'repel', 'causal_push',
     'sequential_glow', 'disintegration', 'ghost_outline',
@@ -906,7 +908,8 @@
   ];
   var SINGLE_ENTITY = [
     'spotlight', 'nametag', 'stamp', 'color_pop', 'reveal',
-    'emanation', 'motion_lines', 'flip',
+    'emanation_shame', 'emanation_cold', 'emanation_joy', 'emanation_love', 'emanation_anger', 'emanation_fear',
+    'motion_lines', 'flip',
     'disintegration', 'ghost_outline', 'speech_bubble', 'thought_bubble', 'alert', 'interjection'
   ];
   var TWO_ENTITY = ['magnetism', 'repel', 'causal_push'];
@@ -925,7 +928,7 @@
     var entityB = entities.length > 1 ? entities[1] : entities[0] || '';
     stopPlayAll = false;
 
-    console.log('--- Playing all 20 animations ---');
+    console.log('--- Playing all 25 animations ---');
     for (var i = 0; i < ALL_TEMPLATES.length; i++) {
       if (stopPlayAll) { console.log('Stopped by user'); break; }
       var name = ALL_TEMPLATES[i];
@@ -938,7 +941,7 @@
       }
       if (MULTI_ENTITY.indexOf(name) >= 0) params.entityPrefixes = entities;
       if (SCENE_WIDE.indexOf(name) >= 0) params.isIndoor = false;
-      if (name === 'emanation') params.particleType = 'sparkle';
+      // emanation variants have hardcoded particleType — no param needed
       if (name === 'motion_lines') params.direction = 'right';
       if (name === 'speech_bubble' || name === 'thought_bubble') params.text = 'Hello!';
       if (name === 'interjection') params.word = 'Wow!';
