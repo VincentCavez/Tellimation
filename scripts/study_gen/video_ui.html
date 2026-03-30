@@ -706,10 +706,12 @@ function buildAnimSpec() {
   else if (['flashback', 'timelapse'].includes(templateName)) {
     // no entity params
   }
-  // Ghost outline needs ghostImageUrl
+  // Ghost outline: entityPrefix = an in-scene entity (puddle placed near it),
+  // ghostImageUrl = the absent entity's asset (used for silhouette contour)
   else if (templateName === 'ghost_outline') {
-    params.entityPrefix = targetName;
     const ghost = currentScene.entities.find(e => !e.in_scene && e.asset_url);
+    const anchor = inScene.length > 0 ? inScene[0] : targetName;
+    params.entityPrefix = anchor;
     if (ghost) {
       params.ghostImageUrl = ghost.asset_url;
     }
@@ -721,7 +723,7 @@ function buildAnimSpec() {
   }
   else if (templateName === 'interjection') {
     params.entityPrefix = targetName;
-    params.word = '?!';
+    params.word = currentScene.interjection_word || '?!';
   }
   // Single-entity templates
   else {

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tellimations Study</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Min-width overlay -->
+  <div id="width-warning">
+    <div class="width-warning-content">
+      <h2>Screen Too Narrow</h2>
+      <p>This study requires a screen at least 768px wide. Please use a desktop or tablet in landscape mode.</p>
+    </div>
+  </div>
+
+  <!-- Loading screen -->
+  <section id="screen-loading" class="screen active">
+    <div class="container">
+      <div class="spinner"></div>
+      <p>Loading study materials...</p>
+    </div>
+  </section>
+
+  <!-- Welcome / Consent -->
+  <section id="screen-welcome" class="screen">
+    <div class="container">
+      <h1>Welcome to the Tellimations Study</h1>
+
+      <div class="info-box">
+        <p>Thank you for participating in this research study. You will watch short animations and answer questions about illustrated scenes.</p>
+        <p>The study consists of two parts:</p>
+        <ul>
+          <li><strong>Part 1</strong> (~20 min): Watch animations and choose what you would say about each scene.</li>
+          <li><strong>Part 2</strong> (~5 min): Read descriptions and rate how appropriate they are.</li>
+        </ul>
+        <p>Please complete the study in one sitting, in a quiet environment.</p>
+      </div>
+
+      <div class="consent-section">
+        <h2>Consent</h2>
+        <p>By checking the box below, you confirm that:</p>
+        <ul>
+          <li>You are at least 18 years old.</li>
+          <li>You understand that your responses will be anonymised and used for research purposes.</li>
+          <li>You may withdraw at any time by closing this page.</li>
+        </ul>
+        <label class="checkbox-label">
+          <input type="checkbox" id="consent-checkbox">
+          <span>I consent to participate in this study.</span>
+        </label>
+      </div>
+
+      <div class="id-section">
+        <label for="prolific-id-input">Prolific ID:</label>
+        <input type="text" id="prolific-id-input" placeholder="Enter your Prolific ID" autocomplete="off">
+      </div>
+
+      <button id="start-btn" class="btn btn-primary" disabled>Start Study</button>
+      <p id="welcome-error" class="error-text hidden"></p>
+    </div>
+  </section>
+
+  <!-- Error screen -->
+  <section id="screen-error" class="screen">
+    <div class="container">
+      <h1>Unable to Continue</h1>
+      <p id="error-message"></p>
+      <p>If you believe this is an error, please contact the researcher.</p>
+    </div>
+  </section>
+
+  <!-- Block 1 -->
+  <section id="screen-block1" class="screen">
+    <div class="progress-bar-container">
+      <div class="progress-bar" id="progress-bar-1"></div>
+      <span class="progress-text" id="progress-text-1"></span>
+    </div>
+    <div class="container trial-container">
+      <img id="scene-image-1" class="scene-image" alt="Scene illustration">
+
+      <div class="narrator-box" id="narrator-box-1">
+        <p class="narrator-label">You are telling a story based on the elements you see in this scene. Here is what you just said:</p>
+        <p class="narrator-text" id="narrator-text-1"></p>
+      </div>
+
+      <div class="video-wrapper" id="video-wrapper-1">
+        <video id="video-player-1" playsinline>
+          <source id="video-source-1" type="video/mp4">
+          Your browser does not support video playback.
+        </video>
+        <div class="video-overlay" id="video-overlay-1">
+          <div class="play-icon">&#9654;</div>
+          <p>Click to play</p>
+        </div>
+        <div class="video-spinner hidden" id="video-spinner-1">
+          <div class="spinner"></div>
+        </div>
+      </div>
+
+      <div id="options-container-1" class="options-container hidden">
+        <p class="question-text">What would you say differently or add to your narration?</p>
+        <div id="radio-options-1" class="radio-options"></div>
+        <button id="next-btn-1" class="btn btn-primary" disabled>Next</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Transition -->
+  <section id="screen-transition" class="screen">
+    <div class="container">
+      <h1>Part 1 Complete!</h1>
+      <p>Great job! Now for Part 2 (shorter).</p>
+      <div class="info-box">
+        <p>You will read what a storytelling system decided to do in response to a narrator's description, and judge whether the decision makes sense.</p>
+      </div>
+      <button id="continue-btn" class="btn btn-primary">Continue to Part 2</button>
+    </div>
+  </section>
+
+  <!-- Block 2 -->
+  <section id="screen-block2" class="screen">
+    <div class="progress-bar-container">
+      <div class="progress-bar" id="progress-bar-2"></div>
+      <span class="progress-text" id="progress-text-2"></span>
+    </div>
+    <div class="container trial-container">
+      <img id="scene-image-2" class="scene-image" alt="Scene illustration">
+
+      <div class="narrator-box" id="narrator-box-2">
+        <p class="narrator-label">You are telling a story based on the elements you see in this scene. Here is what you just said:</p>
+        <p class="narrator-text" id="narrator-text-2"></p>
+      </div>
+
+      <div class="intent-box" id="intent-box-2">
+        <p class="intent-label">The system decided to:</p>
+        <p class="intent-text" id="intent-text-2"></p>
+      </div>
+
+      <div id="likert-container-2" class="likert-container">
+        <p class="question-text">Does this response make sense given what the narrator said?</p>
+        <div class="likert-scale" id="likert-scale-2">
+          <div class="likert-labels">
+            <span>Makes no sense</span>
+            <span>Perfectly appropriate</span>
+          </div>
+          <div class="likert-buttons">
+            <button class="likert-btn" data-value="1">1</button>
+            <button class="likert-btn" data-value="2">2</button>
+            <button class="likert-btn" data-value="3">3</button>
+            <button class="likert-btn" data-value="4">4</button>
+            <button class="likert-btn" data-value="5">5</button>
+          </div>
+        </div>
+        <button id="next-btn-2" class="btn btn-primary" disabled>Next</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Completion -->
+  <section id="screen-done" class="screen">
+    <div class="container">
+      <h1>Thank You!</h1>
+      <p>Your responses have been recorded successfully.</p>
+      <div class="completion-box">
+        <p>Your Prolific completion code:</p>
+        <p class="completion-code" id="completion-code"></p>
+      </div>
+      <p id="flush-status" class="hidden">Saving remaining responses...</p>
+      <a id="prolific-redirect" class="btn btn-primary" href="#" target="_blank">Return to Prolific</a>
+    </div>
+  </section>
+
+  <script src="app.js"></script>
+</body>
+</html>

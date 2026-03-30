@@ -218,7 +218,7 @@
       ],
       "target_category": "Identity",
       "options": {
-        "T": "Correct who is wearing glasses — it is not the girl",
+        "T": "Mention the girl with glasses near the bookshelf by name",
         "E1": "Correct what the teacher is doing — the teacher is not sitting",
         "E2": "Correct where the teacher is standing — not near the bookshelf",
         "D1": "Mention the globe in the background",
@@ -232,7 +232,7 @@
       "narrator_text": "A teacher is standing near a whiteboard. Some students are sitting at their desks.",
       "target_misl": "CH",
       "options": {
-        "T": "Identify or name one of the students more specifically",
+        "T": "Give a name to the girl with glasses near the bookshelf",
         "D1": "Describe the student's posture or expression",
         "D2": "Identify or describe the teacher more specifically",
         "D3": "Mention the globe or bookshelf in the background",
@@ -268,7 +268,7 @@
       ],
       "target_category": "Identity",
       "options": {
-        "T": "Correct who is wearing the paper crown — it is not the boy",
+        "T": "Mention the birthday girl by name",
         "E1": "Correct who is carrying the cake — it is not the father",
         "E2": "Correct what the boy in the bow tie is doing",
         "D1": "Mention the pile of wrapped presents",
@@ -282,7 +282,7 @@
       "narrator_text": "There is a birthday party in a decorated room. Someone is carrying a chocolate cake with candles. Balloons are tied to chairs.",
       "target_misl": "CH",
       "options": {
-        "T": "Identify or describe the birthday child specifically",
+        "T": "Give a name to the birthday girl",
         "D1": "Describe what the birthday child is wearing",
         "D2": "Identify the other children at the party",
         "D3": "Describe the cake in more detail",
@@ -318,7 +318,7 @@
       ],
       "target_category": "Identity",
       "options": {
-        "T": "Correct the description of the child's helmet — it is not black",
+        "T": "Mention the firefighter by name",
         "E1": "Correct the color of the fire truck — it is not white",
         "E2": "Correct what the firefighter is doing",
         "D1": "Mention the fire hoses on the wall",
@@ -332,7 +332,7 @@
       "narrator_text": "A firefighter stands next to a red fire truck at a fire station. A dalmatian sits nearby.",
       "target_misl": "CH",
       "options": {
-        "T": "Identify or describe the child who is also there",
+        "T": "Give a name to the firefighter",
         "D1": "Describe what the child is wearing or doing",
         "D2": "Describe the firefighter's gear in more detail",
         "D3": "Mention the equipment hung on the walls",
@@ -368,7 +368,7 @@
       ],
       "target_category": "Identity",
       "options": {
-        "T": "Correct who is conducting — it is not the cellist",
+        "T": "Mention the conductor by name",
         "E1": "Correct who is playing the violin — it is not a boy",
         "E2": "Correct what the cellist is actually doing",
         "D1": "Mention the red velvet curtains",
@@ -382,7 +382,7 @@
       "narrator_text": "Musicians are on a concert hall stage. Someone plays a cello, and someone else plays a violin. Warm lights shine on the stage.",
       "target_misl": "CH",
       "options": {
-        "T": "Identify or describe the conductor specifically",
+        "T": "Give a name to the conductor",
         "D1": "Describe what the conductor is doing or wearing",
         "D2": "Describe the violinist or cellist more specifically",
         "D3": "Describe the concert hall setting",
@@ -462,7 +462,7 @@
       "stimulus_id": "study1_C1_B_correction",
       "scene_id": "study1_C1_B",
       "condition": "correction",
-      "narrator_text": "A red tulip stands in the garden near the green watering can and the blue butterfly.",
+      "narrator_text": "A red tulip stands in the garden near the green watering can.",
       "errors_description": "(1) one tulip→four [Count] (2) blue→yellow butterfly [Property] (3) singular reference is ambiguous. Targets #1.",
       "target_animation": "C1",
       "target_entities": [
@@ -474,8 +474,8 @@
       "target_category": "Count",
       "options": {
         "T": "Correct the count — there is more than one tulip",
-        "E1": "Correct the color of the butterfly — it is not blue",
-        "E2": "Correct what the butterfly is doing",
+        "E1": "Correct the color of the watering can — it is not green",
+        "E2": "Correct the number of tulips visible",
         "D1": "Mention the climbing roses on the trellis",
         "D2": "Describe the white picket fence"
       }
@@ -484,12 +484,12 @@
       "stimulus_id": "study1_C1_B_suggestion",
       "scene_id": "study1_C1_B",
       "condition": "suggestion",
-      "narrator_text": "There is a tulip growing in a garden. A butterfly flies above it. A watering can sits on the path.",
+      "narrator_text": "There is a tulip growing in a garden. A watering can sits on the path.",
       "target_misl": "CH",
       "options": {
         "T": "Specify how many tulips there are or distinguish between them",
         "D1": "Describe what the tulips look like in detail",
-        "D2": "Specify how many butterflies there are",
+        "D2": "Describe the watering can in detail",
         "D3": "Mention the trellis with roses",
         "D4": "Describe the garden layout"
       },
@@ -669,7 +669,7 @@
       "stimulus_id": "study1_C2_B_correction",
       "scene_id": "study1_C2_B",
       "condition": "correction",
-      "narrator_text": "In the toy box there is a teddy bear, a doll, a block tower, a shoe, and a toy car.",
+      "narrator_text": "In the toy box there is a teddy bear, a doll, a block tower, and a toy car.",
       "errors_description": "(1) toy car→none [Count] (2) shoe doesn't belong [Count] (3) block tower is beside the box, not in it [Space]. Targets shoe.",
       "target_animation": "C2",
       "target_entities": [
@@ -677,7 +677,7 @@
       ],
       "target_category": "Count",
       "options": {
-        "T": "Remove the shoe from the narration — it does not belong with the toys",
+        "T": "Remove the teddy bear from the narration — it does not belong with the toys",
         "E1": "Remove the toy car — there is no toy car",
         "E2": "Correct where the block tower is — it is not inside the box",
         "D1": "Mention the crayons and coloring book on the floor",
@@ -688,11 +688,11 @@
       "stimulus_id": "study1_C2_B_suggestion",
       "scene_id": "study1_C2_B",
       "condition": "suggestion",
-      "narrator_text": "There is a toy box in a playroom. A teddy bear, a rag doll, and some blocks are inside and around it. There is also a shoe.",
+      "narrator_text": "There is a toy box in a playroom. A rag doll and some blocks are inside and around it. There is also a teddy bear.",
       "target_misl": "CH",
       "options": {
-        "T": "Mention that the shoe does not belong or will be removed from the toy box",
-        "D1": "Describe the shoe in more detail",
+        "T": "Mention that the teddy bear does not belong or will be removed from the toy box",
+        "D1": "Describe the teddy bear in more detail",
         "D2": "Mention that the blocks will be put away soon",
         "D3": "Describe the rag doll in more detail",
         "D4": "Say who the toys belong to"
@@ -719,7 +719,7 @@
       "stimulus_id": "study1_C2_C_correction",
       "scene_id": "study1_C2_C",
       "condition": "correction",
-      "narrator_text": "In the fruit bowl there is an apple, a banana, an orange, a tennis ball, and a pear.",
+      "narrator_text": "In the fruit bowl there is an apple, a banana, a tennis ball, and a pear.",
       "errors_description": "(1) pear→none [Count] (2) tennis ball doesn't belong [Count] (3) miscount. Targets tennis ball.",
       "target_animation": "C2",
       "target_entities": [
@@ -738,7 +738,7 @@
       "stimulus_id": "study1_C2_C_suggestion",
       "scene_id": "study1_C2_C",
       "condition": "suggestion",
-      "narrator_text": "There is a fruit bowl on a kitchen counter with an apple, a banana, and an orange. There is also a green ball among them.",
+      "narrator_text": "There is a fruit bowl on a kitchen counter with an apple and a banana. There is also a green ball among them.",
       "target_misl": "CH",
       "options": {
         "T": "Mention that the tennis ball does not belong or should be removed",
@@ -969,33 +969,33 @@
       "stimulus_id": "study1_C3_D_correction",
       "scene_id": "study1_C3_D",
       "condition": "correction",
-      "narrator_text": "Two students are in the classroom. The girl writes in her notebook and the boy raises his hand. The whiteboard says Math Test. All desks are occupied.",
-      "errors_description": "(1) all desks occupied→one is empty [Count] (2) Math Test→no such text, or different text [Property] (3) two students visible but a third desk has belongings. Targets #1.",
+      "narrator_text": "The old man in denim overalls works alone in the workshop, carefully sanding a small wooden shelf. The golden retriever is asleep under the workbench.",
+      "errors_description": "(1) alone→child implied by red hoodie and goggles on stool [Count] (2) wooden shelf→birdhouse [Identity] (3) asleep under workbench→lying at his feet watching him [Property]. Targets #1.",
       "target_animation": "C3",
       "target_entities": [
-        "empty_desk"
+        "child_belongings"
       ],
       "target_category": "Count",
       "options": {
-        "T": "Correct the claim that all desks are occupied — one desk is empty but has belongings",
-        "E1": "Correct the number of students visible in the room",
-        "E2": "Correct what is written on the whiteboard",
-        "D1": "Mention the world map on the wall",
-        "D2": "Describe the time shown on the clock"
+        "T": "Correct the claim that the man is working alone — a child was here and their things are still on the stool",
+        "E1": "Correct what the man is sanding — it is not a shelf",
+        "E2": "Correct what the dog is doing — it is not asleep under the workbench",
+        "D1": "Mention the tools hanging on the pegboard behind him",
+        "D2": "Describe the small wooden projects on the shelves along the wall"
       }
     },
     {
       "stimulus_id": "study1_C3_D_suggestion",
       "scene_id": "study1_C3_D",
       "condition": "suggestion",
-      "narrator_text": "A girl writes in a notebook at her desk. A boy raises his hand behind her. Between them, a desk has an open textbook and a backpack but no one is sitting there.",
+      "narrator_text": "An old man in denim overalls sands a small wooden birdhouse at a cluttered workbench. A golden retriever lies at his feet, watching him work.",
       "target_misl": "CH",
       "options": {
-        "T": "Mention that someone seems to be missing — the desk with belongings suggests another student",
-        "D1": "Describe what is on the empty desk",
-        "D2": "Mention other students who might be in the class",
-        "D3": "Describe the classroom setting",
-        "D4": "Say where the missing student might have gone"
+        "T": "Mention that someone seems to be missing — the red hoodie and safety goggles on the stool suggest a child was here",
+        "D1": "Describe the child's belongings on the stool in more detail",
+        "D2": "Mention the tools hanging on the pegboard",
+        "D3": "Describe the other wooden projects on the shelves",
+        "D4": "Say what the birdhouse might be intended for"
       },
       "mention_counts": {
         "CH": 0,
@@ -1019,7 +1019,7 @@
       "stimulus_id": "study1_P1_A_correction",
       "scene_id": "study1_P1_A",
       "condition": "correction",
-      "narrator_text": "The girl is pointing at the green apples at the bakery stall.",
+      "narrator_text": "The boy in the red t-shirt is pointing at the apples at the market stall.",
       "errors_description": "(1) girl→boy [Identity] (2) green→red [Property] (3) bakery→fruit stall [Identity]. Targets #2.",
       "target_animation": "P1",
       "target_entities": [
@@ -1027,9 +1027,9 @@
       ],
       "target_category": "Property",
       "options": {
-        "T": "Correct the color of the apples — they are not green",
-        "E1": "Correct who is pointing — it is not a girl",
-        "E2": "Correct the type of stall — it is not a bakery",
+        "T": "Correct the color of the boy's t-shirt — it is not red",
+        "E1": "Correct what the boy is pointing at — it is not the green pears",
+        "E2": "Correct who is behind the stall — it is not a man",
         "D1": "Mention the puddle reflecting the stall",
         "D2": "Describe the striped awning"
       }
@@ -1041,7 +1041,7 @@
       "narrator_text": "A boy is at a fruit stall. A woman is selling fruit. There are apples, pears, and bananas.",
       "target_misl": "ENP",
       "options": {
-        "T": "Describe the color or appearance of the apples",
+        "T": "Describe the color of the boy's t-shirt",
         "D1": "Describe the shape or quantity of the apples",
         "D2": "Describe the color or appearance of the pears",
         "D3": "Describe the striped awning above the stall",
@@ -1077,9 +1077,9 @@
       ],
       "target_category": "Property",
       "options": {
-        "T": "Correct the color of the fire truck — it is not yellow",
-        "E1": "Correct the color of the boy's jacket",
-        "E2": "Correct where the clerk is standing",
+        "T": "Correct the color of the boy's jacket — it is not blue",
+        "E1": "Correct the color of the fire truck — it is not yellow",
+        "E2": "Correct who is at the end of the aisle — it is not a customer",
         "D1": "Describe the other toys on the shelf",
         "D2": "Describe the store lighting"
       }
@@ -1091,7 +1091,7 @@
       "narrator_text": "A boy looks at a toy fire truck on a shelf in a toy store. A clerk organizes boxes at the end of the aisle.",
       "target_misl": "ENP",
       "options": {
-        "T": "Describe the color or appearance of the fire truck",
+        "T": "Describe the color of the boy's jacket",
         "D1": "Describe the size or features of the fire truck",
         "D2": "Describe the color of the other toy boxes",
         "D3": "Mention the checkout counter",
@@ -1169,7 +1169,7 @@
       "stimulus_id": "study1_P1_D_correction",
       "scene_id": "study1_P1_D",
       "condition": "correction",
-      "narrator_text": "The child watches a blue clownfish in the tank near the swimming turtle.",
+      "narrator_text": "The child in the yellow sweater watches the clownfish in the tank near the swimming turtle.",
       "errors_description": "(1) blue→orange clownfish [Property] (2) swimming→gliding turtle [Action] (3) child's coat not mentioned. Targets #1.",
       "target_animation": "P1",
       "target_entities": [
@@ -1177,9 +1177,9 @@
       ],
       "target_category": "Property",
       "options": {
-        "T": "Correct the color of the clownfish — it is not blue",
-        "E1": "Correct the description of how the turtle moves",
-        "E2": "Correct the color of the child's raincoat",
+        "T": "Correct the color of the child's sweater — it is not yellow",
+        "E1": "Correct the color of the clownfish — it is not orange",
+        "E2": "Correct the description of how the turtle moves",
         "D1": "Describe the coral formations in the tank",
         "D2": "Mention the informational plaques on the wall"
       }
@@ -1191,8 +1191,8 @@
       "narrator_text": "A child presses against the glass of a large aquarium tank. There is a clownfish among the anemones and a turtle gliding above.",
       "target_misl": "ENP",
       "options": {
-        "T": "Describe the color or appearance of the clownfish",
-        "D1": "Describe the size or movement of the clownfish",
+        "T": "Describe the color of the child's sweater",
+        "D1": "Describe the size or posture of the child",
         "D2": "Describe the color of the coral and anemones",
         "D3": "Describe the turtle in more detail",
         "D4": "Say how the child reacts to the fish"
@@ -1241,7 +1241,7 @@
       "narrator_text": "A woman in an apron is cooking. There is a pot on the stove. A loaf of bread is on the counter.",
       "target_misl": "ENP",
       "options": {
-        "T": "Describe the temperature of what is in the pot (e.g., hot, steaming)",
+        "T": "Describe the temperature of what is in the pot",
         "D1": "Describe the contents of the pot",
         "D2": "Describe the temperature or weather outside",
         "D3": "Describe the loaf of bread in more detail",
@@ -1291,7 +1291,7 @@
       "narrator_text": "A woman sits at a small café table outside. She holds a cup of coffee. A croissant and a newspaper are on the table.",
       "target_misl": "ENP",
       "options": {
-        "T": "Describe the temperature of the coffee (e.g., hot, steaming)",
+        "T": "Describe the temperature of the coffee",
         "D1": "Describe the type or color of the coffee",
         "D2": "Describe the temperature of the air outside",
         "D3": "Describe the café and its chalkboard menu",
@@ -1341,7 +1341,7 @@
       "narrator_text": "A boy sits on a log beside a campfire in a forest clearing. A cast-iron pot hangs over the fire. The first stars are appearing.",
       "target_misl": "ENP",
       "options": {
-        "T": "Describe the temperature of what is in the pot (e.g., hot, bubbling, steaming)",
+        "T": "Describe the temperature of what is in the pot",
         "D1": "Describe what might be cooking in the pot",
         "D2": "Describe the temperature of the evening air",
         "D3": "Describe the fire and its glow on the trees",
@@ -1391,7 +1391,7 @@
       "narrator_text": "A woman stands at an ironing board in a laundry room. She holds an iron over a blue dress shirt. A laundry basket of folded clothes is on the floor.",
       "target_misl": "ENP",
       "options": {
-        "T": "Describe the temperature of the iron (e.g., hot, steaming)",
+        "T": "Describe the temperature of the iron",
         "D1": "Describe the condition of the shirt being ironed",
         "D2": "Describe the temperature of the laundry room",
         "D3": "Describe the contents of the laundry basket",
@@ -1441,7 +1441,7 @@
       "narrator_text": "There is a birdbath in a winter garden. A robin is perched on a fence. There are dead leaves on the ground.",
       "target_misl": "ENP",
       "options": {
-        "T": "Describe the condition of the birdbath (e.g., frozen, icy)",
+        "T": "Describe the condition of the birdbath",
         "D1": "Describe the birdbath's shape or material",
         "D2": "Describe how cold the garden feels overall",
         "D3": "Mention the shed in the corner",
@@ -1491,7 +1491,7 @@
       "narrator_text": "A girl stands outside an ice cream shop holding a cone with three scoops. The shop has a pink and white striped awning.",
       "target_misl": "ENP",
       "options": {
-        "T": "Describe the temperature or condition of the ice cream (e.g., cold, icy, glistening)",
+        "T": "Describe the temperature or condition of the ice cream",
         "D1": "Describe the flavors or colors of the scoops",
         "D2": "Describe how warm the day feels outside",
         "D3": "Describe the shop's awning and sign",
@@ -1541,7 +1541,7 @@
       "narrator_text": "A boy stands at the edge of a pond in a winter park. He looks down at the surface. Bare trees surround the pond and snow covers the ground.",
       "target_misl": "ENP",
       "options": {
-        "T": "Describe the condition of the pond surface (e.g., frozen, icy, frost patterns)",
+        "T": "Describe the condition of the pond surface",
         "D1": "Describe the shape or size of the pond",
         "D2": "Describe how cold the air feels in the park",
         "D3": "Describe the boy's clothing in more detail",
@@ -1591,7 +1591,7 @@
       "narrator_text": "A mother reaches into the freezer compartment of a refrigerator. She pulls out a pizza box. Cold mist spills into the kitchen.",
       "target_misl": "ENP",
       "options": {
-        "T": "Describe the condition of the pizza box (e.g., frost-covered, icy)",
+        "T": "Describe the condition of the pizza box",
         "D1": "Describe the contents of the freezer",
         "D2": "Describe the temperature contrast between kitchen and freezer",
         "D3": "Describe the kitchen around her",
@@ -1641,9 +1641,9 @@
       "narrator_text": "There is an open chest in an attic full of dusty boxes. Inside the chest there is a golden crown.",
       "target_misl": "ENP",
       "options": {
-        "T": "Describe the condition of the crown (e.g., shiny, sparkling, new-looking)",
+        "T": "Describe the condition of the crown",
         "D1": "Describe the size or shape of the crown",
-        "D2": "Describe the condition of the boxes (e.g., dusty, old)",
+        "D2": "Describe the condition of the boxes",
         "D3": "Mention the small window and the light coming in",
         "D4": "Say what someone might do with the crown"
       },
@@ -1691,7 +1691,7 @@
       "narrator_text": "A shopkeeper stands behind a glass counter in a jewelry shop. She holds open a small box with a ring inside. A brass lamp lights the counter.",
       "target_misl": "ENP",
       "options": {
-        "T": "Describe the condition of the ring (e.g., sparkling, brilliant, gleaming)",
+        "T": "Describe the condition of the ring",
         "D1": "Describe the size or style of the ring",
         "D2": "Describe the condition of the jewelry display cases",
         "D3": "Describe the lamp and lighting in the shop",
@@ -1741,7 +1741,7 @@
       "narrator_text": "A man in sunglasses stands next to a red sports car at a car wash exit. Water droplets are on the car's surface.",
       "target_misl": "ENP",
       "options": {
-        "T": "Describe the condition of the car (e.g., gleaming, polished, sparkling)",
+        "T": "Describe the condition of the car",
         "D1": "Describe the shape or model of the car",
         "D2": "Describe the condition of the car wash area",
         "D3": "Describe the man's expression",
@@ -1791,7 +1791,7 @@
       "narrator_text": "A child in pajamas sits in front of a Christmas tree on Christmas morning. A gold star sits at the very top. Presents are piled underneath.",
       "target_misl": "ENP",
       "options": {
-        "T": "Describe the condition of the star ornament (e.g., shiny, gleaming, luminous)",
+        "T": "Describe the condition of the star ornament",
         "D1": "Describe the size or shape of the star",
         "D2": "Describe the condition of the other ornaments",
         "D3": "Describe the wrapped presents",
@@ -1819,209 +1819,9 @@
       "stimulus_id": "study1_P2d_A_correction",
       "scene_id": "study1_P2d_A",
       "condition": "correction",
-      "narrator_text": "The happy boy is standing on the school yard while the teacher sits on a bench.",
-      "errors_description": "(1) happy→sad [IR] (2) standing→sitting [Action] (3) teacher sits→teacher walks [Action]. Targets #1.",
-      "target_animation": "P2d",
-      "target_entities": [
-        "boy"
-      ],
-      "target_category": "Property",
-      "options": {
-        "T": "Correct the emotion — the boy is not happy",
-        "E1": "Correct the boy's posture — he is not standing",
-        "E2": "Correct what the teacher is doing — the teacher is not sitting",
-        "D1": "Mention the ball on the ground",
-        "D2": "Describe the other children in the background"
-      }
-    },
-    {
-      "stimulus_id": "study1_P2d_A_suggestion",
-      "scene_id": "study1_P2d_A",
-      "condition": "suggestion",
-      "narrator_text": "A boy is sitting on the ground in a school yard. He has a scraped knee. A teacher is walking toward him.",
-      "target_misl": "IR",
-      "options": {
-        "T": "Describe how the boy is feeling (e.g., sad, upset, crying)",
-        "D1": "Describe the boy's appearance in more detail",
-        "D2": "Describe how the teacher is feeling",
-        "D3": "Mention the other children playing in the background",
-        "D4": "Describe the relationship between the boy and the teacher"
-      },
-      "mention_counts": {
-        "CH": 3,
-        "S": 3,
-        "IE": 3,
-        "IR": 0,
-        "P": 3,
-        "A": 3,
-        "CO": 3,
-        "ENP": 3,
-        "ADV": 3,
-        "SC": 3,
-        "CC": 3,
-        "M": 3,
-        "L": 3,
-        "G": 3,
-        "T": 3
-      }
-    },
-    {
-      "stimulus_id": "study1_P2d_B_correction",
-      "scene_id": "study1_P2d_B",
-      "condition": "correction",
-      "narrator_text": "The cheerful girl in the red sweater watches the snow fall from her desk by the window.",
-      "errors_description": "(1) cheerful→sad [IR] (2) red→blue sweater [Property] (3) snow→rain [Property]. Targets #1.",
-      "target_animation": "P2d",
-      "target_entities": [
-        "girl"
-      ],
-      "target_category": "Property",
-      "options": {
-        "T": "Correct the emotion — the girl is not cheerful",
-        "E1": "Correct the color of the girl's sweater",
-        "E2": "Correct the weather — it is not snowing",
-        "D1": "Mention the math workbook on the desk",
-        "D2": "Describe the stuffed rabbit on the window seat"
-      }
-    },
-    {
-      "stimulus_id": "study1_P2d_B_suggestion",
-      "scene_id": "study1_P2d_B",
-      "condition": "suggestion",
-      "narrator_text": "A girl sits on a window seat in her bedroom. Heavy rain streams down the glass outside. A stuffed rabbit lies beside her.",
-      "target_misl": "IR",
-      "options": {
-        "T": "Describe how the girl is feeling (e.g., sad, lonely, melancholy)",
-        "D1": "Describe the girl's posture or body language",
-        "D2": "Describe the mood created by the rain",
-        "D3": "Mention the homework on the desk",
-        "D4": "Say what the girl might want to do"
-      },
-      "mention_counts": {
-        "CH": 3,
-        "S": 3,
-        "IE": 3,
-        "IR": 0,
-        "P": 3,
-        "A": 3,
-        "CO": 3,
-        "ENP": 3,
-        "ADV": 3,
-        "SC": 3,
-        "CC": 3,
-        "M": 3,
-        "L": 3,
-        "G": 3,
-        "T": 3
-      }
-    },
-    {
-      "stimulus_id": "study1_P2d_C_correction",
-      "scene_id": "study1_P2d_C",
-      "condition": "correction",
-      "narrator_text": "The excited boy in a white sweatshirt sits in the vet clinic holding a full pet carrier and smiling.",
-      "errors_description": "(1) excited→upset [IR] (2) white→gray sweatshirt [Property] (3) full→empty carrier [Property]. Targets #1.",
-      "target_animation": "P2d",
-      "target_entities": [
-        "boy"
-      ],
-      "target_category": "Property",
-      "options": {
-        "T": "Correct the emotion — the boy is not excited or smiling",
-        "E1": "Correct the color of the boy's sweatshirt",
-        "E2": "Correct the carrier — it is not full",
-        "D1": "Mention the pet adoption poster on the wall",
-        "D2": "Describe the reception desk"
-      }
-    },
-    {
-      "stimulus_id": "study1_P2d_C_suggestion",
-      "scene_id": "study1_P2d_C",
-      "condition": "suggestion",
-      "narrator_text": "A boy sits in a veterinary clinic waiting room. An empty pet carrier is on the chair beside him. A pet adoption poster is on the wall.",
-      "target_misl": "IR",
-      "options": {
-        "T": "Describe how the boy is feeling (e.g., sad, heartbroken, grieving)",
-        "D1": "Describe the boy's body language or posture",
-        "D2": "Describe the mood of the waiting room",
-        "D3": "Describe the poster on the wall",
-        "D4": "Say what might have happened to the pet"
-      },
-      "mention_counts": {
-        "CH": 3,
-        "S": 3,
-        "IE": 3,
-        "IR": 0,
-        "P": 3,
-        "A": 3,
-        "CO": 3,
-        "ENP": 3,
-        "ADV": 3,
-        "SC": 3,
-        "CC": 3,
-        "M": 3,
-        "L": 3,
-        "G": 3,
-        "T": 3
-      }
-    },
-    {
-      "stimulus_id": "study1_P2d_D_correction",
-      "scene_id": "study1_P2d_D",
-      "condition": "correction",
-      "narrator_text": "The happy girl in a blue hoodie waves excitedly at her friend arriving with a suitcase.",
-      "errors_description": "(1) happy→sad [IR] (2) blue→pink hoodie [Property] (3) arriving→leaving/walking away [Action]. Targets #1.",
-      "target_animation": "P2d",
-      "target_entities": [
-        "girl"
-      ],
-      "target_category": "Property",
-      "options": {
-        "T": "Correct the emotion — the girl is not happy",
-        "E1": "Correct the color of the girl's hoodie",
-        "E2": "Correct the direction — the friend is leaving, not arriving",
-        "D1": "Mention the moving truck at the curb",
-        "D2": "Describe the SOLD sign in the garden"
-      }
-    },
-    {
-      "stimulus_id": "study1_P2d_D_suggestion",
-      "scene_id": "study1_P2d_D",
-      "condition": "suggestion",
-      "narrator_text": "A girl waves from the sidewalk. Another girl walks away pulling a suitcase toward a moving truck. Boxes are on the front lawn.",
-      "target_misl": "IR",
-      "options": {
-        "T": "Describe how the girl waving feels (e.g., sad, heartbroken)",
-        "D1": "Describe the girl's body language or expression",
-        "D2": "Describe how the departing friend feels",
-        "D3": "Describe the moving truck and boxes",
-        "D4": "Say why the friend is leaving"
-      },
-      "mention_counts": {
-        "CH": 3,
-        "S": 3,
-        "IE": 3,
-        "IR": 0,
-        "P": 3,
-        "A": 3,
-        "CO": 3,
-        "ENP": 3,
-        "ADV": 3,
-        "SC": 3,
-        "CC": 3,
-        "M": 3,
-        "L": 3,
-        "G": 3,
-        "T": 3
-      }
-    },
-    {
-      "stimulus_id": "study1_P2e_A_correction",
-      "scene_id": "study1_P2e_A",
-      "condition": "correction",
       "narrator_text": "The grumpy old man is standing near a pond holding a kitten.",
       "errors_description": "(1) grumpy→loving [IR] (2) standing→sitting [Action] (3) kitten→puppy [Identity]. Targets #1.",
-      "target_animation": "P2e",
+      "target_animation": "P2d",
       "target_entities": [
         "man"
       ],
@@ -2035,13 +1835,13 @@
       }
     },
     {
-      "stimulus_id": "study1_P2e_A_suggestion",
-      "scene_id": "study1_P2e_A",
+      "stimulus_id": "study1_P2d_A_suggestion",
+      "scene_id": "study1_P2d_A",
       "condition": "suggestion",
       "narrator_text": "An old man is sitting on a park bench. He is holding a small puppy. The puppy is licking his hand.",
       "target_misl": "IR",
       "options": {
-        "T": "Describe how the man feels about the puppy (e.g., loving, affectionate)",
+        "T": "Describe how the man feels about the puppy",
         "D1": "Describe the man's appearance in more detail",
         "D2": "Describe how the puppy feels",
         "D3": "Mention the trees or the pond in the background",
@@ -2066,12 +1866,12 @@
       }
     },
     {
-      "stimulus_id": "study1_P2e_B_correction",
-      "scene_id": "study1_P2e_B",
+      "stimulus_id": "study1_P2d_B_correction",
+      "scene_id": "study1_P2d_B",
       "condition": "correction",
       "narrator_text": "The nervous bride and the bored groom stand far apart under the flower arch at the indoor ceremony.",
       "errors_description": "(1) nervous/bored→beaming/adoring [IR] (2) far apart→holding hands [Relation] (3) indoor→garden [Space]. Targets #1.",
-      "target_animation": "P2e",
+      "target_animation": "P2d",
       "target_entities": [
         "bride",
         "groom"
@@ -2086,13 +1886,13 @@
       }
     },
     {
-      "stimulus_id": "study1_P2e_B_suggestion",
-      "scene_id": "study1_P2e_B",
+      "stimulus_id": "study1_P2d_B_suggestion",
+      "scene_id": "study1_P2d_B",
       "condition": "suggestion",
       "narrator_text": "A bride in a white dress and a groom in a dark suit stand under a flower arch in a garden. They hold each other's hands. Rose petals cover the ground.",
       "target_misl": "IR",
       "options": {
-        "T": "Describe how the couple feels about each other (e.g., in love, adoring)",
+        "T": "Describe how the couple feels about each other",
         "D1": "Describe what the bride and groom are wearing in detail",
         "D2": "Describe the mood of the wedding setting",
         "D3": "Describe the flower arch and decorations",
@@ -2117,12 +1917,12 @@
       }
     },
     {
-      "stimulus_id": "study1_P2e_C_correction",
-      "scene_id": "study1_P2e_C",
+      "stimulus_id": "study1_P2d_C_correction",
+      "scene_id": "study1_P2d_C",
       "condition": "correction",
       "narrator_text": "The tired mother in a black sweater holds the baby carelessly on the bed in the dim room.",
       "errors_description": "(1) tired/careless→tender/overwhelmed [IR] (2) black→cream sweater [Property] (3) bed→rocking chair [Space]. Targets #1.",
-      "target_animation": "P2e",
+      "target_animation": "P2d",
       "target_entities": [
         "mother"
       ],
@@ -2136,13 +1936,13 @@
       }
     },
     {
-      "stimulus_id": "study1_P2e_C_suggestion",
-      "scene_id": "study1_P2e_C",
+      "stimulus_id": "study1_P2d_C_suggestion",
+      "scene_id": "study1_P2d_C",
       "condition": "suggestion",
       "narrator_text": "A mother sits in a rocking chair in a nursery. She cradles a baby wrapped in a blanket. The baby's tiny hand curls around her finger.",
       "target_misl": "IR",
       "options": {
-        "T": "Describe how the mother feels about the baby (e.g., tender, overwhelmed with love)",
+        "T": "Describe how the mother feels about the baby",
         "D1": "Describe the mother's posture or expression in detail",
         "D2": "Describe how the baby seems to feel",
         "D3": "Describe the nursery setting",
@@ -2167,12 +1967,12 @@
       }
     },
     {
-      "stimulus_id": "study1_P2e_D_correction",
-      "scene_id": "study1_P2e_D",
+      "stimulus_id": "study1_P2d_D_correction",
+      "scene_id": "study1_P2d_D",
       "condition": "correction",
       "narrator_text": "The bored boy in a red t-shirt ignores the restless dog beside him in the front yard.",
       "errors_description": "(1) bored/ignores→happy/at peace [IR] (2) red→green t-shirt [Property] (3) front yard→backyard [Space]. Targets #1.",
-      "target_animation": "P2e",
+      "target_animation": "P2d",
       "target_entities": [
         "boy"
       ],
@@ -2186,13 +1986,13 @@
       }
     },
     {
-      "stimulus_id": "study1_P2e_D_suggestion",
-      "scene_id": "study1_P2e_D",
+      "stimulus_id": "study1_P2d_D_suggestion",
+      "scene_id": "study1_P2d_D",
       "condition": "suggestion",
       "narrator_text": "A boy sits in the grass under an oak tree in a backyard. A golden retriever lies beside him with its head on his lap. The boy strokes the dog's ear.",
       "target_misl": "IR",
       "options": {
-        "T": "Describe how the boy feels about the dog (e.g., content, loving, at peace)",
+        "T": "Describe how the boy feels about the dog",
         "D1": "Describe the boy's posture or expression",
         "D2": "Describe how the dog feels",
         "D3": "Describe the backyard setting",
@@ -2217,12 +2017,12 @@
       }
     },
     {
-      "stimulus_id": "study1_P2f_A_correction",
-      "scene_id": "study1_P2f_A",
+      "stimulus_id": "study1_P2e_A_correction",
+      "scene_id": "study1_P2e_A",
       "condition": "correction",
       "narrator_text": "The calm girl is looking at a broken cup on the floor while her brother hides under the table.",
       "errors_description": "(1) calm→angry [IR] (2) cup→vase [Identity] (3) under table→behind couch [Space]. Targets #1.",
-      "target_animation": "P2f",
+      "target_animation": "P2e",
       "target_entities": [
         "girl"
       ],
@@ -2236,14 +2036,14 @@
       }
     },
     {
-      "stimulus_id": "study1_P2f_A_suggestion",
-      "scene_id": "study1_P2f_A",
+      "stimulus_id": "study1_P2e_A_suggestion",
+      "scene_id": "study1_P2e_A",
       "condition": "suggestion",
       "narrator_text": "A girl is looking at a broken vase on the floor. A boy is hiding behind the couch. A cat sits on the windowsill.",
       "target_misl": "IR",
       "options": {
-        "T": "Describe how the girl is feeling (e.g., angry, frustrated)",
-        "D1": "Describe the girl's pose or expression (e.g., arms crossed)",
+        "T": "Describe how the girl is feeling",
+        "D1": "Describe the girl's pose or expression",
         "D2": "Describe how the boy is feeling",
         "D3": "Mention the scattered flowers near the vase",
         "D4": "Describe why the vase is broken"
@@ -2267,12 +2067,12 @@
       }
     },
     {
-      "stimulus_id": "study1_P2f_B_correction",
-      "scene_id": "study1_P2f_B",
+      "stimulus_id": "study1_P2e_B_correction",
+      "scene_id": "study1_P2e_B",
       "condition": "correction",
       "narrator_text": "The relaxed man chats happily with the woman about the perfectly cooked casserole in the tidy kitchen.",
       "errors_description": "(1) relaxed/happy→frustrated/angry [IR] (2) perfectly cooked→burnt [Property] (3) tidy→dirty dishes in the sink [Property]. Targets #1.",
-      "target_animation": "P2f",
+      "target_animation": "P2e",
       "target_entities": [
         "man"
       ],
@@ -2286,14 +2086,14 @@
       }
     },
     {
-      "stimulus_id": "study1_P2f_B_suggestion",
-      "scene_id": "study1_P2f_B",
+      "stimulus_id": "study1_P2e_B_suggestion",
+      "scene_id": "study1_P2e_B",
       "condition": "suggestion",
       "narrator_text": "A man stands at a kitchen counter. A woman faces him with hands on her hips. A burnt casserole sits between them with smoke rising.",
       "target_misl": "IR",
       "options": {
-        "T": "Describe how the man is feeling (e.g., angry, frustrated)",
-        "D1": "Describe the man's body language (e.g., gripping the counter)",
+        "T": "Describe how the man is feeling",
+        "D1": "Describe the man's body language",
         "D2": "Describe how the woman is feeling",
         "D3": "Describe the burnt casserole in detail",
         "D4": "Say what caused the argument"
@@ -2317,12 +2117,12 @@
       }
     },
     {
-      "stimulus_id": "study1_P2f_C_correction",
-      "scene_id": "study1_P2f_C",
+      "stimulus_id": "study1_P2e_C_correction",
+      "scene_id": "study1_P2e_C",
       "condition": "correction",
       "narrator_text": "The pleased player in the blue jersey calmly accepts the referee's decision on the field.",
       "errors_description": "(1) pleased/calm→scowling/furious [IR] (2) blue→red jersey [Property] (3) accepts→barely contained fury [Action]. Targets #1.",
-      "target_animation": "P2f",
+      "target_animation": "P2e",
       "target_entities": [
         "player"
       ],
@@ -2336,14 +2136,14 @@
       }
     },
     {
-      "stimulus_id": "study1_P2f_C_suggestion",
-      "scene_id": "study1_P2f_C",
+      "stimulus_id": "study1_P2e_C_suggestion",
+      "scene_id": "study1_P2e_C",
       "condition": "suggestion",
       "narrator_text": "A boy in a red jersey stands on a soccer field. A referee holds up a yellow card in front of him. Other players watch in the background.",
       "target_misl": "IR",
       "options": {
-        "T": "Describe how the player is feeling (e.g., angry, furious)",
-        "D1": "Describe the player's body language (e.g., clenched fists)",
+        "T": "Describe how the player is feeling",
+        "D1": "Describe the player's body language",
         "D2": "Describe the referee's expression",
         "D3": "Describe the other players' reactions",
         "D4": "Say what the player might have done wrong"
@@ -2367,12 +2167,12 @@
       }
     },
     {
-      "stimulus_id": "study1_P2f_D_correction",
-      "scene_id": "study1_P2f_D",
+      "stimulus_id": "study1_P2e_D_correction",
+      "scene_id": "study1_P2e_D",
       "condition": "correction",
       "narrator_text": "The relaxed driver enjoys the smooth traffic on the highway on a pleasant morning commute.",
       "errors_description": "(1) relaxed→frustrated [IR] (2) smooth→bumper-to-bumper [Property] (3) highway→city street [Space]. Targets #1.",
-      "target_animation": "P2f",
+      "target_animation": "P2e",
       "target_entities": [
         "driver"
       ],
@@ -2386,17 +2186,217 @@
       }
     },
     {
-      "stimulus_id": "study1_P2f_D_suggestion",
-      "scene_id": "study1_P2f_D",
+      "stimulus_id": "study1_P2e_D_suggestion",
+      "scene_id": "study1_P2e_D",
       "condition": "suggestion",
       "narrator_text": "A man in a dress shirt sits in a car stuck in traffic. The clock reads 8:47 AM. Brake lights stretch ahead in a long line.",
       "target_misl": "IR",
       "options": {
-        "T": "Describe how the driver is feeling (e.g., angry, frustrated)",
-        "D1": "Describe the driver's body language (e.g., gripping the wheel)",
+        "T": "Describe how the driver is feeling",
+        "D1": "Describe the driver's body language",
         "D2": "Describe the mood of being stuck in traffic",
         "D3": "Describe the traffic and the city street",
         "D4": "Say where the driver is trying to go"
+      },
+      "mention_counts": {
+        "CH": 3,
+        "S": 3,
+        "IE": 3,
+        "IR": 0,
+        "P": 3,
+        "A": 3,
+        "CO": 3,
+        "ENP": 3,
+        "ADV": 3,
+        "SC": 3,
+        "CC": 3,
+        "M": 3,
+        "L": 3,
+        "G": 3,
+        "T": 3
+      }
+    },
+    {
+      "stimulus_id": "study1_P2f_A_correction",
+      "scene_id": "study1_P2f_A",
+      "condition": "correction",
+      "narrator_text": "The happy boy is standing on the school yard while the teacher sits on a bench.",
+      "errors_description": "(1) happy→sad [IR] (2) standing→sitting [Action] (3) teacher sits→teacher walks [Action]. Targets #1.",
+      "target_animation": "P2f",
+      "target_entities": [
+        "boy"
+      ],
+      "target_category": "Property",
+      "options": {
+        "T": "Correct the emotion — the boy is not happy",
+        "E1": "Correct the boy's posture — he is not standing",
+        "E2": "Correct what the teacher is doing — the teacher is not sitting",
+        "D1": "Mention the ball on the ground",
+        "D2": "Describe the other children in the background"
+      }
+    },
+    {
+      "stimulus_id": "study1_P2f_A_suggestion",
+      "scene_id": "study1_P2f_A",
+      "condition": "suggestion",
+      "narrator_text": "A boy is sitting on the ground in a school yard. He has a scraped knee. A teacher is walking toward him.",
+      "target_misl": "IR",
+      "options": {
+        "T": "Describe how the boy is feeling",
+        "D1": "Describe the boy's appearance in more detail",
+        "D2": "Describe how the teacher is feeling",
+        "D3": "Mention the other children playing in the background",
+        "D4": "Describe the relationship between the boy and the teacher"
+      },
+      "mention_counts": {
+        "CH": 3,
+        "S": 3,
+        "IE": 3,
+        "IR": 0,
+        "P": 3,
+        "A": 3,
+        "CO": 3,
+        "ENP": 3,
+        "ADV": 3,
+        "SC": 3,
+        "CC": 3,
+        "M": 3,
+        "L": 3,
+        "G": 3,
+        "T": 3
+      }
+    },
+    {
+      "stimulus_id": "study1_P2f_B_correction",
+      "scene_id": "study1_P2f_B",
+      "condition": "correction",
+      "narrator_text": "The cheerful girl in the red sweater watches the snow fall from her desk by the window.",
+      "errors_description": "(1) cheerful→sad [IR] (2) red→blue sweater [Property] (3) snow→rain [Property]. Targets #1.",
+      "target_animation": "P2f",
+      "target_entities": [
+        "girl"
+      ],
+      "target_category": "Property",
+      "options": {
+        "T": "Correct the emotion — the girl is not cheerful",
+        "E1": "Correct the color of the girl's sweater",
+        "E2": "Correct the weather — it is not snowing",
+        "D1": "Mention the math workbook on the desk",
+        "D2": "Describe the stuffed rabbit on the window seat"
+      }
+    },
+    {
+      "stimulus_id": "study1_P2f_B_suggestion",
+      "scene_id": "study1_P2f_B",
+      "condition": "suggestion",
+      "narrator_text": "A girl sits on a window seat in her bedroom. Heavy rain streams down the glass outside. A stuffed rabbit lies beside her.",
+      "target_misl": "IR",
+      "options": {
+        "T": "Describe how the girl is feeling",
+        "D1": "Describe the girl's posture or body language",
+        "D2": "Describe the mood created by the rain",
+        "D3": "Mention the homework on the desk",
+        "D4": "Say what the girl might want to do"
+      },
+      "mention_counts": {
+        "CH": 3,
+        "S": 3,
+        "IE": 3,
+        "IR": 0,
+        "P": 3,
+        "A": 3,
+        "CO": 3,
+        "ENP": 3,
+        "ADV": 3,
+        "SC": 3,
+        "CC": 3,
+        "M": 3,
+        "L": 3,
+        "G": 3,
+        "T": 3
+      }
+    },
+    {
+      "stimulus_id": "study1_P2f_C_correction",
+      "scene_id": "study1_P2f_C",
+      "condition": "correction",
+      "narrator_text": "The excited boy in a white sweatshirt sits in the vet clinic holding a full pet carrier and smiling.",
+      "errors_description": "(1) excited→upset [IR] (2) white→gray sweatshirt [Property] (3) full→empty carrier [Property]. Targets #1.",
+      "target_animation": "P2f",
+      "target_entities": [
+        "boy"
+      ],
+      "target_category": "Property",
+      "options": {
+        "T": "Correct the emotion — the boy is not excited or smiling",
+        "E1": "Correct the color of the boy's sweatshirt",
+        "E2": "Correct the carrier — it is not full",
+        "D1": "Mention the pet adoption poster on the wall",
+        "D2": "Describe the reception desk"
+      }
+    },
+    {
+      "stimulus_id": "study1_P2f_C_suggestion",
+      "scene_id": "study1_P2f_C",
+      "condition": "suggestion",
+      "narrator_text": "A boy sits in a veterinary clinic waiting room. An empty pet carrier is on the chair beside him. A pet adoption poster is on the wall.",
+      "target_misl": "IR",
+      "options": {
+        "T": "Describe how the boy is feeling",
+        "D1": "Describe the boy's body language or posture",
+        "D2": "Describe the mood of the waiting room",
+        "D3": "Describe the poster on the wall",
+        "D4": "Say what might have happened to the pet"
+      },
+      "mention_counts": {
+        "CH": 3,
+        "S": 3,
+        "IE": 3,
+        "IR": 0,
+        "P": 3,
+        "A": 3,
+        "CO": 3,
+        "ENP": 3,
+        "ADV": 3,
+        "SC": 3,
+        "CC": 3,
+        "M": 3,
+        "L": 3,
+        "G": 3,
+        "T": 3
+      }
+    },
+    {
+      "stimulus_id": "study1_P2f_D_correction",
+      "scene_id": "study1_P2f_D",
+      "condition": "correction",
+      "narrator_text": "The happy girl in a blue hoodie waves excitedly at her friend arriving with a suitcase.",
+      "errors_description": "(1) happy→sad [IR] (2) blue→pink hoodie [Property] (3) arriving→leaving/walking away [Action]. Targets #1.",
+      "target_animation": "P2f",
+      "target_entities": [
+        "girl"
+      ],
+      "target_category": "Property",
+      "options": {
+        "T": "Correct the emotion — the girl is not happy",
+        "E1": "Correct the color of the girl's hoodie",
+        "E2": "Correct the direction — the friend is leaving, not arriving",
+        "D1": "Mention the moving truck at the curb",
+        "D2": "Describe the SOLD sign in the garden"
+      }
+    },
+    {
+      "stimulus_id": "study1_P2f_D_suggestion",
+      "scene_id": "study1_P2f_D",
+      "condition": "suggestion",
+      "narrator_text": "A girl waves from the sidewalk. Another girl walks away pulling a suitcase toward a moving truck. Boxes are on the front lawn.",
+      "target_misl": "IR",
+      "options": {
+        "T": "Describe how the girl waving feels",
+        "D1": "Describe the girl's body language or expression",
+        "D2": "Describe how the departing friend feels",
+        "D3": "Describe the moving truck and boxes",
+        "D4": "Say why the friend is leaving"
       },
       "mention_counts": {
         "CH": 3,
@@ -2442,10 +2442,10 @@
       "narrator_text": "There is a red fox and a small rabbit on a forest path. There is a big oak tree.",
       "target_misl": "A",
       "options": {
-        "T": "Describe what the fox is doing (e.g., running, chasing)",
+        "T": "Describe what the fox is doing",
         "D1": "Describe the fox's size or other physical features",
         "D2": "Describe what the rabbit is doing",
-        "D3": "Describe the setting in more detail (e.g., the mushrooms, the path)",
+        "D3": "Describe the setting in more detail",
         "D4": "Express what the fox might be thinking"
       },
       "mention_counts": {
@@ -2492,7 +2492,7 @@
       "narrator_text": "A boy is on a skateboard at a skatepark. A girl sits on a bench along the fence watching him.",
       "target_misl": "A",
       "options": {
-        "T": "Describe what the boy is doing on the skateboard (e.g., racing, crouching, speeding down)",
+        "T": "Describe what the boy is doing on the skateboard",
         "D1": "Describe the boy's appearance or stance",
         "D2": "Describe what the girl is doing",
         "D3": "Describe the skatepark features (ramps, rails)",
@@ -2542,7 +2542,7 @@
       "narrator_text": "A white horse is in a green meadow. A small brown foal stands by a wooden fence. Wildflowers dot the grass.",
       "target_misl": "A",
       "options": {
-        "T": "Describe what the horse is doing (e.g., galloping, running)",
+        "T": "Describe what the horse is doing",
         "D1": "Describe the horse's appearance (mane, muscles)",
         "D2": "Describe what the foal is doing",
         "D3": "Describe the meadow and hills",
@@ -2592,7 +2592,7 @@
       "narrator_text": "A red train is at a small station. A woman stands on the platform. Flower boxes line the edge.",
       "target_misl": "A",
       "options": {
-        "T": "Describe what the train is doing (e.g., speeding through, rushing past)",
+        "T": "Describe what the train is doing",
         "D1": "Describe the train's appearance",
         "D2": "Describe what the woman is doing",
         "D3": "Describe the station setting",
@@ -2642,8 +2642,8 @@
       "narrator_text": "A brown bear is standing at the edge of a river. A bird sits on a rock. There are tall reeds along the bank.",
       "target_misl": "A",
       "options": {
-        "T": "Describe what the bear is doing (e.g., reaching, fishing)",
-        "D1": "Describe the bear's size or posture",
+        "T": "Describe what the bear is doing",
+        "D1": "Describe the bear's size",
         "D2": "Describe what the bird is doing",
         "D3": "Mention the fish in the water",
         "D4": "Express what the bear might be thinking"
@@ -2692,7 +2692,7 @@
       "narrator_text": "A chef stands at a gas range in a restaurant kitchen. A waitress passes behind carrying plates. Copper pots hang from a rack overhead.",
       "target_misl": "A",
       "options": {
-        "T": "Describe what the chef is doing (e.g., flipping a pancake)",
+        "T": "Describe what the chef is doing",
         "D1": "Describe the chef's stance or posture",
         "D2": "Describe what the waitress is carrying",
         "D3": "Describe the kitchen equipment",
@@ -2742,7 +2742,7 @@
       "narrator_text": "A woman in an apron sits at a pottery wheel in a studio. A tabby cat watches from a high shelf. Finished pots and vases line the shelves.",
       "target_misl": "A",
       "options": {
-        "T": "Describe what the woman is doing (e.g., shaping clay, forming a vessel)",
+        "T": "Describe what the woman is doing",
         "D1": "Describe the woman's posture or concentration",
         "D2": "Describe what the cat is doing",
         "D3": "Describe the studio and its tools",
@@ -2792,7 +2792,7 @@
       "narrator_text": "A man sits on a stool on a cobblestone street corner with a guitar. A boy crouches in front of him near a hat on the ground. It is evening.",
       "target_misl": "A",
       "options": {
-        "T": "Describe what the musician is doing (e.g., strumming, playing a chord)",
+        "T": "Describe what the musician is doing",
         "D1": "Describe the musician's expression or posture",
         "D2": "Describe what the boy is doing",
         "D3": "Describe the evening street setting",
@@ -2820,7 +2820,7 @@
       "stimulus_id": "study1_S1_A_correction",
       "scene_id": "study1_S1_A",
       "condition": "correction",
-      "narrator_text": "The grandmother is baking in the kitchen. The dog sleeps on a chair. Outside the window, it is sunny.",
+      "narrator_text": "The grandmother is baking in the kitchen. The dog sleeps on a sofa. Outside the window, it is sunny.",
       "errors_description": "(1) baking→stirring pot [Action] (2) dog→cat [Identity] (3) sunny→snowy [Space/Property]. Targets #3.",
       "target_animation": "S1",
       "target_entities": [
@@ -2828,7 +2828,7 @@
       ],
       "target_category": "Space",
       "options": {
-        "T": "Correct what is visible outside the window — it is not sunny",
+        "T": "Correct what the animal is sitting on - it is not a sofa",
         "E1": "Correct what the grandmother is doing — she is not baking",
         "E2": "Correct the animal on the chair — it is not a dog",
         "D1": "Describe the pot on the stove",
@@ -2845,7 +2845,7 @@
         "T": "Describe something in the scene that is hidden behind the grandmother",
         "D1": "Describe the grandmother's appearance or clothing",
         "D2": "Describe what is inside the pot on the stove",
-        "D3": "Add more detail about the cat (e.g., its color or position)",
+        "D3": "Add more detail about the cat",
         "D4": "Say what the grandmother might be saying out loud"
       },
       "mention_counts": {
@@ -3042,7 +3042,7 @@
       "narrator_text": "A knight in armor is on a bridge. There is a moat with a frog on a lily pad. A flag waves on a tower.",
       "target_misl": "S",
       "options": {
-        "T": "Emphasize where exactly the knight is standing (e.g., firmly on the stone bridge)",
+        "T": "Emphasize where exactly the knight is standing",
         "D1": "Describe the knight's armor in more detail",
         "D2": "Describe the frog's exact position in the moat",
         "D3": "Describe the flag or the tower",
@@ -3092,7 +3092,7 @@
       "narrator_text": "A boy is at a treehouse built in an oak tree in a backyard. A rope ladder hangs down. Leaves cover the lawn below.",
       "target_misl": "S",
       "options": {
-        "T": "Emphasize where exactly the boy is (e.g., up on the platform, high in the tree)",
+        "T": "Emphasize where exactly the boy is",
         "D1": "Describe the boy's expression or posture",
         "D2": "Describe the rope ladder's position",
         "D3": "Describe the treehouse features",
@@ -3142,7 +3142,7 @@
       "narrator_text": "A lighthouse stands on a rocky cliff. A keeper is visible through the glass at the top. A small boat bobs in the harbor far below.",
       "target_misl": "S",
       "options": {
-        "T": "Emphasize where exactly the keeper is standing (e.g., at the very summit, in the lantern room)",
+        "T": "Emphasize where exactly the keeper is standing",
         "D1": "Describe the keeper's clothing",
         "D2": "Describe the boat's exact position below",
         "D3": "Describe the dramatic sky and waves",
@@ -3170,7 +3170,7 @@
       "stimulus_id": "study1_S2_D_correction",
       "scene_id": "study1_S2_D",
       "condition": "correction",
-      "narrator_text": "The woman in a linen dress lies on the grass between two palm trees reading a book near the sandy path.",
+      "narrator_text": "The woman lies in a hammock between two palm trees. She holds an open book above her face while reading.",
       "errors_description": "(1) on the grass→in a hammock suspended above ground [Space] (2) between→correct (3) near→in a tropical garden. Targets #1.",
       "target_animation": "S2",
       "target_entities": [
@@ -3178,10 +3178,10 @@
       ],
       "target_category": "Space",
       "options": {
-        "T": "Correct the woman's position — she is not on the grass, she is suspended in a hammock",
-        "E1": "Correct the description of the garden setting",
-        "E2": "Correct where the book is (on her chest, not in her hands)",
-        "D1": "Describe the hibiscus flowers",
+        "T": "Correct the position of the book — she is not holding it, it is resting on her chest",
+        "E1": "Correct the number of palm trees — there are not three",
+        "E2": "Correct the woman's posture — her eyes are closed, she is not reading",
+        "D1": "Describe the hibiscus flowers around the hammock",
         "D2": "Mention the dappled sunlight through the palms"
       }
     },
@@ -3189,12 +3189,12 @@
       "stimulus_id": "study1_S2_D_suggestion",
       "scene_id": "study1_S2_D",
       "condition": "suggestion",
-      "narrator_text": "A woman lies in a colorful hammock between two palm trees in a tropical garden. An open book rests on her chest. Her eyes are closed.",
+      "narrator_text": "A woman lies in a hammock between two palm trees in a tropical garden. Her eyes are closed and her expression is peaceful.",
       "target_misl": "S",
       "options": {
-        "T": "Emphasize where exactly the woman is (e.g., suspended off the ground, hanging in the air)",
-        "D1": "Describe the woman's peaceful expression",
-        "D2": "Describe the hammock's exact position between the trees",
+        "T": "Emphasize where exactly the book is",
+        "D1": "Describe the book in more detail",
+        "D2": "Describe the hammock's colors and position",
         "D3": "Describe the tropical plants and flowers",
         "D4": "Say what the woman might be dreaming about"
       },
@@ -3520,7 +3520,7 @@
       "stimulus_id": "study1_T2_C_correction",
       "scene_id": "study1_T2_C",
       "condition": "correction",
-      "narrator_text": "The woman looks at a single photo of her dog. The dog has always been this size.",
+      "narrator_text": "The woman is taking the dog on a walk.",
       "errors_description": "(1) single photo→row of chronological photos [Count] (2) always this size→grew over time [Time] (3) implied no change→clear change. Targets #2.",
       "target_animation": "T2",
       "target_entities": [
@@ -3528,7 +3528,7 @@
       ],
       "target_category": "Time",
       "options": {
-        "T": "Correct the claim — the dog has not always been this size, it grew over time",
+        "T": "The woman will be taking the dog on a walk",
         "E1": "Correct the number of photos — there is more than one",
         "E2": "Correct the description of the photos",
         "D1": "Describe the fire crackling in the fireplace",
@@ -3542,7 +3542,7 @@
       "narrator_text": "A woman stands in front of a fireplace mantel looking at framed photos arranged in a row. A large golden retriever lies at her feet.",
       "target_misl": "T",
       "options": {
-        "T": "Mention that the photos show time passing (e.g., the dog growing from puppy to adult)",
+        "T": "Mention what the woman will do tomorrow morning",
         "D1": "Describe the photos in more detail",
         "D2": "Describe the current size of the dog",
         "D3": "Describe the living room setting",
@@ -3570,7 +3570,7 @@
       "stimulus_id": "study1_T2_D_correction",
       "scene_id": "study1_T2_D",
       "condition": "correction",
-      "narrator_text": "The girl sketches a normal green tree on a sunny summer afternoon on the hilltop.",
+      "narrator_text": "The girl sketches a normal green tree on a brief sunny summer afternoon on the hilltop.",
       "errors_description": "(1) normal green→showing seasonal transition [Property/Time] (2) summer→mixed seasons [Time] (3) sunny→shifting sky. Targets #2.",
       "target_animation": "T2",
       "target_entities": [
@@ -3578,7 +3578,7 @@
       ],
       "target_category": "Time",
       "options": {
-        "T": "Correct the description — the tree shows multiple seasons, not just summer",
+        "T": "Time passes, the moment is not brief",
         "E1": "Correct the tree's appearance — it is not all green",
         "E2": "Correct the sky — it shifts from warm to cool",
         "D1": "Describe the fallen leaves around the bench",
@@ -3592,7 +3592,7 @@
       "narrator_text": "A girl sits on a bench under a large oak tree on a hilltop. She has a sketchbook on her lap. Rolling fields stretch below.",
       "target_misl": "T",
       "options": {
-        "T": "Mention that the tree shows time passing (e.g., leaves changing from green to gold to bare)",
+        "T": "Mention that time is passing",
         "D1": "Describe the tree's current appearance",
         "D2": "Describe the time of day or sky",
         "D3": "Describe the hilltop setting",
@@ -3643,7 +3643,7 @@
       "narrator_text": "A mother is sitting on a picnic blanket. A girl is sitting on the blanket too. There is a basket and a dog nearby.",
       "target_misl": "CC",
       "options": {
-        "T": "Mention that the mother and the girl are together (e.g., sharing, close to each other)",
+        "T": "Mention that the mother and the girl are together",
         "D1": "Describe what the mother and girl look like",
         "D2": "Mention that the dog and the girl are connected",
         "D3": "Describe the butterfly or the flowers",
@@ -3694,7 +3694,7 @@
       "narrator_text": "A small child stands in a shopping mall near a fountain. A woman in a denim jacket is a few meters away. Potted plants line the walkway.",
       "target_misl": "CC",
       "options": {
-        "T": "Mention that the child and the woman belong together (e.g., she is rushing to reunite with the child)",
+        "T": "Mention that the child and the woman belong together",
         "D1": "Describe the child's expression in more detail",
         "D2": "Mention that the child and the stuffed toy are connected",
         "D3": "Describe the fountain",
@@ -3745,7 +3745,7 @@
       "narrator_text": "A boy kneels on one side of a jigsaw puzzle on the floor. A girl kneels on the other side. Each holds a puzzle piece. The puzzle is nearly complete.",
       "target_misl": "CC",
       "options": {
-        "T": "Mention that the boy's and girl's pieces go together (e.g., they are matching halves)",
+        "T": "Mention that the boy's and girl's pieces go together",
         "D1": "Describe what the puzzle depicts",
         "D2": "Mention that the puzzle and the box image are connected",
         "D3": "Describe the living room setting",
@@ -3997,12 +3997,12 @@
       "stimulus_id": "study1_R2_D_suggestion",
       "scene_id": "study1_R2_D",
       "condition": "suggestion",
-      "narrator_text": "A girl sits on one end of a park bench. A boy sits on the other end. Both have their arms crossed. A crumpled paper lies on the bench between them.",
+      "narrator_text": "A girl sits on one end of a park bench. A boy sits on the other end. Both have their arms crossed.",
       "target_misl": "CC",
       "options": {
         "T": "Mention that the children are separated and not getting along",
         "D1": "Describe their facial expressions",
-        "D2": "Mention that the paper between them might be the cause",
+        "D2": "Mention that the lack of space between them might be the cause",
         "D3": "Describe the park setting",
         "D4": "Say what might have happened before"
       },
@@ -4051,7 +4051,7 @@
       "narrator_text": "There is a boulder at the top of a hill. A wooden fence is at the bottom. A goat is watching from the side.",
       "target_misl": "SC",
       "options": {
-        "T": "Explain why the fence broke (e.g., because the boulder rolled into it)",
+        "T": "Explain why the fence broke",
         "D1": "Describe the boulder's shape or weight",
         "D2": "Describe the goat's reaction to the event",
         "D3": "Describe the flowers on the hillside",
@@ -4102,7 +4102,7 @@
       "narrator_text": "A long row of colorful dominoes stands upright on a table. A child's finger is near the first domino. The dominoes curve in an S-shape.",
       "target_misl": "SC",
       "options": {
-        "T": "Explain what will happen if the finger pushes the first domino (e.g., because it will knock over the next one)",
+        "T": "Explain what will happen if the finger pushes the first domino",
         "D1": "Describe the dominoes' colors and arrangement",
         "D2": "Describe how the child feels about the moment",
         "D3": "Describe the table setting",
@@ -4153,7 +4153,7 @@
       "narrator_text": "A soccer ball is in the air near a house window. The window has a web of cracks spreading from one point. Small glass shards are falling.",
       "target_misl": "SC",
       "options": {
-        "T": "Explain why the window cracked (e.g., because the ball hit it)",
+        "T": "Explain why the window cracked",
         "D1": "Describe the crack pattern on the glass",
         "D2": "Describe how the ball bounced after impact",
         "D3": "Describe the front yard and house",
@@ -4204,7 +4204,7 @@
       "narrator_text": "A bolt of lightning connects the dark clouds to a tall oak tree in an open field. The tree's trunk is split in two. Heavy rain falls.",
       "target_misl": "SC",
       "options": {
-        "T": "Explain why the tree split (e.g., because the lightning struck it)",
+        "T": "Explain why the tree split",
         "D1": "Describe the damage to the tree",
         "D2": "Describe what might happen next to the tree",
         "D3": "Describe the storm and rain",
@@ -4254,7 +4254,7 @@
       "narrator_text": "A boy and his mother are at a bakery. The boy is pointing at a chocolate cake. The baker is behind the counter.",
       "target_misl": "L",
       "options": {
-        "T": "Add what the boy is saying (e.g., asking for the cake)",
+        "T": "Add what the boy is saying",
         "D1": "Describe the boy's expression or posture",
         "D2": "Add what the mother is saying",
         "D3": "Describe the cakes on display in more detail",
@@ -4304,7 +4304,7 @@
       "narrator_text": "A girl in a school uniform stands at a library help desk. A librarian with glasses sits behind the counter looking at her. The girl holds a piece of paper.",
       "target_misl": "L",
       "options": {
-        "T": "Add what the girl is saying (e.g., asking the librarian for help)",
+        "T": "Add what the girl is saying",
         "D1": "Describe the girl's body language",
         "D2": "Add what the librarian might say in response",
         "D3": "Describe the library setting behind them",
@@ -4354,7 +4354,7 @@
       "narrator_text": "A vendor stands behind a produce stall with tomatoes, peppers, and eggplants. A woman with a shopping bag faces him across the stall.",
       "target_misl": "L",
       "options": {
-        "T": "Add what the vendor is saying (e.g., calling out prices, persuading)",
+        "T": "Add what the vendor is saying",
         "D1": "Describe the vendor's gestures",
         "D2": "Add what the woman might say back",
         "D3": "Describe the produce in more detail",
@@ -4404,7 +4404,7 @@
       "narrator_text": "A doctor sits on a stool in a pediatric office. A boy sits on the exam table with his legs dangling. The doctor holds a clipboard.",
       "target_misl": "L",
       "options": {
-        "T": "Add what the doctor is saying (e.g., explaining, reassuring the boy)",
+        "T": "Add what the doctor is saying",
         "D1": "Describe the doctor's expression or gesture",
         "D2": "Add what the boy might say in response",
         "D3": "Describe the pediatric office decorations",
@@ -4504,7 +4504,7 @@
       "narrator_text": "A boy sits at a chess table staring at the board. His hand hovers over a knight piece. His opponent waits across from him.",
       "target_misl": "M",
       "options": {
-        "T": "Describe what the boy might be thinking (e.g., calculating moves, deciding)",
+        "T": "Describe what the boy might be thinking",
         "D1": "Describe the boy's facial expression",
         "D2": "Describe what the opponent is thinking",
         "D3": "Describe the chess position on the board",
@@ -4554,7 +4554,7 @@
       "narrator_text": "A woman stands at a fork in a countryside path. A wooden signpost has two arrows pointing in different directions. Mist hangs over the hills.",
       "target_misl": "M",
       "options": {
-        "T": "Describe what the woman might be thinking (e.g., weighing her options, deciding which way to go)",
+        "T": "Describe what the woman might be thinking",
         "D1": "Describe the woman's posture or expression",
         "D2": "Describe what someone walking the other path might think",
         "D3": "Describe the two paths and where they lead",
@@ -4704,7 +4704,7 @@
       "narrator_text": "A fishbowl with a goldfish sits on a side table. A gray and white cat crouches on the same table, very close to the bowl. The fishbowl is near the edge.",
       "target_misl": "IE",
       "options": {
-        "T": "Mention that something important is about to happen (e.g., the cat might knock the bowl off)",
+        "T": "Mention that something important is about to happen",
         "D1": "Describe the cat's hunting posture",
         "D2": "Mention that something might happen to the goldfish",
         "D3": "Describe the living room setting",
@@ -4754,7 +4754,7 @@
       "narrator_text": "A woman in a bathrobe talks on the phone in a kitchen. Behind her, a toaster sits on the counter with bread in it. It is early morning.",
       "target_misl": "IE",
       "options": {
-        "T": "Mention that something important is happening with the toaster (e.g., the toast is burning)",
+        "T": "Mention that something important is happening with the toaster",
         "D1": "Describe the smoke or color of the toast",
         "D2": "Mention that something is happening with the coffee maker",
         "D3": "Describe the kitchen and morning light",
@@ -4855,7 +4855,7 @@
       "narrator_text": "The two children are playing on the seesaw. The dog watches them.",
       "target_misl": "G",
       "options": {
-        "T": "Use a specific phrase to describe how the children interact (e.g., 'with each other')",
+        "T": "Use a specific phrase to describe how the children interact",
         "D1": "Describe what the children look like",
         "D2": "Use a word to describe how the dog is watching",
         "D3": "Mention the kite in the sky",
@@ -4955,7 +4955,7 @@
       "narrator_text": "A mother reads a storybook to a boy in pajamas at bedtime. She points at a line of text on the page. The room is cozy with soft lamplight.",
       "target_misl": "G",
       "options": {
-        "T": "Use a more precise word for the verb in the story (e.g., 'ran' instead of 'runned')",
+        "T": "Use a more precise word for the verb in the story",
         "D1": "Describe what the boy is doing while listening",
         "D2": "Add a word to describe how the mother reads",
         "D3": "Describe the bedroom setting",
@@ -5005,7 +5005,7 @@
       "narrator_text": "A girl sits at a desk after school reading a graded essay. The paper has red marks and corrections from the teacher. She studies the feedback carefully.",
       "target_misl": "G",
       "options": {
-        "T": "Use a more sophisticated spelling of a word (e.g., 'because')",
+        "T": "Use a more sophisticated spelling of a word",
         "D1": "Describe the girl's expression as she reads",
         "D2": "Add a word the teacher might have suggested",
         "D3": "Describe the empty classroom around her",
