@@ -3723,7 +3723,7 @@
         "D2": "Say what the knight might be guarding"
       },
       "narrator_text_block2": "The knight in armor is standing in the moat near the frog on the lily pad.",
-      "pipeline_intent": "The system detected that you described the knight's location incorrectly and decided to highlight the knight's actual position on the bridge.",
+      "pipeline_intent": "The system detected that you described the knight's location incorrectly and decided to emphasize the knight's actual position on the bridge.",
       "pipeline_animation_id": "S2",
       "pipeline_target_entities": [
         "knight"
@@ -3784,7 +3784,7 @@
         "D2": "Describe the bicycle on the grass"
       },
       "narrator_text_block2": "The boy in a red and white striped shirt stands on the ground under the treehouse looking down at the flowers.",
-      "pipeline_intent": "The system detected that you described the boy as being on the ground and decided to highlight his actual location on the treehouse platform.",
+      "pipeline_intent": "The system detected that you described the boy as being on the ground and decided to emphasize his actual location on the treehouse platform.",
       "pipeline_animation_id": "S2",
       "pipeline_target_entities": [
         "boy"
@@ -3845,7 +3845,7 @@
         "D2": "Mention the winding stone path"
       },
       "narrator_text_block2": "The lighthouse keeper stands at the base of the lighthouse high above the boat in the harbor.",
-      "pipeline_intent": "The system detected that you described the lighthouse keeper as being at the bottom of the tower instead of the top and decided to highlight his actual location on the observation deck.",
+      "pipeline_intent": "The system detected that you described the lighthouse keeper as being at the bottom of the tower instead of the top and decided to emphasize his actual location on the observation deck.",
       "pipeline_animation_id": "S2",
       "pipeline_target_entities": [
         "keeper"
@@ -3906,7 +3906,7 @@
         "D2": "Mention the dappled sunlight through the palms"
       },
       "narrator_text_block2": "The woman lies on the grass between two palm trees. She has an open book on her stomach while she sleeps.",
-      "pipeline_intent": "The system detected that you described the woman's location as being on the grass instead of in the hammock and decided to highlight her correct position with a stamp animation.",
+      "pipeline_intent": "The system detected that you described the woman's location as being on the grass instead of in the hammock and decided to emphasize her correct position with a stamp animation.",
       "pipeline_animation_id": "S2",
       "pipeline_target_entities": [
         "woman"
