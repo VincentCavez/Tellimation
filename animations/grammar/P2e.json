@@ -48,6 +48,6 @@
     }
   ],
   "code_template": "emanation({target}, veins, {particleCount})",
-  "correction_intent": "Child described the wrong emotion — the entity actually feels angry, frustrated, or irritated",
+  "correction_intent": "Child described the wrong emotion — the character actually feels ANGRY, FRUSTRATED, or IRRITATED (e.g. said 'happy' or 'calm' when the character has clenched fists or a red face).",
   "suggestion_intent": "Child hasn't expressed that a character feels angry, frustrated, or irritated"
 }

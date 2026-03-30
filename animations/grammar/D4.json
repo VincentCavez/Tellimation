@@ -30,5 +30,5 @@
   ],
   "code_template": "interjection({target}, {word})",
   "correction_intent": "Child made a SEVERE grammatical error: wrong verb conjugation ('he go' instead of 'he goes'), wrong pronoun ('him is' instead of 'he is'), severely broken sentence structure, OR a tense that clearly contradicts the scene description (e.g. past tense 'was cooking' when the scene describes a present action 'is cooking'). Be generous with tense: future ('will be giving') and near-future ('is going to give') are acceptable when the scene shows the present — the child is anticipating. Only flag tense if it is clearly WRONG relative to the scene (e.g. past for present, present for past). Do NOT flag: missing articles, informal speech, sentence fragments, or minor stylistic issues.",
-  "suggestion_intent": "Child hasn't used a word that describes an action in the future. For instance 'TOMORROW' or 'LATER'."
+  "suggestion_intent": "Child could use a more precise, sophisticated, or grammatically stronger word in their narration. For example: replacing a vague verb with a specific one ('walks' → 'strolls', 'looks' → 'examines'), using a more expressive adjective, or choosing a more accurate word to describe what is happening in the scene."
 }

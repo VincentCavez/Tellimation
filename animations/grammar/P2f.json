@@ -48,6 +48,6 @@
     }
   ],
   "code_template": "emanation({target}, drops, {particleCount})",
-  "correction_intent": "Child described the wrong emotion — the entity actually feels scared, worried, or anxious",
+  "correction_intent": "Child described the wrong emotion — the character actually feels SCARED, WORRIED, or ANXIOUS (e.g. said 'happy' when the character is crying or has a fearful expression).",
   "suggestion_intent": "Child hasn't expressed that a character feels scared, worried, or anxious"
 }

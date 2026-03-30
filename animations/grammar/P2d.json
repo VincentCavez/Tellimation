@@ -48,6 +48,6 @@
     }
   ],
   "code_template": "emanation({target}, hearts, {particleCount})",
-  "correction_intent": "Child described the wrong emotion — the entity actually feels love, affection, or tenderness",
+  "correction_intent": "Child described the wrong emotion — the character actually feels LOVE, AFFECTION, or TENDERNESS toward someone or something (e.g. said 'grumpy' or 'bored' when the character is smiling lovingly).",
   "suggestion_intent": "Child hasn't expressed that a character feels love, affection, or tenderness"
 }

@@ -48,6 +48,6 @@
     }
   ],
   "code_template": "emanation({target}, frost, {particleCount})",
-  "correction_intent": "Child described the wrong sensation — the entity actually feels cold, is shivering, or is uncomfortable from temperature",
+  "correction_intent": "Child described the wrong TEMPERATURE or SENSATION. For OBJECTS (birdbath, pond, ice cream, frozen food): the child said it is warm but it is actually COLD or FROZEN — ice, frost, or cold vapor is visible. For CHARACTERS: the child described the wrong sensation — the character actually feels cold or is shivering.",
   "suggestion_intent": "Child hasn't expressed that a character feels cold or uncomfortable from temperature"
 }

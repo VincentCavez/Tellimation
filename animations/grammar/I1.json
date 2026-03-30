@@ -55,6 +55,6 @@
     }
   ],
   "code_template": "spotlight({target}, {dimStrength}, {glowStrength}, {haloColor}, {maxHaloSize})",
-  "correction_intent": "Child misidentified or confused an entity or a setting that IS present in the scene (e.g. said 'rabbit' when it's actually a 'dog', or said 'bedroom' when it's a 'kitchen'). The target should be the CORRECT entity in the scene that was misidentified, or 'scene'.",
+  "correction_intent": "Child CONFUSED TWO DIFFERENT ENTITIES or referred to a completely wrong entity (e.g. said 'rabbit' when it's actually a 'dog', said 'bedroom' when it's a 'kitchen', described a cat when there is no cat in the scene). I1 is for when the child points to the WRONG entity entirely — NOT for when they use the wrong name/role/profession for the correct entity (use I2 Nametag for that). The target should be the CORRECT entity in the scene that was misidentified, or 'scene'.",
   "suggestion_intent": "Child hasn't mentioned an entity or a setting present in the scene"
 }
