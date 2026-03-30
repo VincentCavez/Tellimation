@@ -3220,7 +3220,7 @@
       "stimulus_id": "study1_T1_A_correction",
       "scene_id": "study1_T1_A",
       "condition": "correction",
-      "narrator_text": "The baker is about to start baking the bread. A boy approaches the shop. The clock shows 6 PM.",
+      "narrator_text": "The baker is about to start baking the bread. A boy approaches the shop. It is summer.",
       "errors_description": "(1) about to bake→already baked [Time] (2) boy→girl [Identity] (3) 6 PM→3 PM [Property]. Targets #1.",
       "target_animation": "T1",
       "target_entities": [
@@ -3230,7 +3230,7 @@
       "options": {
         "T": "Correct the timing — the bread is already baked, not about to be baked",
         "E1": "Correct who is approaching the shop — it is not a boy",
-        "E2": "Correct the time shown on the clock",
+        "E2": "Correct the season — it is not summer",
         "D1": "Mention the fallen leaves on the ground",
         "D2": "Describe the baker's shop"
       }
