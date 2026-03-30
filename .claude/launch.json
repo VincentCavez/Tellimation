@@ -14,6 +14,13 @@
       "runtimeArgs": ["-m", "scripts.study_gen.gen_ui"],
       "port": 5555,
       "autoPort": false
+    },
+    {
+      "name": "survey",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8080"],
+      "port": 8080,
+      "autoPort": false
     }
   ]
 }

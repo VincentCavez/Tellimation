@@ -1,0 +1,503 @@
+/* ===== Reset & Base ===== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: #fafafa;
+  color: #333;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ===== Min-width overlay ===== */
+#width-warning {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #fff;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 2rem;
+}
+
+#width-warning h2 {
+  margin-bottom: 1rem;
+  color: #c62828;
+}
+
+@media (max-width: 767px) {
+  #width-warning {
+    display: flex;
+  }
+  .screen {
+    display: none !important;
+  }
+}
+
+/* ===== Screens ===== */
+.screen {
+  display: none;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+}
+
+.screen.active {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 3rem;
+}
+
+/* ===== Container ===== */
+.container {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* ===== Typography ===== */
+h1 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #1a1a1a;
+}
+
+h2 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #1a1a1a;
+}
+
+p {
+  margin-bottom: 0.75rem;
+}
+
+ul {
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+li {
+  margin-bottom: 0.4rem;
+}
+
+/* ===== Info box ===== */
+.info-box {
+  background: #f5f5f5;
+  border-left: 4px solid #666;
+  border-radius: 4px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* ===== Buttons ===== */
+.btn {
+  display: inline-block;
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+  transition: background 0.2s, opacity 0.2s;
+}
+
+.btn-primary {
+  background: #1976d2;
+  color: #fff;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #1565c0;
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ===== Consent ===== */
+.consent-section {
+  margin-bottom: 2rem;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  cursor: pointer;
+  margin-top: 0.75rem;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin-top: 3px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.checkbox-label span {
+  font-weight: 500;
+}
+
+/* ===== ID input ===== */
+.id-section {
+  margin-bottom: 2rem;
+}
+
+.id-section label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.id-section input {
+  width: 100%;
+  max-width: 360px;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.id-section input:focus {
+  outline: none;
+  border-color: #1976d2;
+  box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.15);
+}
+
+/* ===== Error text ===== */
+.error-text {
+  color: #c62828;
+  font-weight: 500;
+  margin-top: 1rem;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ===== Progress bar ===== */
+.progress-bar-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: #e0e0e0;
+  height: 6px;
+}
+
+.progress-bar {
+  height: 100%;
+  background: #1976d2;
+  transition: width 0.3s ease;
+  width: 0%;
+}
+
+.progress-text {
+  position: fixed;
+  top: 10px;
+  right: 16px;
+  z-index: 101;
+  font-size: 0.85rem;
+  color: #666;
+  font-weight: 500;
+}
+
+/* ===== Trial container ===== */
+.trial-container {
+  padding-top: 1rem;
+}
+
+/* ===== Scene image ===== */
+.scene-image {
+  width: 100%;
+  max-height: 400px;
+  object-fit: contain;
+  border-radius: 8px;
+  background: #eee;
+  margin-bottom: 1.25rem;
+}
+
+/* ===== Narrator box ===== */
+.narrator-box {
+  background: #f5f5f5;
+  border-left: 4px solid #9e9e9e;
+  border-radius: 4px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.narrator-label {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.narrator-text {
+  font-style: italic;
+  font-size: 1.05rem;
+  color: #222;
+  margin-bottom: 0;
+}
+
+.narrator-text::before { content: "\201C"; }
+.narrator-text::after { content: "\201D"; }
+
+/* ===== Intent box (Block 2) ===== */
+.intent-box {
+  background: #e3f2fd;
+  border-left: 4px solid #1976d2;
+  border-radius: 4px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.intent-label {
+  font-size: 0.9rem;
+  color: #1565c0;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.intent-text {
+  font-size: 1.05rem;
+  color: #222;
+  margin-bottom: 0;
+}
+
+/* ===== Video ===== */
+.video-wrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 1.25rem;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #000;
+}
+
+.video-wrapper video {
+  width: 100%;
+  display: block;
+}
+
+.video-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.video-overlay.hidden {
+  display: none;
+}
+
+.play-icon {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.video-overlay p {
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.video-spinner {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ===== Options (Block 1) ===== */
+.options-container {
+  margin-top: 1rem;
+}
+
+.question-text {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #1a1a1a;
+}
+
+.radio-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+}
+
+.option-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.9rem 1rem;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  user-select: none;
+}
+
+.option-card:hover {
+  border-color: #90caf9;
+  background: #f8fbff;
+}
+
+.option-card.selected {
+  border-color: #1976d2;
+  background: #e3f2fd;
+}
+
+.option-card input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  flex-shrink: 0;
+  cursor: pointer;
+  accent-color: #1976d2;
+}
+
+.option-card label {
+  cursor: pointer;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* ===== Likert scale (Block 2) ===== */
+.likert-container {
+  margin-top: 1rem;
+}
+
+.likert-scale {
+  margin-bottom: 1.5rem;
+}
+
+.likert-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 0.75rem;
+  padding: 0 0.25rem;
+}
+
+.likert-buttons {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.likert-btn {
+  width: 56px;
+  height: 56px;
+  border: 2px solid #ddd;
+  border-radius: 50%;
+  background: #fff;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #555;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.likert-btn:hover {
+  border-color: #90caf9;
+  background: #f8fbff;
+}
+
+.likert-btn.selected {
+  border-color: #1976d2;
+  background: #1976d2;
+  color: #fff;
+}
+
+/* ===== Completion ===== */
+.completion-box {
+  background: #e8f5e9;
+  border: 2px solid #66bb6a;
+  border-radius: 8px;
+  padding: 1.5rem;
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.completion-code {
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #2e7d32;
+  margin: 0.5rem 0 0;
+  font-family: "Courier New", monospace;
+}
+
+/* ===== Spinner ===== */
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #ddd;
+  border-top-color: #1976d2;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ===== Loading screen ===== */
+#screen-loading .container {
+  text-align: center;
+  padding-top: 30vh;
+}
+
+/* ===== Welcome screen centering ===== */
+#screen-welcome.active {
+  align-items: center;
+}
+
+/* ===== Transition / Done centering ===== */
+#screen-transition.active,
+#screen-done.active,
+#screen-error.active {
+  align-items: center;
+  text-align: center;
+}
+
+#screen-transition .info-box,
+#screen-done .completion-box {
+  text-align: left;
+}
+
+#screen-done .container {
+  text-align: center;
+}
+
+/* ===== Block screens: normal flow, not flex-centered ===== */
+#screen-block1.active,
+#screen-block2.active {
+  display: block;
+  padding-top: 2rem;
+}
