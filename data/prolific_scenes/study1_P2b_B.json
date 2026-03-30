@@ -15,7 +15,84 @@
         "girl",
         "ice_cream"
       ],
-      "composition_instructions": "Place girl just outside the shop under the awning, standing and holding a tall waffle cone with three scoops (chocolate, strawberry, vanilla), licking the top scoop and smiling. Place ice_cream cone in her hand with scoops glistening and icy."
+      "composition_instructions": "Place girl just outside the shop under the awning, standing and holding a tall waffle cone with three scoops (chocolate, strawberry, vanilla), licking the top scoop and smiling. Place ice_cream cone in her hand with scoops glistening and icy.",
+      "scene_description": "In the foreground of this children's picture-book scene, a grassy field is scattered with small yellow and white flowers and green clovers. Three flat, grey stepping stones are positioned on the grass, leading towards the center. On the far left, a large tree with a thick brown trunk and rounded green foliage frames the scene. To the right of the tree, a girl with long, wavy brown hair tied back with a yellow bow stands in profile, facing right. She is dressed in a green cardigan over a light blue patterned dress, white socks with a grey stripe, and brown shoes. She holds a large ice_cream cone with three scoops—white, pink, and brown—topped with a red cherry, and she is licking the top scoop. Directly behind the girl is a wooden ice cream stand featuring a blue and yellow striped scalloped awning. The stand has a glass display case showing several rectangular containers of different colored ice cream. A large, blank rectangular wooden sign sits atop the stand, and a smaller one is fixed to its right side. To the right of the stand, there are several green bushes and two terracotta pots holding leafy plants. In the background, rolling green hills stretch across the horizon under a light blue sky dotted with soft, white, fluffy clouds, indicating a bright, sunny day. The scene is composed with the girl and the stand as the central focus, surrounded by lush greenery and a clear sky.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "A girl with long wavy brown hair",
+            "A young girl wearing a green cardigan",
+            "A child with a yellow hair bow"
+          ],
+          "S": [
+            "A sunny day with fluffy white clouds",
+            "A wooden ice cream stand in a park",
+            "Rolling green hills under a blue sky",
+            "A grassy field with small yellow flowers"
+          ],
+          "IE": [
+            "The girl arrives at the ice cream stand",
+            "The girl buys a large ice cream cone",
+            "The sun comes out on a warm day"
+          ],
+          "IR": [
+            "The girl feels happy with her treat",
+            "The girl is excited to eat ice cream",
+            "The girl looks content while licking her cone"
+          ],
+          "P": [
+            "The girl wants to finish her ice cream",
+            "The girl intends to enjoy her cold snack",
+            "The girl plans to walk on the stones"
+          ],
+          "A": [
+            "The girl is licking a tall ice cream",
+            "The girl stands in front of the stand",
+            "The girl holds her cone with both hands"
+          ],
+          "CO": [
+            "The ice cream starts to melt slowly",
+            "The girl's hunger is satisfied by the treat",
+            "The girl has a delicious snack to eat"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "A blue and yellow striped scalloped awning",
+            "A large ice cream cone with three scoops",
+            "A light blue dress with small patterns",
+            "Three flat grey stepping stones in grass"
+          ],
+          "ADV": [
+            "Happily",
+            "Carefully",
+            "Slowly",
+            "Sweetly"
+          ],
+          "SC": [
+            "Because it is a very hot day",
+            "While she stands by the wooden stand",
+            "When she licks the cold white scoop"
+          ],
+          "CC": [
+            "And",
+            "But",
+            "So"
+          ],
+          "M": [
+            "Likes",
+            "Wants",
+            "Enjoys",
+            "Thinks"
+          ],
+          "L": [
+            "Orders",
+            "Asks",
+            "Tells",
+            "Whispers"
+          ]
+        }
+      }
     }
   ]
 }

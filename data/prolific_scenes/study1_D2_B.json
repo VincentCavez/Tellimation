@@ -15,7 +15,76 @@
         "boy",
         "opponent"
       ],
-      "composition_instructions": "Place boy at the chess table, leaning forward and staring at the board, one hand hovering over a knight piece, brow deeply furrowed. Place opponent sitting back with arms folded and a patient half-smile."
+      "composition_instructions": "Place boy at the chess table, leaning forward and staring at the board, one hand hovering over a knight piece, brow deeply furrowed. Place opponent sitting back with arms folded and a patient half-smile.",
+      "scene_description": "On the far left of this indoor scene, a large arched wooden window looks out onto a bright, sunny garden with rolling green hills, leafy trees, and bushes dotted with small white, yellow, and blue flowers under a light blue sky with fluffy white clouds. To the right of the window stands a tall wooden bookshelf filled with numerous books in shades of red, blue, green, yellow, and brown. In front of this bookshelf, a boy with short brown hair and a focused, slightly frustrated expression sits on a wooden chair. He is wearing a green sweater with a blue collar and brown elbow patches, yellow pants, and brown boots. He leans forward over a rectangular wooden table, his right hand reaching for a yellow chess piece on a chessboard. The chessboard sits in the center of the table, populated with yellow pieces on the left and blue pieces on the right. Behind the chessboard is a small wooden chess clock with two circular faces. Above the table, a large, round, ornate wooden clock hangs on the yellow wall, its white face showing black numbers and hands pointing to approximately ten minutes past ten. To the right of the table, an opponent with short brown hair and a confident smile sits on a matching wooden chair. He wears a green striped sweater, green pants, and brown boots, with a brown satchel slung over his shoulder and his arms crossed over his chest. Behind him is another tall wooden bookshelf filled with books, and below it, a wooden cabinet with a single round knob. The entire scene is set on a floor made of light brown wooden planks.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "boy with a focused expression",
+            "opponent with a confident smile"
+          ],
+          "S": [
+            "sunny garden outside the arched window",
+            "room with tall wooden bookshelves",
+            "large ornate clock on the wall"
+          ],
+          "IE": [
+            "boy reaching for a yellow chess piece",
+            "chess match currently in progress"
+          ],
+          "IR": [
+            "feeling frustrated by the difficult move",
+            "feeling confident about winning the game"
+          ],
+          "P": [
+            "intending to win the chess match",
+            "planning the next strategic move"
+          ],
+          "A": [
+            "reaching for a yellow chess piece",
+            "sitting with arms crossed across chest"
+          ],
+          "CO": [
+            "chess pieces positioned on the board",
+            "chess clock showing time remaining"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "large arched wooden window",
+            "green sweater with brown elbow patches",
+            "small wooden chess clock",
+            "tall bookshelves filled with colorful books"
+          ],
+          "ADV": [
+            "carefully",
+            "confidently",
+            "intently",
+            "patiently"
+          ],
+          "SC": [
+            "because he is thinking hard",
+            "while his opponent watches him",
+            "when it is his turn to move"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "wonders",
+            "hopes",
+            "knows"
+          ],
+          "L": [
+            "says",
+            "asks",
+            "tells"
+          ]
+        }
+      }
     }
   ]
 }

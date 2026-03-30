@@ -15,7 +15,78 @@
         "doctor",
         "patient"
       ],
-      "composition_instructions": "Place doctor on a rolling stool, sitting and holding a clipboard, speaking with encouraging expression, mouth open, one hand making a reassuring gesture. Place patient on the exam table, sitting with legs dangling, looking at the doctor with slightly nervous expression."
+      "composition_instructions": "Place doctor on a rolling stool, sitting and holding a clipboard, speaking with encouraging expression, mouth open, one hand making a reassuring gesture. Place patient on the exam table, sitting with legs dangling, looking at the doctor with slightly nervous expression.",
+      "scene_description": "In the left foreground of a doctor's examination room, there is a medical examination table with a light gray base and a tan padded top. A roll of white paper is attached to the left end of the table, with a sheet pulled across the top surface. Sitting on the edge of this table is the patient, a young boy with curly brown hair and a concerned facial expression. He is wearing a short-sleeved t-shirt with horizontal green and yellow stripes, long brown pants, and red sneakers with white soles and laces. His hands are resting on the table beside him. Behind the patient on the yellow-striped wall is a large white poster featuring three anatomical diagrams of a human body: the circulatory system on the left, the muscular system in the center, and the skeletal system on the right. Moving to the center, a light brown wooden desk sits on the light-colored wooden floor. On the desk is a computer monitor with a glowing, multi-colored screen, a gray keyboard, and a small mouse. To the right of the desk, the doctor, an older man with short gray hair and a friendly expression, sits in a brown office chair. He is dressed in a white lab coat over a blue V-neck shirt, brown trousers, and dark brown shoes. A stethoscope hangs around his neck. He holds a brown clipboard in his left hand and gestures toward the computer screen with his right hand while looking at the patient. Behind the doctor is a large, arched wooden-framed window. The window is flanked by two long green curtains that are tied back with matching fabric loops. Through the window, a bright daytime scene is visible, featuring lush green trees under a pale blue sky with several fluffy white clouds. The entire illustration is encased within a thin, rounded brown border against a pale yellow background.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "an older doctor with gray hair",
+            "a young boy with curly hair"
+          ],
+          "S": [
+            "a doctor's office with yellow walls",
+            "a sunny day outside the window",
+            "an anatomical poster on the wall"
+          ],
+          "IE": [
+            "the boy arrived for his check-up",
+            "the doctor started explaining the results"
+          ],
+          "IR": [
+            "the boy looks a little bit worried",
+            "the doctor seems friendly and calm"
+          ],
+          "P": [
+            "the doctor wants to help the boy",
+            "the boy wants to feel better soon"
+          ],
+          "A": [
+            "sitting on the padded exam table",
+            "pointing toward the bright computer screen",
+            "holding a brown clipboard in his hand"
+          ],
+          "CO": [
+            "the boy learns about his body",
+            "the doctor finishes the medical exam"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "a striped green and yellow shirt",
+            "a large white anatomical poster",
+            "long green curtains tied back",
+            "a glowing multi-colored computer screen"
+          ],
+          "ADV": [
+            "kindly",
+            "nervously",
+            "clearly",
+            "patiently"
+          ],
+          "SC": [
+            "because he is at the doctor",
+            "while the doctor explains the screen",
+            "when the boy listens carefully"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "worries",
+            "understands",
+            "wonders"
+          ],
+          "L": [
+            "explains",
+            "tells",
+            "describes",
+            "speaks"
+          ]
+        }
+      }
     }
   ]
 }

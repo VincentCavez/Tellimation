@@ -17,7 +17,76 @@
         "teacher",
         "ball"
       ],
-      "composition_instructions": "Place boy on the blacktop ground (center), sitting with legs stretched out, left knee scraped and red, clutching it with one hand, face scrunched as if about to cry. Place teacher walking briskly toward the boy from the right, expression concerned, one hand reaching out. Place ball on the ground a few feet from the boy."
+      "composition_instructions": "Place boy on the blacktop ground (center), sitting with legs stretched out, left knee scraped and red, clutching it with one hand, face scrunched as if about to cry. Place teacher walking briskly toward the boy from the right, expression concerned, one hand reaching out. Place ball on the ground a few feet from the boy.",
+      "scene_description": "In the foreground on the left, a boy with short brown hair sits on a dark grey asphalt surface, crying with his mouth open and eyes squinted. He wears a light blue t-shirt under blue denim overalls, white socks, and brown shoes. His left knee is scraped and red. To his left is a partial blue and orange circular line painted on the ground. In front of him is a hopscotch grid with yellow, blue, and white squares containing numbers. To the right of the hopscotch grid sits a solid red ball on the asphalt near the edge of a grassy area. Approaching from the right is a teacher with brown hair tied in a bun and a concerned facial expression. She wears a green cardigan over a light blue collared shirt, a brown knee-length skirt, dark blue tights, and brown shoes. She is mid-stride, walking toward the boy with her hands slightly raised. The ground on the right is covered in green grass dotted with small white, pink, and yellow flowers. Behind the boy and the teacher, a chain-link fence with a metal top rail spans the width of the scene. Several small green bushes grow along the base of the fence. Three large trees with thick brown trunks and rounded green canopies are positioned across the midground: one on the far left, one behind the red ball, and one on the far right. Behind the teacher and to the right of the center tree is a playground structure featuring a blue and yellow ladder and a green slide with yellow railings. In the background, behind the fence, is a long, single-story brick building with several rectangular windows. The sky above is a light blue, filled with several large, fluffy white clouds, indicating a clear, sunny day.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "a young boy in blue overalls",
+            "a concerned teacher with a bun"
+          ],
+          "S": [
+            "a sunny school playground",
+            "a long brick building in background",
+            "green grass with small flowers"
+          ],
+          "IE": [
+            "the boy fell on the asphalt",
+            "the boy scraped his left knee"
+          ],
+          "IR": [
+            "the boy feels very sad",
+            "the teacher looks worried and concerned"
+          ],
+          "P": [
+            "the teacher wants to help him",
+            "the boy wants his knee to stop hurting"
+          ],
+          "A": [
+            "the boy is sitting and crying",
+            "the teacher is walking toward the boy"
+          ],
+          "CO": [
+            "a red scrape on the boy's knee",
+            "the red ball stopped near the grass"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "a solid red ball",
+            "a green cardigan over a blue shirt",
+            "a colorful hopscotch grid"
+          ],
+          "ADV": [
+            "loudly",
+            "quickly",
+            "anxiously",
+            "painfully"
+          ],
+          "SC": [
+            "because he is hurt",
+            "after he fell down",
+            "as the teacher approaches"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "feels",
+            "worries",
+            "notices",
+            "wants"
+          ],
+          "L": [
+            "cries",
+            "sobs",
+            "calls",
+            "gasps"
+          ]
+        }
+      }
     }
   ]
 }

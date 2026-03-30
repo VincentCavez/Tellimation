@@ -15,7 +15,85 @@
         "girl",
         "tree"
       ],
-      "composition_instructions": "Place girl on the weathered wooden bench under the tree, sitting with a sketchbook open on her lap, looking up at the canopy."
+      "composition_instructions": "Place girl on the weathered wooden bench under the tree, sitting with a sketchbook open on her lap, looking up at the canopy.",
+      "scene_description": "In the foreground on the left, a grassy hill slopes downward, dotted with small flowers in shades of white, yellow, blue, and orange, along with green clovers and several fallen orange oak leaves. A large tree stands on the left side of the hill, featuring a thick, textured brown trunk and a wide canopy of lobed leaves in shades of green, yellow, and orange. Several brown acorns hang from the branches of the tree. Beneath the tree's canopy, a brown wooden bench sits on the grass. A girl with brown hair tied in a ponytail is seated on the right side of the bench, facing right and looking upward with a smile. She wears a light blue short-sleeved shirt, yellow trousers, and brown shoes. She holds a pencil in her right hand and is writing or drawing in an open white notebook resting on her lap. To the right of the hill and extending into the midground, a vast landscape of rolling hills and patchwork fields in shades of green and yellow stretches toward the horizon. In the background, a pale blue sky is filled with several large, soft, white clouds. The scene is brightly lit, suggesting a clear, sunny day.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "girl with brown hair in a ponytail",
+            "girl wearing a light blue shirt",
+            "girl in yellow trousers and brown shoes"
+          ],
+          "S": [
+            "grassy hill with colorful wildflowers",
+            "large oak tree with autumn leaves",
+            "vast landscape of patchwork fields",
+            "sunny day with soft white clouds"
+          ],
+          "IE": [
+            "the girl found a peaceful spot",
+            "the beautiful view inspired her",
+            "a gentle breeze blew leaves down"
+          ],
+          "IR": [
+            "the girl looks happy and relaxed",
+            "she seems curious about the clouds",
+            "she feels inspired by nature"
+          ],
+          "P": [
+            "to draw the rolling hills",
+            "to write a story about the tree",
+            "to enjoy the fresh air"
+          ],
+          "A": [
+            "sitting on a wooden bench",
+            "writing in an open notebook",
+            "looking up at the sky",
+            "holding a pencil to the paper"
+          ],
+          "CO": [
+            "a beautiful drawing in her notebook",
+            "a feeling of calm and peace",
+            "memories of a sunny afternoon"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "thick textured brown tree trunk",
+            "small white and yellow wildflowers",
+            "wide canopy of colorful lobed leaves",
+            "rolling hills and green patchwork fields"
+          ],
+          "ADV": [
+            "happily",
+            "peacefully",
+            "carefully",
+            "upward"
+          ],
+          "SC": [
+            "because the sun is shining brightly",
+            "while she sits under the tree",
+            "when she looks at the clouds"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "wonders",
+            "imagines",
+            "feels"
+          ],
+          "L": [
+            "describes",
+            "tells",
+            "notes",
+            "whispers"
+          ]
+        }
+      }
     }
   ]
 }

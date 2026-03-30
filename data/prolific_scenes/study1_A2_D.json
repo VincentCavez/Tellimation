@@ -15,7 +15,81 @@
         "musician",
         "boy"
       ],
-      "composition_instructions": "Place musician on a wooden stool against the brick wall, sitting and playing acoustic guitar, left hand pressing a chord, right hand strumming, eyes closed, head tilted. Place boy crouching in front, carefully dropping a coin into the upturned fedora hat on the cobblestones."
+      "composition_instructions": "Place musician on a wooden stool against the brick wall, sitting and playing acoustic guitar, left hand pressing a chord, right hand strumming, eyes closed, head tilted. Place boy crouching in front, carefully dropping a coin into the upturned fedora hat on the cobblestones.",
+      "scene_description": "In the lower-left foreground, a cobblestone street composed of rounded grey and brown stones stretches across the bottom of the frame. On the far left, a tall, black street lamp with a glowing yellow lantern stands beside a reddish-brown brick wall. At the base of this wall, green vines and small flowers in shades of purple, white, and pink grow from the ground. Moving to the right, a storefront features a large window and a door framed by light-colored wood, topped with a wide, orange and yellow striped awning. A small, rounded green tree in a brown terracotta pot sits on the sidewalk next to the shop's entrance. In the center of the scene, a musician with curly brown hair sits on a four-legged wooden stool. He wears a yellow button-down shirt over a green-and-white striped shirt, brown trousers, and blue sneakers with white soles and laces. He has a peaceful expression and is playing a brown acoustic guitar. To his right, a boy with short brown hair is crouching on the cobblestones. The boy wears a blue hooded jacket over a light-colored shirt, brown pants, and green sneakers with white soles. He is holding a gold coin and placing it into a black hat that sits on the ground between him and the musician. The hat contains several other gold coins. Behind the musician and the boy, the cobblestone street continues toward the background, which is filled with green leafy trees and cream-colored buildings featuring brown tiled roofs and arched windows. The sky above is a soft blue with fluffy white and light pink clouds, suggesting the warm light of late afternoon or sunset. The entire scene is rendered in a soft, illustrative style with gentle shadows and warm highlights.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "musician with curly brown hair",
+            "boy wearing a blue hooded jacket",
+            "young boy crouching on the ground"
+          ],
+          "S": [
+            "cobblestone street at sunset",
+            "storefront with an orange striped awning",
+            "tall black street lamp",
+            "buildings with brown tiled roofs"
+          ],
+          "IE": [
+            "musician begins playing his acoustic guitar",
+            "boy notices the hat on the ground"
+          ],
+          "IR": [
+            "musician looks peaceful and content",
+            "boy feels happy to give a coin"
+          ],
+          "P": [
+            "musician wants to share his music",
+            "boy intends to donate his gold coin"
+          ],
+          "A": [
+            "musician is strumming the guitar strings",
+            "boy is dropping a coin into the hat",
+            "sitting on a small wooden stool"
+          ],
+          "CO": [
+            "gold coins are collecting in the hat",
+            "music is entertaining people on the street"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "orange and yellow striped awning",
+            "tall black street lamp",
+            "small rounded green tree",
+            "brown acoustic guitar",
+            "blue hooded jacket"
+          ],
+          "ADV": [
+            "peacefully",
+            "gently",
+            "carefully",
+            "kindly"
+          ],
+          "SC": [
+            "because he enjoys the music",
+            "while the musician plays the guitar",
+            "when the boy sees the hat"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "feels",
+            "enjoys",
+            "wants"
+          ],
+          "L": [
+            "sings",
+            "hums",
+            "thanks",
+            "plays"
+          ]
+        }
+      }
     }
   ]
 }

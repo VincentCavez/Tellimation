@@ -15,7 +15,77 @@
         "woman",
         "toaster"
       ],
-      "composition_instructions": "Place woman near the counter, standing with phone to ear, laughing, completely absorbed, facing away from the toaster. Behind her, the toaster has two slices turned dark brown with thin gray smoke curling upward from the slots."
+      "composition_instructions": "Place woman near the counter, standing with phone to ear, laughing, completely absorbed, facing away from the toaster. Behind her, the toaster has two slices turned dark brown with thin gray smoke curling upward from the slots.",
+      "scene_description": "In the bottom left foreground, a rectangular rug with horizontal stripes of red, orange, tan, and green and small tassels on its right edge lies on a light brown wooden plank floor. Behind the rug, a set of green kitchen cabinets runs along the wall, featuring three wooden doors with vertical grain and small round brass knobs. Above the left side of the cabinets, a large, thick-framed wooden window with a rounded top looks out onto a bright blue sky with white clouds and several rounded, stylized trees in shades of orange and green, suggesting a clear daytime setting. On the wooden countertop to the right of the window, a green toaster with a silver base and a black lever holds two slices of dark brown toast, with several wisps of grey smoke curling upward from the slots. To the right of the toaster sits a black drip coffee maker with a glass carafe partially filled with dark coffee. Further right on the counter is a small blue bowl containing a bunch of yellow bananas and several round orange fruits. Standing in the right foreground on the wooden floor is a woman with shoulder-length brown hair. She wears a yellow long-sleeved sweater over a light blue patterned collared shirt, brown trousers, and green shoes. She is turned toward the right, holding a red smartphone to her ear with her right hand, her eyes closed in a smile as she talks. The wall behind the countertop is covered in light yellow square tiles, and above the tiles are dark brown wooden upper cabinets. The green base cabinets continue behind the woman to the right edge of the frame.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "woman with shoulder-length brown hair",
+            "woman wearing a yellow sweater"
+          ],
+          "S": [
+            "sunny kitchen with a large window",
+            "wooden floor with a striped rug",
+            "green cabinets with wooden doors"
+          ],
+          "IE": [
+            "toast is burning in the toaster",
+            "woman is talking on her phone"
+          ],
+          "IR": [
+            "woman looks happy and distracted",
+            "woman is unaware of the smoke"
+          ],
+          "P": [
+            "to finish her phone conversation",
+            "to make breakfast in the kitchen"
+          ],
+          "A": [
+            "talking on a red smartphone",
+            "standing in the kitchen smiling",
+            "burning two slices of bread"
+          ],
+          "CO": [
+            "smoke rising from the green toaster",
+            "toast becoming dark and burnt"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "small green toaster with smoke",
+            "colorful striped rug on the floor",
+            "red smartphone held to her ear",
+            "dark brown toast inside the toaster"
+          ],
+          "ADV": [
+            "happily",
+            "quietly",
+            "brightly"
+          ],
+          "SC": [
+            "while she talks on the phone",
+            "because the toast is burning",
+            "when she smells the smoke"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "forgets",
+            "enjoys",
+            "notices"
+          ],
+          "L": [
+            "laughs",
+            "chats",
+            "speaks",
+            "tells"
+          ]
+        }
+      }
     }
   ]
 }

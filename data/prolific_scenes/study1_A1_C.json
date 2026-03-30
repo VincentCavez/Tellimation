@@ -15,7 +15,73 @@
         "horse",
         "foal"
       ],
-      "composition_instructions": "Place horse galloping powerfully across the meadow from left to right, legs extended in full stride, mane flowing, tail streaming. Place foal near the wooden fence (right), standing with ears perked forward, watching."
+      "composition_instructions": "Place horse galloping powerfully across the meadow from left to right, legs extended in full stride, mane flowing, tail streaming. Place foal near the wooden fence (right), standing with ears perked forward, watching.",
+      "scene_description": "In the bottom left foreground, tall blades of green grass surround a cluster of orange and yellow cup-shaped flowers on thin green stems. Moving right along the bottom edge, there are patches of green clovers and scattered small blue five-petaled flowers with yellow centers. In the bottom right corner, another cluster of yellow and orange flowers sits amidst tall grass. In the midground on the left, a large white horse is galloping toward the right side of the frame. The horse has a long, flowing cream-colored mane and tail, a simple black eye, and dark grey hooves. Its front left leg is extended forward while its other legs are in various stages of a running stride. It is positioned over a patch of darker green grass filled with small blue flowers. To the right of the horse, in the right third of the grassy field, stands a small brown foal. The foal is stationary, facing left toward the larger horse, and has a short dark brown mane and tail with dark grey hooves. Behind both animals, a brown wooden fence with horizontal rails and vertical posts spans the width of the scene. Beyond the fence, the landscape consists of rolling green hills and clusters of rounded green bushes. On the far left and far right sides of the background, there are groups of leafy green trees with brown trunks. The top of the scene is a bright blue sky filled with several large, fluffy white clouds. A soft yellow glow emanates from behind the central clouds, indicating a clear, sunny day.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "a large white horse galloping",
+            "a small brown foal standing still"
+          ],
+          "S": [
+            "a sunny green field with flowers",
+            "rolling hills under a blue sky",
+            "a brown wooden fence in midground"
+          ],
+          "IE": [
+            "the white horse starts to gallop",
+            "the sun shines over the hills"
+          ],
+          "IR": [
+            "the horse feels energetic and free",
+            "the foal feels curious and watchful"
+          ],
+          "P": [
+            "the horse wants to run fast",
+            "the foal plans to follow along"
+          ],
+          "A": [
+            "galloping across the grassy field",
+            "standing still and watching the horse"
+          ],
+          "CO": [
+            "the horse moves across the field",
+            "the foal stays near the fence"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "long flowing cream-colored mane",
+            "small blue five-petaled flowers",
+            "tall blades of green grass"
+          ],
+          "ADV": [
+            "galloping quickly through the meadow",
+            "standing patiently near the trees",
+            "shining brightly in the sky"
+          ],
+          "SC": [
+            "while the horse is running",
+            "because the sun is shining",
+            "as the foal watches"
+          ],
+          "CC": [
+            "the horse runs and jumps",
+            "the foal watches but stays",
+            "it is sunny so they play"
+          ],
+          "M": [
+            "the horse feels very happy",
+            "the foal wants to play",
+            "the horse knows the way"
+          ],
+          "L": [
+            "the horse neighs loudly",
+            "the foal calls out",
+            "the horse whinnies to the foal"
+          ]
+        }
+      }
     }
   ]
 }

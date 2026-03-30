@@ -19,7 +19,76 @@
         "block",
         "shoe"
       ],
-      "composition_instructions": "Place teddy inside the toy box, propped against the inside wall. Place doll draped over the edge of the toy box. Place block tower on the rug beside the box, stacked. Place shoe inside the toy box among the toys, clearly out of place."
+      "composition_instructions": "Place teddy inside the toy box, propped against the inside wall. Place doll draped over the edge of the toy box. Place block tower on the rug beside the box, stacked. Place shoe inside the toy box among the toys, clearly out of place.",
+      "scene_description": "In the foreground on the left, a cluster of blocks sits on a green patterned rug with yellow and blue swirling designs; this group includes a red cube, a yellow cube, a blue cube, a green cube, another red cube, and a tan triangular prism. To the right of these, a single shoe, which is a green and brown sneaker with yellow laces and a white sole, rests on the rug. In the center foreground, a tall stack of blocks consists of a large green cube at the base, followed by a yellow rectangular prism, a blue cylinder, a tan triangular prism, and a small yellow cube at the top. To the right of this stack is a small structure made of a blue rectangular block base, a tan cylinder, and a red triangular block roof. Further right, another structure features a tan arch-shaped block base supporting a green rectangular block and a tan rectangular block, topped with a blue triangular block roof. A single red cube block sits on the far right edge of the rug. The rug itself lies on a light-colored wooden floor. In the middle ground on the left, a large wooden toy chest with visible dovetail joints stands with its lid open. A doll with brown yarn hair, wearing a green dress with yellow patches and small brown shoes, stands upright against the left side of the chest. Inside the open chest, a brown teddy with a light-colored snout and ears sits facing right, alongside other partially visible toys. Above the toy chest, a wooden shelf is mounted on the light pink wall, holding a yellow picture frame, a round pink object, and a green vase. To the right of the toy chest, a large window is framed by light-colored curtains with orange polka dots, tied back with matching fabric. Through the window, a sunny outdoor landscape is visible, featuring rolling green hills, several green and orange trees, and a blue sky with fluffy white clouds under a bright sun.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "brown teddy bear sitting in the chest",
+            "doll with brown yarn hair and dress"
+          ],
+          "S": [
+            "sunny day in a child's bedroom",
+            "rolling green hills outside the window",
+            "green patterned rug on wooden floor"
+          ],
+          "IE": [
+            "the toy chest was left wide open",
+            "blocks were taken out to build towers"
+          ],
+          "IR": [
+            "the doll looks happy and ready to play",
+            "the teddy bear feels safe in the chest"
+          ],
+          "P": [
+            "someone wanted to build a tall tower",
+            "the toys want to stay out and play"
+          ],
+          "A": [
+            "the doll stands against the wooden chest",
+            "the teddy bear sits among the toys"
+          ],
+          "CO": [
+            "colorful blocks are scattered on the rug",
+            "a single shoe sits alone on the floor"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "large wooden toy chest with open lid",
+            "green and brown sneaker with yellow laces",
+            "tall stack of colorful wooden blocks",
+            "green patterned rug with yellow swirls"
+          ],
+          "ADV": [
+            "neatly",
+            "brightly",
+            "quietly",
+            "carefully"
+          ],
+          "SC": [
+            "because the chest is open",
+            "while the sun is shining",
+            "after the child finished playing"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "wants",
+            "likes",
+            "remembers"
+          ],
+          "L": [
+            "says",
+            "tells",
+            "whispers"
+          ]
+        }
+      }
     }
   ]
 }

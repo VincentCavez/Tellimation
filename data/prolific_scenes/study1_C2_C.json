@@ -19,7 +19,90 @@
         "orange",
         "tennis_ball"
       ],
-      "composition_instructions": "Place apple in the fruit bowl (left side). Place banana in the bowl (curved naturally). Place orange in the bowl. Place tennis_ball tucked among the fruit in the bowl, clearly not a fruit."
+      "composition_instructions": "Place apple in the fruit bowl (left side). Place banana in the bowl (curved naturally). Place orange in the bowl. Place tennis_ball tucked among the fruit in the bowl, clearly not a fruit.",
+      "scene_description": "In the immediate foreground at the bottom of the scene is a tiled floor consisting of large, square, light-tan tiles with dark grout lines. Above the floor is a thick wooden countertop made of horizontal planks in a warm brown color with visible wood grain, extending across the width of the image. On the left side of the counter sits a shallow, cream-colored ceramic bowl decorated with a brown pattern of repeating loops and dots around its rim. Inside the bowl, from left to right, is a red apple with a small green leaf, a green tennis_ball with white curved lines, a bright orange with a small green leaf positioned behind the ball, and a yellow banana with brown spots curving upward on the right. To the right of the bowl on the counter is a tan and cream-colored ceramic vase with a wide cream band around its center. The vase holds a bouquet of small peach-colored flowers with yellow centers on thin green stems. Behind the bowl and vase is a backsplash made of square, light-tan marbled tiles, featuring occasional decorative tiles with a blue and white diamond pattern. A large, rectangular window with a tan frame is centered in the wall above the counter. Through the window, a bright daytime scene is visible under a pale blue sky filled with large, fluffy white clouds. On the left side of the window view is a large tree with a brown trunk and green foliage, with several green bushes beneath it. The middle ground through the window shows a green grassy field dotted with small white, yellow, and purple flowers, leading to rolling green hills and stylized trees in the far distance. The wall surrounding the window is a solid, light-cream color, and soft light from the window casts gentle shadows across the wooden countertop.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "a round red apple with a leaf",
+            "a long yellow banana with brown spots",
+            "a bright orange fruit in the bowl",
+            "a green tennis ball among the fruit"
+          ],
+          "S": [
+            "a sunny kitchen with a large window",
+            "rolling green hills under fluffy white clouds",
+            "a warm wooden countertop and tiled floor",
+            "a large leafy tree outside the window"
+          ],
+          "IE": [
+            "someone put a tennis ball in the bowl",
+            "the morning sun began to shine brightly",
+            "fresh flowers were placed in the vase"
+          ],
+          "IR": [
+            "feeling confused by the green tennis ball",
+            "feeling peaceful in the quiet sunny kitchen",
+            "wanting to go outside and play"
+          ],
+          "P": [
+            "to pick a healthy piece of fruit",
+            "to take the ball to the park",
+            "to enjoy the beautiful view outside"
+          ],
+          "A": [
+            "resting inside the decorated ceramic bowl",
+            "blooming in the tan and cream vase",
+            "shining through the clear glass window"
+          ],
+          "CO": [
+            "the kitchen looks very bright and inviting",
+            "the fruit bowl has a surprise inside",
+            "the flowers make the room smell nice"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "a bright red apple with a leaf",
+            "a long yellow banana with brown spots",
+            "a round green tennis ball with stripes",
+            "a tan vase holding peach-colored flowers",
+            "a thick wooden counter with visible grain"
+          ],
+          "ADV": [
+            "brightly",
+            "quietly",
+            "strangely",
+            "neatly",
+            "peacefully"
+          ],
+          "SC": [
+            "because the sun is shining today",
+            "when someone wants a healthy snack",
+            "while the flowers are still fresh"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so",
+            "or"
+          ],
+          "M": [
+            "wonders",
+            "notices",
+            "thinks",
+            "remembers",
+            "knows"
+          ],
+          "L": [
+            "asks",
+            "tells",
+            "says",
+            "whispers",
+            "calls"
+          ]
+        }
+      }
     }
   ]
 }

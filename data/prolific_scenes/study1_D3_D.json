@@ -15,7 +15,74 @@
         "baby",
         "father"
       ],
-      "composition_instructions": "Place baby on the hardwood floor, crawling energetically toward the open staircase, about one meter from the first step. Place father on the couch (far wall), deeply absorbed in a thick paperback, legs on coffee table, not seeing the baby."
+      "composition_instructions": "Place baby on the hardwood floor, crawling energetically toward the open staircase, about one meter from the first step. Place father on the couch (far wall), deeply absorbed in a thick paperback, legs on coffee table, not seeing the baby.",
+      "scene_description": "In the bottom left corner of the scene, a wooden staircase with brown steps and a matching railing ascends toward the upper left. At the base of the stairs, two wooden safety gates are swung wide open, attached to the wall and the banister. A baby with light brown hair, wearing a light blue short-sleeved onesie, is crawling on the light brown wooden floor toward the open gates. To the right of the baby, in the center foreground, sits a round, low wooden coffee table with four legs. On top of the table is a white mug decorated with green leaf patterns. Further to the right, in the bottom right corner, a colorful rectangular play mat with star and heart patterns lies on the floor. On the mat, a brown teddy bear sits upright next to a set of four colorful alphabet blocks labeled A, B, C, and D. Also on the mat are a small orange toy car and a stuffed turtle toy with a pink shell and blue limbs. Behind the coffee table, a green upholstered sofa sits against the wall. A yellow knitted blanket is draped over the left armrest. The father, a man with curly brown hair, is sitting on the sofa, leaning back against a white pillow. He is wearing a green sweater with a white pattern and grey trousers, and he is holding an open blue book with the word \"STORIES\" on the cover. Behind the sofa is a large, three-paneled arched window with a wooden frame. Through the window, a bright outdoor scene is visible under a blue sky with white clouds, featuring a green lawn with small white and blue flowers and two rounded green trees. The interior walls are painted light blue and decorated with soft white cloud patterns that match the sky outside. The scene is set indoors during a bright, sunny day.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "baby with light brown hair",
+            "father with curly brown hair"
+          ],
+          "S": [
+            "sunny living room with blue walls",
+            "large arched window showing green trees",
+            "wooden staircase with open safety gates"
+          ],
+          "IE": [
+            "baby crawling toward the open gates",
+            "father reading a book on the sofa"
+          ],
+          "IR": [
+            "baby feeling curious about the stairs",
+            "father feeling relaxed while reading"
+          ],
+          "P": [
+            "baby trying to climb the stairs",
+            "father wanting to finish his story"
+          ],
+          "A": [
+            "crawling across the wooden floor",
+            "sitting on the green sofa reading"
+          ],
+          "CO": [
+            "baby getting closer to the stairs",
+            "father not noticing the open gates"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "light blue short-sleeved onesie",
+            "round low wooden coffee table",
+            "large three-paneled arched window",
+            "colorful rectangular play mat"
+          ],
+          "ADV": [
+            "quietly",
+            "steadily",
+            "peacefully"
+          ],
+          "SC": [
+            "while the father reads",
+            "because the gates are open",
+            "as the baby crawls"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "wonders",
+            "enjoys",
+            "notices"
+          ],
+          "L": [
+            "reads",
+            "tells",
+            "narrates"
+          ]
+        }
+      }
     }
   ]
 }

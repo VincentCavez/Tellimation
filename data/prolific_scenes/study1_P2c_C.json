@@ -15,7 +15,83 @@
         "man",
         "car"
       ],
-      "composition_instructions": "Place man beside the red sports car, standing with arms crossed and smiling proudly. Place car freshly washed, mirror-smooth and gleaming in sunlight with water droplets beading on hood and roof."
+      "composition_instructions": "Place man beside the red sports car, standing with arms crossed and smiling proudly. Place car freshly washed, mirror-smooth and gleaming in sunlight with water droplets beading on hood and roof.",
+      "scene_description": "In the bottom left foreground, a patch of green grass is dotted with small yellow and white flowers and green clovers. A dark grey, wet paved road begins here, featuring several light blue puddles of water. A long, rectangular metal drainage grate with horizontal bars runs diagonally from the lower center toward the right middle ground, bisecting the wet road. To the right of this grate, in the bottom right corner, is another patch of green grass and dense bushes containing small white, yellow, and blue flowers. Moving into the middle ground on the left, a small, light-brown wooden shed with a slanted roof stands on a grassy area. Inside the open front of the shed, a stack of four folded towels in alternating shades of light blue and light green sits on a shelf next to three small, grey, square boxes. Behind the shed are low green bushes and several large, rounded trees with autumn-colored leaves in shades of yellow and orange. In the middle ground on the right, the paved road continues, and a red car with a rear spoiler is parked on it. The car is covered in small, light-blue water droplets. Standing immediately to the right of the car is a man with curly brown hair, wearing a green and yellow striped sweater, brown trousers, and brown shoes. The man stands with his arms crossed, looking toward the left with a smile. In the background, behind the car and the man, are rolling green hills and a small cluster of tan buildings with domed roofs. The scene is set under a bright blue sky filled with several soft, white, puffy clouds, with a pale yellow sun low on the right horizon, suggesting early morning or late afternoon light.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "man with curly brown hair",
+            "man wearing a green and yellow sweater"
+          ],
+          "S": [
+            "bright blue sky with puffy clouds",
+            "wet paved road with light blue puddles",
+            "small wooden shed with folded towels",
+            "rolling green hills in the background",
+            "early morning or late afternoon sunlight"
+          ],
+          "IE": [
+            "the red car has just been washed",
+            "water is dripping off the car's body"
+          ],
+          "IR": [
+            "the man looks proud and happy",
+            "the man feels satisfied with his work"
+          ],
+          "P": [
+            "the man wants to dry the car",
+            "the man plans to use the towels"
+          ],
+          "A": [
+            "the man stands with his arms crossed",
+            "water flows toward the metal drainage grate",
+            "the man smiles at his clean car"
+          ],
+          "CO": [
+            "the car is now clean and shiny",
+            "the road is covered in wet puddles"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "shiny red car with a rear spoiler",
+            "stack of four colorful folded towels",
+            "long rectangular metal drainage grate",
+            "small light-brown wooden shed",
+            "curly-haired man in a striped sweater"
+          ],
+          "ADV": [
+            "proudly",
+            "patiently",
+            "brightly",
+            "neatly",
+            "quietly"
+          ],
+          "SC": [
+            "because the car is very wet",
+            "while the water drains away",
+            "after he finished washing the car"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "feels",
+            "admires",
+            "wonders",
+            "knows"
+          ],
+          "L": [
+            "says",
+            "tells",
+            "explains",
+            "whispers"
+          ]
+        }
+      }
     }
   ]
 }

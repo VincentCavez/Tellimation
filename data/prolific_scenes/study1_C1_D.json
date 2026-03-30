@@ -19,7 +19,83 @@
         "cupcake_3",
         "baker"
       ],
-      "composition_instructions": "Place cupcake_1 on the middle shelf (left), with sugar flower slightly tilted. Place cupcake_2 on the shelf (center), sitting perfectly upright. Place cupcake_3 on the shelf (right), with a tiny crumb fallen beside it. Place baker behind the marble counter, standing and holding tongs, smiling."
+      "composition_instructions": "Place cupcake_1 on the middle shelf (left), with sugar flower slightly tilted. Place cupcake_2 on the shelf (center), sitting perfectly upright. Place cupcake_3 on the shelf (right), with a tiny crumb fallen beside it. Place baker behind the marble counter, standing and holding tongs, smiling.",
+      "scene_description": "In the foreground, a floor made of large, light brown rectangular tiles spans the bottom of the scene. Above the floor sits a large bakery display case with a curved glass front and a wooden frame. The base of the display case features a white and gray marble-patterned panel. Inside the case, there are three transparent glass shelves. On the top shelf, from left to right, sit three cupcakes. The cupcake on the left, cupcake_1, has tall, swirled pink frosting topped with a single dark brown berry and is held in a dark brown paper liner decorated with a yellow floral pattern. In the center of the top shelf is cupcake_2, which has swirled pink frosting with small red sprinkles, a red cherry with a green stem on top, and a light tan pleated paper liner. To the right on the same shelf is cupcake_3, which is identical to cupcake_2 with pink frosting, red sprinkles, a cherry on top, and a tan liner; a few small brown crumbs lie on the glass shelf just to its right. Behind the display case stands the baker, a young man with short brown hair and a smiling expression. He wears a green long-sleeved shirt and a white apron that covers his torso. He is positioned slightly to the right of center and holds a pair of wooden tongs in his right hand. To the left of the display case is a green counter with gold trim, topped with a potted plant featuring yellow-orange leaves. Above this counter, a wooden shelf holds a white jar, a clear glass bottle filled with liquid, and a cluster of green foliage. To the right of the display case is another green counter with gold trim, upon which sits a light blue cash register. Above the register are two wooden shelves; the upper shelf holds three jars with various colored lids, and the lower shelf holds three small potted plants. The background wall consists of vertical light brown wood panels. Centered on the wall behind the baker is a large rectangular chalkboard with a wooden frame, featuring white cursive writing and decorative scrollwork at the corners. In the upper left and upper right corners of the scene, bundles of dried yellow and green leaves hang from the wall. The overall setting is a brightly lit, warm interior of a bakery during the daytime.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "a young man with short brown hair",
+            "a smiling baker wearing a white apron",
+            "a friendly shopkeeper in a green shirt"
+          ],
+          "S": [
+            "a warm and brightly lit bakery interior",
+            "a large wooden display case with glass",
+            "a chalkboard menu on the back wall",
+            "shelves filled with jars and small plants"
+          ],
+          "IE": [
+            "the baker is ready to serve customers",
+            "only three cupcakes are left in the case"
+          ],
+          "IR": [
+            "the baker looks happy and friendly",
+            "the baker feels proud of his cupcakes"
+          ],
+          "P": [
+            "the baker wants to sell the treats",
+            "the baker is preparing to use the tongs"
+          ],
+          "A": [
+            "the baker is holding wooden tongs",
+            "the baker is smiling at the shop",
+            "three cupcakes sit on the top shelf"
+          ],
+          "CO": [
+            "the display case is almost empty",
+            "the bakery is ready for business"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "a pink cupcake with a dark berry",
+            "a large curved glass display case",
+            "a white and gray marble panel",
+            "a dark chalkboard with white writing"
+          ],
+          "ADV": [
+            "happily",
+            "neatly",
+            "carefully",
+            "brightly",
+            "patiently"
+          ],
+          "SC": [
+            "because the bakery is now open",
+            "while he holds the wooden tongs",
+            "when a customer comes inside"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "hopes",
+            "thinks",
+            "wonders",
+            "likes",
+            "knows"
+          ],
+          "L": [
+            "greets",
+            "offers",
+            "explains",
+            "suggests",
+            "welcomes"
+          ]
+        }
+      }
     }
   ]
 }

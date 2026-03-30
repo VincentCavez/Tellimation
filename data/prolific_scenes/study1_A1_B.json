@@ -15,7 +15,87 @@
         "boy",
         "girl"
       ],
-      "composition_instructions": "Place boy on the skateboard, crouching and racing down a sloped ramp at full speed, arms out for balance, knees deeply bent. Place girl on the wooden bench along the fence, sitting with legs crossed, watching and sipping a juice box."
+      "composition_instructions": "Place boy on the skateboard, crouching and racing down a sloped ramp at full speed, arms out for balance, knees deeply bent. Place girl on the wooden bench along the fence, sitting with legs crossed, watching and sipping a juice box.",
+      "scene_description": "In the bottom left foreground, green leafy plants with small yellow and white flowers and four-leaf clovers grow near a concrete wall decorated with colorful blue, green, and orange graffiti. To the right, a grey metal grind rail with four legs stands on the flat concrete ground. In the bottom right corner, more green plants with white flowers and clovers are visible. Behind the grind rail and to the left, there is a small, grey concrete wedge ramp. To the right of the center, a boy with brown hair, wearing a green and white striped t-shirt, brown shorts, black knee pads, and blue sneakers, is skateboarding on a curved wooden ramp. He is leaning forward with his left hand on the ramp's edge and his right arm extended behind him; his brown skateboard features a small sun logo and black wheels. Behind the skatepark area is a low concrete ledge, and further back, a chain-link fence spans the width of the image. On the left side, behind the fence, a girl with brown hair in a ponytail, wearing a yellow sweater, blue pants, and brown shoes, sits on a wooden bench with dark metal legs while drinking from a cup with a straw. The background consists of a grassy field with small flowers, several large, rounded green trees with brown trunks, and a pale blue sky filled with soft white clouds, all bathed in a warm, golden light.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "a boy with brown hair in a striped shirt",
+            "a girl with a ponytail drinking from a cup",
+            "a young skateboarder wearing black knee pads"
+          ],
+          "S": [
+            "a sunny skatepark with large green trees",
+            "a grassy field behind a chain-link fence",
+            "warm golden light during a clear afternoon",
+            "concrete walls decorated with colorful graffiti"
+          ],
+          "IE": [
+            "the boy drops into the curved wooden ramp",
+            "the girl sits down to take a break",
+            "the sun begins to set over the park"
+          ],
+          "IR": [
+            "the boy looks focused on his skate trick",
+            "the girl feels relaxed while drinking her juice",
+            "the boy feels determined to stay balanced"
+          ],
+          "P": [
+            "the boy wants to ride down the ramp",
+            "the girl plans to watch her friend skate",
+            "the boy intends to land a cool trick"
+          ],
+          "A": [
+            "the boy is skateboarding on a wooden ramp",
+            "the girl is sipping a drink through a straw",
+            "the boy is leaning forward to keep balance"
+          ],
+          "CO": [
+            "the skateboard moves quickly down the curve",
+            "the girl's thirst is quenched by her drink",
+            "the boy successfully stays on his brown board"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "a green and white striped t-shirt",
+            "a brown skateboard with a sun logo",
+            "colorful blue and orange graffiti",
+            "a grey metal grind rail with legs"
+          ],
+          "ADV": [
+            "carefully",
+            "quickly",
+            "steadily",
+            "calmly",
+            "smoothly"
+          ],
+          "SC": [
+            "while the girl drinks her juice",
+            "because he wants to practice skating",
+            "when the boy reaches the bottom"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so",
+            "or"
+          ],
+          "M": [
+            "thinks",
+            "concentrates",
+            "wonders",
+            "enjoys",
+            "decides"
+          ],
+          "L": [
+            "shouts",
+            "says",
+            "cheers",
+            "explains"
+          ]
+        }
+      }
     }
   ]
 }

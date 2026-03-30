@@ -15,7 +15,78 @@
         "large_box",
         "hidden_toy"
       ],
-      "composition_instructions": "Place large_box (race car set) at the front of the shelf, taking up most visible space. Place hidden_toy (small ornate music box with ballerina figure, gold hinges, floral carvings) tucked behind the large box, barely visible at the edge."
+      "composition_instructions": "Place large_box (race car set) at the front of the shelf, taking up most visible space. Place hidden_toy (small ornate music box with ballerina figure, gold hinges, floral carvings) tucked behind the large box, barely visible at the edge.",
+      "scene_description": "In the foreground of this indoor toy store scene, a polished brown wooden floor features three green oval rugs along the bottom edge, with two additional green oval rugs positioned under the front corners of a large four-tiered wooden bookshelf. On the bottom shelf, from left to right, there is a green box depicting a steam train, a yellow box with a similar train, a brown box showing a small airplane, a blue box with a moon and stars, a green box with colorful building blocks, a yellow box with a small yellow car, another yellow box with blocks, an orange box with a blue and green truck, and a blue box with a white rocket. Moving up to the second shelf from the bottom, the left side holds a green box with a train and a blue box showing a boat on waves. Next to these is an open wooden music box decorated with flowers, which contains a hidden_toy in the form of a small ballerina with brown hair wearing a pink tutu, standing in a dance pose. In the center of this shelf sits a large_box, a brown wooden chest with a green front panel featuring a red and white striped sports car. To the right of the large_box is a yellow box with a brown teddy bear, a green box with a small train, and two green boxes containing building blocks. On the third shelf from the bottom, starting from the left, is a yellow box with a train, a yellow box with a truck, a blue box with a rocket, and a green box with blocks. The central area of this shelf is partially obscured by the large_box below it. To the right of the center are a yellow box with a teddy bear, a yellow box with blocks, a brown box with a teddy bear, and a yellow box with blocks. The top shelf holds two green boxes with trains on the left, followed by a yellow box with a plane, a blue box with a rocket, and another blue box with a rocket. To the right are four yellow boxes with blocks and one brown box with blocks, which has a small green toy sitting on top of it. Small white, yellow, and green labels are attached to the front edges of the shelves below various boxes. The background consists of a light-colored wooden wall where four framed pictures hang: the leftmost shows a boat, the middle-left shows a rocket, the middle-right shows a tree in a field, and the rightmost shows a rocket. Three rectangular ceiling lights are mounted at the top of the scene, casting three distinct cones of light down onto the bookshelf.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "small ballerina with brown hair",
+            "tiny dancer in a pink tutu"
+          ],
+          "S": [
+            "indoor toy store with wooden shelves",
+            "polished floor with green oval rugs",
+            "light-colored wall with framed pictures"
+          ],
+          "IE": [
+            "the music box has been opened",
+            "the ballerina is revealed to everyone"
+          ],
+          "IR": [
+            "the ballerina looks ready to perform",
+            "the toys seem to wait for children"
+          ],
+          "P": [
+            "the ballerina wants to spin around",
+            "a child might choose a new toy"
+          ],
+          "A": [
+            "ballerina standing in a dance pose",
+            "lights casting cones onto the shelves"
+          ],
+          "CO": [
+            "the hidden toy is now visible",
+            "the shelf is full of colorful options"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "large brown chest with a green panel",
+            "red and white striped sports car",
+            "small ballerina wearing a pink tutu",
+            "four-tiered wooden bookshelf full of toys"
+          ],
+          "ADV": [
+            "neatly",
+            "gracefully",
+            "brightly",
+            "quietly"
+          ],
+          "SC": [
+            "because the lid is open",
+            "when the store is quiet",
+            "while the ballerina waits to dance"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "or",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "wants",
+            "knows",
+            "imagines"
+          ],
+          "L": [
+            "sings",
+            "whispers",
+            "invites",
+            "tells"
+          ]
+        }
+      }
     }
   ]
 }

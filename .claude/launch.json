@@ -21,6 +21,13 @@
       "runtimeArgs": ["-m", "http.server", "8080"],
       "port": 8080,
       "autoPort": false
+    },
+    {
+      "name": "pipeline-ui",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "scripts.study_gen.pipeline_ui", "--port", "5002"],
+      "port": 5002,
+      "autoPort": false
     }
   ]
 }

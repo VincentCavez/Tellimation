@@ -15,7 +15,78 @@
         "woman",
         "book"
       ],
-      "composition_instructions": "Place woman lying fully stretched out in the hammock, suspended off the ground, one arm trailing over the edge with fingers nearly brushing the sand. Place book open on her chest, pages ruffled. Eyes closed, expression peaceful."
+      "composition_instructions": "Place woman lying fully stretched out in the hammock, suspended off the ground, one arm trailing over the edge with fingers nearly brushing the sand. Place book open on her chest, pages ruffled. Eyes closed, expression peaceful.",
+      "scene_description": "Starting at the bottom left foreground, there are large, dark green fern-like leaves with many small leaflets. Moving right along the bottom edge, there is a patch of green grass dotted with tiny white and pink four-petaled flowers. A light brown, sandy dirt path winds across the lower third of the scene from the left edge toward the right. On the far right foreground, more large green tropical leaves and a cluster of orange-red flowers with yellow centers sit in the grass. Behind the path on the left midground, there is a large, dense bush covered in small yellow and orange flowers. Next to it is a cluster of bright green ferns. Behind these plants stands a tall palm tree with a thick, segmented brown trunk and large, spreading green fronds. A thick brown rope is tied around this trunk, supporting the left side of a hammock. The hammock is made of fabric with horizontal stripes of blue, yellow, and green. Inside the hammock, a woman with medium-length brown hair is lying on her back, eyes closed in sleep. She wears a short-sleeved yellow t-shirt, dark green pants, and brown shoes. Her left arm hangs relaxed over the side of the hammock. A patterned blanket with blue, red, and white geometric designs is draped over her lower body. An open book with white pages and a small green tree illustration on each page rests on her stomach. To the right of the woman, the hammock is tied with another brown rope to a second tall palm tree, identical in appearance to the first. Behind this second tree on the right side of the midground, there are more lush green tropical plants and another large bush filled with small orange-red flowers. In the far left background, there are more green trees and palm fronds. Behind the central scene, low green bushes and shrubs line the horizon. A calm, light blue sea is visible between the palm trees in the distance. The sky above is a pale blue, filled with soft, rounded white and pale yellow clouds, suggesting a bright, clear day. The overall lighting is warm and even, casting soft shadows.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "a woman with medium-length brown hair",
+            "a person wearing a yellow t-shirt"
+          ],
+          "S": [
+            "a tropical garden by the sea",
+            "a bright sunny day with clouds",
+            "tall palm trees with thick trunks",
+            "a winding sandy path through grass"
+          ],
+          "IE": [
+            "the woman fell asleep while reading",
+            "the sun came out for a nap"
+          ],
+          "IR": [
+            "feeling very peaceful and relaxed",
+            "appearing calm and well-rested"
+          ],
+          "P": [
+            "intending to finish her book",
+            "wanting to take a quiet nap"
+          ],
+          "A": [
+            "sleeping soundly in a striped hammock",
+            "resting her arm over the edge",
+            "lying under a patterned blue blanket"
+          ],
+          "CO": [
+            "the open book rests on her stomach",
+            "the woman is now fast asleep"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "a colorful blue and yellow hammock",
+            "an open book with tree pictures",
+            "lush green ferns and tropical plants",
+            "bright orange and yellow flower bushes"
+          ],
+          "ADV": [
+            "peacefully",
+            "quietly",
+            "deeply",
+            "gently"
+          ],
+          "SC": [
+            "while she was reading her book",
+            "because the garden is so quiet",
+            "as the sun shines brightly"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "dreams",
+            "feels",
+            "knows",
+            "remembers"
+          ],
+          "L": [
+            "sighs",
+            "breathes",
+            "whispers"
+          ]
+        }
+      }
     }
   ]
 }

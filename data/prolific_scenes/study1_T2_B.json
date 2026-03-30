@@ -15,7 +15,84 @@
         "worker",
         "building"
       ],
-      "composition_instructions": "Place worker on the concrete slab, standing and studying a blueprint on a makeshift table of stacked cinder blocks."
+      "composition_instructions": "Place worker on the concrete slab, standing and studying a blueprint on a makeshift table of stacked cinder blocks.",
+      "scene_description": "In the foreground, a brown dirt path scattered with small grey pebbles runs horizontally across the bottom, bordered by green grass filled with small white, yellow, and purple flowers and green clovers. Behind the path, a grey chain-link fence with vertical metal posts spans the width of the scene. On the far left, a large, rounded green tree with a thick brown trunk stands behind the fence. In the center-left, a worker stands facing right, holding a large white blueprint in both hands. The worker has brown hair and wears a yellow hard hat, an orange safety vest over a blue short-sleeved shirt, brown work pants with a tool belt, and brown boots. To the right of the the worker's feet is a stack of three grey cinder blocks. Behind the worker is a building under construction, featuring a yellow facade with brown window frames and a brown roofline. The building is surrounded by an intricate system of wooden scaffolding. To the left of the building's central yellow section, the scaffolding is mostly empty. The central section has two floors with windows, while the right side of the building shows an exposed wooden frame with beams and joists. Within the construction site, several wooden ladders are leaned against the structure, and bags of cement and wooden planks are scattered on various levels of the scaffolding and the ground. To the right of the building, more wooden scaffolding extends outwards. On the far right, another large, rounded green tree stands behind the fence. Behind the building, a tall yellow and grey construction crane rises into the sky, its horizontal jib extending to the left. In the far background, more green trees, bushes, and the roofs of distant houses are visible under a bright sky filled with large, fluffy, cream-colored and white clouds, indicating a clear, sunny day.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "a worker in a yellow hard hat",
+            "a man wearing an orange safety vest",
+            "a builder with a brown tool belt"
+          ],
+          "S": [
+            "a sunny day with fluffy white clouds",
+            "a construction site behind a chain-link fence",
+            "a tall yellow crane in the background",
+            "a dirt path with small grey pebbles"
+          ],
+          "IE": [
+            "the worker looks at the building plans",
+            "a new house is being built",
+            "the crane is ready to lift materials"
+          ],
+          "IR": [
+            "the worker feels focused on his work",
+            "the man seems calm while reading",
+            "the builder looks happy with the progress"
+          ],
+          "P": [
+            "he wants to build a tall house",
+            "the worker plans to use the blocks",
+            "he intends to follow the blueprint"
+          ],
+          "A": [
+            "holding a large white blueprint",
+            "standing next to a stack of blocks",
+            "studying the drawings for the building"
+          ],
+          "CO": [
+            "the house is halfway finished",
+            "scaffolding surrounds the yellow building",
+            "materials are ready for the next step"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "large white blueprint",
+            "tall yellow construction crane",
+            "small grey pebbles on the path",
+            "bright orange safety vest",
+            "grey cinder blocks stacked high"
+          ],
+          "ADV": [
+            "carefully",
+            "intently",
+            "steadily",
+            "quietly"
+          ],
+          "SC": [
+            "while he looks at the plans",
+            "because the house is not finished",
+            "when the crane moves the wood"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "wonders",
+            "decides",
+            "knows"
+          ],
+          "L": [
+            "explains",
+            "tells",
+            "shows"
+          ]
+        }
+      }
     }
   ]
 }

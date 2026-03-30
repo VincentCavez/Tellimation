@@ -15,7 +15,76 @@
         "woman",
         "iron"
       ],
-      "composition_instructions": "Place woman at the ironing board, standing and pressing a light blue dress shirt with a hot iron. The iron releases a thick burst of white steam."
+      "composition_instructions": "Place woman at the ironing board, standing and pressing a light blue dress shirt with a hot iron. The iron releases a thick burst of white steam.",
+      "scene_description": "On the far left, a large window with a rounded brown wooden frame is set into a pale green wall. Through the window, a sunny outdoor scene is visible, featuring rolling green hills dotted with small white and pink flowers, two large leafy green trees, and a bright blue sky with fluffy white clouds. Moving right along the light brown wood-plank floor, a large, light blue front-loading washing machine stands against the wall. It features a circular glass door with a dark gray rim, three small control knobs, and a detergent drawer. To the right of the washing machine, a woman with brown hair tied in a ponytail stands behind a yellow wooden ironing board. She has a cheerful expression and is wearing a light blue long-sleeved sweater, a yellow apron with brown stains, brown pants, and brown shoes. The woman is using a brown and silver iron to press a light blue collared shirt. A large, billowing cloud of white steam rises from the iron toward the right. A green and brown striped cloth is draped over the left side of the ironing board. To the right of the ironing board on the floor sits a round, woven wicker laundry basket filled with orange, blue, and green clothes. Behind the woman, a brown wooden shelf is mounted on the green wall, holding a large green detergent bottle, a yellow box, and a blue spray bottle. The room has a thick brown wooden trim at the top of the walls and a brown baseboard. Centered on the cream-colored ceiling is a circular light fixture with a brown frame and a frosted glass dome.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "woman with brown hair in a ponytail",
+            "cheerful woman wearing a yellow apron"
+          ],
+          "S": [
+            "sunny day visible through the window",
+            "green laundry room with wood floors",
+            "laundry room with a wooden shelf"
+          ],
+          "IE": [
+            "the woman begins to iron clothes",
+            "steam rising from the hot iron"
+          ],
+          "IR": [
+            "the woman feels happy doing chores",
+            "she looks content with her work"
+          ],
+          "P": [
+            "she plans to iron the clothes",
+            "she wants to finish the laundry"
+          ],
+          "A": [
+            "pressing the iron on the shirt",
+            "standing behind the yellow ironing board"
+          ],
+          "CO": [
+            "a large cloud of steam appears",
+            "the wrinkled shirt becomes smooth"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "large light blue front-loading washing machine",
+            "round woven wicker laundry basket",
+            "bright yellow apron with brown stains",
+            "small blue spray bottle on shelf"
+          ],
+          "ADV": [
+            "carefully",
+            "cheerfully",
+            "steadily",
+            "smoothly"
+          ],
+          "SC": [
+            "while she irons the blue shirt",
+            "because the iron is very hot",
+            "after she finishes the washing"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "feels",
+            "knows",
+            "likes"
+          ],
+          "L": [
+            "hums",
+            "sighs",
+            "whistles"
+          ]
+        }
+      }
     }
   ]
 }

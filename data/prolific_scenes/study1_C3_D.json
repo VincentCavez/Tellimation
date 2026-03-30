@@ -16,7 +16,78 @@
         "grandfather",
         "dog"
       ],
-      "composition_instructions": "Place grandfather at the workbench (center), standing and sanding a small wooden birdhouse. Place dog lying at grandfather's feet, chin on paws, watching. Leave the stool at the corner of the workbench empty with a red hoodie draped over it — the boy (ghost entity) would appear here, standing beside grandfather as usual and helping with the project."
+      "composition_instructions": "Place grandfather at the workbench (center), standing and sanding a small wooden birdhouse. Place dog lying at grandfather's feet, chin on paws, watching. Leave the stool at the corner of the workbench empty with a red hoodie draped over it — the boy (ghost entity) would appear here, standing beside grandfather as usual and helping with the project.",
+      "scene_description": "In the bottom left foreground, several light brown wooden planks lie stacked on a floor made of wide wooden boards, which are scattered with curly wood shavings and small blue paint splatters. To the right of the planks, a three-legged wooden stool holds a red hooded sweatshirt draped over its seat. Behind the stool, an open doorway on the left reveals a sunlit outdoor scene with a winding dirt path leading through green bushes and trees under a blue sky with fluffy white clouds, indicating a clear day. To the right of the doorway, a wooden wall features a square window with a four-pane frame, showing more of the green trees and sky. In the center of the room, a grandfather with a full white beard and mustache, wearing a green baseball cap, a red and black plaid shirt, and blue denim overalls over brown boots, stands facing right. He is leaning over a large wooden workbench, using his hands to assemble a small, light-colored wooden birdhouse. Lying on the floor to the right of the grandfather is a golden-furred dog, a retriever, looking up toward him with a calm expression. The heavy wooden workbench is cluttered with various items, including a metal hand plane, a hammer, a large silver wrench, several blocks of wood, and a glass jar. Underneath the workbench, several paint cans in colors like green, red, and blue are stored alongside rolls of grey material and a wooden drawer. To the right of the workbench, a grey bucket is filled with vertical wood scraps, and several more planks lean against the side of the bench. On the wall behind the grandfather, a wooden pegboard holds an organized array of tools, including two hammers, three silver wrenches, a trowel, a small saw, four screwdrivers with colorful handles, and two pairs of pliers. To the right of the pegboard, a tall wooden shelving unit is filled with numerous glass jars containing small hardware like screws and nails on the top two shelves, while the lower shelves hold various paint cans in shades of green, yellow, blue, and red, along with several small glass bottles. The overall setting is a rustic, well-lit woodworking shop during a bright, clear day.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "grandfather with a full white beard",
+            "golden-furred retriever dog"
+          ],
+          "S": [
+            "rustic woodworking shop during the day",
+            "sunlit outdoor scene through the doorway",
+            "heavy wooden workbench cluttered with tools",
+            "shelves filled with jars and paint"
+          ],
+          "IE": [
+            "grandfather begins to assemble a birdhouse",
+            "dog settles down on the wooden floor"
+          ],
+          "IR": [
+            "grandfather appears focused on his task",
+            "dog looks calm and content"
+          ],
+          "P": [
+            "grandfather wants to finish the birdhouse",
+            "dog intends to stay by his side"
+          ],
+          "A": [
+            "grandfather is fitting wooden pieces together",
+            "dog is lying on the floor",
+            "sunlight streams through the open door"
+          ],
+          "CO": [
+            "wood shavings cover the workshop floor",
+            "birdhouse stands nearly complete on the bench"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "small light-colored wooden birdhouse",
+            "red and black plaid shirt",
+            "heavy wooden workbench with many tools",
+            "bright blue sky with fluffy clouds"
+          ],
+          "ADV": [
+            "carefully",
+            "patiently",
+            "neatly",
+            "quietly"
+          ],
+          "SC": [
+            "while the sun shines through the door",
+            "because he is building a birdhouse",
+            "as the dog watches him work"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "wants",
+            "decides",
+            "knows"
+          ],
+          "L": [
+            "says",
+            "tells",
+            "hums"
+          ]
+        }
+      }
     }
   ]
 }

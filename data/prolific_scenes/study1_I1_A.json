@@ -17,7 +17,84 @@
         "boy",
         "dog"
       ],
-      "composition_instructions": "Place girl on the swing set (left), swinging with legs extended. Place boy on the wooden bench (center), sitting with chin resting on hands, looking slightly bored. Place dog under the slide (right), lying down with head on paws."
+      "composition_instructions": "Place girl on the swing set (left), swinging with legs extended. Place boy on the wooden bench (center), sitting with chin resting on hands, looking slightly bored. Place dog under the slide (right), lying down with head on paws.",
+      "scene_description": "In the lower foreground, a green lawn is dotted with small white, yellow, and pink flowers. A grey stone path curves from the left side toward the center of the scene. On the left side of the midground, a green metal swing set stands with two swings. A girl with brown hair in pigtails, decorated with blue flowers, sits on the right swing wearing a yellow dress with white polka dots, white socks, and blue shoes. To her right, a boy sits on a brown wooden bench; he wears a blue cap, a yellow and green striped shirt, brown pants, and brown boots, resting his chin on his hands. Behind the bench is a large, leafy green tree. To the right of the boy, a playground slide with a yellow chute, red railings, and a green ladder stands on a red and blue padded surface. A brown dog lies sleeping on the ground next to the slide. Further to the right, a square wooden sandbox is filled with sand and contains a blue toy truck, a red bucket with a blue shovel, a green starfish, a red cup, and a small sandcastle. In the background, green bushes and rolling hills stretch across the horizon. A short wooden picket fence is located behind the sandbox, next to another large green tree on the far right. The sky above is light blue, filled with several white fluffy clouds and a bright yellow sun shining in the upper center.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "girl with brown pigtails and blue flowers",
+            "boy wearing a blue cap and striped shirt",
+            "brown dog sleeping peacefully on the ground"
+          ],
+          "S": [
+            "sunny day at a colorful neighborhood playground",
+            "green lawn dotted with small wildflowers",
+            "bright yellow sun in a blue sky",
+            "wooden sandbox filled with various toys"
+          ],
+          "IE": [
+            "the girl begins to swing back and forth",
+            "the boy sits down on the bench",
+            "the dog finds a spot to nap"
+          ],
+          "IR": [
+            "the girl feels joyful while swinging",
+            "the boy looks calm and thoughtful",
+            "the dog feels relaxed in the sun"
+          ],
+          "P": [
+            "the girl wants to swing even higher",
+            "the boy plans to wait for his friend",
+            "the dog intends to sleep all afternoon"
+          ],
+          "A": [
+            "girl is swinging on the green swing set",
+            "boy is resting his chin on his hands",
+            "dog is lying still near the slide"
+          ],
+          "CO": [
+            "the playground is filled with happy children",
+            "the toys are scattered in the sandbox",
+            "the flowers bloom in the bright sunlight"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "yellow dress with white polka dots",
+            "green metal swing set with two swings",
+            "square wooden sandbox with a blue truck",
+            "bright yellow sun behind white fluffy clouds"
+          ],
+          "ADV": [
+            "happily",
+            "quietly",
+            "peacefully",
+            "gently"
+          ],
+          "SC": [
+            "while the girl swings",
+            "because the sun is out",
+            "since the dog is tired"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "wonders",
+            "enjoys",
+            "dreams"
+          ],
+          "L": [
+            "hums",
+            "sighs",
+            "laughs",
+            "calls"
+          ]
+        }
+      }
     }
   ]
 }

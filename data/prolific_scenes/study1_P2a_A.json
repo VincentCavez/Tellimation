@@ -15,7 +15,77 @@
         "woman",
         "pot"
       ],
-      "composition_instructions": "Place woman near the gas stove, standing and holding a wooden spoon. Place pot on the burner with thick curls of steam rising, lid resting beside it."
+      "composition_instructions": "Place woman near the gas stove, standing and holding a wooden spoon. Place pot on the burner with thick curls of steam rising, lid resting beside it.",
+      "scene_description": "In the foreground, a large wooden kitchen island with a prominent grain stretches across the bottom of the scene. On the left side of this island sits a rectangular wooden cutting board holding a loaf of sliced bread and two loose slices, with a silver knife featuring a wooden handle resting beside them. Moving to the midground on the left, a woman with brown hair tied in a low ponytail stands facing right. She wears a blue long-sleeved sweater and a yellow apron with dark smudges, holding a wooden spoon in her right hand. She is positioned in front of a beige stove that has a blue and white checkered towel hanging from its handle. On the stove sits a large silver pot with a lid, from which white wisps of steam are rising. Above the stove is a large, conical copper-colored range hood. To the left of the stove, a white ceramic jar holds several wooden utensils, and a similar wooden jar sits to its right. Behind the woman and stove is a backsplash of square, tan-colored tiles. In the center of the midground, a large arched window with a dark wooden frame provides a view of a rainy day outside, showing grey clouds, green trees, and a meadow of yellow and white flowers. Below the window is a white farmhouse sink with a tall silver faucet. To the right of the sink on the wooden countertop are three small potted plants in yellow and terracotta pots. On the far right, two wooden shelves are mounted on the yellow wall; the top shelf holds two wooden bowls and a glass jar with a green lid, while the bottom shelf holds two light blue bowls and two glass jars with wooden lids. Below these shelves on the counter sits a large white ceramic jar with a lid. On the far left, a blue cabinet with a gold knob is partially visible. The overall setting is a cozy, warm-toned kitchen during a rainstorm.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "a woman with brown hair in a ponytail",
+            "a woman wearing a blue sweater and yellow apron"
+          ],
+          "S": [
+            "a cozy kitchen with warm yellow walls",
+            "a rainy day visible through the arched window",
+            "a large wooden island in the foreground",
+            "grey clouds and green trees outside"
+          ],
+          "IE": [
+            "the rain starting to fall outside",
+            "the pot of soup beginning to boil"
+          ],
+          "IR": [
+            "feeling cozy and warm inside the kitchen",
+            "the woman looking content while she cooks"
+          ],
+          "P": [
+            "to cook a warm meal for the rainy day",
+            "to slice the fresh loaf of bread"
+          ],
+          "A": [
+            "the woman holding a wooden spoon",
+            "steam rising from the silver pot",
+            "rain falling against the window pane"
+          ],
+          "CO": [
+            "a warm meal being prepared for later",
+            "the kitchen feeling safe from the storm"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "a large steaming silver pot",
+            "a thick loaf of crusty bread",
+            "a bright yellow apron with dark smudges",
+            "a wide arched wooden window frame"
+          ],
+          "ADV": [
+            "gently",
+            "steadily",
+            "patiently",
+            "warmly"
+          ],
+          "SC": [
+            "while the rain falls outside",
+            "because it is a cold rainy day",
+            "as the steam rises from the pot"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "wants",
+            "knows"
+          ],
+          "L": [
+            "hums",
+            "whispers",
+            "calls"
+          ]
+        }
+      }
     }
   ]
 }

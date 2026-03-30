@@ -15,7 +15,80 @@
         "girl",
         "window"
       ],
-      "composition_instructions": "Place girl on the window seat, sitting and pressing her forehead against the glass, eyes downcast and glistening, lips turned down, one hand flat on the pane."
+      "composition_instructions": "Place girl on the window seat, sitting and pressing her forehead against the glass, eyes downcast and glistening, lips turned down, one hand flat on the pane.",
+      "scene_description": "On the far left of the scene, a four-tiered wooden bookshelf is recessed into a cream-colored wall. The top shelf contains a blue book, a green book, a pinecone, a brown book, a red book, and a yellow book. The second shelf down holds a pinecone, a small potted plant in a grey pot, a green book, a red book, and a blue book. The third shelf features a blue book, a red book, a green book, a purple book, a yellow book, and an orange book. The bottom shelf displays a green book, a yellow book, a blue book, a small white object, an orange book, and a green book. In the center of the room, a girl sits on the wooden sill of a large, two-paned window. She has wavy brown hair held back by a yellow headband with a green pattern, and she is wearing a thick yellow knitted sweater, blue jeans cuffed at the ankles, and brown lace-up boots decorated with small white flowers. She is positioned in profile, facing right, with a single tear on her cheek and her hands clasped together in front of her chest. To her left on the sill are two striped pillows in shades of green and orange. To her right on the sill are a green pillow with a pattern of dark green trees and another striped orange and green pillow. A string of glowing yellow fairy lights is draped across the top of the wooden window frame. To the right of the window, a wooden desk stands against the wall. On the desk sits a wooden cup filled with colored pencils, two stacked notebooks, an open spiral notebook, an open book with illustrations of a green field, and a desk lamp with a beige shade and a brown base. Above the desk, a corkboard is pinned with two drawings—one of a sunny day with clouds and one of a yellow flower—along with several yellow sticky notes and a piece of paper. The floor is made of light-colored wooden planks, and a large, circular braided rug in shades of green, yellow, and brown covers the center foreground. Through the glass of the window, a rainy landscape is visible under a dark, grey, cloudy sky. The background features lush green grass, a winding stone path, several large leafy trees, and two small cottages with thatched roofs nestled among the greenery. Rain streaks are visible falling diagonally from left to right against the dark clouds and the green scenery.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "girl with wavy brown hair",
+            "girl wearing a yellow knitted sweater",
+            "girl with a tear on her cheek"
+          ],
+          "S": [
+            "rainy day outside the window",
+            "cozy room with a wooden desk",
+            "dark grey clouds in the sky",
+            "lush green landscape with cottages"
+          ],
+          "IE": [
+            "rain falling against the window pane",
+            "the grey clouds covering the sun"
+          ],
+          "IR": [
+            "feeling sad about the rainy weather",
+            "hoping for the rain to stop"
+          ],
+          "P": [
+            "waiting for the storm to pass",
+            "making a silent wish or prayer"
+          ],
+          "A": [
+            "sitting on the wooden window sill",
+            "clasping her hands together",
+            "looking out at the rainy scene"
+          ],
+          "CO": [
+            "a single tear falling down her face",
+            "staying inside instead of playing out"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "thick yellow knitted sweater",
+            "large circular braided rug",
+            "glowing yellow fairy lights",
+            "small cottages with thatched roofs",
+            "brown lace-up boots with flowers"
+          ],
+          "ADV": [
+            "sadly",
+            "quietly",
+            "diagonally",
+            "patiently"
+          ],
+          "SC": [
+            "because it is raining outside",
+            "while she sits by the window",
+            "until the clouds go away"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "wishes",
+            "feels",
+            "hopes",
+            "remembers"
+          ],
+          "L": [
+            "whispers",
+            "prays",
+            "sighs"
+          ]
+        }
+      }
     }
   ]
 }

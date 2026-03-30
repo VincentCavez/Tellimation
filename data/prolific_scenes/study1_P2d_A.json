@@ -15,7 +15,77 @@
         "man",
         "puppy"
       ],
-      "composition_instructions": "Place man on the green wooden bench, sitting and holding a small puppy on his lap. The puppy licks his hand. The man beams with a wide gentle smile, eyes crinkled with warmth."
+      "composition_instructions": "Place man on the green wooden bench, sitting and holding a small puppy on his lap. The puppy licks his hand. The man beams with a wide gentle smile, eyes crinkled with warmth.",
+      "scene_description": "In the bottom left foreground, a lush green lawn is dotted with small four-leaf clovers and tiny blue and yellow flowers, with several fallen orange and yellow autumn leaves scattered across the grass. A light brown dirt and gravel path runs horizontally across the lower third of the scene. To the left in the midground, a small blue pond contains several green lily pads and two white ducks with orange beaks swimming toward the left. Behind the pond is a gentle green slope leading to distant bushes. In the center-right of the midground, an elderly man sits on a green wooden park bench. The man has a short white beard and a smiling expression, wearing a brown flat cap, a green cardigan over a tan and brown checkered shirt, brown trousers, and brown boots. A small golden-yellow puppy sits on the man's lap, looking up and licking his right hand while the man rests his left hand on the puppy's back. A brown wooden walking cane with a curved handle leans against the right side of the bench. Two large, leafy green trees with thick brown trunks are positioned on the right side of the scene, with one directly behind the man and the other further to the right. Sunlight filters through the leaves of the tree behind the man, creating bright yellow highlights. In the background, rolling green hills and dense bushes sit under a pale blue sky filled with soft, fluffy white clouds, suggesting a clear, sunny day.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "An elderly man with a white beard",
+            "A small golden-yellow puppy",
+            "Two white ducks with orange beaks"
+          ],
+          "S": [
+            "A sunny day in a green park",
+            "Sitting on a green wooden bench",
+            "Near a blue pond with lily pads"
+          ],
+          "IE": [
+            "The man stops to rest on a bench",
+            "The puppy climbs onto the man's lap"
+          ],
+          "IR": [
+            "The man feels happy and peaceful",
+            "The puppy feels playful and loving"
+          ],
+          "P": [
+            "To spend time together in the sun",
+            "To show affection to his little dog"
+          ],
+          "A": [
+            "The man is petting the puppy's back",
+            "The puppy is licking the man's hand",
+            "The ducks swim across the pond"
+          ],
+          "CO": [
+            "The man smiles warmly at his pet",
+            "The puppy wags its tail with joy"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "A green cardigan over a checkered shirt",
+            "A brown flat cap on his head",
+            "Small four-leaf clovers in the grass"
+          ],
+          "ADV": [
+            "Happily",
+            "Gently",
+            "Playfully",
+            "Quietly"
+          ],
+          "SC": [
+            "While they sit under the trees",
+            "Because the puppy loves its owner",
+            "When the sun shines through the leaves"
+          ],
+          "CC": [
+            "And",
+            "But",
+            "So"
+          ],
+          "M": [
+            "Loves",
+            "Enjoys",
+            "Thinks",
+            "Feels"
+          ],
+          "L": [
+            "Laughs",
+            "Giggles",
+            "Sighs"
+          ]
+        }
+      }
     }
   ]
 }

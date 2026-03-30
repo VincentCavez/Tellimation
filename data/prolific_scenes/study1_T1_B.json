@@ -15,7 +15,79 @@
         "boy",
         "wrapping"
       ],
-      "composition_instructions": "Place boy on the carpet, sitting and holding a new toy robot still in packaging, smiling. Scattered torn wrapping paper in bright colors around him on the floor."
+      "composition_instructions": "Place boy on the carpet, sitting and holding a new toy robot still in packaging, smiling. Scattered torn wrapping paper in bright colors around him on the floor.",
+      "scene_description": "In the bottom-left foreground, a deflated blue balloon rests on a patterned beige rug. To its right is a large, messy pile of torn wrapping in shades of blue, yellow, and green, tangled with yellow ribbons. A young boy with short, wavy brown hair sits cross-legged on the rug in the center-left of the scene. He wears a mustard-yellow knit sweater over a blue collared shirt, brown trousers, and brown shoes. He is smiling and looking at a rectangular cardboard box he holds, which contains a green toy robot with red, blue, and yellow details. To the boy's right, a deflated green balloon lies on the rug, followed by a piece of crumpled red wrapping and another deflated green balloon in the bottom-right corner. Behind the boy, a rectangular wooden table with a lower shelf sits on the rug. On the table are three white plates, one of which has crumbs on it, along with two tan cups—one standing and one lying on its side—and a single blue cup. In the midground on the far left, an open arched doorway shows dense green foliage outside. On the cream-colored wall behind the boy, a string of colorful triangular bunting in red, yellow, blue, and green is attached with tape. To the right of the bunting, a large, dark-framed window reveals a bright outdoor landscape with several rounded green trees under a light blue sky dotted with white, fluffy clouds. The overall lighting is bright and even, indicating a clear day.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "young boy with wavy brown hair",
+            "smiling boy in a mustard sweater"
+          ],
+          "S": [
+            "bright room with a large window",
+            "sunny day with fluffy white clouds",
+            "messy room after a birthday party",
+            "beige patterned rug on the floor"
+          ],
+          "IE": [
+            "the boy just finished opening presents",
+            "a birthday celebration has just ended"
+          ],
+          "IR": [
+            "the boy feels happy and excited",
+            "he is pleased with his new toy"
+          ],
+          "P": [
+            "the boy wants to play with his robot",
+            "he intends to take the robot out"
+          ],
+          "A": [
+            "holding a rectangular box with a robot",
+            "sitting cross-legged on the rug",
+            "smiling at his new gift"
+          ],
+          "CO": [
+            "a large pile of torn wrapping paper",
+            "deflated balloons scattered across the floor",
+            "dirty dishes left on the wooden table"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "green toy robot with colorful details",
+            "messy pile of blue and yellow wrapping",
+            "bright mustard-yellow knit sweater",
+            "large dark-framed window showing green trees"
+          ],
+          "ADV": [
+            "happily",
+            "messily",
+            "brightly",
+            "carefully"
+          ],
+          "SC": [
+            "because he got a new toy",
+            "while he sits on the rug",
+            "after the party is over"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "likes",
+            "wonders",
+            "thinks",
+            "loves"
+          ],
+          "L": [
+            "exclaims",
+            "says",
+            "tells"
+          ]
+        }
+      }
     }
   ]
 }

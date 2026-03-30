@@ -11,13 +11,92 @@
       "scene_number": 1,
       "title": "The Spelling Lesson",
       "background_prompt": "A classroom with a whiteboard at the front showing a sentence, a teacher's desk, student desks in rows, and educational posters. No people.",
-      "full_scene_prompt": "A bright classroom during a lesson. A teacher in a button-down shirt and slacks stands at the front, pointing with a marker at a sentence written in large clear letters on the whiteboard. The sentence reads: 'The dogs is playing in the park.' A student \u2014 a girl of about nine with a raised hand and an eager expression \u2014 sits at a front desk, clearly having spotted the error. Other students sit at their desks in rows behind her. Educational posters about grammar and vocabulary decorate the walls. A teacher's desk with a mug and papers sits to the side. The fluorescent lights are bright and the room feels active and engaged.",
+      "full_scene_prompt": "A bright classroom during a lesson. A teacher in a button-down shirt and slacks stands at the front, pointing with a marker at a sentence written in large clear letters on the whiteboard. The sentence reads: 'The dogs is playing in the park.' A student — a girl of about nine with a raised hand and an eager expression — sits at a front desk, clearly having spotted the error. Other students sit at their desks in rows behind her. Educational posters about grammar and vocabulary decorate the walls. A teacher's desk with a mug and papers sits to the side. The fluorescent lights are bright and the room feels active and engaged.",
       "entities_in_scene": [
         "teacher",
         "student",
         "whiteboard"
       ],
-      "composition_instructions": "Place teacher at the front, standing and pointing with a marker at a sentence on the whiteboard. Place student at a front desk, sitting with raised hand and eager expression. Other students at desks behind her."
+      "composition_instructions": "Place teacher at the front, standing and pointing with a marker at a sentence on the whiteboard. Place student at a front desk, sitting with raised hand and eager expression. Other students at desks behind her.",
+      "scene_description": "In the foreground of this classroom scene, a student with brown hair, wearing a blue and yellow striped shirt, green pants, and a green backpack, sits on a small wooden chair on the left, raising his right hand. To his right, another student with brown hair in a red shirt and blue pants sits at a wooden desk, looking toward the center. Further right, a third student, a girl with brown hair in a yellow shirt and blue pants, sits at another desk. Several empty wooden desks and chairs are arranged in rows across the light brown wooden floor. In the midground, a large whiteboard with a wooden frame occupies the left side, displaying the sentence \"THE DOGS IS PLAYING IN THE PARK.\" written in black. A teacher with brown hair tied back, wearing a green sweater and blue jeans, stands to the right of the whiteboard, pointing at the text with a black marker. To her right is a large bulletin board with a green scalloped border, featuring a world map, an alphabet strip, a number chart, and various diagrams. Next to the bulletin board stands a two-door wooden cabinet, and on the far right is a tall wooden bookshelf filled with colorful books. In the background, large windows reveal a sunny outdoor setting with a grassy field dotted with small flowers, several large green trees with brown trunks, and a bright blue sky filled with soft white clouds.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "teacher with brown hair and green sweater",
+            "boy in blue and yellow striped shirt",
+            "student in red shirt at a desk",
+            "girl with brown hair in yellow shirt"
+          ],
+          "S": [
+            "bright classroom with large windows",
+            "sunny day with green trees outside",
+            "wooden floor with several desks and chairs",
+            "large whiteboard with a wooden frame"
+          ],
+          "IE": [
+            "teacher points to sentence on the board",
+            "student raises hand to answer a question",
+            "teacher shows a mistake in the text"
+          ],
+          "IR": [
+            "teacher feels happy and encouraging",
+            "boy feels eager to participate",
+            "students feel focused on the lesson"
+          ],
+          "P": [
+            "teacher wants to teach grammar",
+            "boy intends to correct the sentence",
+            "students plan to learn from teacher"
+          ],
+          "A": [
+            "pointing at text with black marker",
+            "raising hand to get attention",
+            "sitting quietly at a wooden desk"
+          ],
+          "CO": [
+            "student is ready to speak",
+            "class learns about plural verbs",
+            "sentence will be corrected soon"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "blue and yellow striped shirt",
+            "green sweater and blue jeans",
+            "large whiteboard with wooden frame",
+            "tall wooden bookshelf with colorful books",
+            "fluffy white clouds in blue sky"
+          ],
+          "ADV": [
+            "eagerly",
+            "patiently",
+            "clearly",
+            "brightly"
+          ],
+          "SC": [
+            "because the sentence has a mistake",
+            "when the teacher points to board",
+            "while the students are sitting"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "knows",
+            "wants",
+            "notices"
+          ],
+          "L": [
+            "asks",
+            "explains",
+            "tells",
+            "points"
+          ]
+        }
+      }
     }
   ],
   "interjection_word": "are!"

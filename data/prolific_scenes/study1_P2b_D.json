@@ -15,7 +15,82 @@
         "mother",
         "frozen_food"
       ],
-      "composition_instructions": "Place mother in front of the refrigerator with the top freezer open, reaching in with one hand. Place frozen_food (pizza box coated in white frost crystals) being pulled from the freezer. Cold mist spills out."
+      "composition_instructions": "Place mother in front of the refrigerator with the top freezer open, reaching in with one hand. Place frozen_food (pizza box coated in white frost crystals) being pulled from the freezer. Cold mist spills out.",
+      "scene_description": "In the foreground, the kitchen floor is composed of large, square tiles in shades of tan and brown with dark grout lines. On the far left, there are lower kitchen cabinets featuring olive green frames, brownish-tan inset panels, and vertical silver handles, all topped with a medium-toned wooden countertop. Above this counter, a window reveals a bright outdoor scene under a light blue sky with fluffy white clouds and three stylized, round green trees with brown trunks. In the center of the scene, a mother stands facing right, leaning toward an open refrigerator. She has brown hair styled in a bun and is wearing a long-sleeved, ribbed green sweater, a knee-length skirt with vertical yellow and light blue stripes, and brown loafers. She is placing a rectangular container of frozen_food into the refrigerator with her right hand; the container is light blue and white and appears to contain a block of ice. Swirling white wisps of cold vapor emanate from the frozen_food and the open freezer compartment. The refrigerator is a large, silver, stainless-steel appliance with its bottom freezer drawer pulled open and its top door swung open to the right. The interior of the fridge is lit with a warm yellow glow and contains three empty white shelves, while the freezer drawer also shows empty white compartments. To the right of the refrigerator is another set of lower cabinets matching those on the left, with green frames and a wooden countertop. In the background, above the mother and the refrigerator, are light tan upper cabinets with horizontal silver handles set against a pale, off-white wall. The overall setting is a clean, brightly lit kitchen during a sunny day.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "a mother with brown hair in a bun",
+            "a woman wearing a green ribbed sweater",
+            "a lady in a yellow and blue skirt"
+          ],
+          "S": [
+            "a bright kitchen on a sunny day",
+            "large square tan and brown floor tiles",
+            "a stainless steel refrigerator with open doors",
+            "green trees visible through the window"
+          ],
+          "IE": [
+            "the mother opening the large silver refrigerator",
+            "taking a container of food to store",
+            "cold air escaping from the open freezer"
+          ],
+          "IR": [
+            "the mother looking calm and focused",
+            "feeling satisfied with finishing the grocery task"
+          ],
+          "P": [
+            "intending to keep the frozen food cold",
+            "planning to organize the empty refrigerator shelves"
+          ],
+          "A": [
+            "placing a frozen container into the fridge",
+            "leaning forward toward the open appliance",
+            "standing on the tiled kitchen floor"
+          ],
+          "CO": [
+            "cold vapor swirling around the frozen food",
+            "the refrigerator light illuminating the empty shelves"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "a ribbed green long-sleeved sweater",
+            "a rectangular container of frozen food",
+            "swirling white wisps of cold vapor",
+            "a large silver stainless-steel refrigerator",
+            "yellow and blue vertical striped skirt"
+          ],
+          "ADV": [
+            "carefully",
+            "gently",
+            "steadily",
+            "quietly"
+          ],
+          "SC": [
+            "because the food needs to stay frozen",
+            "while the refrigerator door is wide open",
+            "as she leans into the kitchen appliance"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "knows",
+            "remembers",
+            "decides"
+          ],
+          "L": [
+            "says",
+            "hums",
+            "tells",
+            "whispers"
+          ]
+        }
+      }
     }
   ]
 }

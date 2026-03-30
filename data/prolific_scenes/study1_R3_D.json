@@ -15,7 +15,76 @@
         "lightning",
         "tree"
       ],
-      "composition_instructions": "Place the tree in the center. Place the lightning as a brilliant jagged bolt connecting clouds to the tree's crown. At the impact point, the tree trunk split cleanly down the middle, two halves leaning apart, pale raw wood visible. Wisps of smoke and steam rising from the split."
+      "composition_instructions": "Place the tree in the center. Place the lightning as a brilliant jagged bolt connecting clouds to the tree's crown. At the impact point, the tree trunk split cleanly down the middle, two halves leaning apart, pale raw wood visible. Wisps of smoke and steam rising from the split.",
+      "scene_description": "In the bottom left foreground, a lush green meadow is filled with various small wildflowers, including yellow daisies, blue bell-shaped flowers, and tiny white blossoms, interspersed with clumps of three-leaf clovers and broad-leafed plants. To the right, a winding dirt path made of brown earth and scattered grey stones curves from the bottom right corner towards the center of the scene, featuring several shallow puddles reflecting the grey sky. Along the right edge of the path, more wildflowers grow, including clusters of small red and blue blossoms. In the middle ground, a large, thick-trunked tree stands prominently at the end of the path, its brown bark split down the center where a stylized yellow and white lightning bolt strikes it from above. Wisps of light blue and grey smoke rise from the crack in the tree's trunk, which is topped with a canopy of green leaves dotted with small pink and yellow flowers. Behind the tree, the green field continues towards a line of rounded, dark green bushes and trees that stretch across the horizon. The background is dominated by a heavy, dark grey sky filled with thick, swirling storm clouds. A bright, warm glow emanates from behind the central clouds where the lightning originates, casting light onto the scene below. Diagonal lines of rain fall consistently across the entire landscape, from the dark clouds down to the flower-filled meadow and the path. The entire scene is set during a daytime storm, with the dramatic light of the lightning bolt providing the primary focal point.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "no characters or animals are visible"
+          ],
+          "S": [
+            "a lush green meadow with wildflowers",
+            "heavy dark grey swirling storm clouds",
+            "a winding dirt path with puddles",
+            "diagonal lines of falling rain"
+          ],
+          "IE": [
+            "a bright lightning bolt strikes the tree"
+          ],
+          "IR": [
+            "the atmosphere feels dramatic and powerful",
+            "the tree appears to be suffering"
+          ],
+          "P": [
+            "the storm intends to drench the field",
+            "the lightning aims for the tall tree"
+          ],
+          "A": [
+            "rain falls across the entire landscape",
+            "smoke rises from the split trunk",
+            "lightning hits the center of the tree"
+          ],
+          "CO": [
+            "the tree trunk is split in half",
+            "shallow puddles form on the path",
+            "wisps of smoke drift into the air"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "a large thick-trunked tree",
+            "stylized yellow and white lightning bolt",
+            "heavy dark grey storm clouds",
+            "lush green meadow with tiny blossoms"
+          ],
+          "ADV": [
+            "dramatically",
+            "consistently",
+            "suddenly",
+            "heavily"
+          ],
+          "SC": [
+            "because the lightning struck the trunk",
+            "while the rain falls on the field",
+            "as smoke rises from the wood"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "feels",
+            "notices",
+            "wonders"
+          ],
+          "L": [
+            "tells",
+            "calls",
+            "whispers"
+          ]
+        }
+      }
     }
   ]
 }

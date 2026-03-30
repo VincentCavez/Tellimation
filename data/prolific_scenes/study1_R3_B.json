@@ -15,7 +15,77 @@
         "finger",
         "dominoes"
       ],
-      "composition_instructions": "Place dominoes standing upright in a long curving S-shape line across the table. At the far left, position a child's index finger just barely touching the top edge of the first domino, the domino starting to lean."
+      "composition_instructions": "Place dominoes standing upright in a long curving S-shape line across the table. At the far left, position a child's index finger just barely touching the top edge of the first domino, the domino starting to lean.",
+      "scene_description": "In the lower-left foreground, a hand wearing a light blue ribbed sleeve extends into the frame, with a single finger poised to push a standing green domino. To the left of this finger, four dominoes have already tipped over in a sequence: one brown, one yellow, another brown, and one blue. A long, straight line of standing dominoes continues from the green one across the wooden table to the right edge of the frame. These dominoes are colored, from left to right, yellow, green, red, blue, yellow, green, purple, a brown one with visible dots, red, teal, yellow, purple, green, blue, red, green, blue, red, yellow, purple, green, red, and yellow. Behind the left side of this straight line, a second group of dominoes is arranged in a semi-circular curve; these include several brown ones with dots, as well as blue and yellow ones. Centered behind the straight line of dominoes is a light-colored wooden ruler. To the right of the ruler sits a yellow desk lamp featuring a round base, a curved neck, and a bell-shaped shade with a visible white bulb. The table surface is a warm, light-grained wood. In the background, visible through what appears to be a large window or opening, is a lush outdoor landscape under a bright blue sky with several soft white clouds. Large green trees with rounded, stylized leaf clusters stand on the far left and right. In the middle distance, rolling green hills stretch toward the horizon. The foreground of the outdoor scene is a grassy meadow filled with small white, pink, and yellow flowers, along with several green four-leaf clovers. The overall lighting is bright and cheerful, indicating a clear daytime setting.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "a person's hand in a blue sleeve",
+            "a finger poised to push"
+          ],
+          "S": [
+            "a warm light-grained wooden table",
+            "a bright sunny day outside",
+            "lush green trees and rolling hills",
+            "a meadow with colorful flowers"
+          ],
+          "IE": [
+            "a finger about to push a domino",
+            "the first dominoes have already fallen"
+          ],
+          "IR": [
+            "feeling focused on the game",
+            "feeling excited to see them fall"
+          ],
+          "P": [
+            "to knock down the whole line",
+            "to watch the dominoes tumble over"
+          ],
+          "A": [
+            "pushing the standing green domino",
+            "setting up a long line of dominoes"
+          ],
+          "CO": [
+            "four dominoes have already tipped over",
+            "the rest of the line will fall"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "a light blue ribbed sleeve",
+            "a long line of colorful dominoes",
+            "a yellow desk lamp",
+            "a light-colored wooden ruler"
+          ],
+          "ADV": [
+            "carefully",
+            "steadily",
+            "patiently",
+            "brightly"
+          ],
+          "SC": [
+            "because he wants them to fall",
+            "when the finger pushes the green one",
+            "while the sun shines outside"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "wants",
+            "hopes",
+            "knows"
+          ],
+          "L": [
+            "counts",
+            "whispers",
+            "says"
+          ]
+        }
+      }
     }
   ]
 }

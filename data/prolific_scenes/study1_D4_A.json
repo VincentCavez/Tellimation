@@ -19,7 +19,81 @@
         "dog",
         "kite"
       ],
-      "composition_instructions": "Place child_1 on the left side of the seesaw, lifted high, laughing with hands gripping handle. Place child_2 on the right side touching the ground, pushing off with feet. Place dog on the paved path a few meters away, sitting with tongue out, watching and wagging tail. Place kite high in the sky above the trees."
+      "composition_instructions": "Place child_1 on the left side of the seesaw, lifted high, laughing with hands gripping handle. Place child_2 on the right side touching the ground, pushing off with feet. Place dog on the paved path a few meters away, sitting with tongue out, watching and wagging tail. Place kite high in the sky above the trees.",
+      "scene_description": "In the bottom left foreground, several yellow and white flowers grow in a lush green field. A stone path made of grey rounded rocks winds from the bottom left corner toward the center of the scene. Sitting on this path is a dog, a black and white border collie with its tongue hanging out, looking toward the right. To the right of the path, child_1, a girl with curly brown hair wearing a yellow hat, a purple jacket, brown pants, and brown boots, sits on the left end of a wooden seesaw. She is laughing and holding onto the wooden handles. A thin string extends from her hand up to a red diamond-shaped kite with white trailing ribbons flying in the upper center of the sky. The wooden seesaw is brown and rests on a central wooden pivot. On the right end of the seesaw sits child_2, a boy with short brown hair wearing an orange t-shirt, blue shorts, and brown shoes. He has a neutral or slightly sad expression and holds onto the handles. In the bottom right corner, there are purple and white flowers. Behind the characters, the landscape consists of rolling green hills and several large trees with thick brown trunks and rounded green canopies. One tree is on the far left, another is in the center-left, and a third is on the far right. The background features a bright blue sky filled with soft, white, puffy clouds, suggesting a sunny daytime setting. The dog is positioned to the left of child_1, while child_2 is on the far right of the playground equipment. The kite is positioned above and between the two children.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "girl with curly brown hair and yellow hat",
+            "boy wearing an orange t-shirt and blue shorts",
+            "black and white border collie with tongue out"
+          ],
+          "S": [
+            "sunny park with rolling green hills",
+            "bright blue sky with puffy white clouds",
+            "winding stone path through the grass",
+            "large trees with thick brown trunks"
+          ],
+          "IE": [
+            "children playing together on a wooden seesaw",
+            "girl flying a red diamond-shaped kite"
+          ],
+          "IR": [
+            "girl feeling happy and excited",
+            "boy looking slightly sad or bored",
+            "dog appearing friendly and attentive"
+          ],
+          "P": [
+            "girl trying to fly the kite high",
+            "children wanting to balance the seesaw"
+          ],
+          "A": [
+            "girl laughing while holding the kite string",
+            "boy sitting on the end of the seesaw",
+            "dog sitting patiently on the stone path"
+          ],
+          "CO": [
+            "seesaw tilting down on the girl's side",
+            "kite soaring high above the trees"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "red diamond-shaped kite with white ribbons",
+            "purple jacket and brown boots",
+            "lush green field with yellow and purple flowers",
+            "sturdy wooden seesaw with handles"
+          ],
+          "ADV": [
+            "happily",
+            "quietly",
+            "high",
+            "patiently"
+          ],
+          "SC": [
+            "while the girl flies her kite",
+            "because the boy is sitting still",
+            "as the dog watches the children"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "enjoys",
+            "feels",
+            "wonders",
+            "notices"
+          ],
+          "L": [
+            "laughs",
+            "shouts",
+            "barks",
+            "whispers"
+          ]
+        }
+      }
     }
   ],
   "interjection_word": "are!"

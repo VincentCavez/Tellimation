@@ -15,7 +15,76 @@
         "janitor",
         "scoreboard"
       ],
-      "composition_instructions": "Place janitor between rows of seats, pushing a wide broom and sweeping up discarded popcorn bags, cups, and ticket stubs. Confetti in red and white scattered on steps."
+      "composition_instructions": "Place janitor between rows of seats, pushing a wide broom and sweeping up discarded popcorn bags, cups, and ticket stubs. Confetti in red and white scattered on steps.",
+      "scene_description": "In the bottom foreground, a lush green field is dotted with small white and yellow flowers and patches of clover, with a white painted line marking the corner of a sports field on the right. Moving to the middle ground from left to right, a tall gray stadium light pole stands behind a set of bleachers. The bleachers feature four rows of colorful plastic seats in shades of blue, green, orange, and yellow, many of which are littered with red cups, popcorn boxes, and scraps of paper. A metal railing runs along the top and sides of the seating area. In front of the bleachers is a brown track where a green recycling bin with a white recycling symbol sits. To the right of the bin, the janitor, an elderly man with gray hair, a mustache, and glasses, is bent slightly forward as he sweeps the track with a long-handled broom. He is dressed in a blue jacket, tan trousers, and brown boots. Scattered on the track around him are more pieces of trash, including a popcorn box and a red soda can. Further to the right, a large wooden scoreboard is mounted on two thick wooden posts, featuring various rectangular panels in green, yellow, and blue. A second tall gray stadium light pole rises behind the scoreboard. In the background, a dense line of green deciduous and coniferous trees fills the horizon, with a gray concrete wall visible in the distance through a gap in the foliage. A wooden fence runs behind the scoreboard and trees on the right. The scene is set during a bright day under a clear blue sky filled with several soft, white, fluffy clouds.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "elderly janitor with gray hair and glasses",
+            "man wearing a blue jacket and tan trousers"
+          ],
+          "S": [
+            "sunny day at a sports stadium",
+            "colorful bleachers under a bright blue sky",
+            "lush green field with small white flowers",
+            "large wooden scoreboard near a line of trees"
+          ],
+          "IE": [
+            "fans left trash all over the bleachers",
+            "popcorn boxes and soda cans litter the track"
+          ],
+          "IR": [
+            "janitor feels determined to clean the stadium",
+            "man looks content while doing his work"
+          ],
+          "P": [
+            "to sweep all the trash into a pile",
+            "to make the sports field look new again"
+          ],
+          "A": [
+            "sweeping the brown track with a broom",
+            "walking past the green recycling bin",
+            "cleaning up after a busy sports game"
+          ],
+          "CO": [
+            "the track becomes cleaner behind the janitor",
+            "trash is gathered together to be removed"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "large wooden scoreboard with colorful panels",
+            "long-handled broom with straw bristles",
+            "green recycling bin with a white symbol",
+            "bright blue sky with fluffy white clouds"
+          ],
+          "ADV": [
+            "carefully sweeping the dusty brown track",
+            "steadily walking across the stadium grounds",
+            "brightly shining sun over the green field"
+          ],
+          "SC": [
+            "while he sweeps the messy track",
+            "because the fans left their trash behind",
+            "after the exciting game has finally ended"
+          ],
+          "CC": [
+            "the seats are blue and green",
+            "he sweeps the track and cleans up",
+            "it is sunny but there are clouds"
+          ],
+          "M": [
+            "he thinks about the next big game",
+            "he knows exactly where the trash goes",
+            "he feels proud of the clean field"
+          ],
+          "L": [
+            "he might hum a quiet song",
+            "he tells himself to keep working hard",
+            "he says hello to the empty stadium"
+          ]
+        }
+      }
     }
   ]
 }

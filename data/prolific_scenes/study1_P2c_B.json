@@ -15,7 +15,83 @@
         "man",
         "ring"
       ],
-      "composition_instructions": "Place man behind the glass counter, standing and holding open a small velvet box. Place ring on the tiny satin cushion inside the box, diamond refracting light into tiny rainbows."
+      "composition_instructions": "Place man behind the glass counter, standing and holding open a small velvet box. Place ring on the tiny satin cushion inside the box, diamond refracting light into tiny rainbows.",
+      "scene_description": "Starting at the bottom foreground, the scene features dark brown wooden floorboards running horizontally. Resting on the floor is a large, polished wooden jewelry display counter with a glass front and a curved right side. Inside the glass case, on the left, are four rectangular wooden trays lined with dark purple velvet, arranged in two rows of two on two separate shelves. In the curved right section of the case, a fifth identical tray is tilted upward. All trays inside the case are empty. On the wooden countertop, starting from the left, sits a brass desk lamp with a circular base and a glowing yellow dome-shaped shade. To its right lies a magnifying glass with a silver rim and a dark brown wooden handle. Further right on the counter is a stack of three shallow wooden trays with dark purple lining. Standing behind the counter is an elderly man with grey hair, a grey mustache, and round black-rimmed glasses. He wears a white long-sleeved shirt under a brown vest and is smiling as he holds open a small teal jewelry box with both hands. Inside the box is a gold ring featuring a large, sparkling white diamond that emits colorful light rays. The interior walls are pale olive green, decorated with large rectangular panels outlined in dark brown wooden molding. Above the man hangs a brass light fixture with a petal-shaped design and a glowing yellow bulb. To the right of the man is a large, arched window with a thick wooden frame, showing a bright daytime outdoor scene. Through the window, a dirt path winds through a lush green forest under a light blue sky with fluffy white clouds. Small yellow and white flowers and green clovers are scattered in the grass near the path. Another petal-shaped brass light fixture hangs from the ceiling in front of the window. To the far right, the olive green wall continues with another decorative wooden wall panel.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "an elderly man with a grey mustache",
+            "a jeweler wearing a brown vest",
+            "a man with round black-rimmed glasses"
+          ],
+          "S": [
+            "inside a cozy jewelry shop",
+            "a bright sunny day outside the window",
+            "a lush green forest through the window",
+            "a polished wooden counter with glass display"
+          ],
+          "IE": [
+            "the jeweler opens a small teal box",
+            "a sparkling diamond ring is revealed"
+          ],
+          "IR": [
+            "the jeweler feels proud of the ring",
+            "the man looks happy and content"
+          ],
+          "P": [
+            "to show the beautiful ring to someone",
+            "to sell the sparkling diamond ring"
+          ],
+          "A": [
+            "holding the jewelry box with both hands",
+            "standing behind the wooden display counter",
+            "smiling warmly at the viewer"
+          ],
+          "CO": [
+            "the diamond ring shines with colorful light",
+            "the shop is filled with warm light"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "a sparkling white diamond ring",
+            "a small teal jewelry box",
+            "a polished wooden display counter",
+            "a brass desk lamp with a yellow shade",
+            "an elderly man with a grey mustache"
+          ],
+          "ADV": [
+            "proudly",
+            "carefully",
+            "brightly",
+            "warmly",
+            "gently"
+          ],
+          "SC": [
+            "because the ring is very special",
+            "when he opens the teal box",
+            "while he stands behind the counter"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "feels",
+            "knows",
+            "wonders",
+            "hopes"
+          ],
+          "L": [
+            "says",
+            "explains",
+            "describes",
+            "shows"
+          ]
+        }
+      }
     }
   ]
 }

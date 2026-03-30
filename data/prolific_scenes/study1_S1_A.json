@@ -16,7 +16,71 @@
         "cat",
         "window"
       ],
-      "composition_instructions": "Place grandmother at the gas stove, standing and stirring a large pot with a wooden spoon. Position her directly in front of the window, partially blocking the view of snow falling outside. Place cat curled up on the cushioned wooden chair (right), sleeping with tail draped over edge."
+      "composition_instructions": "Place grandmother at the gas stove, standing and stirring a large pot with a wooden spoon. Position her directly in front of the window, partially blocking the view of snow falling outside. Place cat curled up on the cushioned wooden chair (right), sleeping with tail draped over edge.",
+      "scene_description": "In the foreground on the left, a stone wall sits beneath a wooden windowsill. A wooden chair with a slatted back and four legs is positioned in front of the wall, holding a blue and white checkered cushion. A grey tabby cat is curled up asleep on the cushion, its head tucked toward the right. The floor consists of wide, horizontal wooden planks that stretch across the room to a circular, multi-toned brown woven rug in the bottom right corner. In the center of the scene, a grandmother stands facing right. She has grey hair pulled into a bun, wears round spectacles, and has a pleasant expression. She is dressed in a long-sleeved green dress patterned with small yellow and blue flowers and wears dark brown shoes. She holds a wooden spoon and is stirring a steaming copper pot located on the left burner of a dark green stove. The stove features five circular knobs on its front panel and a large oven door with a rectangular window. To the right of the stove is a light-colored wooden cabinet and a countertop with a brown speckled surface, backed by white tiles with a floral motif. In the background, two windows with white lace curtains and valances offer a view of a snowy landscape with rolling hills and green pine trees under a grey, snow-filled sky. On the yellow-toned walls, two black wrought-iron racks hang, supporting five copper pans and two dark grey pans of varying sizes. Two bundles of dried green herbs hang from the wall to the right of the central window.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "An elderly grandmother with grey hair",
+            "A sleeping grey tabby cat"
+          ],
+          "S": [
+            "A cozy kitchen with wooden floors",
+            "A snowy winter day outside",
+            "Copper pans hanging on the walls"
+          ],
+          "IE": [
+            "The grandmother starts cooking a meal",
+            "Snow begins to fall outside"
+          ],
+          "IR": [
+            "The grandmother feels happy and content",
+            "The cat feels warm and sleepy"
+          ],
+          "P": [
+            "The grandmother wants to cook soup",
+            "The cat wants to take a nap"
+          ],
+          "A": [
+            "Stirring a steaming pot with a spoon",
+            "Curling up on a checkered cushion"
+          ],
+          "CO": [
+            "Steam rises from the hot pot",
+            "The kitchen stays warm and cozy"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "A long-sleeved green floral dress",
+            "A steaming copper pot",
+            "A blue and white checkered cushion",
+            "A dark green vintage stove"
+          ],
+          "ADV": [
+            "Gently stirring the hot soup",
+            "Peacefully sleeping on the chair",
+            "Steadily falling snow outside"
+          ],
+          "SC": [
+            "While the snow falls outside",
+            "Because the kitchen is warm",
+            "When the soup is ready"
+          ],
+          "CC": [
+            "The grandmother stirs and the cat sleeps",
+            "It is cold outside but warm inside"
+          ],
+          "M": [
+            "The grandmother thinks about dinner",
+            "The cat feels safe and warm"
+          ],
+          "L": [
+            "The grandmother whispers a quiet greeting",
+            "The grandmother says it smells delicious"
+          ]
+        }
+      }
     }
   ]
 }

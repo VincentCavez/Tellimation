@@ -15,7 +15,76 @@
         "boy",
         "ladder"
       ],
-      "composition_instructions": "Place boy on the treehouse platform (up in the tree), standing with both hands gripping the wooden railing, looking down with a proud grin. Feet planted solidly on the wooden planks."
+      "composition_instructions": "Place boy on the treehouse platform (up in the tree), standing with both hands gripping the wooden railing, looking down with a proud grin. Feet planted solidly on the wooden planks.",
+      "scene_description": "In the bottom-left foreground, a lush green meadow is filled with small pink and white flowers, three-leaf clovers, and scattered brown leaves. Moving toward the center, the thick, gnarled roots of a large tree emerge from the grassy ground, surrounded by more clovers and fallen leaves. In the bottom-right foreground, taller stalks with orange-brown leaves stand next to small blue and white flowers. Dominating the midground is a massive tree with a thick, textured brown trunk that splits into several large branches supporting a dense canopy of green and yellowish-green leaves. Built into the branches on the left side of the tree is a wooden treehouse made of brown planks with a pitched roof and a small square window. A wooden platform extends from the treehouse, bordered by a railing made of wooden posts and thick rope. On this platform, a young boy with short brown hair, wearing a red and white striped shirt, blue overalls, and yellow shoes, stands smiling and looking downward. Attached to the edge of the platform and hanging vertically toward the ground is a rope ladder with wooden rungs. In the background, soft green rolling hills sit beneath a bright blue sky filled with several large, fluffy white clouds, indicating a clear, sunny day.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "young boy with short brown hair",
+            "boy wearing blue overalls and striped shirt"
+          ],
+          "S": [
+            "sunny day with fluffy white clouds",
+            "lush green meadow with colorful flowers",
+            "massive tree with a wooden treehouse"
+          ],
+          "IE": [
+            "boy standing on the treehouse platform",
+            "rope ladder hanging toward the ground"
+          ],
+          "IR": [
+            "boy looking happy and smiling",
+            "feeling excited to be high up"
+          ],
+          "P": [
+            "wanting to climb down the ladder",
+            "planning to play in the meadow"
+          ],
+          "A": [
+            "standing on the wooden platform",
+            "looking down at the grassy ground"
+          ],
+          "CO": [
+            "boy being safe in his treehouse",
+            "ladder providing a way to the ground"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "thick textured brown tree trunk",
+            "small pink and white meadow flowers",
+            "wooden treehouse with a pitched roof",
+            "long rope ladder with wooden rungs"
+          ],
+          "ADV": [
+            "happily",
+            "carefully",
+            "downward"
+          ],
+          "SC": [
+            "because he is in the treehouse",
+            "when he climbs down the ladder",
+            "while he looks at the flowers"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "feels",
+            "wants",
+            "wonders"
+          ],
+          "L": [
+            "says",
+            "calls",
+            "shouts",
+            "laughs"
+          ]
+        }
+      }
     }
   ]
 }

@@ -17,7 +17,77 @@
         "boy",
         "clerk"
       ],
-      "composition_instructions": "Place firetruck on the wooden shelf (center), bright red with shiny chrome ladder. Place boy in front of the shelf, standing and pointing at the fire truck with wide eyes. Place clerk at the end of the aisle near checkout, standing and organizing boxes."
+      "composition_instructions": "Place firetruck on the wooden shelf (center), bright red with shiny chrome ladder. Place boy in front of the shelf, standing and pointing at the fire truck with wide eyes. Place clerk at the end of the aisle near checkout, standing and organizing boxes.",
+      "scene_description": "In the left foreground of this indoor shop, a large, light-brown wooden bookshelf with three empty shelves stands prominently, its side panel curving at the top. To its right is a connected wooden shelving unit where a red firetruck toy with a silver ladder and black wheels sits on the top shelf. Behind these shelves, large floor-to-ceiling windows reveal a background of rounded green trees and bushes under a light blue sky with soft white clouds. In the center of the room, a young boy with short brown hair, a green t-shirt, brown cargo shorts, yellow socks, and blue sneakers stands on a floor made of large tan and light-brown tiles. He is smiling and pointing his right hand toward the firetruck. To the right of the boy, a clerk with brown hair tied in a bun, wearing a tan shirt and a dark brown apron, stands behind a curved wooden counter. She is smiling while handling a stack of small tan and green boxes. On the counter to her left is a grey cash register. Beside the counter is a grey metal rolling cart holding several more boxes in brown, blue, green, and purple. Behind the clerk, large windows show a grassy hill dotted with small white and yellow flowers under the same blue, cloudy sky. Above the entire scene, the ceiling is made of white tiles and features two long, glowing, rectangular light fixtures with rounded ends that angle toward the center of the room.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "a young boy with short brown hair",
+            "a smiling clerk with a hair bun"
+          ],
+          "S": [
+            "inside a bright and sunny toy shop",
+            "large windows showing green trees and clouds",
+            "a floor made of large tan tiles"
+          ],
+          "IE": [
+            "the boy spots a red firetruck toy",
+            "the clerk starts organizing the new boxes"
+          ],
+          "IR": [
+            "the boy feels excited about the toy",
+            "the clerk feels happy to be working"
+          ],
+          "P": [
+            "the boy wants to play with the truck",
+            "the clerk intends to stack all the boxes"
+          ],
+          "A": [
+            "the boy is pointing at the firetruck",
+            "the clerk is stacking small boxes on the counter"
+          ],
+          "CO": [
+            "the boy might take the toy home",
+            "the counter becomes filled with organized boxes"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "a bright red firetruck with a ladder",
+            "a large light-brown wooden bookshelf",
+            "a young boy in a green t-shirt",
+            "a grey cash register on the counter"
+          ],
+          "ADV": [
+            "happily",
+            "carefully",
+            "brightly",
+            "excitedly"
+          ],
+          "SC": [
+            "because he sees a cool toy",
+            "while the clerk stacks the boxes",
+            "when he points at the shelf"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "wants",
+            "likes",
+            "thinks",
+            "decides"
+          ],
+          "L": [
+            "says",
+            "asks",
+            "shows",
+            "calls"
+          ]
+        }
+      }
     }
   ]
 }

@@ -14,7 +14,73 @@
         "man",
         "mural"
       ],
-      "composition_instructions": "Place man in the center of the alley, standing and facing the viewer with hands in pockets, positioned directly in front of the wall. He should almost entirely block whatever is behind him. Only at the very edges (above shoulders, beside arms), fragments of a vibrant colorful street mural should peek through."
+      "composition_instructions": "Place man in the center of the alley, standing and facing the viewer with hands in pockets, positioned directly in front of the wall. He should almost entirely block whatever is behind him. Only at the very edges (above shoulders, beside arms), fragments of a vibrant colorful street mural should peek through.",
+      "scene_description": "In the bottom foreground, a ground made of irregular grey stone pavers features dark cracks where several small green clover-like plants grow. Moving from left to right across the bottom, there is a single white flower with a yellow center, a small green caterpillar crawling on a stone, a yellow flower, and another white flower. In the midground on the left, five brown cylindrical trash cans with lids are clustered together. In the center of the scene, a man stands facing forward with his hands tucked into the pockets of a long green coat. The man has a brown beard and mustache and wears a yellow knit beanie, a blue and brown plaid scarf, brown pants, and brown boots. To the right of the man stands a brown metal fire escape with a vertical ladder leading up to a small balcony with railings. A grey vertical pipe is attached to the wall on the far right. Behind the man, a large brick wall features a colorful mural. On the left side of the mural is a large blue wing, while the center contains swirling patterns of orange, yellow, and blue. On the right side of the mural is a large green plant with several pointed leaves. In the background above the wall, green rounded trees and bushes are visible under a bright blue sky with large, fluffy white clouds. On the far right, the upper portion of a brick building rises behind the fire escape.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "a man with a brown beard",
+            "a man wearing a yellow beanie"
+          ],
+          "S": [
+            "an urban alley with a mural",
+            "a brick wall with colorful art",
+            "a bright blue sky with clouds"
+          ],
+          "IE": [
+            "the man stops in the alley",
+            "a caterpillar crawls across the stone"
+          ],
+          "IR": [
+            "the man feels calm and peaceful",
+            "the man appears happy and content"
+          ],
+          "P": [
+            "the man wants to keep warm",
+            "the man intends to walk further"
+          ],
+          "A": [
+            "standing with hands in coat pockets",
+            "looking forward at the viewer"
+          ],
+          "CO": [
+            "the coat keeps the man warm",
+            "the mural brightens the brick wall"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "a long green coat with buttons",
+            "a blue and brown plaid scarf",
+            "five brown cylindrical trash cans"
+          ],
+          "ADV": [
+            "standing very quietly in place",
+            "shining brightly in the sky",
+            "crawling slowly on the ground"
+          ],
+          "SC": [
+            "because the weather is cold",
+            "while he waits in the alley",
+            "since the mural is very large"
+          ],
+          "CC": [
+            "the coat and the beanie",
+            "the mural but not the wall",
+            "it is cold so he wears a scarf"
+          ],
+          "M": [
+            "thinks about the beautiful mural",
+            "feels the cold winter air",
+            "notices the small green caterpillar"
+          ],
+          "L": [
+            "says hello to the viewer",
+            "describes the art on the wall",
+            "whispers to the little caterpillar"
+          ]
+        }
+      }
     }
   ]
 }

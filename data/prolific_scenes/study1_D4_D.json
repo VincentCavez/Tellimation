@@ -10,12 +10,80 @@
       "scene_number": 1,
       "title": "The Graded Essay",
       "background_prompt": "A school desk with a marked-up paper, a pencil case, a textbook, and a window showing a schoolyard. No people.",
-      "full_scene_prompt": "A classroom after school. A girl of about twelve with a brown ponytail and a denim jacket sits at a desk by the window, holding a graded essay in both hands. The paper has neat handwriting but is covered in the teacher's red ink marks \u2014 circled words, underlined phrases, and marginal comments. One prominent red circle surrounds the word 'becuz' with the correction 'because' written beside it in red. The girl studies the corrections with a focused, slightly frustrated expression, biting her lower lip. A pencil case and an English textbook sit on the desk. Through the window, the empty schoolyard is visible with a basketball hoop and painted lines. The afternoon sun casts long shadows across the desk. Other desks around her are empty \u2014 she stayed behind to review.",
+      "full_scene_prompt": "A classroom after school. A girl of about twelve with a brown ponytail and a denim jacket sits at a desk by the window, holding a graded essay in both hands. The paper has neat handwriting but is covered in the teacher's red ink marks — circled words, underlined phrases, and marginal comments. One prominent red circle surrounds the word 'becuz' with the correction 'because' written beside it in red. The girl studies the corrections with a focused, slightly frustrated expression, biting her lower lip. A pencil case and an English textbook sit on the desk. Through the window, the empty schoolyard is visible with a basketball hoop and painted lines. The afternoon sun casts long shadows across the desk. Other desks around her are empty — she stayed behind to review.",
       "entities_in_scene": [
         "girl",
         "essay"
       ],
-      "composition_instructions": "Place girl at the desk by the window, sitting and holding a graded essay covered in red marks. Her expression focused, slightly frustrated, biting lower lip."
+      "composition_instructions": "Place girl at the desk by the window, sitting and holding a graded essay covered in red marks. Her expression focused, slightly frustrated, biting lower lip.",
+      "scene_description": "In the foreground, a wooden floor with wide, light-brown planks stretches across the bottom of the scene. On the left, a small wooden chair with a curved back sits empty next to a sturdy wooden table. On the table, from left to right, lies an open white notebook filled with geometric diagrams and drawings, a green zippered pencil case with a small yellow star charm, an open textbook showing illustrations of a sun and a caterpillar, and a yellow pencil with a pink eraser. A girl with wavy brown hair tied in a low ponytail sits on a matching wooden chair on the right side of the table. She is wearing a long-sleeved sweater with horizontal orange and yellow stripes, blue jeans, and brown sneakers with white soles and laces. Her body is angled toward the left, and she holds a white paper essay in both hands, staring at it with a frustrated, frowning expression; the essay is covered in red ink markings and circles. Behind the table is a large, wooden-framed window divided by a central vertical bar, offering a view of rolling green hills, lush green trees, and a bright blue sky with fluffy white clouds. To the right of the girl is a wide, arched doorway that opens to the outdoors. A dirt path leads away from the doorway, winding past green bushes and grass toward a large, tan-colored house with a red-tiled roof and arched windows in the distance. The outdoor setting suggests a clear, sunny day with a bright blue sky and scattered white clouds. The girl is positioned between the table and the open doorway, with the house and path visible behind her to the right.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "girl with wavy brown hair",
+            "student in a striped sweater"
+          ],
+          "S": [
+            "sunny day with rolling green hills",
+            "cozy room with a wooden table",
+            "large house at the end of the path"
+          ],
+          "IE": [
+            "receiving an essay with red marks",
+            "looking at a graded school assignment"
+          ],
+          "IR": [
+            "feeling frustrated with her schoolwork",
+            "looking disappointed by the red circles"
+          ],
+          "P": [
+            "wanting to improve her writing",
+            "trying to understand the teacher's notes"
+          ],
+          "A": [
+            "holding a paper with both hands",
+            "staring intensely at the red ink"
+          ],
+          "CO": [
+            "the essay is covered in red marks",
+            "the girl has a frowning expression"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "a green pencil case with a star",
+            "a long-sleeved orange and yellow sweater",
+            "an open textbook with a caterpillar"
+          ],
+          "ADV": [
+            "frustratedly",
+            "unhappily",
+            "closely",
+            "quietly"
+          ],
+          "SC": [
+            "because there are many red marks",
+            "while she sits at the table",
+            "when she sees her grade"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "thinks",
+            "wonders",
+            "feels",
+            "remembers"
+          ],
+          "L": [
+            "sighs",
+            "grumbles",
+            "mutters"
+          ]
+        }
+      }
     }
   ],
   "interjection_word": "because!"

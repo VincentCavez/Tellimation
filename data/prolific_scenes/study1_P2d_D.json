@@ -10,12 +10,89 @@
       "scene_number": 1,
       "title": "The Backyard",
       "background_prompt": "A suburban backyard with a mowed lawn, a wooden fence, a tire swing hanging from a tree, and a garden shed. Warm summer afternoon. No people, no animals.",
-      "full_scene_prompt": "A suburban backyard on a warm summer afternoon. A boy of about eleven in a green t-shirt and cargo shorts sits cross-legged on the mowed lawn under the shade of a large oak tree. A golden retriever with a thick, shiny coat lies beside him with its head resting on the boy's lap, eyes half-closed in contentment. The boy gently strokes the dog's ear with one hand and rests the other on the dog's back. His face shows pure, quiet happiness \u2014 a soft smile, relaxed eyes, completely at peace. A tire swing hangs from a thick branch above them, swaying slightly in the breeze. A wooden fence encloses the yard, and a small garden shed with a blue door sits in the back corner. Dandelions dot the grass.",
+      "full_scene_prompt": "A suburban backyard on a warm summer afternoon. A boy of about eleven in a green t-shirt and cargo shorts sits cross-legged on the mowed lawn under the shade of a large oak tree. A golden retriever with a thick, shiny coat lies beside him with its head resting on the boy's lap, eyes half-closed in contentment. The boy gently strokes the dog's ear with one hand and rests the other on the dog's back. His face shows pure, quiet happiness — a soft smile, relaxed eyes, completely at peace. A tire swing hangs from a thick branch above them, swaying slightly in the breeze. A wooden fence encloses the yard, and a small garden shed with a blue door sits in the back corner. Dandelions dot the grass.",
       "entities_in_scene": [
         "boy",
         "dog"
       ],
-      "composition_instructions": "Place boy under the oak tree, sitting cross-legged on the lawn. Place dog beside him with head resting on his lap, eyes half-closed. Boy gently strokes the dog's ear, face showing soft smile and quiet happiness."
+      "composition_instructions": "Place boy under the oak tree, sitting cross-legged on the lawn. Place dog beside him with head resting on his lap, eyes half-closed. Boy gently strokes the dog's ear, face showing soft smile and quiet happiness.",
+      "scene_description": "In the bottom foreground, a lush green lawn filled with small white, yellow, and light blue flowers, along with occasional four-leaf clovers, stretches across the entire width of the scene. Moving to the midground on the left, a brown wooden fence made of vertical planks with rounded tops borders the yard. In front of this fence sits a small wooden shed with a peaked, shingled brown roof, vertical brown siding, a single door with a small circular handle, and a square four-paned window on its right side. In the center of the midground, a golden-colored dog lies on the grass with its eyes closed, resting its head on the lap of a boy. The boy is sitting cross-legged on the grass, leaning his back against the thick, textured brown trunk of a large deciduous tree. The boy has curly brown hair, a gentle smile, and wears a yellow baseball cap with a brown brim, a green and white horizontally striped t-shirt, blue denim overalls, and brown shoes with white soles. He is using his right hand to pet the dog's head. To the right of the boy, a black tire swing hangs from a sturdy tree branch by a thick brown rope. The tree's canopy is filled with dense green foliage. To the right of the tree, the wooden fence continues to the edge of the frame, with a cluster of green bushes featuring small blue flowers growing at its base. In the background, behind the fence, the rounded tops of several green trees are visible against a pale blue sky. The sky is filled with soft, puffy white clouds that are tinged with a warm golden-yellow glow, suggesting the light of late afternoon or early morning. The overall lighting is soft and warm, casting gentle shadows to the right of the shed, the boy, the dog, and the tree.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "boy with curly brown hair",
+            "golden-colored dog resting peacefully",
+            "boy wearing a yellow baseball cap"
+          ],
+          "S": [
+            "sunny backyard with a wooden fence",
+            "large tree with a tire swing",
+            "soft golden light of late afternoon",
+            "small wooden shed in the yard"
+          ],
+          "IE": [
+            "the boy sits down to rest",
+            "the dog finds a comfortable spot",
+            "the sun begins to set"
+          ],
+          "IR": [
+            "the boy feels happy and calm",
+            "the dog feels safe and relaxed",
+            "the boy enjoys the quiet moment"
+          ],
+          "P": [
+            "the boy wants to pet his dog",
+            "they intend to enjoy the afternoon",
+            "the dog wants to take a nap"
+          ],
+          "A": [
+            "boy is petting the dog's head",
+            "dog is sleeping on the boy's lap",
+            "boy is leaning against the tree"
+          ],
+          "CO": [
+            "the dog falls fast asleep",
+            "the boy and dog are bonded",
+            "the yard stays quiet and peaceful"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "yellow baseball cap with a brown brim",
+            "green and white striped t-shirt",
+            "black tire swing on a rope",
+            "small wooden shed with a window",
+            "lush green lawn with tiny flowers"
+          ],
+          "ADV": [
+            "gently",
+            "peacefully",
+            "quietly",
+            "softly"
+          ],
+          "SC": [
+            "while the boy sits under the tree",
+            "because the dog is tired",
+            "as the sun begins to set"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "loves",
+            "feels",
+            "thinks",
+            "knows"
+          ],
+          "L": [
+            "whispers",
+            "tells",
+            "calls"
+          ]
+        }
+      }
     }
   ]
 }

@@ -17,7 +17,84 @@
         "child",
         "turtle"
       ],
-      "composition_instructions": "Place clownfish among the anemone tentacles in the center of the tank, darting and vivid orange with white stripes. Place turtle in the upper portion of the tank, gliding with flippers extended. Place child in front of the glass, pressing both palms flat against the surface, face close, mesmerized."
+      "composition_instructions": "Place clownfish among the anemone tentacles in the center of the tank, darting and vivid orange with white stripes. Place turtle in the upper portion of the tank, gliding with flippers extended. Place child in front of the glass, pressing both palms flat against the surface, face close, mesmerized.",
+      "scene_description": "In the foreground, a brown stone-paved floor stretches across the bottom of the scene. A brown wooden bench with a curved back and seat sits in the center, positioned directly in front of a large, curved aquarium tank. To the right of the bench, a child with short brown hair, wearing a green textured sweater, yellow vertically-striped pants, and blue shoes, stands facing the aquarium with both hands pressed against the glass. The aquarium is framed by thick, brown wooden posts and beams. Inside the tank, a clownfish with orange and white stripes and black outlines swims toward the right in the center. Above and to the right of the clownfish, a green turtle with a brown patterned shell swims toward the left. The tank is filled with various types of coral: on the left, there is a tall green branching coral, a smaller green rounded coral, and a cluster of blue tube corals; in the center, there is a yellowish-brown branching coral; on the right, there are tall brown tubular corals, a flat blue and white shelf coral, and rounded green and brown corals. The walls on either side of the tank are yellow and decorated with orange line art of coral and shells. Above the aquarium tank, large windows reveal an outdoor scene under a light blue sky with soft white clouds and visible sunbeams streaming downward. The background features green rolling hills, bushes with small purple and yellow flowers, and a large green tree on the right side. The overall lighting suggests a bright, sunny day.",
+      "misl_targets": {
+        "macro": {
+          "CH": [
+            "a small boy with brown hair",
+            "an orange and white striped clownfish",
+            "a green sea turtle with a shell"
+          ],
+          "S": [
+            "inside a bright and sunny aquarium",
+            "a large curved glass tank with coral",
+            "rolling green hills visible through windows",
+            "a brown wooden bench on stone floors"
+          ],
+          "IE": [
+            "the boy walks up to the glass",
+            "the clownfish swims close to the boy",
+            "the turtle glides through the clear water"
+          ],
+          "IR": [
+            "the boy feels curious about the fish",
+            "the boy is excited to see animals",
+            "the fish seems calm in the water"
+          ],
+          "P": [
+            "the boy wants to touch the glass",
+            "the fish wants to explore the coral",
+            "the boy intends to watch the animals"
+          ],
+          "A": [
+            "pressing hands against the aquarium glass",
+            "swimming through the deep blue water",
+            "looking at the colorful coral reef"
+          ],
+          "CO": [
+            "the boy sees the fish up close",
+            "the animals stay safe inside the tank",
+            "the boy learns about sea life"
+          ]
+        },
+        "micro": {
+          "ENP": [
+            "bright orange and white clownfish",
+            "large green turtle with patterned shell",
+            "small boy in a green textured sweater",
+            "colorful coral in the blue water"
+          ],
+          "ADV": [
+            "gently",
+            "curiously",
+            "closely",
+            "brightly"
+          ],
+          "SC": [
+            "because he wants to see the fish",
+            "while the turtle swims above him",
+            "when the sun shines through the window"
+          ],
+          "CC": [
+            "and",
+            "but",
+            "so"
+          ],
+          "M": [
+            "wonders",
+            "likes",
+            "notices",
+            "imagines"
+          ],
+          "L": [
+            "whispers",
+            "asks",
+            "exclaims",
+            "tells"
+          ]
+        }
+      }
     }
   ]
 }
