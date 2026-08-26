@@ -9,3 +9,14 @@ data/users/
 data/prolific_gen/**/*.png
 !data/prolific_gen/**/scene_1_full.png
 data/prolific_gen/**/*.mp4
+
+# macOS noise — 218 of these were tracked
+.DS_Store
+
+# Generated stimuli and paper material: kept on disk, out of the repo.
+# data/study_gen and data/oral_instructions stay tracked — the app serves them.
+data/prolific_videos/
+data/old/
+data/study1_utterances.pdf
+supplemental/
+supplemental.zip
