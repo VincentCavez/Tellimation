@@ -1,4 +1,4 @@
-"""Post-session analytics: SLP report generation via Gemini 3 Pro."""
+"""Post-session analytics: SLP report generation via Gemini Pro."""
 
 from __future__ import annotations
 
@@ -9,9 +9,10 @@ from typing import Any, Dict
 from google import genai
 from google.genai import types
 
+from config.models import PRO_MODEL_ID
 from src.models.student_profile import StudentProfile
 
-MODEL_ID = "gemini-3-pro-preview"
+MODEL_ID = PRO_MODEL_ID
 
 # ---------------------------------------------------------------------------
 # Prompt
@@ -127,7 +128,6 @@ async def generate_report(
         config=types.GenerateContentConfig(
             system_instruction=REPORT_SYSTEM_PROMPT,
             thinking_config=types.ThinkingConfig(thinking_budget=1024),
-            temperature=1.0,
         ),
     )
 

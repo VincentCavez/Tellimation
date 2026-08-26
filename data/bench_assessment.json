@@ -1,0 +1,1993 @@
+{
+ "sample_size": 40,
+ "summaries": [
+  {
+   "model": "gemini-3-flash-preview",
+   "correction": {
+    "n": 20,
+    "animation_match": 0.15,
+    "entity_match": 0.45,
+    "both": 0.15,
+    "no_output": 0.0,
+    "errors": 0,
+    "median_ms": 1628
+   },
+   "suggestion": {
+    "n": 20,
+    "animation_match": 0.45,
+    "entity_match": 0.65,
+    "both": 0.45,
+    "no_output": 0.0,
+    "errors": 0,
+    "median_ms": 1311
+   },
+   "all": {
+    "n": 40,
+    "animation_match": 0.3,
+    "entity_match": 0.55,
+    "both": 0.3,
+    "no_output": 0.0,
+    "errors": 0,
+    "median_ms": 1451
+   }
+  },
+  {
+   "model": "gemini-3.1-flash-lite",
+   "correction": {
+    "n": 20,
+    "animation_match": 0.25,
+    "entity_match": 0.55,
+    "both": 0.2,
+    "no_output": 0.0,
+    "errors": 0,
+    "median_ms": 1443
+   },
+   "suggestion": {
+    "n": 20,
+    "animation_match": 0.5,
+    "entity_match": 0.6,
+    "both": 0.4,
+    "no_output": 0.0,
+    "errors": 0,
+    "median_ms": 1240
+   },
+   "all": {
+    "n": 40,
+    "animation_match": 0.375,
+    "entity_match": 0.575,
+    "both": 0.3,
+    "no_output": 0.0,
+    "errors": 0,
+    "median_ms": 1331
+   }
+  },
+  {
+   "model": "gemini-3.6-flash",
+   "correction": {
+    "n": 20,
+    "animation_match": 0.3,
+    "entity_match": 0.45,
+    "both": 0.25,
+    "no_output": 0.0,
+    "errors": 0,
+    "median_ms": 5112
+   },
+   "suggestion": {
+    "n": 20,
+    "animation_match": 0.55,
+    "entity_match": 0.75,
+    "both": 0.45,
+    "no_output": 0.0,
+    "errors": 0,
+    "median_ms": 3452
+   },
+   "all": {
+    "n": 40,
+    "animation_match": 0.425,
+    "entity_match": 0.6,
+    "both": 0.35,
+    "no_output": 0.0,
+    "errors": 0,
+    "median_ms": 3818
+   }
+  }
+ ],
+ "runs": [
+  {
+   "model": "gemini-3-flash-preview",
+   "results": [
+    {
+     "stimulus_id": "study1_A1_A_correction",
+     "condition": "correction",
+     "animation_id_short": "I1",
+     "target_entities": [
+      "fox"
+     ],
+     "description": "It looks like you called the fox white, but this fox has beautiful reddish-orange fur!",
+     "elapsed_ms": 1921,
+     "validation": {
+      "animation_match": false,
+      "entity_match": true,
+      "warnings": [
+       "Expected A1 but got I1"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_A2_B_correction",
+     "condition": "correction",
+     "animation_id_short": "I2",
+     "target_entities": [
+      "waitress"
+     ],
+     "description": "The person carrying the plates is a waitress, not a waiter.",
+     "elapsed_ms": 2038,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false,
+      "warnings": [
+       "Expected A2 but got I2",
+       "Expected entities ['chef'] but got ['waitress']"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_C1_C_correction",
+     "condition": "correction",
+     "animation_id_short": "A1",
+     "target_entities": [
+      "man"
+     ],
+     "description": "The man isn't walking away; he is actually standing still and looking a little bit worried.",
+     "elapsed_ms": 1452,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false,
+      "warnings": [
+       "Expected C1 but got A1",
+       "Expected entities ['car_1', 'car_2', 'car_3'] but got ['man']"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_C2_D_correction",
+     "condition": "correction",
+     "animation_id_short": "I1",
+     "target_entities": [
+      "scene"
+     ],
+     "description": "You mentioned seeing a dictionary, but we only have three books and a mug on the shelf.",
+     "elapsed_ms": 1372,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false,
+      "warnings": [
+       "Expected C2 but got I1",
+       "Expected entities ['mug'] but got ['scene']"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_D1_A_correction",
+     "condition": "correction",
+     "animation_id_short": "I2",
+     "target_entities": [
+      "mother"
+     ],
+     "description": "The child called the mother 'father' when she is clearly a woman with her hair in a bun.",
+     "elapsed_ms": 1451,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false,
+      "warnings": [
+       "Expected D1 but got I2",
+       "Expected entities ['boy'] but got ['mother']"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_D2_B_correction",
+     "condition": "correction",
+     "animation_id_short": "P1",
+     "target_entities": [
+      "boy"
+     ],
+     "description": "The boy is actually wearing a green sweater with a blue collar, not a red one.",
+     "elapsed_ms": 1679,
+     "validation": {
+      "animation_match": false,
+      "entity_match": true,
+      "warnings": [
+       "Expected D2 but got P1"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_D3_C_correction",
+     "condition": "correction",
+     "animation_id_short": "A2",
+     "target_entities": [
+      "woman"
+     ],
+     "description": "You said the woman is watching the toast, but she actually has her eyes closed while she chats on her phone!",
+     "elapsed_ms": 1785,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false,
+      "warnings": [
+       "Expected D3 but got A2",
+       "Expected entities ['toaster'] but got ['woman']"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_D4_D_correction",
+     "condition": "correction",
+     "animation_id_short": "P1",
+     "target_entities": [
+      "essay"
+     ],
+     "description": "The child described the essay as perfect and flawless, but the scene shows it is covered in red ink markings and corrections.",
+     "elapsed_ms": 1444,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false,
+      "warnings": [
+       "Expected D4 but got P1",
+       "Expected entities ['girl'] but got ['essay']"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_I2_A_correction",
+     "condition": "correction",
+     "animation_id_short": "I1",
+     "target_entities": [
+      "boy_glasses"
+     ],
+     "description": "It looks like the student with the glasses is a boy, not a girl!",
+     "elapsed_ms": 1758,
+     "validation": {
+      "animation_match": false,
+      "entity_match": true,
+      "warnings": [
+       "Expected I2 but got I1"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_P1_B_correction",
+     "condition": "correction",
+     "animation_id_short": "P1",
+     "target_entities": [
+      "firetruck"
+     ],
+     "description": "The fire truck is red, but you said it was yellow.",
+     "elapsed_ms": 1222,
+     "validation": {
+      "animation_match": true,
+      "entity_match": true,
+      "warnings": []
+     }
+    },
+    {
+     "stimulus_id": "study1_P2a_C_correction",
+     "condition": "correction",
+     "animation_id_short": "P2b",
+     "target_entities": [
+      "pot"
+     ],
+     "description": "It looks like the pot is actually very hot since there is steam rising and the stew is bubbling!",
+     "elapsed_ms": 1525,
+     "validation": {
+      "animation_match": false,
+      "entity_match": true,
+      "warnings": [
+       "Expected P2a but got P2b"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_P2b_D_correction",
+     "condition": "correction",
+     "animation_id_short": "A2",
+     "target_entities": [
+      "mother"
+     ],
+     "description": "The mother is putting frozen food into the refrigerator, not taking something out of an oven.",
+     "elapsed_ms": 1729,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false,
+      "warnings": [
+       "Expected P2b but got A2",
+       "Expected entities ['frozen_food'] but got ['mother']"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_P2d_A_correction",
+     "condition": "correction",
+     "animation_id_short": "I1",
+     "target_entities": [
+      "puppy"
+     ],
+     "description": "The child identified the small golden puppy as a kitten.",
+     "elapsed_ms": 1618,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false,
+      "warnings": [
+       "Expected P2d but got I1",
+       "Expected entities ['man'] but got ['puppy']"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_P2e_B_correction",
+     "condition": "correction",
+     "animation_id_short": "P2a",
+     "target_entities": [
+      "man"
+     ],
+     "description": "The man doesn't look relaxed; he actually looks quite embarrassed because the food is burnt.",
+     "elapsed_ms": 2117,
+     "validation": {
+      "animation_match": false,
+      "entity_match": true,
+      "warnings": [
+       "Expected P2e but got P2a"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_P2f_C_correction",
+     "condition": "correction",
+     "animation_id_short": "P2c",
+     "target_entities": [
+      "boy"
+     ],
+     "description": "The child described the boy as excited and smiling, but he actually looks sad with downturned eyes.",
+     "elapsed_ms": 1591,
+     "validation": {
+      "animation_match": false,
+      "entity_match": true,
+      "warnings": [
+       "Expected P2f but got P2c"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_R1_D_correction",
+     "condition": "correction",
+     "animation_id_short": "P1",
+     "target_entities": [
+      "scene"
+     ],
+     "description": "It looks like you said the classroom is empty, but there are lots of fun toys and colorful drawings all around!",
+     "elapsed_ms": 1653,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false,
+      "warnings": [
+       "Expected R1 but got P1",
+       "Expected entities ['boy', 'letters'] but got ['scene']"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_R3_A_correction",
+     "condition": "correction",
+     "animation_id_short": "R3",
+     "target_entities": [
+      "fence",
+      "boulder"
+     ],
+     "description": "The child described a causal event that did not happen; the fence did not knock over the boulder.",
+     "elapsed_ms": 1634,
+     "validation": {
+      "animation_match": true,
+      "entity_match": true,
+      "warnings": []
+     }
+    },
+    {
+     "stimulus_id": "study1_S1_B_correction",
+     "condition": "correction",
+     "animation_id_short": "P1",
+     "target_entities": [
+      "librarian"
+     ],
+     "description": "The child described the librarian's cardigan as red, but it is actually yellow.",
+     "elapsed_ms": 1411,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false,
+      "warnings": [
+       "Expected S1 but got P1",
+       "Expected entities ['garden'] but got ['librarian']"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_S2_C_correction",
+     "condition": "correction",
+     "animation_id_short": "S2",
+     "target_entities": [
+      "keeper"
+     ],
+     "description": "The child says the keeper is at the base of the lighthouse near the boat, but he is actually at the top on the observation deck.",
+     "elapsed_ms": 1307,
+     "validation": {
+      "animation_match": true,
+      "entity_match": true,
+      "warnings": []
+     }
+    },
+    {
+     "stimulus_id": "study1_T1_D_correction",
+     "condition": "correction",
+     "animation_id_short": "I1",
+     "target_entities": [
+      "scene"
+     ],
+     "description": "The child mentioned a packed stadium with cheering fans, but the scene shows empty bleachers and no fans.",
+     "elapsed_ms": 1628,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false,
+      "warnings": [
+       "Expected T1 but got I1",
+       "Expected entities ['scoreboard'] but got ['scene']"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_A1_A_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "A1",
+     "target_entities": [
+      "fox",
+      "rabbit"
+     ],
+     "description": "The child identified the characters and setting but didn't mention that the animals are racing. This suggestion highlights their movement through the woods to encourage the child to describe the action.",
+     "elapsed_ms": 1356,
+     "validation": {
+      "animation_match": true,
+      "entity_match": true
+     }
+    },
+    {
+     "stimulus_id": "study1_A2_B_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "A2",
+     "target_entities": [
+      "chef"
+     ],
+     "description": "The child mentioned the chef standing there, but they could describe the action of the chef flipping a pancake with the frying pan.",
+     "elapsed_ms": 1161,
+     "validation": {
+      "animation_match": true,
+      "entity_match": true
+     }
+    },
+    {
+     "stimulus_id": "study1_C1_C_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "I2",
+     "target_entities": [
+      "man"
+     ],
+     "description": "The storyteller has introduced the man standing by the cars, but giving him a name would make his role in the story even more special!",
+     "elapsed_ms": 1148,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false
+     }
+    },
+    {
+     "stimulus_id": "study1_C2_D_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "C3",
+     "target_entities": [
+      "book_1"
+     ],
+     "description": "The child mentioned some interesting items in a room, but no characters are present yet. To help build narrative continuity, the child could reference an owner or a character from a previous scene who might have left these items behind.",
+     "elapsed_ms": 1434,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false
+     }
+    },
+    {
+     "stimulus_id": "study1_D1_A_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "D1",
+     "target_entities": [
+      "boy"
+     ],
+     "description": "The boy is pointing at the yummy cake, but he hasn't said anything yet. What do you think he might say to his mother or the baker?",
+     "elapsed_ms": 1214,
+     "validation": {
+      "animation_match": true,
+      "entity_match": true
+     }
+    },
+    {
+     "stimulus_id": "study1_D2_B_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "D2",
+     "target_entities": [
+      "boy"
+     ],
+     "description": "The boy is staring very intently at the board; it would be great to hear what he is thinking or what his plan is for that knight piece.",
+     "elapsed_ms": 1221,
+     "validation": {
+      "animation_match": true,
+      "entity_match": true
+     }
+    },
+    {
+     "stimulus_id": "study1_D3_C_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "D3",
+     "target_entities": [
+      "toaster"
+     ],
+     "description": "The child describes the toaster sitting on the counter, but hasn't mentioned the important problem: the toast is actually burning, which would start the action in the scene.",
+     "elapsed_ms": 1450,
+     "validation": {
+      "animation_match": true,
+      "entity_match": true
+     }
+    },
+    {
+     "stimulus_id": "study1_D4_D_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "D2",
+     "target_entities": [
+      "girl"
+     ],
+     "description": "The girl is looking very closely at her paper; perhaps you could tell me what she is thinking or wondering about her teacher's feedback?",
+     "elapsed_ms": 1500,
+     "validation": {
+      "animation_match": false,
+      "entity_match": true
+     }
+    },
+    {
+     "stimulus_id": "study1_I2_A_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "I1",
+     "target_entities": [
+      "girl_braids"
+     ],
+     "description": "The child mentioned students in general, but could enrich the narrative by describing the girl with the long brown braids specifically.",
+     "elapsed_ms": 1239,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false
+     }
+    },
+    {
+     "stimulus_id": "study1_P1_B_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "P1",
+     "target_entities": [
+      "firetruck"
+     ],
+     "description": "The child mentioned the fire truck, but we can encourage them to use more descriptive language to describe its color or features, such as 'the bright red firetruck with a tall ladder'.",
+     "elapsed_ms": 1220,
+     "validation": {
+      "animation_match": true,
+      "entity_match": true
+     }
+    },
+    {
+     "stimulus_id": "study1_P2a_C_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "P1",
+     "target_entities": [
+      "pot"
+     ],
+     "description": "The child mentioned the cast-iron pot but could describe the large wooden spoon used for stirring to make the scene more vivid.",
+     "elapsed_ms": 1223,
+     "validation": {
+      "animation_match": false,
+      "entity_match": true
+     }
+    },
+    {
+     "stimulus_id": "study1_P2b_D_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "P1",
+     "target_entities": [
+      "mother"
+     ],
+     "description": "The child mentioned the mother but didn't describe her appearance, like her ribbed green sweater or her yellow and blue striped skirt.",
+     "elapsed_ms": 1375,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false
+     }
+    },
+    {
+     "stimulus_id": "study1_P2d_A_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "P2c",
+     "target_entities": [
+      "man"
+     ],
+     "description": "The man looks so happy and peaceful while he's holding his new friend!",
+     "elapsed_ms": 1278,
+     "validation": {
+      "animation_match": false,
+      "entity_match": true
+     }
+    },
+    {
+     "stimulus_id": "study1_P2e_B_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "P2e",
+     "target_entities": [
+      "man"
+     ],
+     "description": "I've noticed the man looks very upset about the burnt casserole. Maybe you could describe how he is feeling or what he might be thinking about dinner being ruined!",
+     "elapsed_ms": 1464,
+     "validation": {
+      "animation_match": true,
+      "entity_match": true
+     }
+    },
+    {
+     "stimulus_id": "study1_P2f_C_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "P2f",
+     "target_entities": [
+      "boy"
+     ],
+     "description": "The boy looks quite troubled sitting there; you could describe how he's feeling worried or anxious about his pet while he waits.",
+     "elapsed_ms": 1493,
+     "validation": {
+      "animation_match": true,
+      "entity_match": true
+     }
+    },
+    {
+     "stimulus_id": "study1_R1_D_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "R3",
+     "target_entities": [
+      "boy",
+      "letters"
+     ],
+     "description": "The boy is holding a letter and looks like he is about to finish the word on the board. You could explain why he's doing that or what happens when he puts the letter in the gap!",
+     "elapsed_ms": 1547,
+     "validation": {
+      "animation_match": false,
+      "entity_match": true
+     }
+    },
+    {
+     "stimulus_id": "study1_R3_A_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "R3",
+     "target_entities": [
+      "boulder",
+      "fence"
+     ],
+     "description": "The child has described the boulder and the fence separately but hasn't mentioned the potential causal relationship between them, such as the boulder rolling down because the hill is steep or what might happen if it hits the fence.",
+     "elapsed_ms": 1311,
+     "validation": {
+      "animation_match": true,
+      "entity_match": true
+     }
+    },
+    {
+     "stimulus_id": "study1_S1_B_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "I1",
+     "target_entities": [
+      "garden"
+     ],
+     "description": "The child described the interior of the library beautifully, but hasn't mentioned the sunny garden visible just outside the doorway yet.",
+     "elapsed_ms": 1167,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false
+     }
+    },
+    {
+     "stimulus_id": "study1_S2_C_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "I1",
+     "target_entities": [
+      "scene"
+     ],
+     "description": "The child has described the lighthouse, the keeper, and the boat, but hasn't yet mentioned the beautiful weather, such as the bright daylight or the fluffy white and grey clouds in the sky.",
+     "elapsed_ms": 1259,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false
+     }
+    },
+    {
+     "stimulus_id": "study1_T1_D_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "P1",
+     "target_entities": [
+      "scoreboard"
+     ],
+     "description": "The child mentioned the scoreboard and the score, but adding descriptive details about its appearance\u2014like being a large, wooden structure with colorful panels\u2014would make the scene more vivid.",
+     "elapsed_ms": 1564,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false
+     }
+    }
+   ],
+   "wall_s": 10.8
+  },
+  {
+   "model": "gemini-3.1-flash-lite",
+   "results": [
+    {
+     "stimulus_id": "study1_A1_A_correction",
+     "condition": "correction",
+     "animation_id_short": "I1",
+     "target_entities": [
+      "rabbit"
+     ],
+     "description": "Oh my, you mentioned two rabbits, but there is only one rabbit in our story!",
+     "elapsed_ms": 1782,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false,
+      "warnings": [
+       "Expected A1 but got I1",
+       "Expected entities ['fox'] but got ['rabbit']"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_A2_B_correction",
+     "condition": "correction",
+     "animation_id_short": "I2",
+     "target_entities": [
+      "chef"
+     ],
+     "description": "The chef is wearing a white jacket, not a black apron.",
+     "elapsed_ms": 1611,
+     "validation": {
+      "animation_match": false,
+      "entity_match": true,
+      "warnings": [
+       "Expected A2 but got I2"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_C1_C_correction",
+     "condition": "correction",
+     "animation_id_short": "A2",
+     "target_entities": [
+      "man"
+     ],
+     "description": "The man is actually standing still holding his keys, not walking away.",
+     "elapsed_ms": 1176,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false,
+      "warnings": [
+       "Expected C1 but got A2",
+       "Expected entities ['car_1', 'car_2', 'car_3'] but got ['man']"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_C2_D_correction",
+     "condition": "correction",
+     "animation_id_short": "I1",
+     "target_entities": [
+      "scene"
+     ],
+     "description": "You described a dictionary, but I don't see one on the shelf!",
+     "elapsed_ms": 2266,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false,
+      "warnings": [
+       "Expected C2 but got I1",
+       "Expected entities ['mug'] but got ['scene']"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_D1_A_correction",
+     "condition": "correction",
+     "animation_id_short": "I1",
+     "target_entities": [
+      "mother"
+     ],
+     "description": "It looks like the boy is with his mother, not his father!",
+     "elapsed_ms": 1262,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false,
+      "warnings": [
+       "Expected D1 but got I1",
+       "Expected entities ['boy'] but got ['mother']"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_D2_B_correction",
+     "condition": "correction",
+     "animation_id_short": "P1",
+     "target_entities": [
+      "boy"
+     ],
+     "description": "The boy is actually wearing a green sweater, not a red one.",
+     "elapsed_ms": 1443,
+     "validation": {
+      "animation_match": false,
+      "entity_match": true,
+      "warnings": [
+       "Expected D2 but got P1"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_D3_C_correction",
+     "condition": "correction",
+     "animation_id_short": "A2",
+     "target_entities": [
+      "woman"
+     ],
+     "description": "The woman is actually busy talking on the phone, not watching the toaster. She is also still holding the phone to her ear, not putting it down.",
+     "elapsed_ms": 1341,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false,
+      "warnings": [
+       "Expected D3 but got A2",
+       "Expected entities ['toaster'] but got ['woman']"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_D4_D_correction",
+     "condition": "correction",
+     "animation_id_short": "P2f",
+     "target_entities": [
+      "girl"
+     ],
+     "description": "It looks like the girl is actually feeling frustrated and worried about her essay, not proud and happy!",
+     "elapsed_ms": 1270,
+     "validation": {
+      "animation_match": false,
+      "entity_match": true,
+      "warnings": [
+       "Expected D4 but got P2f"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_I2_A_correction",
+     "condition": "correction",
+     "animation_id_short": "I2",
+     "target_entities": [
+      "boy_glasses"
+     ],
+     "description": "The student with glasses is a boy, not a girl.",
+     "elapsed_ms": 7773,
+     "validation": {
+      "animation_match": true,
+      "entity_match": true,
+      "warnings": []
+     }
+    },
+    {
+     "stimulus_id": "study1_P1_B_correction",
+     "condition": "correction",
+     "animation_id_short": "P1",
+     "target_entities": [
+      "boy"
+     ],
+     "description": "The boy is actually wearing a green shirt, not a blue jacket.",
+     "elapsed_ms": 3361,
+     "validation": {
+      "animation_match": true,
+      "entity_match": false,
+      "warnings": [
+       "Expected entities ['firetruck'] but got ['boy']"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_P2a_C_correction",
+     "condition": "correction",
+     "animation_id_short": "P2a",
+     "target_entities": [
+      "pot"
+     ],
+     "description": "The pot is actually hot and contains bubbling stew, rather than being a cold pot of water.",
+     "elapsed_ms": 5129,
+     "validation": {
+      "animation_match": true,
+      "entity_match": true,
+      "warnings": []
+     }
+    },
+    {
+     "stimulus_id": "study1_P2b_D_correction",
+     "condition": "correction",
+     "animation_id_short": "A2",
+     "target_entities": [
+      "mother"
+     ],
+     "description": "The mother is putting cold frozen food into the refrigerator, not taking a pizza box out of an oven.",
+     "elapsed_ms": 1610,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false,
+      "warnings": [
+       "Expected P2b but got A2",
+       "Expected entities ['frozen_food'] but got ['mother']"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_P2d_A_correction",
+     "condition": "correction",
+     "animation_id_short": "I2",
+     "target_entities": [
+      "man"
+     ],
+     "description": "The man is smiling and looks very kind, not grumpy!",
+     "elapsed_ms": 1436,
+     "validation": {
+      "animation_match": false,
+      "entity_match": true,
+      "warnings": [
+       "Expected P2d but got I2"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_P2e_B_correction",
+     "condition": "correction",
+     "animation_id_short": "D2",
+     "target_entities": [
+      "man"
+     ],
+     "description": "The man doesn't seem relaxed; the scene shows him leaning on the island while the woman glares at him, and the food is burnt, suggesting a tense situation.",
+     "elapsed_ms": 1725,
+     "validation": {
+      "animation_match": false,
+      "entity_match": true,
+      "warnings": [
+       "Expected P2e but got D2"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_P2f_C_correction",
+     "condition": "correction",
+     "animation_id_short": "P2c",
+     "target_entities": [
+      "boy"
+     ],
+     "description": "The boy is actually feeling sad and looks down, not excited or smiling.",
+     "elapsed_ms": 1359,
+     "validation": {
+      "animation_match": false,
+      "entity_match": true,
+      "warnings": [
+       "Expected P2f but got P2c"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_R1_D_correction",
+     "condition": "correction",
+     "animation_id_short": "P2c",
+     "target_entities": [
+      "scene"
+     ],
+     "description": "The classroom is full of colorful toys, books, and art, so it is not an empty classroom at all!",
+     "elapsed_ms": 1595,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false,
+      "warnings": [
+       "Expected R1 but got P2c",
+       "Expected entities ['boy', 'letters'] but got ['scene']"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_R3_A_correction",
+     "condition": "correction",
+     "animation_id_short": "R3",
+     "target_entities": [
+      "fence",
+      "boulder"
+     ],
+     "description": "The fence didn't knock over the boulder; the boulder is sitting still on the hill.",
+     "elapsed_ms": 1378,
+     "validation": {
+      "animation_match": true,
+      "entity_match": true,
+      "warnings": []
+     }
+    },
+    {
+     "stimulus_id": "study1_S1_B_correction",
+     "condition": "correction",
+     "animation_id_short": "P1",
+     "target_entities": [
+      "librarian"
+     ],
+     "description": "The librarian is actually wearing a yellow cardigan, not a red one.",
+     "elapsed_ms": 1334,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false,
+      "warnings": [
+       "Expected S1 but got P1",
+       "Expected entities ['garden'] but got ['librarian']"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_S2_C_correction",
+     "condition": "correction",
+     "animation_id_short": "S2",
+     "target_entities": [
+      "keeper"
+     ],
+     "description": "The lighthouse keeper is actually standing on the observation deck of the lighthouse, not at the base.",
+     "elapsed_ms": 1183,
+     "validation": {
+      "animation_match": true,
+      "entity_match": true,
+      "warnings": []
+     }
+    },
+    {
+     "stimulus_id": "study1_T1_D_correction",
+     "condition": "correction",
+     "animation_id_short": "I2",
+     "target_entities": [
+      "scoreboard"
+     ],
+     "description": "The scoreboard actually has multiple green, yellow, and blue panels on it, so it is not blank.",
+     "elapsed_ms": 1331,
+     "validation": {
+      "animation_match": false,
+      "entity_match": true,
+      "warnings": [
+       "Expected T1 but got I2"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_A1_A_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "A1",
+     "target_entities": [
+      "fox"
+     ],
+     "description": "It looks like the red fox is ready to move! Can you tell us what the fox is doing as it runs along the forest path?",
+     "elapsed_ms": 1051,
+     "validation": {
+      "animation_match": true,
+      "entity_match": true
+     }
+    },
+    {
+     "stimulus_id": "study1_A2_B_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "A2",
+     "target_entities": [
+      "chef"
+     ],
+     "description": "The chef is cooking at the range; why not show them flipping a pancake in their frying pan?",
+     "elapsed_ms": 1376,
+     "validation": {
+      "animation_match": true,
+      "entity_match": true
+     }
+    },
+    {
+     "stimulus_id": "study1_C1_C_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "I2",
+     "target_entities": [
+      "man"
+     ],
+     "description": "It's fun to give your character a name! What should we call the man standing by the cars?",
+     "elapsed_ms": 1261,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false
+     }
+    },
+    {
+     "stimulus_id": "study1_C2_D_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "C1",
+     "target_entities": [
+      "book_1",
+      "book_2",
+      "book_3"
+     ],
+     "description": "The books are lined up so perfectly! Why don't you try naming each book to give them their own special personalities?",
+     "elapsed_ms": 1240,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false
+     }
+    },
+    {
+     "stimulus_id": "study1_D1_A_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "D1",
+     "target_entities": [
+      "boy"
+     ],
+     "description": "The boy is pointing at a cake! What do you think he's saying to the baker about it?",
+     "elapsed_ms": 1394,
+     "validation": {
+      "animation_match": true,
+      "entity_match": true
+     }
+    },
+    {
+     "stimulus_id": "study1_D2_B_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "D2",
+     "target_entities": [
+      "boy"
+     ],
+     "description": "The boy is staring intensely at the board with his hand hovering over a piece! I wonder what he is thinking about his next move.",
+     "elapsed_ms": 1149,
+     "validation": {
+      "animation_match": true,
+      "entity_match": true
+     }
+    },
+    {
+     "stimulus_id": "study1_D3_C_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "D3",
+     "target_entities": [
+      "toaster"
+     ],
+     "description": "Oh no, looks like the toast is starting to burn! Could you tell me what happens next when the woman notices the smoke?",
+     "elapsed_ms": 1171,
+     "validation": {
+      "animation_match": true,
+      "entity_match": true
+     }
+    },
+    {
+     "stimulus_id": "study1_D4_D_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "P2e",
+     "target_entities": [
+      "girl"
+     ],
+     "description": "The girl is looking at her essay. I wonder if you could describe how she is feeling about those corrections? For example, does she look frustrated or disappointed?",
+     "elapsed_ms": 1266,
+     "validation": {
+      "animation_match": false,
+      "entity_match": true
+     }
+    },
+    {
+     "stimulus_id": "study1_I2_A_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "I2",
+     "target_entities": [
+      "boy_glasses"
+     ],
+     "description": "You've mentioned students! Why not give one of them a fun name, like the boy with the glasses?",
+     "elapsed_ms": 1136,
+     "validation": {
+      "animation_match": true,
+      "entity_match": false
+     }
+    },
+    {
+     "stimulus_id": "study1_P1_B_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "P1",
+     "target_entities": [
+      "firetruck"
+     ],
+     "description": "You described the fire truck so well! Can you tell me more about what it looks like? Maybe you can describe its color or other special features to help the audience imagine it clearly.",
+     "elapsed_ms": 1137,
+     "validation": {
+      "animation_match": true,
+      "entity_match": true
+     }
+    },
+    {
+     "stimulus_id": "study1_P2a_C_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "P1",
+     "target_entities": [
+      "campfire"
+     ],
+     "description": "You could describe the bright orange and yellow flames of the campfire to bring the warmth of the fire to life!",
+     "elapsed_ms": 9629,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false
+     }
+    },
+    {
+     "stimulus_id": "study1_P2b_D_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "P1",
+     "target_entities": [
+      "mother"
+     ],
+     "description": "You described the action perfectly! Can you add a few more details about what the mother is wearing to help us picture her outfit, like her sweater or skirt?",
+     "elapsed_ms": 2918,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false
+     }
+    },
+    {
+     "stimulus_id": "study1_P2d_A_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "P2c",
+     "target_entities": [
+      "man"
+     ],
+     "description": "The man looks so peaceful with the puppy! How do you think he is feeling inside while he holds it?",
+     "elapsed_ms": 1230,
+     "validation": {
+      "animation_match": false,
+      "entity_match": true
+     }
+    },
+    {
+     "stimulus_id": "study1_P2e_B_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "P2e",
+     "target_entities": [
+      "man"
+     ],
+     "description": "The man seems quite upset about the burnt casserole! You could tell us more about how angry or frustrated he is feeling right now.",
+     "elapsed_ms": 1143,
+     "validation": {
+      "animation_match": true,
+      "entity_match": true
+     }
+    },
+    {
+     "stimulus_id": "study1_P2f_C_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "D2",
+     "target_entities": [
+      "boy"
+     ],
+     "description": "The boy is sitting all alone waiting. What do you think he might be thinking or feeling about his pet right now?",
+     "elapsed_ms": 1314,
+     "validation": {
+      "animation_match": false,
+      "entity_match": true
+     }
+    },
+    {
+     "stimulus_id": "study1_R1_D_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "R1",
+     "target_entities": [
+      "boy",
+      "letters"
+     ],
+     "description": "The boy is interacting with the letters on the board! Maybe you can tell us if he is putting them together or matching them to complete the word?",
+     "elapsed_ms": 1290,
+     "validation": {
+      "animation_match": true,
+      "entity_match": true
+     }
+    },
+    {
+     "stimulus_id": "study1_R3_A_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "R3",
+     "target_entities": [
+      "goat",
+      "boulder"
+     ],
+     "description": "The goat is watching the boulder. You could tell us more about why it's watching, maybe something like 'The goat watches the boulder because it might roll down!'",
+     "elapsed_ms": 1256,
+     "validation": {
+      "animation_match": true,
+      "entity_match": false
+     }
+    },
+    {
+     "stimulus_id": "study1_S1_B_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "I1",
+     "target_entities": [
+      "scene"
+     ],
+     "description": "The librarian is standing near a beautiful, sunny garden outside! Why don't you describe what that garden looks like through the doorway?",
+     "elapsed_ms": 1115,
+     "validation": {
+      "animation_match": false,
+      "entity_match": true
+     }
+    },
+    {
+     "stimulus_id": "study1_S2_C_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "I1",
+     "target_entities": [
+      "scene"
+     ],
+     "description": "The weather is lovely today\u2014would you like to describe the bright daylight or the fluffy clouds in the sky?",
+     "elapsed_ms": 1136,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false
+     }
+    },
+    {
+     "stimulus_id": "study1_T1_D_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "P1",
+     "target_entities": [
+      "scoreboard"
+     ],
+     "description": "You described the scoreboard perfectly! Can you add more detail about what it looks like, such as the large wooden frame or its colorful panels?",
+     "elapsed_ms": 1134,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false
+     }
+    }
+   ],
+   "wall_s": 17.9
+  },
+  {
+   "model": "gemini-3.6-flash",
+   "results": [
+    {
+     "stimulus_id": "study1_A1_A_correction",
+     "condition": "correction",
+     "animation_id_short": "P1",
+     "target_entities": [
+      "fox"
+     ],
+     "description": "The child described the fox as white, but the fox has reddish-orange fur.",
+     "elapsed_ms": 2401,
+     "validation": {
+      "animation_match": false,
+      "entity_match": true,
+      "warnings": [
+       "Expected A1 but got P1"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_A2_B_correction",
+     "condition": "correction",
+     "animation_id_short": "A2",
+     "target_entities": [
+      "chef"
+     ],
+     "description": "The chef is tossing a pancake in a frying pan, not stirring a pot.",
+     "elapsed_ms": 9093,
+     "validation": {
+      "animation_match": true,
+      "entity_match": true,
+      "warnings": []
+     }
+    },
+    {
+     "stimulus_id": "study1_C1_C_correction",
+     "condition": "correction",
+     "animation_id_short": "A1",
+     "target_entities": [
+      "man"
+     ],
+     "description": "The man is standing still in the parking lot holding his keys, not walking away.",
+     "elapsed_ms": 2388,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false,
+      "warnings": [
+       "Expected C1 but got A1",
+       "Expected entities ['car_1', 'car_2', 'car_3'] but got ['man']"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_C2_D_correction",
+     "condition": "correction",
+     "animation_id_short": "I1",
+     "target_entities": [
+      "scene"
+     ],
+     "description": "You mentioned a dictionary on the shelf, but there isn't one in the room.",
+     "elapsed_ms": 4072,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false,
+      "warnings": [
+       "Expected C2 but got I1",
+       "Expected entities ['mug'] but got ['scene']"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_D1_A_correction",
+     "condition": "correction",
+     "animation_id_short": "I2",
+     "target_entities": [
+      "mother"
+     ],
+     "description": "The child referred to the mother as the boy's father.",
+     "elapsed_ms": 5582,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false,
+      "warnings": [
+       "Expected D1 but got I2",
+       "Expected entities ['boy'] but got ['mother']"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_D2_B_correction",
+     "condition": "correction",
+     "animation_id_short": "P1",
+     "target_entities": [
+      "boy"
+     ],
+     "description": "The boy is wearing a green sweater, not a red sweater.",
+     "elapsed_ms": 3543,
+     "validation": {
+      "animation_match": false,
+      "entity_match": true,
+      "warnings": [
+       "Expected D2 but got P1"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_D3_C_correction",
+     "condition": "correction",
+     "animation_id_short": "A2",
+     "target_entities": [
+      "woman"
+     ],
+     "description": "The woman is talking on her phone with her eyes closed, rather than watching the toaster or putting her phone down.",
+     "elapsed_ms": 3473,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false,
+      "warnings": [
+       "Expected D3 but got A2",
+       "Expected entities ['toaster'] but got ['woman']"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_D4_D_correction",
+     "condition": "correction",
+     "animation_id_short": "P1",
+     "target_entities": [
+      "essay"
+     ],
+     "description": "The child described the essay as perfect with no corrections, but the essay is covered in red ink markings and circles.",
+     "elapsed_ms": 5112,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false,
+      "warnings": [
+       "Expected D4 but got P1",
+       "Expected entities ['girl'] but got ['essay']"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_I2_A_correction",
+     "condition": "correction",
+     "animation_id_short": "A1",
+     "target_entities": [
+      "teacher"
+     ],
+     "description": "The teacher is standing on the left side of the room, not sitting at a desk.",
+     "elapsed_ms": 5277,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false,
+      "warnings": [
+       "Expected I2 but got A1",
+       "Expected entities ['boy_glasses'] but got ['teacher']"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_P1_B_correction",
+     "condition": "correction",
+     "animation_id_short": "P1",
+     "target_entities": [
+      "firetruck"
+     ],
+     "description": "The child described the firetruck as yellow, but it is actually red.",
+     "elapsed_ms": 3483,
+     "validation": {
+      "animation_match": true,
+      "entity_match": true,
+      "warnings": []
+     }
+    },
+    {
+     "stimulus_id": "study1_P2a_C_correction",
+     "condition": "correction",
+     "animation_id_short": "P2a",
+     "target_entities": [
+      "pot"
+     ],
+     "description": "The child described the pot as cold, but steam is rising and the stew is bubbling hot.",
+     "elapsed_ms": 3932,
+     "validation": {
+      "animation_match": true,
+      "entity_match": true,
+      "warnings": []
+     }
+    },
+    {
+     "stimulus_id": "study1_P2b_D_correction",
+     "condition": "correction",
+     "animation_id_short": "A2",
+     "target_entities": [
+      "mother"
+     ],
+     "description": "The mother is putting frozen food into the refrigerator freezer, not taking pizza out of an oven.",
+     "elapsed_ms": 5495,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false,
+      "warnings": [
+       "Expected P2b but got A2",
+       "Expected entities ['frozen_food'] but got ['mother']"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_P2d_A_correction",
+     "condition": "correction",
+     "animation_id_short": "I1",
+     "target_entities": [
+      "puppy"
+     ],
+     "description": "The child called the golden-yellow puppy a kitten.",
+     "elapsed_ms": 3583,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false,
+      "warnings": [
+       "Expected P2d but got I1",
+       "Expected entities ['man'] but got ['puppy']"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_P2e_B_correction",
+     "condition": "correction",
+     "animation_id_short": "P2e",
+     "target_entities": [
+      "woman"
+     ],
+     "description": "The child described the interaction as happy and relaxed, but the woman is actually glaring angrily at the man with her hands on her hips.",
+     "elapsed_ms": 6909,
+     "validation": {
+      "animation_match": true,
+      "entity_match": false,
+      "warnings": [
+       "Expected entities ['man'] but got ['woman']"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_P2f_C_correction",
+     "condition": "correction",
+     "animation_id_short": "P1",
+     "target_entities": [
+      "boy"
+     ],
+     "description": "The boy is wearing a yellow and green striped long-sleeved shirt with blue denim overalls, not a white sweatshirt, and he looks sad rather than excited or smiling.",
+     "elapsed_ms": 7228,
+     "validation": {
+      "animation_match": false,
+      "entity_match": true,
+      "warnings": [
+       "Expected P2f but got P1"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_R1_D_correction",
+     "condition": "correction",
+     "animation_id_short": "P1",
+     "target_entities": [
+      "letters"
+     ],
+     "description": "The child described the whiteboard as blank, but magnetic letters spelling 'CAT' are attached to it.",
+     "elapsed_ms": 5749,
+     "validation": {
+      "animation_match": false,
+      "entity_match": true,
+      "warnings": [
+       "Expected R1 but got P1"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_R3_A_correction",
+     "condition": "correction",
+     "animation_id_short": "R3",
+     "target_entities": [
+      "fence",
+      "boulder"
+     ],
+     "description": "The child incorrectly stated that the fence knocked over the boulder.",
+     "elapsed_ms": 3758,
+     "validation": {
+      "animation_match": true,
+      "entity_match": true,
+      "warnings": []
+     }
+    },
+    {
+     "stimulus_id": "study1_S1_B_correction",
+     "condition": "correction",
+     "animation_id_short": "P1",
+     "target_entities": [
+      "librarian"
+     ],
+     "description": "The child described the librarian wearing a red cardigan, but she is wearing a yellow cardigan.",
+     "elapsed_ms": 5504,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false,
+      "warnings": [
+       "Expected S1 but got P1",
+       "Expected entities ['garden'] but got ['librarian']"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_S2_C_correction",
+     "condition": "correction",
+     "animation_id_short": "S2",
+     "target_entities": [
+      "keeper"
+     ],
+     "description": "The lighthouse keeper is standing on the observation deck at the top of the lighthouse, not at its base.",
+     "elapsed_ms": 2162,
+     "validation": {
+      "animation_match": true,
+      "entity_match": true,
+      "warnings": []
+     }
+    },
+    {
+     "stimulus_id": "study1_T1_D_correction",
+     "condition": "correction",
+     "animation_id_short": "I1",
+     "target_entities": [
+      "scene"
+     ],
+     "description": "The child described a packed stadium with fans cheering and a game beginning, but the stadium is empty with only a janitor cleaning up.",
+     "elapsed_ms": 5913,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false,
+      "warnings": [
+       "Expected T1 but got I1",
+       "Expected entities ['scoreboard'] but got ['scene']"
+      ]
+     }
+    },
+    {
+     "stimulus_id": "study1_A1_A_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "A1",
+     "target_entities": [
+      "fox",
+      "rabbit"
+     ],
+     "description": "The child described the characters and background but didn't mention the action of the fox and rabbit running or racing through the forest.",
+     "elapsed_ms": 4002,
+     "validation": {
+      "animation_match": true,
+      "entity_match": true
+     }
+    },
+    {
+     "stimulus_id": "study1_A2_B_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "A2",
+     "target_entities": [
+      "chef"
+     ],
+     "description": "The child mentioned the chef standing at the stove, but hasn't described the action of flipping a pancake with the frying pan.",
+     "elapsed_ms": 3452,
+     "validation": {
+      "animation_match": true,
+      "entity_match": true
+     }
+    },
+    {
+     "stimulus_id": "study1_C1_C_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "I2",
+     "target_entities": [
+      "man"
+     ],
+     "description": "The child introduced the man in the scene, offering a great opportunity to give him a name to bring the story to life.",
+     "elapsed_ms": 3223,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false
+     }
+    },
+    {
+     "stimulus_id": "study1_C2_D_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "C3",
+     "target_entities": [
+      "mug"
+     ],
+     "description": "The child could describe who left the warm mug on the shelf or who owns this home office to introduce a character into the story.",
+     "elapsed_ms": 5844,
+     "validation": {
+      "animation_match": false,
+      "entity_match": true
+     }
+    },
+    {
+     "stimulus_id": "study1_D1_A_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "D1",
+     "target_entities": [
+      "boy"
+     ],
+     "description": "The boy is pointing at the chocolate cake, but hasn't said anything yet\u2014what does he ask the baker?",
+     "elapsed_ms": 2394,
+     "validation": {
+      "animation_match": true,
+      "entity_match": true
+     }
+    },
+    {
+     "stimulus_id": "study1_D2_B_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "D2",
+     "target_entities": [
+      "boy"
+     ],
+     "description": "The boy is staring intensely at the board with his hand hovering, but we don't know what move he is planning or thinking about.",
+     "elapsed_ms": 1998,
+     "validation": {
+      "animation_match": true,
+      "entity_match": true
+     }
+    },
+    {
+     "stimulus_id": "study1_D3_C_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "D3",
+     "target_entities": [
+      "toaster"
+     ],
+     "description": "The child describes the toaster with bread in it, but hasn't mentioned the key initiating event that the toast is starting to burn while the woman is on the phone.",
+     "elapsed_ms": 4325,
+     "validation": {
+      "animation_match": true,
+      "entity_match": true
+     }
+    },
+    {
+     "stimulus_id": "study1_D4_D_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "D2",
+     "target_entities": [
+      "girl"
+     ],
+     "description": "The child described the girl studying her feedback carefully, but hasn't shared what she might be thinking or wondering about her essay results.",
+     "elapsed_ms": 3875,
+     "validation": {
+      "animation_match": false,
+      "entity_match": true
+     }
+    },
+    {
+     "stimulus_id": "study1_I2_A_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "I2",
+     "target_entities": [
+      "teacher"
+     ],
+     "description": "The child mentioned a teacher, but giving the teacher a specific name would make the story more personal and engaging.",
+     "elapsed_ms": 3355,
+     "validation": {
+      "animation_match": true,
+      "entity_match": false
+     }
+    },
+    {
+     "stimulus_id": "study1_P1_B_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "P1",
+     "target_entities": [
+      "firetruck"
+     ],
+     "description": "The child mentioned the fire truck, but hasn't described its bright red color or the ladder attached to it.",
+     "elapsed_ms": 1723,
+     "validation": {
+      "animation_match": true,
+      "entity_match": true
+     }
+    },
+    {
+     "stimulus_id": "study1_P2a_C_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "P1",
+     "target_entities": [
+      "boy"
+     ],
+     "description": "The child mentioned the boy sitting by the fire, but hasn't described what he looks like or what he is wearing.",
+     "elapsed_ms": 4397,
+     "validation": {
+      "animation_match": false,
+      "entity_match": true
+     }
+    },
+    {
+     "stimulus_id": "study1_P2b_D_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "P1",
+     "target_entities": [
+      "frozen_food"
+     ],
+     "description": "The child mentioned pulling out a pizza box, but could describe its specific appearance like the rectangular container of frozen food.",
+     "elapsed_ms": 1428,
+     "validation": {
+      "animation_match": false,
+      "entity_match": true
+     }
+    },
+    {
+     "stimulus_id": "study1_P2d_A_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "P2c",
+     "target_entities": [
+      "man"
+     ],
+     "description": "The child described the man sitting on the bench holding the puppy, but hasn't mentioned how happy and peaceful he feels.",
+     "elapsed_ms": 3560,
+     "validation": {
+      "animation_match": false,
+      "entity_match": true
+     }
+    },
+    {
+     "stimulus_id": "study1_P2e_B_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "P2e",
+     "target_entities": [
+      "man"
+     ],
+     "description": "The child described the characters' positions and the burnt food, but has not yet shared how the man is feeling or reacting inside to the burnt casserole.",
+     "elapsed_ms": 1454,
+     "validation": {
+      "animation_match": true,
+      "entity_match": true
+     }
+    },
+    {
+     "stimulus_id": "study1_P2f_C_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "P2f",
+     "target_entities": [
+      "boy"
+     ],
+     "description": "The boy looks anxious and worried about his pet while sitting in the waiting room.",
+     "elapsed_ms": 2735,
+     "validation": {
+      "animation_match": true,
+      "entity_match": true
+     }
+    },
+    {
+     "stimulus_id": "study1_R1_D_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "R1",
+     "target_entities": [
+      "boy",
+      "letters"
+     ],
+     "description": "The child describes the boy and the letters separately; connecting them using 'and' or 'so' can show how the boy interacts with the word on the board.",
+     "elapsed_ms": 2610,
+     "validation": {
+      "animation_match": true,
+      "entity_match": true
+     }
+    },
+    {
+     "stimulus_id": "study1_R3_A_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "R3",
+     "target_entities": [
+      "boulder",
+      "goat"
+     ],
+     "description": "The child mentions the positions of the boulder and the goat, but hasn't connected them with a subordinating conjunction to explain why or when something happens, such as while the goat watches or because the hill is steep.",
+     "elapsed_ms": 3818,
+     "validation": {
+      "animation_match": true,
+      "entity_match": false
+     }
+    },
+    {
+     "stimulus_id": "study1_S1_B_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "I1",
+     "target_entities": [
+      "scene"
+     ],
+     "description": "The child described the interior of the library, but hasn't mentioned the bright, sunny garden visible just outside through the doorway.",
+     "elapsed_ms": 4030,
+     "validation": {
+      "animation_match": false,
+      "entity_match": true
+     }
+    },
+    {
+     "stimulus_id": "study1_S2_C_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "I1",
+     "target_entities": [
+      "scene"
+     ],
+     "description": "The child described the lighthouse, cliff, keeper, and boat, but hasn't yet mentioned the bright daylight, calm blue waters, or the fluffy clouds in the sky.",
+     "elapsed_ms": 1938,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false
+     }
+    },
+    {
+     "stimulus_id": "study1_T1_D_suggestion",
+     "condition": "suggestion",
+     "animation_id_short": "D2",
+     "target_entities": [
+      "janitor"
+     ],
+     "description": "The janitor is working hard after the game. You could describe what he is thinking or feeling as he cleans up the empty stadium.",
+     "elapsed_ms": 4779,
+     "validation": {
+      "animation_match": false,
+      "entity_match": false
+     }
+    }
+   ],
+   "wall_s": 29.8
+  }
+ ]
+}

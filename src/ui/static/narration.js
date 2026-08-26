@@ -13,6 +13,8 @@ var NarrationClient = (function() {
   var audioChunks = [];
   var isRecording = false;
   var awaitingAssessment = false;
+  var emptyHintTimer = null;
+  var pttHintOriginalHTML = null;
   var stream = null;
 
   // Voice playback state
@@ -338,9 +340,32 @@ var NarrationClient = (function() {
     voiceQueue = [];
   }
 
+  /**
+   * The server heard nothing. Release the assessment gate and flash the hint,
+   * so the turn ends with a visible cue instead of silence. In study mode this
+   * is the only channel available — the system never speaks there.
+   */
+  function handleEmptyTranscription() {
+    awaitingAssessment = false;
+    _cancelWordReveal();
+    if (feedbackEl) feedbackEl.textContent = '';
+    if (!pttHintEl) return;
+    if (emptyHintTimer) clearTimeout(emptyHintTimer);
+    if (pttHintOriginalHTML === null) pttHintOriginalHTML = pttHintEl.innerHTML;
+    pttHintEl.innerHTML = "I didn't catch that \u2014 try again";
+    pttHintEl.classList.add('ptt-hint-retry');
+    pttHintEl.style.visibility = '';
+    emptyHintTimer = setTimeout(function() {
+      pttHintEl.innerHTML = pttHintOriginalHTML;
+      pttHintEl.classList.remove('ptt-hint-retry');
+      emptyHintTimer = null;
+    }, 3000);
+  }
+
   return {
     init: init,
     destroy: destroy,
+    handleEmptyTranscription: handleEmptyTranscription,
     handleVoiceHeader: handleVoiceHeader,
     handleVoiceBinary: handleVoiceBinary,
     isRecording: function() { return isRecording; },

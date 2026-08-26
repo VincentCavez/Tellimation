@@ -38,6 +38,8 @@ import uvicorn
 from google import genai
 from google.genai import types
 
+from config.models import FLASH_MODEL_ID
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -48,7 +50,7 @@ STUDY_SCENES_DIR = DATA_DIR / "study_scenes"
 STUDY_GEN_DIR = DATA_DIR / "study_gen"
 
 API_KEY = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY", "")
-MODEL_ID = "gemini-3-flash-preview"
+MODEL_ID = FLASH_MODEL_ID
 
 # Serve images
 app.mount("/images", StaticFiles(directory=str(STUDY_GEN_DIR)), name="images")
@@ -218,7 +220,6 @@ async def api_enrich(request: Request):
         ],
         config=types.GenerateContentConfig(
             thinking_config=types.ThinkingConfig(thinking_budget=4096),
-            temperature=1.0,
             response_mime_type="application/json",
         ),
     )

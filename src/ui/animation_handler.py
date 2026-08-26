@@ -21,6 +21,7 @@ from google import genai
 from google.genai import types
 
 from config.misl import ANIMATION_ID_TO_TEMPLATE
+from config.models import FLASH_MODEL_ID
 from src.interaction.tellimation import generate_invocation_array, _build_fallback
 from src.models.assessment import Discrepancy
 from src.models.invocation import AnimationInvocation, InvocationArray
@@ -30,7 +31,7 @@ from src.narration.voice_guidance import text_to_speech
 
 logger = logging.getLogger(__name__)
 
-_ORAL_GUIDANCE_MODEL = "gemini-3-flash-preview"
+_ORAL_GUIDANCE_MODEL = FLASH_MODEL_ID
 _ORAL_GUIDANCE_TIMEOUT = 10
 
 
@@ -84,7 +85,6 @@ async def generate_oral_guidance(
             contents=prompt,
             config=types.GenerateContentConfig(
                 thinking_config=types.ThinkingConfig(thinking_budget=256),
-                temperature=1.0,
             ),
         ),
         timeout=_ORAL_GUIDANCE_TIMEOUT,

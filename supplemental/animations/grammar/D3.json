@@ -1,0 +1,51 @@
+{
+  "id": "D3",
+  "name": "Alert",
+  "category": "Discourse",
+  "mode": "both",
+  "scaffolding_intent": "Displays exclamation mark sprites above the entity, signaling an important event or reaction that should be narrated",
+  "misl_elements": [
+    "IE",
+    "IR"
+  ],
+  "target_type": ["entity","duo","group"],
+  "parameters": [
+    {
+      "name": "markCount",
+      "type": "int",
+      "range": [
+        1,
+        3
+      ],
+      "default": 3,
+      "description": "Number of exclamation marks"
+    },
+    {
+      "name": "color",
+      "type": "rgb",
+      "range": [
+        0,
+        255
+      ],
+      "default": [
+        255,
+        220,
+        30
+      ],
+      "description": "Fill color of the exclamation marks"
+    },
+    {
+      "name": "scale",
+      "type": "float",
+      "range": [
+        1.0,
+        2.0
+      ],
+      "default": 1.0,
+      "description": "Size multiplier for the alert marks"
+    }
+  ],
+  "code_template": "alert({target}, {markCount}, {color})",
+  "correction_intent": "Child described an incorrect event",
+  "suggestion_intent": "Child hasn't mentioned an important event or reaction in the scene"
+}

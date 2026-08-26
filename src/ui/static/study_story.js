@@ -83,6 +83,10 @@
       case 'scene_complete':
         break;
 
+      case 'transcription_empty':
+        NarrationClient.handleEmptyTranscription();
+        break;
+
       case 'study_log':
         console.log('[' + msg.tag + '] ' + msg.text);
         if (msg.tag === 'MISTAKES') window._gotMistakes = true;

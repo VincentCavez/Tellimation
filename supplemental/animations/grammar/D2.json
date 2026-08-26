@@ -1,0 +1,35 @@
+{
+  "id": "D2",
+  "name": "Thought Bubble",
+  "category": "Discourse",
+  "mode": "suggestion",
+  "scaffolding_intent": "Displays a pixelated thought bubble above the character, scaffolding internal response, plan, and mental verbs",
+  "misl_elements": [
+    "IR",
+    "P",
+    "M"
+  ],
+  "target_type": ["entity","duo","group"],
+  "parameters": [
+    {
+      "name": "bubbleText",
+      "type": "string",
+      "range": [],
+      "default": "...",
+      "description": "Text to display inside the thought bubble"
+    },
+    {
+      "name": "scale",
+      "type": "float",
+      "range": [
+        1.0,
+        2.0
+      ],
+      "default": 1.0,
+      "description": "Size multiplier for the thought bubble"
+    }
+  ],
+  "code_template": "thought_bubble({target}, {bubbleText})",
+  "correction_intent": "Child attributed the WRONG thought or feeling to a character (e.g. 'he thinks he is sad' when the scene shows the character is happy). Do NOT use D2 when the child described a thought/plan instead of an action — that is an action error, use A1 or A2 instead.",
+  "suggestion_intent": "Child hasn't described what a character might be thinking"
+}

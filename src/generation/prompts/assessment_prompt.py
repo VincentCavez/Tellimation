@@ -6,7 +6,7 @@ Two-pass assessment:
 
 Legacy single-call prompts are preserved for backward compatibility.
 
-Model: Gemini 3 Flash (gemini-3-flash-preview)
+Model: config.models.FLASH_MODEL_ID
 """
 
 ASSESSMENT_SYSTEM_PROMPT = """\

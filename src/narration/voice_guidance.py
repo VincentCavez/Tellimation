@@ -1,4 +1,4 @@
-"""Voice guidance via Gemini 2.5 Flash TTS (Achernar voice).
+"""Voice guidance via Gemini TTS (Achernar voice).
 
 Provides:
   - text_to_speech: Convert text to PCM audio (24 kHz, 16-bit mono).
@@ -15,16 +15,15 @@ from typing import Any, Dict, List
 from google import genai
 from google.genai import types
 
+from config.models import FLASH_MODEL_ID, TTS_MODEL_ID, TTS_VOICE
+
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Model constants
 # ---------------------------------------------------------------------------
 
-TTS_MODEL_ID = "gemini-2.5-flash-preview-tts"
-TTS_VOICE = "Achernar"
-
-TEXT_MODEL_ID = "gemini-3-flash-preview"
+TEXT_MODEL_ID = FLASH_MODEL_ID
 
 # ---------------------------------------------------------------------------
 # TTS
@@ -123,7 +122,6 @@ async def generate_scene_intro(
             config=types.GenerateContentConfig(
                 system_instruction=SCENE_INTRO_SYSTEM_PROMPT,
                 thinking_config=types.ThinkingConfig(thinking_budget=256),
-                temperature=1.0,
             ),
         )
         text = response.text.strip().strip('"').strip("'")
@@ -200,7 +198,6 @@ async def generate_correction_text(
                 thinking_config=types.ThinkingConfig(
                     thinking_budget=256,
                 ),
-                temperature=1.0,
             ),
         )
         text = response.text.strip().strip('"').strip("'")
@@ -257,7 +254,6 @@ async def generate_branch_narration(
                 thinking_config=types.ThinkingConfig(
                     thinking_budget=256,
                 ),
-                temperature=1.0,
             ),
         )
         text = response.text.strip()

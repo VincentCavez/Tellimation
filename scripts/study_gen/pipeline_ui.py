@@ -40,6 +40,7 @@ from src.interaction.misl_selector import select_misl_candidates
 from src.models.assessment import Discrepancy
 from animations.grammar import get_animation, get_all_animations
 from config.misl import MACRO_PRIORITY_ORDER, MICRO_CODES, MISL_CODE_TO_KEY
+from config.models import FLASH_MODEL_ID
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("pipeline_ui")
@@ -117,7 +118,7 @@ def load_all_grammars() -> Dict[str, Dict[str, Any]]:
 # Scene description generation (VLM)
 # ---------------------------------------------------------------------------
 
-DESCRIBE_MODEL_ID = "gemini-3-flash-preview"
+DESCRIBE_MODEL_ID = FLASH_MODEL_ID
 DESCRIBE_TIMEOUT = 30
 
 DESCRIBE_PROMPT = """\
@@ -183,7 +184,6 @@ async def describe_one_scene(client: genai.Client, scene_id: str, force: bool) -
                 prompt_text,
             ],
             config=types.GenerateContentConfig(
-                temperature=0.3,
             ),
         ),
         timeout=DESCRIBE_TIMEOUT,
@@ -349,7 +349,6 @@ async def generate_misl_targets_for_scene(
             model=DESCRIBE_MODEL_ID,
             contents=contents,
             config=types.GenerateContentConfig(
-                temperature=0.3,
                 response_mime_type="application/json",
             ),
         ),
