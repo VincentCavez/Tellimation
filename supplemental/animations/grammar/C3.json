@@ -1,0 +1,38 @@
+{
+  "id": "C3",
+  "name": "Ghost Outline",
+  "category": "Count",
+  "mode": "correction",
+  "scaffolding_intent": "Displays an amorphous shape with a question mark that dissolves, scaffolding absence \u2014 something is missing from the narration",
+  "misl_elements": ["CH"],
+  "target_type": ["entity"],
+  "parameters": [
+    {
+      "name": "puddleColor",
+      "type": "rgb",
+      "range": [
+        0,
+        255
+      ],
+      "default": [
+        60,
+        65,
+        85
+      ],
+      "description": "Color of the dark puddle shape"
+    },
+    {
+      "name": "ghostOpacity",
+      "type": "float",
+      "range": [
+        0.45,
+        0.9
+      ],
+      "default": 0.45,
+      "description": "Opacity of the ghost outline entity"
+    }
+  ],
+  "code_template": "ghost_outline({target}, {puddleColor})",
+  "correction_intent": "Child referenced an entity that is NOT in the current scene AND is from a different scene (e.g. mentioning a character from scene 1 while narrating scene 3). Do NOT use this when the child simply misnames a present entity \u2014 that is I1_spotlight. C3 is ONLY for entities truly absent from the scene.",
+  "suggestion_intent": "Child could reference an entity that appeared in a previous or upcoming scene but is absent from the current scene, to create narrative continuity."
+}

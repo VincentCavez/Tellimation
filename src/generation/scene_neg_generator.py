@@ -6,7 +6,7 @@ objectives in mind.  Entity properties serve as "descriptive affordances"
 — visual features that invite and support specific verbal descriptions
 from the child.
 
-Model: Gemini 3 Flash (gemini-3-flash-preview)
+Model: config.models.FLASH_MODEL_ID
 """
 
 from __future__ import annotations
@@ -31,6 +31,7 @@ from config.misl import (
     MISL_TO_ANIMATIONS,
     COUNT_ANIMATIONS,
 )
+from config.models import FLASH_MODEL_ID
 from src.generation.prompts.scene_neg_prompt import (
     CONTINUATION_SCENE_USER_PROMPT,
     INITIAL_SCENE_USER_PROMPT,
@@ -43,7 +44,7 @@ from src.models.student_profile import StudentProfile
 
 logger = logging.getLogger(__name__)
 
-MODEL_ID = "gemini-3-flash-preview"
+MODEL_ID = FLASH_MODEL_ID
 
 # Timeouts and retries
 GENERATION_TIMEOUT = 90  # seconds (higher thinking budget needs more time)
@@ -527,7 +528,6 @@ async def generate_scene_manifest(
                     config=types.GenerateContentConfig(
                         system_instruction=SCENE_NEG_SYSTEM_PROMPT,
                         thinking_config=types.ThinkingConfig(thinking_budget=8192),
-                        temperature=1.0,
                         response_mime_type="application/json",
                     ),
                 ),

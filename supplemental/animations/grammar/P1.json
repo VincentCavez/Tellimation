@@ -1,0 +1,37 @@
+{
+  "id": "P1",
+  "name": "Color Pop",
+  "category": "Property",
+  "mode": "both",
+  "scaffolding_intent": "Desaturates everything except the target to emphasize its visual attributes, scaffolding color adjectives and descriptive noun phrases",
+  "misl_elements": [
+    "ENP",
+    "ADV"
+  ],
+  "target_type": ["entity","duo","group"],
+  "parameters": [
+    {
+      "name": "desaturationStrength",
+      "type": "float",
+      "range": [
+        0.8,
+        1
+      ],
+      "default": 0.8,
+      "description": "How much non-target pixels are desaturated"
+    },
+    {
+      "name": "saturationBoost",
+      "type": "float",
+      "range": [
+        0.4,
+        0.6
+      ],
+      "default": 0.4,
+      "description": "How much to boost saturation of the active color group"
+    }
+  ],
+  "code_template": "color_pop({target}, {desaturationStrength}, {saturationBoost})",
+  "correction_intent": "Child described an incorrect property of an entity",
+  "suggestion_intent": "Child hasn't described the properties of an entity"
+}

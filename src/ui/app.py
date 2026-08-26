@@ -76,6 +76,7 @@ from google.genai import types
 from src.models.assessment import Discrepancy
 from src.interaction.tellimation import _select_animation_for_discrepancy, select_discrepancy, load_animation_params
 from config.misl import ANIMATION_ID_TO_TEMPLATE
+from config.models import FLASH_MODEL_ID
 from src.ui.animation_handler import _send_animation_message, execute_animation, execute_invocation_array, send_voice
 
 logging.basicConfig(
@@ -91,7 +92,7 @@ STATIC_DIR = BASE_DIR / "static"
 MAX_SCENES = 5
 INITIAL_SCENE_COUNT = 1  # number of scenes offered on the selection page
 
-_SHORT_LLM_MODEL = "gemini-3-flash-preview"
+_SHORT_LLM_MODEL = FLASH_MODEL_ID
 _SHORT_LLM_TIMEOUT = 10
 
 # Valid participant codes: admin + 20 participants
@@ -1201,7 +1202,6 @@ async def _generate_story_intro(
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     thinking_config=types.ThinkingConfig(thinking_budget=256),
-                    temperature=1.0,
                 ),
             ),
             timeout=_SHORT_LLM_TIMEOUT,
@@ -1241,7 +1241,6 @@ async def _extract_character_name(
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     thinking_config=types.ThinkingConfig(thinking_budget=256),
-                    temperature=1.0,
                 ),
             ),
             timeout=_SHORT_LLM_TIMEOUT,
@@ -1376,6 +1375,23 @@ async def _send_initial_guidance(
 # Study audio handling
 # ---------------------------------------------------------------------------
 
+# Empty transcription used to be a silent dead end: the server just returned and
+# the child got no signal at all. Send an explicit cue instead. In study mode
+# send_voice is a no-op by design (the system never speaks), so the client cue
+# is the only channel there.
+_EMPTY_SPEECH_LINE = "I didn't quite catch that. Hold the space bar and tell me again!"
+_MAX_SPOKEN_EMPTY_PROMPTS = 3
+
+
+async def _handle_empty_transcription(session, ws: "_WebSocketAdapter") -> None:
+    """Acknowledge that nothing was heard, so the turn is not a dead end."""
+    await ws.send_json({"type": "transcription_empty"})
+
+    session.empty_transcription_count += 1
+    if session.empty_transcription_count <= _MAX_SPOKEN_EMPTY_PROMPTS:
+        asyncio.ensure_future(send_voice(session, ws, _EMPTY_SPEECH_LINE))
+
+
 async def _handle_study_audio(
     session: SessionState,
     audio_bytes: bytes,
@@ -1417,12 +1433,11 @@ async def _handle_study_audio(
 
         # ── Step 1: Transcribe ──
         transcription = await transcribe_audio(
-            api_key=session.api_key,
             audio_bytes=audio_bytes,
-            narration_history=session.narration_history,
-            narrative_text="",
+            known_names=session.character_names.values(),
         )
         if not transcription:
+            await _handle_empty_transcription(session, ws)
             return
 
         logger.info("\033[92m[TRANSCRIPTION]\033[0m %s", transcription)
@@ -1758,15 +1773,11 @@ async def _handle_audio(
         # ── Special phases: naming / ending choice need only transcription ──
         if session.naming_phase or session.awaiting_ending_choice:
             transcription = await transcribe_audio(
-                api_key=session.api_key,
                 audio_bytes=audio_bytes,
-                narration_history=session.narration_history,
-                narrative_text=(
-                    session.current_scene.get("narrative_text", "")
-                    if session.current_scene else ""
-                ),
+                known_names=session.character_names.values(),
             )
             if not transcription:
+                await _handle_empty_transcription(session, ws)
                 return
             if session.naming_phase:
                 await _handle_naming(session, ws, transcription)
@@ -1783,15 +1794,11 @@ async def _handle_audio(
 
         # ── Step 1: Transcribe ──
         transcription = await transcribe_audio(
-            api_key=session.api_key,
             audio_bytes=audio_bytes,
-            narration_history=session.narration_history,
-            narrative_text=(
-                session.current_scene.get("narrative_text", "")
-                if session.current_scene else ""
-            ),
+            known_names=session.character_names.values(),
         )
         if not transcription:
+            await _handle_empty_transcription(session, ws)
             return
 
         logger.info("\033[92m[TRANSCRIPTION]\033[0m %s", transcription)
@@ -2234,7 +2241,6 @@ async def _classify_ending_intent(api_key: str, transcription: str) -> str:
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     thinking_config=types.ThinkingConfig(thinking_budget=256),
-                    temperature=1.0,
                 ),
             ),
             timeout=_SHORT_LLM_TIMEOUT,

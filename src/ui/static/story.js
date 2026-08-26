@@ -277,6 +277,10 @@
             handleAnimation(msg);
             break;
 
+          case 'transcription_empty':
+            NarrationClient.handleEmptyTranscription();
+            break;
+
           case 'add_temp_sprite':
             handleAddTempSprite(msg);
             break;

@@ -23,13 +23,12 @@ from PIL import Image
 from google import genai
 from google.genai import types
 
+from config.models import IMAGE_MODEL_ID
 from src.generation.prompts.scene_prompt import BACKGROUND_IMAGE_PROMPT_TEMPLATE
 from src.generation.prompts.sprite_prompt import ENTITY_IMAGE_PROMPT
 
 logger = logging.getLogger(__name__)
 
-# Nano Banana 2 for image generation
-IMAGE_MODEL_ID = "gemini-3.1-flash-image-preview"
 
 # Timeouts (seconds)
 IMAGE_TIMEOUT = 120

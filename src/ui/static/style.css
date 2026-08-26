@@ -820,3 +820,9 @@ a { color: var(--teal); text-decoration: none; }
     font-size: 1.5rem;
   }
 }
+
+/* Shown for a few seconds when nothing was transcribed, so an unheard turn
+   ends with a visible cue instead of silence. */
+.ptt-hint.ptt-hint-retry {
+  color: var(--yellow, #e0a030);
+}

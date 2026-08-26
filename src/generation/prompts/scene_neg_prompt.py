@@ -5,7 +5,7 @@ describes WHAT is in the scene (entities, positions, relations, properties,
 features) and serves as the brief for image generation AND as context for
 the assessment and Tellimation modules.
 
-Model: Gemini 3 Flash (gemini-3-flash-preview)
+Model: config.models.FLASH_MODEL_ID
 """
 
 # ---------------------------------------------------------------------------

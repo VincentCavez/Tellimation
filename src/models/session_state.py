@@ -56,6 +56,9 @@ class SessionState:
         # Key: "target_id::misl_element"
         self.voice_escalated_errors: Dict[str, str] = {}
 
+        # Turns where nothing was transcribed — caps how often we say so out loud
+        self.empty_transcription_count: int = 0
+
         # Character naming phase — True until child names the main character
         self.naming_phase: bool = True
         # Child-given character names (entity_id → name), persists across scenes
@@ -82,3 +85,4 @@ class SessionState:
         self.current_scene_log = None
         self.pending_animation = None
         self.voice_escalated_errors = {}
+        self.empty_transcription_count = 0

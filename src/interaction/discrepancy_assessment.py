@@ -8,7 +8,7 @@ The orchestrator function assess_utterance() runs both passes sequentially
 and merges results into a single AssessmentResponse with a unified
 discrepancies list (corrections first, then suggestions).
 
-Model: Gemini 3 Flash (gemini-3-flash-preview)
+Model: config.models.FLASH_MODEL_ID
 """
 
 from __future__ import annotations
@@ -23,6 +23,7 @@ from google import genai
 from google.genai import types
 
 from config.misl import MACROSTRUCTURE, MICROSTRUCTURE
+from config.models import FLASH_MODEL_ID
 from src.models.assessment import (
     AssessmentResponse,
     Discrepancy,
@@ -48,7 +49,7 @@ from src.generation.utils import (
 
 logger = logging.getLogger(__name__)
 
-MODEL_ID = "gemini-3-flash-preview"
+MODEL_ID = FLASH_MODEL_ID
 ASSESSMENT_TIMEOUT = 30
 MAX_RETRIES = 2
 
@@ -183,7 +184,6 @@ async def _gemini_call(
                         thinking_config=types.ThinkingConfig(
                             thinking_budget=thinking_budget
                         ),
-                        temperature=1.0,
                         response_mime_type="application/json",
                     ),
                 ),
@@ -703,10 +703,8 @@ async def assess_utterance(
     # --- Step 0: Transcription (if audio provided) ---
     if audio_bytes is not None:
         utterance_text = await transcribe_audio(
-            api_key=api_key,
             audio_bytes=audio_bytes,
-            narration_history=narration_history,
-            narrative_text=narrative_text,
+            known_names=(character_names or {}).values(),
         )
         logger.info("\033[92m[TRANSCRIPTION]\033[0m %s", utterance_text)
 
