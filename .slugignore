@@ -1,0 +1,18 @@
+# Kept out of the Heroku slug: build artefacts and paper material that the
+# running app never reads. Verified with a grep over src/ and the client JS --
+# none of these paths appear in any server route, static mount or asset URL.
+#
+# Served at runtime, so NOT listed here:
+#   data/study_gen         -> mounted at /study-assets
+#   data/oral_instructions -> mounted at /oral-instructions
+#   data/study_scenes, data/prolific_scenes, data/*.json, written_instructions.txt
+
+data/prolific_gen
+data/prolific_videos
+data/old
+data/study1_utterances.pdf
+
+supplemental
+supplemental.zip
+
+tests

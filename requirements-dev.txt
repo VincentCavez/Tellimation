@@ -1,0 +1,4 @@
+# Test-only dependencies. Not installed on Heroku: shipping a test runner
+# in the production slug adds weight for nothing.
+-r requirements.txt
+pytest>=8.0
