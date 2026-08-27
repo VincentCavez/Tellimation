@@ -311,6 +311,7 @@ def push_to_google_sheet(participant_id: str) -> bool:
         ("profile.json", "profile"),
         ("study_log.json", "study_log"),
         ("training_log.json", "training_log"),
+        ("questionnaire.json", "questionnaire"),
     ]:
         fpath = pdir / filename
         if fpath.exists():
@@ -433,3 +434,33 @@ def push_study_scenes(
     if ok:
         pushed_counts.update(pending)
     return ok
+
+
+def save_and_push_questionnaire(participant_id: str, answers: Dict[str, int]) -> bool:
+    """Persist the end-of-session questionnaire and push it to the Sheet.
+
+    One row, data_type "questionnaire", json_data = {"answers": {"1".."12": 1..5}}.
+    The local file is written first so the manual /api/push-data safety net
+    (which now includes questionnaire.json) can resend it if the push fails.
+    """
+    from datetime import datetime, timezone
+
+    data = {
+        "participant": participant_id,
+        "answers": answers,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+    pdir = _participant_dir(participant_id)
+    pdir.mkdir(parents=True, exist_ok=True)
+    (pdir / "questionnaire.json").write_text(
+        json.dumps(data, indent=2), encoding="utf-8"
+    )
+
+    if not GOOGLE_SHEET_WEBHOOK:
+        logger.debug("GOOGLE_SHEET_WEBHOOK not set — questionnaire saved locally only")
+        return False
+    return _post_sheet_rows([{
+        "participant_id": participant_id,
+        "data_type": "questionnaire",
+        "json_data": json.dumps(data),
+    }], participant_id)

@@ -69,6 +69,7 @@ from src.persistence import (
     append_study_log_entry,
     load_study_log,
     push_study_scenes,
+    save_and_push_questionnaire,
     push_to_google_sheet,
 )
 from google import genai
@@ -287,6 +288,11 @@ async def study_landing_page():
     return (TEMPLATES_DIR / "study_landing.html").read_text()
 
 
+@app.get("/study/questionnaire", response_class=HTMLResponse)
+async def study_questionnaire_page():
+    return (TEMPLATES_DIR / "study_questionnaire.html").read_text()
+
+
 @app.get("/study/story", response_class=HTMLResponse)
 async def study_story_page():
     return (TEMPLATES_DIR / "study_story.html").read_text()
@@ -400,6 +406,36 @@ async def study_instructions():
         "end_paragraph": paragraphs[6] if len(paragraphs) > 6 else "",
         "end_audio": "/oral-instructions/4_end.wav",
     })
+
+
+_QUESTIONNAIRE_ITEMS = 12
+
+
+@app.post("/api/study/questionnaire")
+async def study_questionnaire_submit(request: Request):
+    """Persist + push the end-of-session questionnaire (12 Likert items)."""
+    body = await request.json()
+    participant = str(body.get("participant", "")).strip()
+    answers = body.get("answers") or {}
+
+    _load_study_config()
+    if participant not in (_STUDY_ASSIGNMENTS or {}):
+        return JSONResponse(status_code=400, content={"error": "Unknown participant"})
+
+    clean: Dict[str, int] = {}
+    for i in range(1, _QUESTIONNAIRE_ITEMS + 1):
+        v = answers.get(str(i), answers.get(i))
+        if not isinstance(v, int) or not 1 <= v <= 5:
+            return JSONResponse(
+                status_code=400,
+                content={"error": f"Missing or invalid answer for item {i}"},
+            )
+        clean[str(i)] = v
+
+    ok = await asyncio.to_thread(save_and_push_questionnaire, participant, clean)
+    # The local file is written either way; a failed push is recoverable via
+    # /api/push-data, so don't fail the child's submit over it — but say so.
+    return JSONResponse(content={"status": "ok", "pushed": ok})
 
 
 # Wave 2 gate: IDs 1-8 were consumed by study 1 (spring 2026); reusing one

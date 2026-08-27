@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tellimations Questionnaire</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="/static/style.css?v=7">
+  <style>
+    .q-wrapper {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 24px 16px 60px;
+      position: relative;
+      z-index: 1;
+    }
+    .q-card {
+      background: var(--card-bg, #d9c7a9);
+      border-radius: 18px;
+      padding: 18px 22px;
+      margin-bottom: 14px;
+    }
+    .q-text {
+      font-weight: 600;
+      margin-bottom: 12px;
+      font-size: 1.05rem;
+      color: #3d2f1e;
+    }
+    .q-card.q-missing { outline: 3px solid #DB0038; }
+    .q-scale {
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+    }
+    .q-opt {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      border: none;
+      background: rgba(255,255,255,0.55);
+      border-radius: 12px;
+      padding: 10px 4px;
+      font: inherit;
+      font-size: 0.72rem;
+      line-height: 1.15;
+      text-align: center;
+      color: #4a3b28;
+    }
+    .q-opt .dot {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 3px solid #8a744f;
+      background: #fff;
+    }
+    .q-opt.selected { background: #53BAC1; color: #fff; }
+    .q-opt.selected .dot { background: #F7C200; border-color: #fff; }
+    .q-submit-wrap { text-align: center; margin-top: 24px; }
+    .q-error { color: #DB0038; font-weight: 600; text-align: center; margin-top: 10px; min-height: 1.4em; }
+    .q-thanks {
+      color: #3d2f1e;
+      text-align: center;
+      font-size: 1.4rem;
+      font-weight: 700;
+      padding: 80px 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="falling-pixels-bg" id="falling-pixels"></div>
+  <div class="q-wrapper" id="q-form">
+    <div class="login-logo" style="text-align:center; margin-bottom: 6px;">
+      <span class="t2">Tell</span><span class="t3">imations</span>
+    </div>
+    <p style="text-align:center; margin: 0 0 22px; font-weight:600; color: #3d2f1e;">
+      One last thing! Tell us what you thought. There are no right or wrong answers.
+    </p>
+    <div id="q-items"></div>
+    <div class="q-submit-wrap">
+      <button class="btn btn-red" id="btn-submit">Send my answers</button>
+    </div>
+    <div class="q-error" id="q-error"></div>
+  </div>
+  <div class="q-thanks" id="q-thanks" style="display:none;">
+    Thank you! Your answers were sent. &#127881;
+  </div>
+
+  <script>
+    // Verbatim items from the study questionnaire (Google Forms original).
+    var QUESTIONS = [
+      "It was easy to use",
+      "I knew what to do without help",
+      "I could tell my story without problems",
+      "I had fun using it",
+      "I would like to use it again",
+      "I would tell my friends about it",
+      "I understood what the animations were showing me",
+      "The animations helped me notice things I missed.",
+      "The animations were easy to follow.",
+      "The animations helped me tell a better story.",
+      "I said more about the picture because of the animations.",
+      "I learned something new about telling stories.",
+    ];
+    var SCALE = ["Strongly disagree", "Disagree", "Not sure", "Agree", "Strongly agree"];
+
+    var participant = sessionStorage.getItem('participant_number');
+    if (!participant) window.location.href = '/study';
+
+    var answers = {};  // qIndex (1-based) -> 1..5
+    var itemsEl = document.getElementById('q-items');
+
+    QUESTIONS.forEach(function(text, qi) {
+      var card = document.createElement('div');
+      card.className = 'q-card';
+      card.id = 'q-card-' + (qi + 1);
+      var p = document.createElement('div');
+      p.className = 'q-text';
+      p.textContent = (qi + 1) + '. ' + text;
+      card.appendChild(p);
+      var scale = document.createElement('div');
+      scale.className = 'q-scale';
+      SCALE.forEach(function(label, si) {
+        var opt = document.createElement('button');
+        opt.type = 'button';
+        opt.className = 'q-opt';
+        var dot = document.createElement('span');
+        dot.className = 'dot';
+        opt.appendChild(dot);
+        opt.appendChild(document.createTextNode(label));
+        opt.addEventListener('click', function() {
+          answers[qi + 1] = si + 1;
+          card.classList.remove('q-missing');
+          scale.querySelectorAll('.q-opt').forEach(function(o) { o.classList.remove('selected'); });
+          opt.classList.add('selected');
+        });
+        scale.appendChild(opt);
+      });
+      card.appendChild(scale);
+      itemsEl.appendChild(card);
+    });
+
+    document.getElementById('btn-submit').addEventListener('click', async function() {
+      var errEl = document.getElementById('q-error');
+      errEl.textContent = '';
+      var missing = [];
+      for (var i = 1; i <= QUESTIONS.length; i++) {
+        var card = document.getElementById('q-card-' + i);
+        if (!answers[i]) { missing.push(i); card.classList.add('q-missing'); }
+        else card.classList.remove('q-missing');
+      }
+      if (missing.length) {
+        errEl.textContent = 'Please answer every question — the ones in red are missing.';
+        document.getElementById('q-card-' + missing[0]).scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      this.disabled = true;
+      try {
+        var resp = await fetch('/api/study/questionnaire', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ participant: participant, answers: answers }),
+        });
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        sessionStorage.setItem('questionnaire_done', 'true');
+        document.getElementById('q-form').style.display = 'none';
+        document.getElementById('q-thanks').style.display = 'block';
+        setTimeout(function() { window.location.href = '/study/landing'; }, 2500);
+      } catch (e) {
+        errEl.textContent = 'Could not send the answers — please tell the experimenter.';
+        this.disabled = false;
+      }
+    });
+  </script>
+  <script>
+    // Falling pixels animation in margins (same as login)
+    const colors = ['#DB0038', '#F7C200', '#519DD9', '#53BAC1', '#EDEDED'];
+    const pixelsContainer = document.getElementById('falling-pixels');
+    let activePixels = 0;
+    function createPixel() {
+      if (activePixels >= 8) return;
+      const pixel = document.createElement('div');
+      pixel.className = 'falling-pixel';
+      pixel.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      const side = Math.random() < 0.5 ? 'left' : 'right';
+      pixel.style.left = (side === 'left' ? Math.random() * 20 : 100 - Math.random() * 20) + '%';
+      pixel.style.top = '-20px';
+      const duration = 3 + Math.random() * 3;
+      pixel.style.animation = `fall ${duration}s linear forwards`;
+      pixelsContainer.appendChild(pixel);
+      activePixels++;
+      setTimeout(() => { pixel.remove(); activePixels--; }, duration * 1000);
+    }
+    setInterval(createPixel, 600);
+  </script>
+</body>
+</html>
