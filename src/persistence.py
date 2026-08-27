@@ -336,8 +336,18 @@ def push_to_google_sheet(participant_id: str) -> bool:
         method="POST",
     )
 
+    # macOS python.org installs often lack the system CA bundle (certificate
+    # verify failed); fall back to certifi's when available. No-op on Heroku.
+    ssl_ctx = None
     try:
-        with urllib.request.urlopen(req, timeout=15) as resp:
+        import certifi
+        import ssl
+        ssl_ctx = ssl.create_default_context(cafile=certifi.where())
+    except ImportError:
+        pass
+
+    try:
+        with urllib.request.urlopen(req, timeout=15, context=ssl_ctx) as resp:
             body = resp.read().decode("utf-8")
             logger.info(
                 "Pushed %d rows to Google Sheet for %s: %s",

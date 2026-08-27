@@ -17,7 +17,7 @@ TUTORIAL_TEXTS = [
     "If something is hiding behind another thing, I can lift it up like a flap so you can peek behind!",
     "I can also stamp a character to show where they are standing!",
     "If I want you to use the past tense, the picture will look like an old movie!",
-    "And if I want you to talk about the future, you will see a day-and-night effect!",
+    "If you see the day turn into night, it means time is passing — tell me what happens later!",
     "When two characters are connected, they will be pulled toward each other!",
     "And if they should be apart, they will push away from each other!",
     "When one thing causes something to happen to another, you will see a push!",

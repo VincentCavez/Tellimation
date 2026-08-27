@@ -768,6 +768,14 @@ async def study_websocket_endpoint(websocket: WebSocket):
                         "story": _story_key,
                         "scene": _scene_num,
                     })
+                    # Incremental Sheet push: the Heroku filesystem is ephemeral
+                    # (daily dyno restarts wipe data/users/), so waiting for the
+                    # end of the session risks losing the whole run. Push a
+                    # snapshot at every scene change, off the event loop —
+                    # push_to_google_sheet is blocking urllib (~1-2s).
+                    asyncio.get_running_loop().run_in_executor(
+                        None, push_to_google_sheet, _pid
+                    )
             elif msg_type == "interrupt":
                 # Child started speaking again before animation was displayed
                 if session._study_pending_anim_log:
@@ -785,6 +793,14 @@ async def study_websocket_endpoint(websocket: WebSocket):
             await websocket.send_json({"type": "error", "message": "Internal server error"})
         except Exception:
             pass
+    finally:
+        # Final snapshot: covers the last scene (no scene_loaded follows it),
+        # tab closes, and mid-story disconnects.
+        if participant:
+            try:
+                await asyncio.to_thread(push_to_google_sheet, str(participant))
+            except Exception:
+                logger.exception("Final Sheet push failed for participant=%s", participant)
 
 
 @app.websocket("/ws")
