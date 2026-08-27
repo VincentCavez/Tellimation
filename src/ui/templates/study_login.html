@@ -32,7 +32,7 @@
 
     async function proceed() {
       const num = parseInt(numInput.value, 10);
-      if (!num || num < 1 || num > 12) { numInput.focus(); return; }
+      if (!num || num < 9 || num > 16) { numInput.focus(); return; }
 
       btnOk.disabled = true;
       try {

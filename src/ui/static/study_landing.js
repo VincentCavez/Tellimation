@@ -467,6 +467,11 @@
     var totalStories = assignmentData.order ? assignmentData.order.length : 4;
 
     if (storiesDone >= totalStories) {
+      // Questionnaire first — the end message plays once it is submitted
+      if (sessionStorage.getItem('questionnaire_done') !== 'true') {
+        window.location.href = '/study/questionnaire';
+        return;
+      }
       // Triple the falling pixels
       var pixelInterval = window._pixelInterval;
       if (pixelInterval) clearInterval(pixelInterval);
