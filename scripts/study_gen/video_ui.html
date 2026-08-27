@@ -113,6 +113,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 <script src="/static_js/engine.js"></script>
 <script src="/static_js/animation_helpers.js"></script>
 <script src="/static_js/animation_templates.js"></script>
+<!-- Study-1 visuals (nametag / reveal / ghost_outline), kept for stimulus regeneration -->
+<script src="/static_js/animation_templates_legacy.js"></script>
 <script src="/static_js/animations.js"></script>
 
 <script>
@@ -148,29 +150,35 @@ const BLANK_OUT = 500;
 const FPS = 30;
 
 // ─── Anim type → template name ───
+// Default: current visuals (I2 silhouette / C3 missing_piece / S1 peek).
+// Open with ?legacy to regenerate the study-1 videos byte-comparable
+// (nametag / ghost_outline / reveal, from animation_templates_legacy.js).
+const USE_LEGACY = new URLSearchParams(location.search).has('legacy');
 const ANIM_TYPE_TO_TEMPLATE = {
   A1: 'motion_lines', A2: 'flip',
-  C1: 'sequential_glow', C2: 'disintegration', C3: 'ghost_outline',
+  C1: 'sequential_glow', C2: 'disintegration',
+  C3: USE_LEGACY ? 'ghost_outline' : 'missing_piece',
   D1: 'speech_bubble', D2: 'thought_bubble', D3: 'alert', D4: 'interjection',
-  I1: 'spotlight', I2: 'nametag',
+  I1: 'spotlight',
+  I2: USE_LEGACY ? 'nametag' : 'silhouette',
   P1: 'color_pop',
   P2a: 'emanation_shame', P2b: 'emanation_cold', P2c: 'emanation_joy',
   P2d: 'emanation_love', P2e: 'emanation_anger', P2f: 'emanation_fear',
   R1: 'magnetism', R2: 'repel', R3: 'causal_push',
-  S1: 'reveal', S2: 'stamp',
+  S1: USE_LEGACY ? 'reveal' : 'peek', S2: 'stamp',
   T1: 'flashback', T2: 'timelapse',
 };
 
 const ANIM_NAMES = {
   A1: 'Motion Lines', A2: 'Flip',
-  C1: 'Sequential Glow', C2: 'Disintegration', C3: 'Ghost Outline',
+  C1: 'Sequential Glow', C2: 'Disintegration', C3: USE_LEGACY ? 'Ghost Outline' : 'Missing Piece',
   D1: 'Speech Bubble', D2: 'Thought Bubble', D3: 'Alert', D4: 'Interjection',
-  I1: 'Spotlight', I2: 'Nametag',
+  I1: 'Spotlight', I2: USE_LEGACY ? 'Nametag' : 'Silhouette',
   P1: 'Color Pop',
   P2a: 'Emanation (Shame)', P2b: 'Emanation (Cold)', P2c: 'Emanation (Joy)',
   P2d: 'Emanation (Love)', P2e: 'Emanation (Anger)', P2f: 'Emanation (Fear)',
   R1: 'Magnetism', R2: 'Repel', R3: 'Causal Push',
-  S1: 'Reveal', S2: 'Stamp',
+  S1: USE_LEGACY ? 'Reveal' : 'Peek', S2: 'Stamp',
   T1: 'Flashback', T2: 'Timelapse',
 };
 
@@ -706,14 +714,23 @@ function buildAnimSpec() {
   else if (['flashback', 'timelapse'].includes(templateName)) {
     // no entity params
   }
-  // Ghost outline: entityPrefix = an in-scene entity (puddle placed near it),
-  // ghostImageUrl = the absent entity's asset (used for silhouette contour)
+  // Ghost outline (legacy): entityPrefix = an in-scene entity (puddle placed
+  // near it), ghostImageUrl = the absent entity's asset (silhouette contour)
   else if (templateName === 'ghost_outline') {
     const ghost = currentScene.entities.find(e => !e.in_scene && e.asset_url);
     const anchor = inScene.length > 0 ? inScene[0] : targetName;
     params.entityPrefix = anchor;
     if (ghost) {
       params.ghostImageUrl = ghost.asset_url;
+    }
+  }
+  // Missing piece: the hole self-places on the emptiest spot; the floating
+  // piece carries the absent entity's silhouette (pieceImageUrl)
+  else if (templateName === 'missing_piece') {
+    const ghost = currentScene.entities.find(e => !e.in_scene && e.asset_url);
+    params.entityPrefix = targetName;
+    if (ghost) {
+      params.pieceImageUrl = ghost.asset_url;
     }
   }
   // Text-based templates

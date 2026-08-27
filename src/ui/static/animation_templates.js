@@ -56,180 +56,95 @@ AnimationTemplates.register('spotlight', function(params) {
   };
 }, 3000);
 
-// ── I2: Nametag ──
-// Large beige nametag with entity type text, connected by an undulating
-// red string. The tag pivots slightly at the string attachment point.
-AnimationTemplates.register('nametag', _perTargetWrapper(function(params) {
+// ── I2: Silhouette ──
+// The entity turns into a flat dark silhouette in place, holds with a gentle
+// breathing pulse, then snaps back to full color with a brief flash — asking
+// "who or what is this?". No text, no added sprite.
+AnimationTemplates.register('silhouette', _perTargetWrapper(function(params) {
   var prefix = params.entityPrefix || '';
-  var bgColor = params.bgColor || [235, 215, 180]; // beige
-  var borderColor = params.borderColor || [120, 95, 60]; // dark brown border
-  var textColor = params.textColor || [80, 50, 30]; // dark brown
-  var stringColor = params.stringColor || [200, 50, 40]; // red
+  var holdMs = params.holdMs != null ? params.holdMs : 1200;
+  var pulseAmplitude = params.pulseAmplitude != null ? params.pulseAmplitude : 0.05;
+  var cycles = Math.max(1, Math.round(params.cycles != null ? params.cycles : 1));
+  var sc = params.silhouetteColor || [15, 15, 25];
 
-  // Label text: use explicit labelText param if provided, otherwise empty (prompt to name)
-  var entityType = (params.labelText != null && params.labelText !== '') ? params.labelText : '';
-  // Pre-compute text width: each char is (_FONT_W + _FONT_SPACING) * scale, minus trailing space
-  var textScale = 3;
-  var charW = (_FONT_W + _FONT_SPACING) * textScale;
-  var textW = entityType.length > 0 ? entityType.length * charW - _FONT_SPACING : 0;
-  var textH = _FONT_H * textScale;
-
-  var labelPadX = 24, labelPadY = 20;
-  var labelW = Math.max(110, textW + labelPadX * 2);
-  var labelH = textH + labelPadY * 2;
+  // Phase fractions within ONE cycle, derived from real-ms proportions.
+  var FADE_MS = 150, FLASH_MS = 120, PAUSE_MS = 400;
+  var cycleMs = FADE_MS + holdMs + FLASH_MS + PAUSE_MS;
+  var fFade = FADE_MS / cycleMs;
+  var fHoldEnd = (FADE_MS + holdMs) / cycleMs;
+  var fFlashEnd = (FADE_MS + holdMs + FLASH_MS) / cycleMs;
 
   return function animate(buf, PW, PH, t) {
-    var env = _easeEnvelope(t, 0.15, 0.15);
-    if (env < 0.01) return;
+    // Position within the current cycle (0..1)
+    var ct = (t * cycles) % 1;
+    if (t >= 1) ct = 1;
 
-    var bounds = _computeEntityBounds(buf, PW, prefix);
-    if (bounds.x2 < 0) return;
-
-    // Decide side: offset tag left or right based on available space
-    var spaceLeft = bounds.x1;
-    var spaceRight = PW - 1 - bounds.x2;
-    var offsetRight = spaceRight >= spaceLeft;
-    var holeOnLeft = offsetRight; // hole on the side facing the entity
-
-    // Tag position: static, offset to the side, vertically at entity center
-    var tagGap = 24;
-    var tagCenterY = Math.max(labelH / 2 + 2, Math.min(bounds.cy, PH - labelH / 2 - 2));
-    var tagX; // top-left corner X of the tag
-    if (offsetRight) {
-      tagX = bounds.x2 + tagGap;
+    // Collect entity pixels + bounds (layer preferred: includes covered pixels)
+    var minX = PW, maxX = 0, minY = PH, maxY = 0;
+    var indices = [];
+    var layerData = _getEntityLayer(buf, prefix);
+    if (layerData && layerData.length > 0) {
+      for (var k = 0; k < layerData.length; k++) {
+        var li = layerData[k];
+        var lx = li.idx % PW, ly = Math.floor(li.idx / PW);
+        if (lx < minX) minX = lx; if (lx > maxX) maxX = lx;
+        if (ly < minY) minY = ly; if (ly > maxY) maxY = ly;
+        if (buf[li.idx].e && _isEntity(buf[li.idx].e, prefix)) indices.push(li.idx);
+      }
     } else {
-      tagX = bounds.x1 - tagGap - labelW;
-    }
-    var tagY = Math.round(tagCenterY - labelH / 2); // top-left corner Y
-
-    // Hole: circle INSIDE the tag, next to the border, at mid-height
-    var holeRadius = 3;
-    var holeCenterLy = Math.round(labelH / 2); // local Y in tag coords
-    var holeCenterLx = holeOnLeft ? (1 + holeRadius + 1) : (labelW - 2 - holeRadius); // 1px inside border
-    var holeScreenX = tagX + holeCenterLx;
-    var holeScreenY = tagY + holeCenterLy;
-
-    // String endpoint: actual entity contour pixel via horizontal ray-cast
-    var stringDirX = offsetRight ? 1 : -1;
-    var rayCY = Math.round(bounds.cy);
-    var rayStartX = Math.round(bounds.cx);
-    var stringEndX = rayStartX, stringEndY = rayCY;
-    var rayFoundEntity = false;
-    for (var rd = 1; rd <= Math.ceil(Math.max(bounds.x2 - bounds.cx, bounds.cx - bounds.x1)) + 2; rd++) {
-      var rtx = rayStartX + stringDirX * rd;
-      if (rtx < 0 || rtx >= PW) break;
-      var rti = rayCY * PW + rtx;
-      if (buf[rti].e && _isEntity(buf[rti].e, prefix)) {
-        stringEndX = rtx; stringEndY = rayCY;
-        rayFoundEntity = true;
-      } else if (rayFoundEntity) {
-        break;
-      }
-    }
-    // Fall back to bounding box edge if ray found nothing
-    if (!rayFoundEntity) {
-      stringEndX = offsetRight ? bounds.x2 : bounds.x1;
-      stringEndY = rayCY;
-    }
-
-    // Draw the undulating red string from hole to entity edge (only string moves)
-    var stringDx = stringEndX - holeScreenX;
-    var stringDy = stringEndY - holeScreenY;
-    var stringLen = Math.max(1, Math.sqrt(stringDx * stringDx + stringDy * stringDy));
-    var steps = Math.round(stringLen);
-    if (steps > 1) {
-      var snx = -stringDy / stringLen, sny = stringDx / stringLen;
-      for (var si2 = 0; si2 <= steps; si2++) {
-        var progress = si2 / steps;
-        var waveAmp = 2 * Math.sin(progress * Math.PI) * env;
-        var waveOff = waveAmp * Math.sin(progress * Math.PI * 2.5 + t * Math.PI * 4);
-        var px = Math.round(holeScreenX + stringDx * progress + snx * waveOff);
-        var py = Math.round(holeScreenY + stringDy * progress + sny * waveOff);
-        for (var st = -1; st <= 1; st++) {
-          var spx = px + Math.round(snx * st);
-          var spy = py + Math.round(sny * st);
-          if (spx >= 0 && spx < PW && spy >= 0 && spy < PH) {
-            var si = spy * PW + spx;
-            _blendPixel(buf, si, stringColor[0], stringColor[1], stringColor[2], env);
-          }
+      for (var i = 0; i < buf.length; i++) {
+        if (buf[i].e && _isEntity(buf[i].e, prefix)) {
+          var x = i % PW, y = Math.floor(i / PW);
+          indices.push(i);
+          if (x < minX) minX = x; if (x > maxX) maxX = x;
+          if (y < minY) minY = y; if (y > maxY) maxY = y;
         }
       }
     }
+    if (indices.length === 0) return;
+    var cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
 
-    // Draw label (static, no rotation)
-    for (var ly = 0; ly < labelH; ly++) {
-      for (var lx = 0; lx < labelW; lx++) {
-        var drawX = tagX + lx;
-        var drawY = tagY + ly;
-        if (drawX < 0 || drawX >= PW || drawY < 0 || drawY >= PH) continue;
+    if (ct < fHoldEnd) {
+      // ── Fade-in + hold: flat silhouette, breathing (shrink-only pulse so the
+      // nearest-pixel redraw never leaves holes) ──
+      var fillProg = ct < fFade ? ct / fFade : 1;
+      var holdProg = ct < fFade ? 0 : (ct - fFade) / (fHoldEnd - fFade);
+      var scale = 1 - pulseAmplitude * (0.5 + 0.5 * Math.sin(holdProg * Math.PI * 4));
 
-        // Round corners: diagonal notch at each corner (Manhattan distance < 3)
-        var cxDist = Math.min(lx, labelW - 1 - lx);
-        var cyDist = Math.min(ly, labelH - 1 - ly);
-        if (cxDist + cyDist < 9) continue;
-
-        var di = drawY * PW + drawX;
-        var borderThick = 5;
-        var isBorder = (ly < borderThick || ly >= labelH - borderThick || lx < borderThick || lx >= labelW - borderThick);
-
-        // Hole: round circle inside the tag (not touching border)
-        var hdx = lx - holeCenterLx, hdy = ly - holeCenterLy;
-        var holeDist = Math.sqrt(hdx * hdx + hdy * hdy);
-        var isHole = holeDist <= holeRadius;
-        if (isHole) continue; // leave hole transparent (shows background)
-
-        // Hole border: dark ring around the hole
-        var isHoleRing = holeDist <= holeRadius + 1 && holeDist > holeRadius;
-
-        // Red line: from hole edge to tag border, at mid-height (1px tall)
-        var isRedLine = false;
-        if (ly === holeCenterLy) {
-          if (holeOnLeft && lx >= 0 && lx < holeCenterLx - holeRadius) isRedLine = true;
-          if (!holeOnLeft && lx > holeCenterLx + holeRadius && lx <= labelW - 1) isRedLine = true;
-        }
-
-        var cr, cg, cb;
-        if (isRedLine) {
-          cr = stringColor[0]; cg = stringColor[1]; cb = stringColor[2];
-        } else if (isHoleRing) {
-          cr = borderColor[0]; cg = borderColor[1]; cb = borderColor[2];
-        } else if (isBorder) {
-          cr = borderColor[0]; cg = borderColor[1]; cb = borderColor[2];
-        } else {
-          cr = bgColor[0]; cg = bgColor[1]; cb = bgColor[2];
-        }
-        _blendPixel(buf, di, cr, cg, cb, env);
+      // Blank visible entity pixels to behind-colors
+      for (var k = 0; k < indices.length; k++) {
+        var idx = indices[k];
+        buf[idx].r = buf[idx]._br;
+        buf[idx].g = buf[idx]._bg;
+        buf[idx].b = buf[idx]._bb;
+      }
+      // Draw the silhouette at scaled positions around the anchor
+      var source = layerData && layerData.length > 0 ? layerData : indices;
+      var useLayers = !!(layerData && layerData.length > 0);
+      for (var k = 0; k < source.length; k++) {
+        var idx = useLayers ? source[k].idx : source[k];
+        var px = idx % PW, py = Math.floor(idx / PW);
+        var nx = Math.round(cx + (px - cx) * scale);
+        var ny = Math.round(cy + (py - cy) * scale);
+        if (nx < 0 || nx >= PW || ny < 0 || ny >= PH) continue;
+        var nidx = ny * PW + nx;
+        // During fade-in, blend original color toward the flat silhouette color
+        buf[nidx].r = Math.round(buf[nidx]._r * (1 - fillProg) + sc[0] * fillProg);
+        buf[nidx].g = Math.round(buf[nidx]._g * (1 - fillProg) + sc[1] * fillProg);
+        buf[nidx].b = Math.round(buf[nidx]._b * (1 - fillProg) + sc[2] * fillProg);
+      }
+    } else if (ct < fFlashEnd) {
+      // ── Instant reveal + brightness flash (colors already restored by the
+      // engine each frame; just add a decaying white boost) ──
+      var flashProg = (ct - fHoldEnd) / (fFlashEnd - fHoldEnd);
+      var boost = (1 - flashProg) * 0.55;
+      for (var k = 0; k < indices.length; k++) {
+        _blendPixel(buf, indices[k], 255, 255, 255, boost);
       }
     }
-
-    // Draw text inside the label (static, no rotation)
-    var textStartX = tagX + Math.round((labelW - textW) / 2);
-    var textStartY = tagY + labelPadY;
-    var upper = entityType;
-    var cx2 = textStartX;
-    for (var ci = 0; ci < upper.length; ci++) {
-      var ch = upper[ci];
-      var glyph = _PIXEL_FONT[ch];
-      if (!glyph) { cx2 += charW; continue; }
-      for (var gy = 0; gy < _FONT_H; gy++) {
-        for (var gx = 0; gx < _FONT_W; gx++) {
-          if (!glyph[gy * _FONT_W + gx]) continue;
-          for (var sy2 = 0; sy2 < textScale; sy2++) {
-            for (var sx2 = 0; sx2 < textScale; sx2++) {
-              var drawX2 = cx2 + gx * textScale + sx2;
-              var drawY2 = textStartY + gy * textScale + sy2;
-              if (drawX2 >= 0 && drawX2 < PW && drawY2 >= 0 && drawY2 < PH) {
-                var ti = drawY2 * PW + drawX2;
-                _blendPixel(buf, ti, textColor[0], textColor[1], textColor[2], env);
-              }
-            }
-          }
-        }
-      }
-      cx2 += charW;
-    }
+    // else: pause — draw nothing, the engine restores the original frame
   };
-}), 3000);
+}), 2500);
 
 // ── S2: Stamp ──
 // Phase 1 (0→0.3): entity lifts upward, black silhouette at original position.
@@ -588,50 +503,140 @@ AnimationTemplates.register('color_pop', function(params) {
   };
 }, 3000);
 
-// ── S1: Reveal ──
-// Occluding layer becomes semi-transparent to show hidden elements.
-AnimationTemplates.register('reveal', function(params) {
+// ── S1: Peek ──
+// The occluding entity lifts like a flap hinged on one edge: its layer
+// squeezes horizontally toward the hinge (with a slight darkening simulating
+// rotation), exposing the behind-pixels. Optionally halos a hidden entity
+// (entityPrefixB) while open. Closes back and pauses.
+AnimationTemplates.register('peek', function(params) {
   var prefix = params.entityPrefix || '';
-  var revealAlpha = params.revealAlpha != null ? params.revealAlpha : 0.7;
+  var prefixB = params.entityPrefixB || '';
+  var hingeSide = params.hingeSide || 'auto';
+  var openness = params.openness != null ? params.openness : 0.8;
+  var holdMs = params.holdMs != null ? params.holdMs : 1200;
+  var glowStrength = params.glowStrength != null ? params.glowStrength : 0.5;
+
+  var OPEN_MS = 300, CLOSE_MS = 300, PAUSE_MS = 400;
+  var totalMs = OPEN_MS + holdMs + CLOSE_MS + PAUSE_MS;
+  var fOpen = OPEN_MS / totalMs;
+  var fHoldEnd = (OPEN_MS + holdMs) / totalMs;
+  var fCloseEnd = (OPEN_MS + holdMs + CLOSE_MS) / totalMs;
+
+  var resolvedHinge = null; // 'left' | 'right', computed once from the buffer
 
   return function animate(buf, PW, PH, t) {
-    var env = _easeEnvelope(t, 0.25, 0.25);
-    var alpha = revealAlpha * env;
+    // Opening progress 0..1 (ease-out on open, ease-in on close)
+    var prog;
+    if (t < fOpen) {
+      var ot = t / fOpen;
+      prog = 1 - (1 - ot) * (1 - ot);
+    } else if (t < fHoldEnd) {
+      prog = 1;
+    } else if (t < fCloseEnd) {
+      var ctc = (t - fHoldEnd) / (fCloseEnd - fHoldEnd);
+      prog = 1 - ctc * ctc;
+    } else {
+      return; // pause — engine restores the original frame
+    }
+    if (prog <= 0.001) return;
 
-    // Make occluding entity more transparent to reveal what's behind
-    for (var i = 0; i < buf.length; i++) {
-      if (_isEntity(buf[i].e, prefix)) {
-        buf[i].r = Math.round(buf[i]._r * (1 - alpha) + buf[i]._br * alpha);
-        buf[i].g = Math.round(buf[i]._g * (1 - alpha) + buf[i]._bg * alpha);
-        buf[i].b = Math.round(buf[i]._b * (1 - alpha) + buf[i]._bb * alpha);
+    // Collect occluder pixels + bounds
+    var minX = PW, maxX = 0;
+    var indices = [];
+    var layerData = _getEntityLayer(buf, prefix);
+    if (layerData && layerData.length > 0) {
+      for (var k = 0; k < layerData.length; k++) {
+        var li = layerData[k];
+        var lx = li.idx % PW;
+        if (lx < minX) minX = lx; if (lx > maxX) maxX = lx;
+        if (buf[li.idx].e && _isEntity(buf[li.idx].e, prefix)) indices.push(li.idx);
+      }
+    } else {
+      for (var i = 0; i < buf.length; i++) {
+        if (buf[i].e && _isEntity(buf[i].e, prefix)) {
+          var x = i % PW;
+          indices.push(i);
+          if (x < minX) minX = x; if (x > maxX) maxX = x;
+        }
       }
     }
+    if (indices.length === 0) return;
 
-    // White opaque outline on border pixels throughout the animation
-    if (env > 0.01) {
-      var bounds = _computeEntityBounds(buf, PW, prefix);
-      var neighbors = [[-1,0],[1,0],[0,-1],[0,1]];
-      for (var y = bounds.y1; y <= bounds.y2; y++) {
-        for (var x = bounds.x1; x <= bounds.x2; x++) {
-          if (x < 0 || x >= PW || y < 0 || y >= PH) continue;
-          var idx = y * PW + x;
-          var isEntity = _isEntity(buf[idx].e, prefix);
-          if (!isEntity) continue;
-          var isBorder = false;
-          for (var n = 0; n < 4; n++) {
-            var nx = x + neighbors[n][0], ny = y + neighbors[n][1];
-            if (nx < 0 || nx >= PW || ny < 0 || ny >= PH) { isBorder = true; break; }
-            var ne = buf[ny * PW + nx].e;
-            if (!_isEntity(ne, prefix)) { isBorder = true; break; }
-          }
-          if (isBorder) {
-            _blendPixel(buf, idx, 255, 255, 255, env);
+    // Resolve hinge side once
+    if (resolvedHinge === null) {
+      if (hingeSide === 'left' || hingeSide === 'right') {
+        resolvedHinge = hingeSide;
+      } else if (prefixB) {
+        // Hinge on the side of the occluder farthest from the hidden element
+        var bBounds = _computeEntityBounds(buf, PW, prefixB);
+        if (bBounds.x2 >= 0) {
+          resolvedHinge = bBounds.cx < (minX + maxX) / 2 ? 'right' : 'left';
+        }
+      }
+      if (resolvedHinge === null) {
+        // No hidden element: hinge on the side with LESS free space toward the
+        // frame edge, so the flap opens toward open space
+        var spaceLeft = minX, spaceRight = PW - 1 - maxX;
+        resolvedHinge = spaceLeft <= spaceRight ? 'left' : 'right';
+      }
+    }
+    var hingeX = resolvedHinge === 'left' ? minX : maxX;
+
+    var scaleX = 1 - openness * prog;
+    var darken = 1 - 0.2 * prog;
+
+    // Blank visible occluder pixels to behind-colors (this IS the exposure)
+    for (var k = 0; k < indices.length; k++) {
+      var idx = indices[k];
+      buf[idx].r = buf[idx]._br;
+      buf[idx].g = buf[idx]._bg;
+      buf[idx].b = buf[idx]._bb;
+    }
+
+    // Redraw the occluder squeezed toward the hinge (shrink-only → no holes)
+    var source = layerData && layerData.length > 0 ? layerData : indices;
+    var useLayers = !!(layerData && layerData.length > 0);
+    for (var k = 0; k < source.length; k++) {
+      var srcIdx, srcR, srcG, srcB;
+      if (useLayers) {
+        var li = source[k];
+        srcIdx = li.idx; srcR = li.r; srcG = li.g; srcB = li.b;
+      } else {
+        srcIdx = source[k];
+        srcR = buf[srcIdx]._r; srcG = buf[srcIdx]._g; srcB = buf[srcIdx]._b;
+      }
+      var px = srcIdx % PW, py = Math.floor(srcIdx / PW);
+      var nx = Math.round(hingeX + (px - hingeX) * scaleX);
+      if (nx < 0 || nx >= PW) continue;
+      var nidx = py * PW + nx;
+      buf[nidx].r = Math.round(srcR * darken);
+      buf[nidx].g = Math.round(srcG * darken);
+      buf[nidx].b = Math.round(srcB * darken);
+    }
+
+    // Halo on the hidden element while exposed (same distance-field technique
+    // as spotlight, glow-only: no scene dimming)
+    if (prefixB && prog > 0.3) {
+      var df = _getDistField(buf, prefixB);
+      if (df) {
+        var haloSize = 10;
+        var alphaMax = 0.7 * glowStrength * prog;
+        for (var i = 0; i < buf.length; i++) {
+          if (df[i] > 0 && df[i] <= haloSize) {
+            var falloff = 1 - df[i] / haloSize;
+            var a = alphaMax * falloff * falloff;
+            _blendPixel(buf, i, 255, 240, 180, a);
+          } else if (df[i] === 0 && _isEntity(buf[i].e || '', prefixB)) {
+            var boost = 1 + 0.25 * glowStrength * prog;
+            buf[i].r = Math.min(255, Math.round(buf[i].r * boost));
+            buf[i].g = Math.min(255, Math.round(buf[i].g * boost));
+            buf[i].b = Math.min(255, Math.round(buf[i].b * boost));
           }
         }
       }
     }
   };
-}, 1500);
+}, 2500);
 
 // ── P2: Emanation ──
 // Custom multi-pixel sprites (icicles, vapor, stars, dust clouds, hearts)
@@ -1728,27 +1733,36 @@ AnimationTemplates.register('disintegration', function(params) {
   };
 }, 2000);
 
-// ── C3: Ghost Outline ──
-// Dark flat puddle at an empty spot + big "?" with black outline. Scaffolds absence.
-AnimationTemplates.register('ghost_outline', function(params) {
+// ── C3: Missing Piece ──
+// A jigsaw-piece-shaped hole opens in the scene where an absent entity would
+// be, exposing a flat dark backing; the matching piece — bearing the absent
+// entity's silhouette (pieceImageUrl, injected by the caller) — hovers at the
+// nearest frame edge, then fades, and the hole closes. Scaffolds absence.
+AnimationTemplates.register('missing_piece', function(params) {
   var prefix = params.entityPrefix || '';
-  // ghostImageUrl: URL to the entity asset from another scene (full-size RGBA PNG)
-  var ghostImageUrl = params.ghostImageUrl || '';
+  var holeScale = params.holeScale != null ? params.holeScale : 1.2;
+  var edgePulse = params.edgePulse != null ? params.edgePulse : 0.5;
+  var pieceOpacity = params.pieceOpacity != null ? params.pieceOpacity : 0.8;
+  var holdMs = params.holdMs != null ? params.holdMs : 1500;
+  var pieceImageUrl = params.pieceImageUrl || '';
 
-  var cachedPuddleCx = null, cachedPuddleY = null;
-  var cachedRx = 0, cachedRy = 0;
-  var cachedEdgeOffsets = null;
+  var OPEN_MS = 200, CLOSE_MS = 200, PAUSE_MS = 400;
+  var totalMs = OPEN_MS + holdMs + CLOSE_MS + PAUSE_MS;
+  var fOpen = OPEN_MS / totalMs;
+  var fHoldEnd = (OPEN_MS + holdMs) / totalMs;
+  var fCloseEnd = (OPEN_MS + holdMs + CLOSE_MS) / totalMs;
 
-  // Ghost silhouette data (loaded from image)
-  var ghostLoading = false, ghostReady = false;
-  var ghostContour = null; // [{x, y}] relative to ghost bounding box
-  var ghostMask = null;    // [{x, y}] all opaque pixels
-  var ghostW = 0, ghostH = 0;
-  var ghostScale = 1;
+  var BACKING = [45, 50, 65];   // flat pixel backing inside the hole
+  var EDGE = [160, 180, 210];   // pulsing edge color
 
-  function loadGhostImage() {
-    if (ghostLoading || !ghostImageUrl) return;
-    ghostLoading = true;
+  // Silhouette of the absent entity, loaded from its cut-out PNG (same
+  // pipeline as the old ghost_outline: bounding box, mask, contour)
+  var imgLoading = false, imgReady = false;
+  var mask = null, contour = null, imgW = 0, imgH = 0;
+
+  function loadPieceImage() {
+    if (imgLoading || !pieceImageUrl) return;
+    imgLoading = true;
     var img = new Image();
     img.crossOrigin = 'anonymous';
     img.onload = function() {
@@ -1757,234 +1771,201 @@ AnimationTemplates.register('ghost_outline', function(params) {
       var ctx = off.getContext('2d');
       ctx.drawImage(img, 0, 0);
       var data = ctx.getImageData(0, 0, img.width, img.height).data;
-
-      // Find bounding box of opaque pixels
       var x1 = img.width, y1 = img.height, x2 = 0, y2 = 0;
       for (var y = 0; y < img.height; y++) {
         for (var x = 0; x < img.width; x++) {
-          var a = data[(y * img.width + x) * 4 + 3];
-          if (a > 30) {
+          if (data[(y * img.width + x) * 4 + 3] > 30) {
             if (x < x1) x1 = x; if (x > x2) x2 = x;
             if (y < y1) y1 = y; if (y > y2) y2 = y;
           }
         }
       }
-      if (x2 <= x1) { ghostLoading = false; return; }
-
-      ghostW = x2 - x1 + 1;
-      ghostH = y2 - y1 + 1;
-
-      // Build mask (opaque pixels) and contour (edge pixels)
-      ghostMask = [];
-      ghostContour = [];
+      if (x2 <= x1) { imgLoading = false; return; }
+      imgW = x2 - x1 + 1; imgH = y2 - y1 + 1;
+      mask = []; contour = [];
+      var dirs = [[-1,0],[1,0],[0,-1],[0,1]];
       for (var y = y1; y <= y2; y++) {
         for (var x = x1; x <= x2; x++) {
-          var a = data[(y * img.width + x) * 4 + 3];
-          if (a > 30) {
-            ghostMask.push({ x: x - x1, y: y - y1 });
-            // Check if it's an edge pixel (has a transparent neighbor)
-            var isEdge = false;
-            var dirs = [[-1,0],[1,0],[0,-1],[0,1]];
-            for (var d = 0; d < 4; d++) {
-              var nx = x + dirs[d][0], ny = y + dirs[d][1];
-              if (nx < 0 || nx >= img.width || ny < 0 || ny >= img.height) { isEdge = true; break; }
-              if (data[(ny * img.width + nx) * 4 + 3] <= 30) { isEdge = true; break; }
+          if (data[(y * img.width + x) * 4 + 3] <= 30) continue;
+          mask.push({ x: x - x1, y: y - y1 });
+          for (var d = 0; d < 4; d++) {
+            var nx = x + dirs[d][0], ny = y + dirs[d][1];
+            if (nx < 0 || nx >= img.width || ny < 0 || ny >= img.height
+                || data[(ny * img.width + nx) * 4 + 3] <= 30) {
+              contour.push({ x: x - x1, y: y - y1 });
+              break;
             }
-            if (isEdge) ghostContour.push({ x: x - x1, y: y - y1 });
           }
         }
       }
-      ghostReady = true;
+      imgReady = true;
     };
-    img.src = ghostImageUrl;
+    img.src = pieceImageUrl;
+  }
+
+  // Procedural jigsaw mask: base rectangle + a round tab on the top edge and a
+  // round notch cut into the right edge. Returns true when (px,py) — local
+  // coords with (0,0) at the rect top-left — is inside the piece shape.
+  function inPiece(px, py, w, h) {
+    var tabR = Math.max(3, Math.round(Math.min(w, h) * 0.18));
+    // Tab: sticks out above the top edge, centered
+    var tcx = w / 2, tcy = 0;
+    var dtx = px - tcx, dty = py - tcy;
+    if (py < 0) return dtx * dtx + dty * dty <= tabR * tabR;
+    if (px < 0 || px >= w || py >= h) return false;
+    // Notch: bitten out of the right edge, centered vertically
+    var ncx = w, ncy = h / 2;
+    var dnx = px - ncx, dny = py - ncy;
+    if (dnx * dnx + dny * dny <= tabR * tabR) return false;
+    return true;
+  }
+
+  var cachedHole = null; // { x0, y0, w, h }
+
+  function placeHole(buf, PW, PH, holeW, holeH) {
+    // The entity is absent from this scene: sweep a grid of candidate spots
+    // (same spirit as the old ghost_outline empty-spot search) and take the
+    // one covering the FEWEST entity pixels — a hole opening over a present
+    // character would break the "where the absent entity would be" metaphor.
+    var xFracs = [0.5, 0.32, 0.68, 0.18, 0.82, 0.08, 0.92];
+    var yFracs = [0.62, 0.45, 0.75];
+    var best = null, bestCount = Infinity;
+    for (var yi = 0; yi < yFracs.length; yi++) {
+      for (var xi = 0; xi < xFracs.length; xi++) {
+        var x0 = Math.round(PW * xFracs[xi] - holeW / 2);
+        var y0 = Math.round(PH * yFracs[yi] - holeH / 2);
+        x0 = _clamp(x0, 2, PW - holeW - 2);
+        y0 = _clamp(y0, 2, PH - holeH - 2);
+        var count = 0;
+        for (var ty = y0; ty < y0 + holeH; ty += 2) {
+          for (var tx = x0; tx < x0 + holeW; tx += 2) {
+            var e = buf[ty * PW + tx].e;
+            if (e && e !== '' && e !== 'background' && e.indexOf('bg') !== 0) count++;
+          }
+        }
+        if (count < bestCount) {
+          bestCount = count;
+          best = { x0: x0, y0: y0, w: holeW, h: holeH };
+          if (count === 0) return best;
+        }
+      }
+    }
+    return best;
   }
 
   return function animate(buf, PW, PH, t) {
-    // Start loading ghost image on first frame
-    if (ghostImageUrl && !ghostLoading && !ghostReady) loadGhostImage();
+    if (pieceImageUrl && !imgLoading && !imgReady) loadPieceImage();
 
-    if (cachedPuddleCx === null) {
-      var bounds = _computeEntityBounds(buf, PW, prefix);
-      var ew = bounds.x2 - bounds.x1 + 1;
-      var eh = bounds.y2 - bounds.y1 + 1;
-      cachedRx = Math.max(8, Math.round(ew * 0.55));
-      cachedRy = Math.max(3, Math.round(eh * 0.08));
+    // Opening progress
+    var prog;
+    if (t < fOpen) {
+      prog = t / fOpen;
+    } else if (t < fHoldEnd) {
+      prog = 1;
+    } else if (t < fCloseEnd) {
+      prog = 1 - (t - fHoldEnd) / (fCloseEnd - fHoldEnd);
+    } else {
+      return; // pause — engine restores the original frame
+    }
+    if (prog <= 0.001) return;
 
-      // Find an empty ground-level spot (not overlapping any entity)
-      var groundY = bounds.y2;
-      var testH = 10;
-      var bestCx = null;
-      var offsets = [1.0, -1.0, 1.5, -1.5, 2.0, -2.0, 0.7, -0.7];
-      for (var oi = 0; oi < offsets.length; oi++) {
-        var testCx = Math.round(bounds.cx + offsets[oi] * ew);
-        if (testCx - cachedRx < 0 || testCx + cachedRx >= PW) continue;
-        var occupied = false;
-        for (var ty = Math.max(0, groundY - testH); ty <= Math.min(PH - 1, groundY + cachedRy); ty++) {
-          for (var tx = testCx - 5; tx <= testCx + 5; tx++) {
-            if (tx < 0 || tx >= PW) continue;
-            var ti = ty * PW + tx;
-            if (buf[ti].e && buf[ti].e !== '' && buf[ti].e !== 'background' && !buf[ti].e.startsWith('bg')) {
-              occupied = true; break;
-            }
-          }
-          if (occupied) break;
+    // Hole size: from the absent entity's cut-out when loaded, else a default
+    if (cachedHole === null) {
+      var scale = PW / 1376; // source cut-outs are 1376x768
+      var baseW = imgReady ? Math.round(imgW * scale) : Math.round(PW * 0.16);
+      var baseH = imgReady ? Math.round(imgH * scale) : Math.round(PH * 0.28);
+      var holeW = Math.max(16, Math.round(baseW * holeScale));
+      var holeH = Math.max(16, Math.round(baseH * holeScale));
+      cachedHole = placeHole(buf, PW, PH, holeW, holeH);
+    }
+    var hole = cachedHole;
+
+    // ── Hole: flat backing growing from the center, jigsaw-shaped ──
+    var hw = hole.w, hh = hole.h;
+    var hcx = hole.x0 + hw / 2, hcy = hole.y0 + hh / 2;
+    var pulse = 0.5 + 0.5 * Math.sin(t * Math.PI * 8);
+    var edgeA = (0.35 + 0.65 * edgePulse * pulse) * prog;
+    var tabR = Math.max(3, Math.round(Math.min(hw, hh) * 0.18));
+
+    for (var py = -tabR; py < hh; py++) {
+      var sy = hole.y0 + py;
+      if (sy < 0 || sy >= PH) continue;
+      for (var px = 0; px <= hw + 1; px++) {
+        var sx = hole.x0 + px;
+        if (sx < 0 || sx >= PW) continue;
+        // Grow from center: only pixels within prog of the half-extent
+        var fx = Math.abs(sx - hcx) / (hw / 2 + tabR);
+        var fy = Math.abs(sy - hcy) / (hh / 2 + tabR);
+        if (Math.max(fx, fy) > prog) continue;
+        if (!inPiece(px, py, hw, hh)) continue;
+        var idx = sy * PW + sx;
+        // Edge if any 4-neighbour is outside the piece shape
+        var isEdge = !inPiece(px - 1, py, hw, hh) || !inPiece(px + 1, py, hw, hh)
+                  || !inPiece(px, py - 1, hw, hh) || !inPiece(px, py + 1, hw, hh);
+        if (isEdge) {
+          _blendPixel(buf, idx, EDGE[0], EDGE[1], EDGE[2], edgeA);
+        } else if (prog > 0.98) {
+          // Fully open: flat opaque backing — a hole, not a tinted veil
+          buf[idx].r = BACKING[0]; buf[idx].g = BACKING[1]; buf[idx].b = BACKING[2];
+        } else {
+          _blendPixel(buf, idx, BACKING[0], BACKING[1], BACKING[2], 0.92 * prog);
         }
-        if (!occupied) { bestCx = testCx; break; }
-      }
-      if (bestCx === null) {
-        bestCx = bounds.cx + Math.round(ew * 1.5);
-        if (bestCx + cachedRx >= PW) bestCx = bounds.cx - Math.round(ew * 1.5);
-      }
-      cachedPuddleCx = _clamp(bestCx, cachedRx, PW - cachedRx - 1);
-      cachedPuddleY = groundY;
-
-      cachedEdgeOffsets = [];
-      for (var row = 0; row < cachedRy * 2 + 1; row++) {
-        cachedEdgeOffsets.push(Math.random() * Math.PI * 2);
-      }
-
-      // Scale ghost to match buffer resolution vs source image (1:1 natural size)
-      if (ghostReady && ghostH > 0) {
-        ghostScale = PW / 1376;  // source images are 1376×768
       }
     }
 
-    // Recompute ghost scale if it loaded after first frame
-    if (ghostReady && ghostScale === 1 && ghostH > 0) {
-      var bounds2 = _computeEntityBounds(buf, PW, prefix);
-      var eh2 = bounds2.y2 - bounds2.y1 + 1;
-      var ew2 = bounds2.x2 - bounds2.x1 + 1;
-      ghostScale = PW / 1376;
-    }
+    // ── Floating piece at the nearest frame edge, with the entity silhouette ──
+    var pieceA = pieceOpacity * prog;
+    if (pieceA > 0.03) {
+      var pw2 = Math.round(hw * 0.6), ph2 = Math.round(hh * 0.6);
+      var margin = 6;
+      var pieceX = hcx < PW / 2 ? margin : PW - pw2 - margin;
+      var bob = Math.round(Math.sin(t * Math.PI * 4) * 3);
+      var pieceY = _clamp(Math.round(hcy - ph2 / 2) + bob, 2, PH - ph2 - 2);
 
-    var cx = cachedPuddleCx;
-    var puddleY = cachedPuddleY;
-    var rx = cachedRx, ry = cachedRy;
-
-    // Phase 1 (t 0→0.15): fade in | Phase 2 (t 0.15→0.7): wobble | Phase 3 (t 0.7→1): dissolve
-    var shapeAlpha = 1;
-    if (t < 0.15) {
-      shapeAlpha = t / 0.15;
-    } else if (t > 0.7) {
-      shapeAlpha = 1 - (t - 0.7) / 0.3;
-    }
-    shapeAlpha = Math.max(0, Math.min(1, shapeAlpha));
-    if (shapeAlpha < 0.01) return;
-
-    var gc = params.puddleColor || [60, 65, 85];
-
-    // Draw flat puddle
-    for (var dy = -ry; dy <= ry; dy++) {
-      var py = puddleY + dy;
-      if (py < 0 || py >= PH) continue;
-      var rowFrac = dy / ry;
-      var halfW = rx * Math.sqrt(Math.max(0, 1 - rowFrac * rowFrac));
-      var rowIdx = (dy + ry) % cachedEdgeOffsets.length;
-      var wobble = Math.sin(t * Math.PI * 5 + cachedEdgeOffsets[rowIdx]) * 2;
-      halfW += wobble;
-      if (halfW < 1) continue;
-
-      for (var dx = Math.round(-halfW); dx <= Math.round(halfW); dx++) {
-        var px = cx + dx;
-        if (px < 0 || px >= PW) continue;
-        var pi = py * PW + px;
-        var edgeFrac = Math.abs(dx) / halfW;
-        var isEdge = edgeFrac > 0.8;
-        if (isEdge && (px + py) % 2 !== 0) continue;
-        var sa = shapeAlpha * (0.6 - 0.2 * edgeFrac);
-        _blendPixel(buf, pi, gc[0], gc[1], gc[2], sa);
+      for (var py = -Math.round(ph2 * 0.18); py < ph2; py++) {
+        var sy = pieceY + py;
+        if (sy < 0 || sy >= PH) continue;
+        for (var px = 0; px <= pw2 + 1; px++) {
+          var sx = pieceX + px;
+          if (sx < 0 || sx >= PW) continue;
+          if (!inPiece(px, py, pw2, ph2)) continue;
+          var idx = sy * PW + sx;
+          var isEdge = !inPiece(px - 1, py, pw2, ph2) || !inPiece(px + 1, py, pw2, ph2)
+                    || !inPiece(px, py - 1, pw2, ph2) || !inPiece(px, py + 1, pw2, ph2);
+          if (isEdge) {
+            _blendPixel(buf, idx, EDGE[0], EDGE[1], EDGE[2], pieceA);
+          } else {
+            _blendPixel(buf, idx, 70, 76, 96, pieceA * 0.9);
+          }
+        }
       }
-    }
 
-    // Draw ghost silhouette (or fallback "?" if no image)
-    if (shapeAlpha > 0.15) {
-      var qa = Math.min(1, (shapeAlpha - 0.15) / 0.25) * shapeAlpha;
-
-      // Gentle float
-      var floatX = Math.round(Math.sin(t * Math.PI * 2.3) * 3 + Math.cos(t * Math.PI * 1.7) * 2);
-      var floatY = Math.round(Math.sin(t * Math.PI * 1.9 + 1.2) * 3 + Math.cos(t * Math.PI * 2.7) * 2);
-
-      if (ghostReady && ghostContour) {
-        // Draw ghost entity silhouette — semi-transparent fill + bright contour
-        var gw = Math.round(ghostW * ghostScale);
-        var gh = Math.round(ghostH * ghostScale);
-        var gx0 = cx - Math.round(gw / 2) + floatX;
-        var gy0 = puddleY - ry - gh - 6 + floatY;
-
-        // Semi-transparent fill (ghostly)
-        for (var mi = 0; mi < ghostMask.length; mi++) {
-          var mx = gx0 + Math.round(ghostMask[mi].x * ghostScale);
-          var my = gy0 + Math.round(ghostMask[mi].y * ghostScale);
+      // Entity silhouette inside the piece (dark fill + light contour)
+      if (imgReady && mask) {
+        var fitScale = Math.min((pw2 * 0.8) / imgW, (ph2 * 0.8) / imgH);
+        var gw = Math.round(imgW * fitScale), gh = Math.round(imgH * fitScale);
+        var gx0 = pieceX + Math.round((pw2 - gw) / 2);
+        var gy0 = pieceY + Math.round((ph2 - gh) / 2);
+        for (var mi = 0; mi < mask.length; mi++) {
+          var mx = gx0 + Math.round(mask[mi].x * fitScale);
+          var my = gy0 + Math.round(mask[mi].y * fitScale);
           if (mx >= 0 && mx < PW && my >= 0 && my < PH) {
-            var mpi = my * PW + mx;
-            _blendPixel(buf, mpi, 40, 50, 70, qa * 0.45);
+            _blendPixel(buf, my * PW + mx, 25, 28, 40, pieceA * 0.85);
           }
         }
-
-        // Bright contour outline
-        for (var ci = 0; ci < ghostContour.length; ci++) {
-          var ex = gx0 + Math.round(ghostContour[ci].x * ghostScale);
-          var ey = gy0 + Math.round(ghostContour[ci].y * ghostScale);
+        for (var ci = 0; ci < contour.length; ci++) {
+          var ex = gx0 + Math.round(contour[ci].x * fitScale);
+          var ey = gy0 + Math.round(contour[ci].y * fitScale);
           if (ex >= 0 && ex < PW && ey >= 0 && ey < PH) {
-            var epi = ey * PW + ex;
-            _blendPixel(buf, epi, 160, 180, 210, qa * 0.85);
+            _blendPixel(buf, ey * PW + ex, EDGE[0], EDGE[1], EDGE[2], pieceA * 0.8);
           }
         }
       } else {
-        // Fallback: "?" bitmap (13×20) if no ghost image
-        var qMark = [
-          0,0,0,1,1,1,1,1,1,1,0,0,0,
-          0,0,1,1,1,1,1,1,1,1,1,0,0,
-          0,1,1,1,0,0,0,0,0,1,1,1,0,
-          1,1,1,0,0,0,0,0,0,0,1,1,1,
-          1,1,1,0,0,0,0,0,0,0,1,1,1,
-          1,1,0,0,0,0,0,0,0,0,1,1,1,
-          0,0,0,0,0,0,0,0,0,1,1,1,0,
-          0,0,0,0,0,0,0,0,1,1,1,0,0,
-          0,0,0,0,0,0,0,1,1,1,0,0,0,
-          0,0,0,0,0,0,1,1,1,0,0,0,0,
-          0,0,0,0,0,1,1,1,0,0,0,0,0,
-          0,0,0,0,0,1,1,1,0,0,0,0,0,
-          0,0,0,0,0,1,1,1,0,0,0,0,0,
-          0,0,0,0,0,1,1,1,0,0,0,0,0,
-          0,0,0,0,0,0,0,0,0,0,0,0,0,
-          0,0,0,0,0,0,0,0,0,0,0,0,0,
-          0,0,0,0,0,0,0,0,0,0,0,0,0,
-          0,0,0,0,0,1,1,1,0,0,0,0,0,
-          0,0,0,0,0,1,1,1,0,0,0,0,0,
-          0,0,0,0,0,0,0,0,0,0,0,0,0
-        ];
-        var qW = 13, qH = 20;
-        var qx0 = cx - Math.floor(qW / 2) + floatX;
-        var qy0 = puddleY - ry - qH - 3 + floatY;
-        var dirs = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
-        for (var qy = 0; qy < qH; qy++) {
-          for (var qx = 0; qx < qW; qx++) {
-            if (!qMark[qy * qW + qx]) continue;
-            for (var d = 0; d < 8; d++) {
-              var nx = qx + dirs[d][0], ny = qy + dirs[d][1];
-              var isInsideBitmap = nx >= 0 && nx < qW && ny >= 0 && ny < qH;
-              if (isInsideBitmap && qMark[ny * qW + nx]) continue;
-              var sx = qx0 + nx, sy = qy0 + ny;
-              if (sx >= 0 && sx < PW && sy >= 0 && sy < PH) {
-                _blendPixel(buf, sy * PW + sx, 0, 0, 0, qa);
-              }
-            }
-          }
-        }
-        for (var qy = 0; qy < qH; qy++) {
-          for (var qx = 0; qx < qW; qx++) {
-            if (!qMark[qy * qW + qx]) continue;
-            var sx = qx0 + qx, sy = qy0 + qy;
-            if (sx >= 0 && sx < PW && sy >= 0 && sy < PH) {
-              _blendPixel(buf, sy * PW + sx, 255, 255, 220, qa);
-            }
-          }
-        }
+        // Fallback: a "?" would reintroduce a symbol — keep the piece plain.
       }
     }
   };
-}, 2500);
+}, 3000);
 
 // ── R1: Magnetism ──
 AnimationTemplates.register('magnetism', function(params) {

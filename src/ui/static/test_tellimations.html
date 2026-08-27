@@ -151,12 +151,12 @@
     <div class="family-label">I — Identity</div>
     <div class="controls">
       <button onclick="playT('spotlight')">spotlight</button>
-      <button onclick="playT('nametag')">nametag</button>
+      <button onclick="playT('silhouette')">silhouette</button>
     </div>
 
     <div class="family-label">S — Space</div>
     <div class="controls">
-      <button onclick="playT('reveal')">reveal</button>
+      <button onclick="playT('peek')">peek</button>
       <button onclick="playT('settle')">settle</button>
     </div>
 
@@ -194,7 +194,7 @@
     <div class="controls">
       <button onclick="playT('bonk')">bonk</button>
       <button onclick="playT('sequential_glow')">sequential_glow</button>
-      <button onclick="playT('ghost_outline')">ghost_outline</button>
+      <button onclick="playT('missing_piece')">missing_piece</button>
     </div>
 
     <div class="family-label">D — Discourse</div>
@@ -267,7 +267,7 @@ function drawScene() {
   buf.rect(0, Math.round(PH * 0.7) - 2, PW, 4, 90, 170, 60, 'bg');
 
   // Snapshot background BEFORE drawing entities
-  // so animations like 'reveal' and 'ghost_outline' can blend to bg
+  // so animations like 'peek' and 'missing_piece' can blend to bg
   buf.snapshotBackground();
 
   // ── Fox (fox_01) — orange, left side ──
@@ -380,24 +380,24 @@ function verifyState(before, label) {
 var ENTITY_LIST = ['fox_01', 'owl_01', 'mushroom_01'];
 
 var TEMPLATE_ORDER = [
-  'spotlight', 'nametag',
-  'reveal', 'settle',
+  'spotlight', 'silhouette',
+  'peek', 'settle',
   'color_pop',
   'emanation_shame', 'emanation_cold', 'emanation_joy', 'emanation_love', 'emanation_anger', 'emanation_fear',
   'flashback', 'timelapse',
   'motion_lines', 'flip',
   'magnetism', 'repel', 'causal_push',
-  'bonk', 'sequential_glow', 'ghost_outline',
+  'bonk', 'sequential_glow', 'missing_piece',
   'speech_bubble', 'thought_bubble', 'alert', 'interjection'
 ];
 
 var TEMPLATE_CONFIG = {
   // Single-entity
   spotlight:     { duration: 1500 },
-  nametag:       { duration: 1500 },
+  silhouette:    { duration: 2500 },
   settle:        { duration: 1200 },
   color_pop:     { duration: 1200 },
-  reveal:        { duration: 1500 },
+  peek:          { duration: 2500 },
   emanation_shame:  { duration: 1500 },
   emanation_cold:   { duration: 1500 },
   emanation_joy:    { duration: 1500 },
@@ -405,7 +405,7 @@ var TEMPLATE_CONFIG = {
   emanation_anger:  { duration: 1500 },
   emanation_fear:   { duration: 1500 },
   flashback:     { duration: 1500 },
-  ghost_outline: { duration: 1500 },
+  missing_piece: { duration: 3000 },
   alert:         { duration: 1200 },
   motion_lines:  { duration: 1200, useDirection: true },
   flip:  { duration: 1500, useDirection: true, dirParam: 'lurchDirection' },

@@ -4,8 +4,14 @@
   "category": "Count",
   "mode": "both",
   "scaffolding_intent": "Entities of the same kind glow one at a time in sequence, producing a visual count of the group",
-  "misl_elements": ["CH", "ENP"],
-  "target_type": ["duo","group"],
+  "misl_elements": [
+    "CH",
+    "ENP"
+  ],
+  "target_type": [
+    "duo",
+    "group"
+  ],
   "parameters": [
     {
       "name": "entityPrefixes",
@@ -26,6 +32,6 @@
     }
   ],
   "code_template": "sequential_glow({target}, {entityPrefixes})",
-  "correction_intent": "Child stated a number of entities that does not match the scene ('two kittens' when three are visible), or used a singular reference for a group of similar entities ('the kitten' when three kittens are present). Use ONLY when the scene contains two or more entities of the same kind; target all of them. Do NOT use for a single misidentified entity (that is I1_spotlight) or for an entity that is absent from the scene (that is C3_ghost_outline).",
+  "correction_intent": "Child stated a number of entities that does not match the scene ('two kittens' when three are visible), or used a singular reference for a group of similar entities ('the kitten' when three kittens are present). Use ONLY when the scene contains two or more entities of the same kind; target all of them. Do NOT use for a single misidentified entity (that is I1_spotlight) or for an entity that is absent from the scene (that is C3_missing_piece).",
   "suggestion_intent": "The scene contains a group of two or more similar entities (several children, animals, or objects of the same kind) that the child has not counted: they referred to the group collectively or vaguely ('some kids', 'the animals', 'they'), mentioned only one member, or did not mention the group at all. Target all members of the group so the child can enumerate them."
 }

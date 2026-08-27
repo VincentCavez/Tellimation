@@ -1,68 +1,64 @@
 {
   "id": "I2",
-  "name": "Nametag",
+  "name": "Silhouette",
   "category": "Identity",
   "mode": "both",
-  "scaffolding_intent": "Displays a floating label with ellipsis attached to the entity, inviting the child to name it",
+  "scaffolding_intent": "The entity turns into a flat black silhouette in place, holds, then snaps back to full color, asking who or what it is",
   "misl_elements": [
     "CH"
   ],
-  "target_type": ["entity","duo","group"],
+  "target_type": [
+    "entity",
+    "duo",
+    "group"
+  ],
   "parameters": [
     {
-      "name": "bgColor",
-      "type": "rgb_vary",
+      "name": "holdMs",
+      "type": "int",
       "range": [
-        0,
-        255
+        800,
+        2000
       ],
-      "default": [
-        255,
-        248,
-        220
-      ],
-      "description": "Label background color (cream)"
+      "default": 1200,
+      "description": "Duration the silhouette is held before the reveal"
     },
     {
-      "name": "textColor",
-      "type": "rgb_vary",
-      "range": [
-        0,
-        255
-      ],
-      "default": [
-        30,
-        30,
-        30
-      ],
-      "description": "Label text color (black)"
-    },
-    {
-      "name": "stringColor",
-      "type": "rgb_vary",
-      "range": [
-        0,
-        255
-      ],
-      "default": [
-        139,
-        90,
-        43
-      ],
-      "description": "Label border / string color (brown)"
-    },
-    {
-      "name": "scale",
+      "name": "pulseAmplitude",
       "type": "float",
       "range": [
-        1.0,
-        2.0
+        0.0,
+        0.12
       ],
-      "default": 1.0,
-      "description": "Size multiplier for the nametag label"
+      "default": 0.05,
+      "description": "Scale pulse of the silhouette around its anchor (0 = none)"
+    },
+    {
+      "name": "cycles",
+      "type": "int",
+      "range": [
+        1,
+        3
+      ],
+      "default": 1,
+      "description": "Number of silhouette/reveal cycles per playback"
+    },
+    {
+      "name": "silhouetteColor",
+      "type": "rgb",
+      "range": [
+        0,
+        255
+      ],
+      "default": [
+        15,
+        15,
+        25
+      ],
+      "description": "Flat fill color of the silhouette"
     }
   ],
-  "code_template": "nametag({target}, {bgColor}, {textColor}, {stringColor})",
-  "correction_intent": "Child used the WRONG TITLE, ROLE, or PROFESSION for a character (e.g. said 'teacher' when it's actually a 'conductor', said 'the boy' when the scene shows 'the fireman', called a 'doctor' a 'nurse'). The entity itself IS present in the scene — the child sees the right person but labels them with the wrong name/role/profession. This is NOT about confusing two different entities (use I1 for that). I2 is specifically about mislabeling a character's identity/role.",
-  "suggestion_intent": "Child could give a name to an entity to enrich their narrative"
+  "code_template": "silhouette({target}, {holdMs}, {pulseAmplitude}, {cycles}, {silhouetteColor})",
+  "correction_intent": "Child used a wrong name, role, or profession for the right entity ('the teacher' for the mother; 'the girl' for the boy with glasses). Target that entity. Not for confusing two different entities; that is I1.",
+  "suggestion_intent": "An entity the child mentioned remains unnamed or unspecified ('a boy', 'someone', 'the animal') and could be named or distinguished. Target that entity."
 }

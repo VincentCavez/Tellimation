@@ -29,13 +29,13 @@ logger = logging.getLogger(__name__)
 
 # Default durations per template (matching JS registration)
 _DEFAULT_DURATIONS: Dict[str, int] = {
-    "spotlight": 3000, "nametag": 2000, "color_pop": 3000,
+    "spotlight": 3000, "silhouette": 2500, "color_pop": 3000,
     "emanation_shame": 2500, "emanation_cold": 2500, "emanation_joy": 2500,
     "emanation_love": 2500, "emanation_anger": 2500, "emanation_fear": 2500,
-    "motion_lines": 2000, "flip": 2000, "reveal": 2500, "stamp": 3000,
+    "motion_lines": 2000, "flip": 2000, "peek": 2500, "stamp": 3000,
     "flashback": 3000, "timelapse": 4000, "magnetism": 2500, "repel": 2000,
     "causal_push": 2000, "sequential_glow": 3000, "disintegration": 2000,
-    "ghost_outline": 2500, "speech_bubble": 1500, "thought_bubble": 1500,
+    "missing_piece": 3000, "speech_bubble": 1500, "thought_bubble": 1500,
     "alert": 1200, "interjection": 2000,
 }
 
@@ -111,7 +111,7 @@ def _select_animation_for_discrepancy(
     - Property → color_pop (P1): emphasize visual attributes
     - Action → motion_lines (A1): draw attention to what entity is doing
     - Space (with entity targets) → stamp (S2): show where entity is
-    - Space (setting, no specific entity) → reveal (S1): reveal the whole scene
+    - Space (setting, no specific entity) → peek (S1): expose what is behind
     - Time → flashback (T1): temporal context
     - Relation → magnetism (R1): show connection between entities
     - Count → sequential_glow (C1): highlight entities for counting
@@ -124,16 +124,16 @@ def _select_animation_for_discrepancy(
 
     # Use the animation_id provided by the LLM
     _ID_TO_TEMPLATE = {
-        "I1": "I1_spotlight", "I2": "I2_nametag",
+        "I1": "I1_spotlight", "I2": "I2_silhouette",
         "P1": "P1_color_pop",
         "P2A": "P2a_emanation_shame", "P2B": "P2b_emanation_cold",
         "P2C": "P2c_emanation_joy", "P2D": "P2d_emanation_love",
         "P2E": "P2e_emanation_anger", "P2F": "P2f_emanation_fear",
         "A1": "A1_motion_line", "A2": "A2_flip",
-        "S1": "S1_reveal", "S2": "S2_stamp",
+        "S1": "S1_peek", "S2": "S2_stamp",
         "T1": "T1_flashback", "T2": "T2_timelapse",
         "R1": "R1_magnetism", "R2": "R2_repel", "R3": "R3_causal_push",
-        "C1": "C1_sequential_glow", "C2": "C2_disintegration", "C3": "C3_ghost_outline",
+        "C1": "C1_sequential_glow", "C2": "C2_disintegration", "C3": "C3_missing_piece",
         "D1": "D1_speech_bubble", "D2": "D2_thought_bubble", "D3": "D3_alert", "D4": "D4_interjection",
     }
 
