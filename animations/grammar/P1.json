@@ -3,7 +3,7 @@
   "name": "Color Pop",
   "category": "Property",
   "mode": "both",
-  "scaffolding_intent": "Desaturates everything except the target to emphasize its visual attributes, scaffolding color adjectives and descriptive noun phrases",
+  "scaffolding_intent": "Desaturates everything except the target so its colors and visible attributes stand out, prompting descriptive noun phrases",
   "misl_elements": [
     "ENP",
     "ADV"
@@ -32,6 +32,6 @@
     }
   ],
   "code_template": "color_pop({target}, {desaturationStrength}, {saturationBoost})",
-  "correction_intent": "Child described an incorrect property of an entity",
-  "suggestion_intent": "Child hasn't described the properties of an entity"
+  "correction_intent": "Child stated a wrong visible attribute of an entity: color, size, shape, or clothing ('the red car' for a blue car; 'the tall man' for a short one). Target that entity. Not for non-visible properties like temperature or emotion; that is P2.",
+  "suggestion_intent": "Child mentioned an entity with a bare noun ('a dog', 'the house') although it has distinctive visible attributes (color, size, pattern, clothing). Target that entity. Requires attributes that are clearly visible and worth describing."
 }

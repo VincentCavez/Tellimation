@@ -3,7 +3,7 @@
   "name": "Magnetism",
   "category": "Relation",
   "mode": "both",
-  "scaffolding_intent": "Two elements drift toward each other with sparkle particles, scaffolding coordinating conjunctions and co-mention",
+  "scaffolding_intent": "Two entities drift toward each other with sparkle particles, showing that they belong together or act together",
   "misl_elements": [
     "CC"
   ],
@@ -48,6 +48,6 @@
     }
   ],
   "code_template": "magnetism({target}, {entityPrefixB})",
-  "correction_intent": "Child described an incorrect relationship between two grouped entities",
-  "suggestion_intent": "Child hasn't described the relationship between two grouped entities"
+  "correction_intent": "Child described as separate, apart, or unrelated two entities the scene shows together (sharing, holding hands, working side by side, one carrying the other). Target the two entities. Not for a wrong cause between them; that is R3.",
+  "suggestion_intent": "The scene shows two entities clearly together (sharing an object, sitting side by side, one helping the other) and the child mentioned them separately or mentioned only one. Target the two entities so the child links them ('the girl and her mother')."
 }

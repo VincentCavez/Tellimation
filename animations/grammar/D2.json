@@ -2,8 +2,8 @@
   "id": "D2",
   "name": "Thought Bubble",
   "category": "Discourse",
-  "mode": "suggestion",
-  "scaffolding_intent": "Displays a pixelated thought bubble above the character, scaffolding internal response, plan, and mental verbs",
+  "mode": "both",
+  "scaffolding_intent": "Displays a pixelated thought bubble above a character, prompting the child to express what that character feels, wants, or plans",
   "misl_elements": [
     "IR",
     "P",
@@ -16,7 +16,7 @@
       "type": "string",
       "range": [],
       "default": "...",
-      "description": "Text to display inside the thought bubble"
+      "description": "'...' (default) or a single word quoted verbatim from the child's utterance. Never an invented thought."
     },
     {
       "name": "scale",
@@ -30,6 +30,6 @@
     }
   ],
   "code_template": "thought_bubble({target}, {bubbleText})",
-  "correction_intent": "Child attributed the WRONG thought or feeling to a character (e.g. 'he thinks he is sad' when the scene shows the character is happy). Do NOT use D2 when the child described a thought/plan instead of an action — that is an action error, use A1 or A2 instead.",
-  "suggestion_intent": "Child hasn't described what a character might be thinking"
+  "correction_intent": "Child attributed a feeling, intention, or thought that the scene contradicts ('he is sad' for a character shown laughing; 'she wants to leave' for a character settling in). Target that character. Do NOT use when the child described a thought or plan instead of a visible action; that is A1 or A2.",
+  "suggestion_intent": "A character shows a visible emotional or intentional state (facial expression, posture, gesture, reaction to an event) and the child has not said how that character feels, what they want, or what they plan to do. Target that character. Requires visible evidence in the scene."
 }

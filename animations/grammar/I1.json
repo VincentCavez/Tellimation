@@ -3,7 +3,7 @@
   "name": "Spotlight",
   "category": "Identity",
   "mode": "both",
-  "scaffolding_intent": "Isolates a character or object by darkening the scene and adding a luminous halo, prompting the child to identify and name it",
+  "scaffolding_intent": "Isolates a character, object, or the setting by darkening the rest of the scene and adding a luminous halo, prompting the child to identify it",
   "misl_elements": [
     "CH","S"
   ],
@@ -55,6 +55,6 @@
     }
   ],
   "code_template": "spotlight({target}, {dimStrength}, {glowStrength}, {haloColor}, {maxHaloSize})",
-  "correction_intent": "Child CONFUSED TWO DIFFERENT ENTITIES or referred to a completely wrong entity (e.g. said 'rabbit' when it's actually a 'dog', said 'bedroom' when it's a 'kitchen', described a cat when there is no cat in the scene). I1 is for when the child points to the WRONG entity entirely — NOT for when they use the wrong name/role/profession for the correct entity (use I2 Nametag for that). The target should be the CORRECT entity in the scene that was misidentified, or 'scene'.",
-  "suggestion_intent": "Child hasn't mentioned an entity or a setting present in the scene"
+  "correction_intent": "Child confused two entities or named a wrong one ('rabbit' for a dog, 'bedroom' for a kitchen). Target the correct entity, or 'scene' for a wrong setting. Not for a wrong name, role, or profession on the right entity; that is I2.",
+  "suggestion_intent": "A prominent character or object in the scene, or the setting itself, has not been mentioned by the child. Target the most story-relevant unmentioned entity, or 'scene' if the place has not been named. Not for entities already mentioned but unnamed; that is I2."
 }

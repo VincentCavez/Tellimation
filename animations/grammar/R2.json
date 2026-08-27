@@ -3,7 +3,7 @@
   "name": "Repel",
   "category": "Relation",
   "mode": "both",
-  "scaffolding_intent": "Two elements push apart like same-polarity magnets, scaffolding incorrect grouping or contrastive conjunctions",
+  "scaffolding_intent": "Two entities push apart like same-polarity magnets, showing that they are separate, opposed, or do not belong together",
   "misl_elements": [
     "CC"
   ],
@@ -38,6 +38,6 @@
     }
   ],
   "code_template": "repel({target}, {entityPrefixB}, {repelPixels})",
-  "correction_intent": "Child incorrectly grouped entities together",
-  "suggestion_intent": "Child hasn't distinguished between entities that are different"
+  "correction_intent": "Child treated as together two entities the scene shows apart or in conflict ('the two friends' for children fighting; 'the cat and the dog are playing' when one flees the other; grouping an entity with another it is clearly separated from). Target the two entities. Not for a wrong spatial position of one entity; that is S2.",
+  "suggestion_intent": "The scene shows two entities in opposition or contrast (one wants what the other refuses, one is happy and the other sad, one stays while the other leaves) and the child has not expressed the contrast. Target the two entities. Requires a visible opposition, not mere distance."
 }

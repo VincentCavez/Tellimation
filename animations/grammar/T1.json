@@ -4,9 +4,7 @@
   "category": "Time",
   "mode": "both",
   "scaffolding_intent": "Applies an old-film desaturation effect to signal past tense, scaffolding temporal language",
-  "misl_elements": [
-    "T"
-  ],
+  "misl_elements": ["S", "T"],
   "target_type": ["scene"],
   "parameters": [
     {

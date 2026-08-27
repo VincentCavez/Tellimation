@@ -3,7 +3,7 @@
   "name": "Emanation (Cold)",
   "category": "Property",
   "mode": "both",
-  "scaffolding_intent": "Emits cold/frost particles around the entity",
+  "scaffolding_intent": "Emits frost particles around an entity and shifts its tint toward blue, showing that it is cold or frozen",
   "misl_elements": [
     "ENP",
     "ADV",
@@ -48,6 +48,6 @@
     }
   ],
   "code_template": "emanation({target}, frost, {particleCount})",
-  "correction_intent": "Child described the wrong TEMPERATURE or SENSATION. For OBJECTS (birdbath, pond, ice cream, frozen food): the child said it is warm but it is actually COLD or FROZEN — ice, frost, or cold vapor is visible. For CHARACTERS: the child described the wrong sensation — the character actually feels cold or is shivering.",
-  "suggestion_intent": "Child hasn't expressed that a character feels cold or uncomfortable from temperature"
+  "correction_intent": "Child described as warm or hot something the scene shows cold or frozen: an object with visible ice, frost, or snow (pond, ice cream, window), or a character shivering, bundled up, or breathing vapor. Target that object or character. Not for heat; that is P2a.",
+  "suggestion_intent": "An object is visibly frozen or icy, or a character is visibly cold (shivering, bundled up, breathing vapor), and the child mentioned it without saying so. Target that object or character. Requires a visible cue of cold."
 }

@@ -2,8 +2,8 @@
   "id": "C3",
   "name": "Ghost Outline",
   "category": "Count",
-  "mode": "correction",
-  "scaffolding_intent": "Displays an amorphous shape with a question mark that dissolves, scaffolding absence \u2014 something is missing from the narration",
+  "mode": "both",
+  "scaffolding_intent": "The silhouette of an entity that exists in another scene of the story appears as a translucent ghost hovering over a dark puddle in the current scene, then dissolves, signaling that this entity is not here",
   "misl_elements": ["CH"],
   "target_type": ["entity"],
   "parameters": [
@@ -32,7 +32,7 @@
       "description": "Opacity of the ghost outline entity"
     }
   ],
-  "code_template": "ghost_outline({target}, {puddleColor})",
-  "correction_intent": "Child referenced an entity that is NOT in the current scene AND is from a different scene (e.g. mentioning a character from scene 1 while narrating scene 3). Do NOT use this when the child simply misnames a present entity \u2014 that is I1_spotlight. C3 is ONLY for entities truly absent from the scene.",
-  "suggestion_intent": "Child could reference an entity that appeared in a previous or upcoming scene but is absent from the current scene, to create narrative continuity."
+  "code_template": "ghost_outline({target}, {puddleColor}, {ghostOpacity})",
+  "correction_intent": "Child referenced an entity that is NOT in the current scene but exists in another scene of the same story (e.g. mentioning the dog from scene 1 while narrating scene 3, where the dog is absent). The target is the ID of that entity as it appears in the other scene. Do NOT use when the child misnames an entity that IS present (that is I1_spotlight), when the child states a wrong number for a present group (that is C1_sequential_glow), or when the mentioned entity exists in no scene of the story.",
+  "suggestion_intent": "An entity that appeared in a previous scene, or that will appear in an upcoming scene, is absent from the current scene, and the child has not accounted for it (where it went, why it is not here, whether it will come back). The target is the ID of that entity in the other scene. Use only when the absence is narratively meaningful for continuity, not for background objects."
 }

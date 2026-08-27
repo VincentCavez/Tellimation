@@ -3,7 +3,7 @@
   "name": "Emanation (Shame)",
   "category": "Property",
   "mode": "both",
-  "scaffolding_intent": "Emits shame/embarrassment particles around the entity",
+  "scaffolding_intent": "Emits steam particles around an entity and shifts its tint toward red: on an object, that it is hot; on a character, that they are embarrassed or ashamed",
   "misl_elements": [
     "ENP",
     "ADV",
@@ -48,6 +48,6 @@
     }
   ],
   "code_template": "emanation({target}, steam, {particleCount})",
-  "correction_intent": "Child described the wrong TEMPERATURE or EMOTION. For OBJECTS (pot, coffee, iron, stove): the child said it is cold/cool but it is actually HOT — steam or heat is rising from it. For CHARACTERS: the child described the wrong emotion — the character actually feels ashamed, embarrassed, or guilty.",
-  "suggestion_intent": "Child hasn't expressed that a character feels ashamed, embarrassed, or guilty"
+  "correction_intent": "Child described as cold or cool an object the scene shows hot (steam or heat rising from a pot, cup, iron, stove), or attributed a wrong emotion to a character the scene shows embarrassed or ashamed (blushing, hiding the face, looking down after a blunder). Target that object or character. Not for cold; that is P2b.",
+  "suggestion_intent": "An object is visibly hot (steam, heat haze) or a character is visibly embarrassed or ashamed (blushing, hiding the face, looking down after a blunder), and the child mentioned it without saying so. Target that object or character. Requires a visible cue."
 }

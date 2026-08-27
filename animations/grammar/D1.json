@@ -2,8 +2,8 @@
   "id": "D1",
   "name": "Speech Bubble",
   "category": "Discourse",
-  "mode": "suggestion",
-  "scaffolding_intent": "Displays a pixelated speech bubble above the character, scaffolding dialogue and direct speech using linguistic verbs",
+  "mode": "both",
+  "scaffolding_intent": "Displays a pixelated speech bubble above a character who is speaking in the scene, prompting the child to report speech with a linguistic verb",
   "misl_elements": [
     "L"
   ],
@@ -14,7 +14,7 @@
       "type": "string",
       "range": [],
       "default": "...",
-      "description": "Text to display inside the speech bubble"
+      "description": "'...' (default) or a single word quoted verbatim from the child's utterance. Never invented dialogue."
     },
     {
       "name": "scale",
@@ -28,6 +28,6 @@
     }
   ],
   "code_template": "speech_bubble({target}, {bubbleText})",
-  "correction_intent": "Child attributed incorrect dialogue to a character",
-  "suggestion_intent": "Child hasn't included dialogue for the characters"
+  "correction_intent": "Child attributed speech to the wrong character, or denied speech to a character the scene shows speaking (open mouth, shouting, on the phone). Target the character actually speaking.",
+  "suggestion_intent": "A character is visibly speaking in the scene and the child has not reported it with a linguistic verb (said, asked, told, shouted). Target that character. Requires visible evidence of speech."
 }

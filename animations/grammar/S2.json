@@ -3,7 +3,7 @@
   "name": "Stamp",
   "category": "Space",
   "mode": "both",
-  "scaffolding_intent": "Entity lifts to reveal a silhouette then snaps back with cracks radiating on impact, reinforcing actual spatial location",
+  "scaffolding_intent": "Entity lifts to reveal its silhouette then snaps back with cracks radiating on impact, marking exactly where it stands",
   "misl_elements": [
     "CH","S"
   ],
@@ -31,6 +31,6 @@
     }
   ],
   "code_template": "stamp({target}, {liftPixels}, {crackCount})",
-  "correction_intent": "Child described an incorrect location for the entity",
-  "suggestion_intent": "Child hasn't mentioned the location of an entity"
+  "correction_intent": "Child placed an entity somewhere it is not ('on the bridge' when it stands by the river; 'floating' when it is on the ground; 'inside' when it is outside). Target that entity. Not for something hidden behind another entity; that is S1.",
+  "suggestion_intent": "Child mentioned an entity without saying where it is, although its position is distinctive (on a bridge, under a tree, in a doorway, at the edge of a cliff). Target that entity. Requires a location that adds to the story."
 }

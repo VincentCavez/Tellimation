@@ -3,7 +3,7 @@
   "name": "Alert",
   "category": "Discourse",
   "mode": "both",
-  "scaffolding_intent": "Displays exclamation mark sprites above the entity, signaling an important event or reaction that should be narrated",
+  "scaffolding_intent": "Displays exclamation mark sprites above an entity involved in the key event of the scene, signaling that something important is happening there",
   "misl_elements": [
     "IE",
     "IR"
@@ -46,6 +46,6 @@
     }
   ],
   "code_template": "alert({target}, {markCount}, {color})",
-  "correction_intent": "Child described an incorrect event",
-  "suggestion_intent": "Child hasn't mentioned an important event or reaction in the scene"
+  "correction_intent": "Child described the key event of the scene wrongly, or stated that nothing is happening when the scene shows a problem or surprise (a theft, a fall, a threat, a discovery). Target the entity at the center of the actual event. Do NOT use for a wrong action of a single entity; that is A1 or A2.",
+  "suggestion_intent": "The scene contains a problem, surprise, or turning point (the initiating event) that the child has not mentioned, or a character visibly reacting to it whose reaction the child has not described. Target the entity involved in the event. Requires a clearly depicted event, not routine activity."
 }

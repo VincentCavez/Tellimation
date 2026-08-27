@@ -3,7 +3,7 @@
   "name": "Causal Push",
   "category": "Relation",
   "mode": "both",
-  "scaffolding_intent": "Element A rushes toward element B with an impact burst at collision, scaffolding causality and consequence",
+  "scaffolding_intent": "Entity A rushes into entity B with an impact burst, showing that A causes something to happen to B",
   "misl_elements": [
     "CC",
     "SC",
@@ -41,6 +41,6 @@
     }
   ],
   "code_template": "causal_push({target}, {entityPrefixB}, {knockPixels})",
-  "correction_intent": "Child described an incorrect causal link between entities",
-  "suggestion_intent": "Child hasn't described the causal link between entities"
+  "correction_intent": "Child got the cause wrong or reversed it (the dog scared the cat, not the cat the dog; the wind, not the boy, knocked over the vase). Target the actual cause as A and the affected entity as B. Not for a wrong action of one entity alone; that is A1 or A2.",
+  "suggestion_intent": "The scene shows one entity clearly causing something to happen to another (a push, a chase, a spill, a fright) and the child narrated the two as separate facts without linking them ('the dog runs. The cat is scared.'). Target the cause as A and the affected entity as B."
 }
