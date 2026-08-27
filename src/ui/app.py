@@ -401,16 +401,23 @@ async def study_instructions():
     })
 
 
+# Wave 2 gate: IDs 1-8 were consumed by study 1 (spring 2026); reusing one
+# would mix waves in the Google Sheet. Raise/remove for later waves.
+_STUDY_MIN_PARTICIPANT = 9
+
+
 @app.post("/api/study/validate")
 async def study_validate(request: Request):
-    """Validate a study participant number (1-8)."""
+    """Validate a study participant number against the assignment table."""
     body = await request.json()
     num = body.get("number")
     try:
         num = int(num)
     except (TypeError, ValueError):
         return JSONResponse(status_code=400, content={"valid": False})
-    if 1 <= num <= 8:
+    _load_study_config()
+    known = str(num) in (_STUDY_ASSIGNMENTS or {})
+    if known and num >= _STUDY_MIN_PARTICIPANT:
         return JSONResponse(content={"valid": True})
     return JSONResponse(status_code=400, content={"valid": False})
 
