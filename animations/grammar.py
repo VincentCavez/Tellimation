@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -110,6 +111,48 @@ def _validate_definition(data: Dict[str, Any], filepath: Path) -> None:
                 f"{filepath.name}: parameter '{param['name']}' has invalid type "
                 f"'{param['type']}', must be one of {VALID_PARAM_TYPES}"
             )
+        if param["type"] in ("rgb", "rgb_vary"):
+            default = param.get("default")
+            if not isinstance(default, list) or len(default) != 3 \
+                    or not all(isinstance(c, int) for c in default):
+                raise ValueError(
+                    f"{filepath.name}: parameter '{param['name']}' ({param['type']}) "
+                    f"default must be a list of 3 ints, got {default!r}"
+                )
+            # rgb_vary is escalated with random +/-30 then clamped to 0-255, so its
+            # default must be a real color. Plain rgb may be a signed delta (the
+            # emanation tints), so no bounds there.
+            if param["type"] == "rgb_vary" and not all(0 <= c <= 255 for c in default):
+                raise ValueError(
+                    f"{filepath.name}: parameter '{param['name']}' (rgb_vary) "
+                    f"default must be in [0, 255], got {default!r}"
+                )
+        if param["type"] == "enum":
+            values = param.get("range") or []
+            if not values:
+                raise ValueError(
+                    f"{filepath.name}: enum parameter '{param['name']}' has an empty range"
+                )
+            if param.get("default") not in values:
+                raise ValueError(
+                    f"{filepath.name}: enum parameter '{param['name']}' default "
+                    f"{param.get('default')!r} not in range {values}"
+                )
+
+    # Cross-check code_template vs parameters. Params flow to the client by NAME
+    # (a dict), never positionally, and no Python code consumes code_template --
+    # so a declared param absent from the template is legal (15 of 25 files do
+    # it) and only worth a warning. A template referencing an UNDECLARED param
+    # is a real defect: nothing would ever fill it.
+    placeholders = set(re.findall(r"\{(\w+)\}", data["code_template"])) - {"target"}
+    declared = {p["name"] for p in data["parameters"]}
+    if placeholders - declared:
+        raise ValueError(
+            f"{filepath.name}: code_template references undeclared parameters "
+            f"{sorted(placeholders - declared)}"
+        )
+    if declared - placeholders:
+        _TEMPLATE_DRIFT[filepath.stem] = sorted(declared - placeholders)
 
 
 # ---------------------------------------------------------------------------
@@ -118,6 +161,10 @@ def _validate_definition(data: Dict[str, Any], filepath: Path) -> None:
 
 _grammar: Dict[str, AnimationDef] = {}
 _loaded = False
+
+# Params declared but absent from their code_template (legal — see the
+# cross-check comment). Collected during load, reported as ONE line.
+_TEMPLATE_DRIFT: Dict[str, List[str]] = {}
 
 
 def _load_grammar() -> None:
@@ -130,6 +177,7 @@ def _load_grammar() -> None:
         return
 
     _grammar = {}
+    _TEMPLATE_DRIFT.clear()
     for filepath in sorted(GRAMMAR_DIR.glob("*.json")):
         try:
             with open(filepath, "r", encoding="utf-8") as f:
@@ -156,6 +204,12 @@ def _load_grammar() -> None:
             raise
 
     logger.info("[grammar] Loaded %d animation definitions", len(_grammar))
+    if _TEMPLATE_DRIFT:
+        logger.info(
+            "[grammar] %d definitions declare parameters their code_template "
+            "does not reference (legal; params flow by name): %s",
+            len(_TEMPLATE_DRIFT), ", ".join(sorted(_TEMPLATE_DRIFT)),
+        )
     _loaded = True
 
 

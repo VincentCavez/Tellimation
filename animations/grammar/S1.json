@@ -1,26 +1,66 @@
 {
   "id": "S1",
-  "name": "Reveal",
+  "name": "Peek",
   "category": "Space",
   "mode": "both",
-  "scaffolding_intent": "Makes an occluding layer semi-transparent to show hidden elements, drawing attention to missed or incorrect descriptions",
+  "scaffolding_intent": "The occluding entity lifts like a flap from one edge, exposing what is behind it while that element glows, then closes back",
   "misl_elements": [
-    "CH","S"
+    "S"
   ],
-  "target_type": ["entity","duo", "group"],
+  "target_type": [
+    "entity"
+  ],
   "parameters": [
     {
-      "name": "revealAlpha",
+      "name": "entityPrefixB",
+      "type": "string",
+      "range": [],
+      "default": "",
+      "description": "Optional entity ID of the hidden element behind the target. Empty if the hidden element is not an extracted entity; the flap still exposes the behind-pixels."
+    },
+    {
+      "name": "hingeSide",
+      "type": "enum",
+      "range": [
+        "auto",
+        "left",
+        "right"
+      ],
+      "default": "auto",
+      "description": "Edge the flap rotates around. 'auto' picks the side farthest from the hidden element, or the side with less free space toward the frame edge when no hidden element is given."
+    },
+    {
+      "name": "openness",
       "type": "float",
       "range": [
-        0.6,
-        1
+        0.7,
+        0.9
       ],
-      "default": 0.6,
-      "description": "Transparency level of occluding layer"
+      "default": 0.8,
+      "description": "How far the flap opens: the occluder's horizontal scale shrinks to 1 - openness. Higher = more open = more visible."
+    },
+    {
+      "name": "holdMs",
+      "type": "int",
+      "range": [
+        800,
+        2000
+      ],
+      "default": 1200,
+      "description": "Duration the flap stays open"
+    },
+    {
+      "name": "glowStrength",
+      "type": "float",
+      "range": [
+        0.3,
+        1.0
+      ],
+      "default": 0.5,
+      "description": "Halo intensity on the hidden element while exposed (only when entityPrefixB is set)"
     }
   ],
-  "code_template": "reveal({target}, {revealAlpha})",
-  "correction_intent": "Child described an incorrect hidden element",
-  "suggestion_intent": "Child hasn't described a hidden element"
+  "code_template": "peek({target}, {entityPrefixB}, {hingeSide}, {openness}, {holdMs}, {glowStrength})",
+  "correction_intent": "Child described wrongly, or denied, something partly hidden behind an entity ('it is sunny outside' when the window behind the grandmother shows snow; 'nothing is behind the curtain'). Target the occluding entity; entityPrefixB is the hidden element if it is an extracted entity.",
+  "suggestion_intent": "A story-relevant element is partly hidden behind an entity and the child has not mentioned it. Target the occluding entity; entityPrefixB is the hidden element if it is an extracted entity. Requires that the element is actually occluded, not merely in the background."
 }

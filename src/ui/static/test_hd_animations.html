@@ -166,12 +166,12 @@
 <div class="family-label">I — Identity</div>
 <div class="controls">
   <button onclick="playT('spotlight')">spotlight</button>
-  <button onclick="playT('nametag')">nametag</button>
+  <button onclick="playT('silhouette')">silhouette</button>
 </div>
 
 <div class="family-label">S — Space</div>
 <div class="controls">
-  <button onclick="playT('reveal')">reveal</button>
+  <button onclick="playT('peek')">peek</button>
   <button onclick="playT('stamp')">stamp</button>
 </div>
 
@@ -209,7 +209,7 @@
 <div class="controls">
   <button onclick="playT('sequential_glow')">sequential_glow</button>
   <button onclick="playT('disintegration')">disintegration</button>
-  <button onclick="playT('ghost_outline')">ghost_outline</button>
+  <button onclick="playT('missing_piece')">missing_piece</button>
 </div>
 
 <div class="family-label">D — Discourse</div>
@@ -660,23 +660,23 @@ function reloadScene() {
 // ═══════════════════════════════════════════════════════════════════
 
 var TEMPLATE_ORDER = [
-  'spotlight', 'nametag',
-  'reveal', 'stamp',
+  'spotlight', 'silhouette',
+  'peek', 'stamp',
   'color_pop',
   'emanation_shame', 'emanation_cold', 'emanation_joy', 'emanation_love', 'emanation_anger', 'emanation_fear',
   'flashback', 'timelapse',
   'motion_lines', 'flip',
   'magnetism', 'repel', 'causal_push',
-  'sequential_glow', 'disintegration', 'ghost_outline',
+  'sequential_glow', 'disintegration', 'missing_piece',
   'speech_bubble', 'thought_bubble', 'alert', 'interjection'
 ];
 
 var TEMPLATE_CONFIG = {
   spotlight:     { duration: 3000 },
-  nametag:       { duration: 3000 },
+  silhouette:    { duration: 3000 },
   stamp:         { duration: 3000 },
   color_pop:     { duration: 3000 },
-  reveal:        { duration: 3000 },
+  peek:          { duration: 3000 },
   emanation_shame:  { duration: 3000 },
   emanation_cold:   { duration: 3000 },
   emanation_joy:    { duration: 3000 },
@@ -684,7 +684,7 @@ var TEMPLATE_CONFIG = {
   emanation_anger:  { duration: 3000 },
   emanation_fear:   { duration: 3000 },
   flashback:     { duration: 3000 },
-  ghost_outline: { duration: 3000, useGhost: true },
+  missing_piece: { duration: 3000, useGhost: true },
   disintegration:{ duration: 3000 },
   alert:         { duration: 3000 },
   motion_lines:  { duration: 3000, useDirection: true },
@@ -738,7 +738,7 @@ function buildSpec(templateName) {
   if (cfg.useWord) params.word = word;
   if (cfg.useGhost) {
     var ghostUrl = document.getElementById('cfgGhost').value;
-    if (ghostUrl) params.ghostImageUrl = ghostUrl;
+    if (ghostUrl) params.pieceImageUrl = ghostUrl;
   }
 
   return { template: templateName, params: params, duration_ms: cfg.duration };

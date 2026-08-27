@@ -288,10 +288,12 @@
         <span class="family-label">I: Identity</span>
         <span class="anim-pair"><button class="anim-btn" onclick="playTemplate('spotlight')">spotlight</button><button class="dl-btn" onclick="downloadAnimation('spotlight')" title="Download video">&#x2193;</button></span>
         <span class="anim-pair"><button class="anim-btn" onclick="playTemplate('nametag')">nametag</button><button class="dl-btn" onclick="downloadAnimation('nametag')" title="Download video">&#x2193;</button></span>
+        <span class="anim-pair"><button class="anim-btn" onclick="playTemplate('silhouette')">silhouette</button><button class="dl-btn" onclick="downloadAnimation('silhouette')" title="Download video">&#x2193;</button></span>
       </div>
       <div class="family">
         <span class="family-label">S: Space</span>
         <span class="anim-pair"><button class="anim-btn" onclick="playTemplate('reveal')">reveal</button><button class="dl-btn" onclick="downloadAnimation('reveal')" title="Download video">&#x2193;</button></span>
+        <span class="anim-pair"><button class="anim-btn" onclick="playTemplate('peek')">peek</button><button class="dl-btn" onclick="downloadAnimation('peek')" title="Download video">&#x2193;</button></span>
         <span class="anim-pair"><button class="anim-btn" onclick="playTemplate('stamp')">stamp</button><button class="dl-btn" onclick="downloadAnimation('stamp')" title="Download video">&#x2193;</button></span>
       </div>
       <div class="family">
@@ -325,6 +327,7 @@
         <span class="anim-pair"><button class="anim-btn" onclick="playTemplate('sequential_glow')">sequential_glow</button><button class="dl-btn" onclick="downloadAnimation('sequential_glow')" title="Download video">&#x2193;</button></span>
         <span class="anim-pair"><button class="anim-btn" onclick="playTemplate('disintegration')">disintegration</button><button class="dl-btn" onclick="downloadAnimation('disintegration')" title="Download video">&#x2193;</button></span>
         <span class="anim-pair"><button class="anim-btn" onclick="playTemplate('ghost_outline')">ghost_outline</button><button class="dl-btn" onclick="downloadAnimation('ghost_outline')" title="Download video">&#x2193;</button></span>
+        <span class="anim-pair"><button class="anim-btn" onclick="playTemplate('missing_piece')">missing_piece</button><button class="dl-btn" onclick="downloadAnimation('missing_piece')" title="Download video">&#x2193;</button></span>
       </div>
       <div class="family">
         <span class="family-label">D: Discourse</span>
@@ -366,6 +369,8 @@
   <script src="engine.js"></script>
   <script src="animation_helpers.js"></script>
   <script src="animation_templates.js"></script>
+  <!-- Study-1 visuals (nametag / reveal / ghost_outline), kept for stimulus regeneration -->
+  <script src="animation_templates_legacy.js"></script>
   <script src="animations.js"></script>
 
   <script>
@@ -641,10 +646,10 @@
     // Animation triggering
     // =====================================================================
     var SINGLE_ENTITY = [
-      'spotlight', 'nametag', 'stamp', 'color_pop', 'reveal',
+      'spotlight', 'nametag', 'silhouette', 'stamp', 'color_pop', 'reveal', 'peek',
       'emanation_shame', 'emanation_cold', 'emanation_joy', 'emanation_love', 'emanation_anger', 'emanation_fear',
       'motion_lines', 'flip',
-      'disintegration', 'ghost_outline', 'speech_bubble', 'thought_bubble', 'alert', 'interjection'
+      'disintegration', 'ghost_outline', 'missing_piece', 'speech_bubble', 'thought_bubble', 'alert', 'interjection'
     ];
     var TWO_ENTITY = ['magnetism', 'repel', 'causal_push'];
     var SCENE_WIDE = ['timelapse', 'flashback'];
@@ -705,13 +710,13 @@
     // Play All (sequential)
     // =====================================================================
     var ALL_TEMPLATES = [
-      'spotlight', 'nametag', 'reveal', 'stamp',
+      'spotlight', 'nametag', 'silhouette', 'reveal', 'peek', 'stamp',
       'color_pop', 'emanation_shame', 'emanation_cold', 'emanation_joy',
       'emanation_love', 'emanation_anger', 'emanation_fear',
       'flashback', 'timelapse',
       'motion_lines', 'flip',
       'magnetism', 'repel', 'causal_push',
-      'sequential_glow', 'disintegration', 'ghost_outline',
+      'sequential_glow', 'disintegration', 'ghost_outline', 'missing_piece',
       'speech_bubble', 'thought_bubble', 'alert', 'interjection'
     ];
 

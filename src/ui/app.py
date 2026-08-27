@@ -165,6 +165,34 @@ def _apply_scene_to_session(
     )
 
 
+def _resolve_piece_image_url(story_key: str, entity_id: str) -> str:
+    """URL of the absent entity's cut-out PNG for the missing_piece (C3) animation.
+
+    The entity is absent from the CURRENT scene by definition of C3, so its
+    cut-out is searched across the story's other scenes, by the same filename
+    convention the scene endpoint uses (withoutbg-scene_<n>_<id>.png). Returns
+    "" when nothing matches — the client then draws the piece without a
+    silhouette (deliberate: no fallback symbol).
+    """
+    data_dir = _find_data_dir()
+    if not data_dir or not story_key or not entity_id:
+        return ""
+    _load_study_config()
+    stories_config = _STUDY_STORIES or {}
+    story_meta = stories_config.get(story_key) or stories_config.get(story_key.upper()) or {}
+    image_dir_rel = story_meta.get("image_dir", "")
+    if not image_dir_rel:
+        return ""
+    asset_dir = data_dir.parent / image_dir_rel / "assets"
+    if not asset_dir.is_dir():
+        return ""
+    matches = sorted(asset_dir.glob(f"withoutbg-scene_*_{entity_id}.png"))
+    if not matches:
+        return ""
+    dir_key = Path(image_dir_rel).name
+    return f"/study-assets/{dir_key}/assets/{matches[0].name}"
+
+
 def _find_data_dir() -> Path | None:
     p = BASE_DIR.resolve()
     for _ in range(8):
@@ -1521,14 +1549,14 @@ async def _handle_study_audio(
             if macro_sel is None and micro_cands is None:
                 return []
 
-            # ── CH shortcut: if macro=CH and unnamed characters exist, force nametag ──
-            # Filter out inanimate objects — only living beings get nametags
+            # ── CH shortcut: if macro=CH and unnamed characters exist, force silhouette ──
+            # Filter out inanimate objects — only living beings get the naming prompt
             _INANIMATE = {"balloon", "box", "train", "cart", "basket", "boat", "gate", "fence", "bridge", "kite", "ball", "cake", "cookie", "jar", "lamp", "lantern", "tent", "wagon", "wheel", "sled"}
             if macro_sel == "CH" and entities_in_scene:
                 unnamed = [e for e in entities_in_scene if e not in session.character_names and e not in _INANIMATE]
                 if unnamed:
                     target = unnamed[0]
-                    logger.info("[study] CH shortcut: forcing I2 nametag on unnamed entity '%s'", target)
+                    logger.info("[study] CH shortcut: forcing I2 silhouette on unnamed entity '%s'", target)
                     return [Discrepancy(
                         pass_type="suggestion",
                         type="Identity",
@@ -1571,7 +1599,7 @@ async def _handle_study_audio(
                 session.character_names[na["entity_id"]] = na["name"]
             await ws.send_json({"type": "study_log", "tag": "NAMES", "text": str(name_assignments)})
 
-        # Drop nametag suggestion if the entity was just named
+        # Drop the naming suggestion if the entity was just named
         if name_assignments and suggestions:
             named_ids = {na["entity_id"] for na in name_assignments}
             suggestions = [s for s in suggestions if not (s.animation_id == "I2" and any(t in named_ids for t in s.target_entities))]
@@ -1709,6 +1737,14 @@ async def _handle_study_audio(
             # D4 interjection: inject the correct word from Gemini
             if template == "interjection" and chosen_disc.correction_word:
                 anim_params["word"] = chosen_disc.correction_word
+
+            # C3 missing_piece: the target entity is absent from this scene —
+            # resolve its cut-out from another scene of the story so the piece
+            # can carry its silhouette
+            if template == "missing_piece" and targets:
+                anim_params["pieceImageUrl"] = _resolve_piece_image_url(
+                    getattr(session, "study_story_key", ""), targets[0]
+                )
 
             # Send ONE animation — adapt params to template target expectations
             combined_prefix = "|".join(targets) if targets else ""
@@ -1870,13 +1906,13 @@ async def _handle_audio(
             if macro_sel is None and micro_cands is None:
                 return []
 
-            # ── CH shortcut: if macro=CH and unnamed characters exist, force nametag ──
+            # ── CH shortcut: if macro=CH and unnamed characters exist, force silhouette ──
             _INANIMATE = {"balloon", "box", "train", "cart", "basket", "boat", "gate", "fence", "bridge", "kite", "ball", "cake", "cookie", "jar", "lamp", "lantern", "tent", "wagon", "wheel", "sled"}
             if macro_sel == "CH" and entities_in_scene:
                 unnamed = [e for e in entities_in_scene if e not in session.character_names and e not in _INANIMATE]
                 if unnamed:
                     target = unnamed[0]
-                    logger.info("[audio] CH shortcut: forcing I2 nametag on unnamed entity '%s'", target)
+                    logger.info("[audio] CH shortcut: forcing I2 silhouette on unnamed entity '%s'", target)
                     return [Discrepancy(
                         pass_type="suggestion",
                         type="Identity",
@@ -1923,7 +1959,7 @@ async def _handle_audio(
                 session.character_names[na["entity_id"]] = na["name"]
                 logger.info("[assessment] Registered name: %s → %s", na["entity_id"], na["name"])
 
-        # Drop nametag suggestion if the entity was just named
+        # Drop the naming suggestion if the entity was just named
         if name_assignments and suggestions:
             named_ids = {na["entity_id"] for na in name_assignments}
             suggestions = [s for s in suggestions if not (s.animation_id == "I2" and any(t in named_ids for t in s.target_entities))]

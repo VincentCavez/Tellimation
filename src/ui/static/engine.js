@@ -629,7 +629,7 @@ function renderSpriteEntry(eid, entry, pixelBuffer) {
 // ---------------------------------------------------------------------------
 
 /**
- * Global store for temporary sprites (speech bubbles, nametags, etc.).
+ * Global store for temporary sprites (speech bubbles, overlays, etc.).
  * Keys are sprite IDs, values are raw_sprite_data objects
  * ({x, y, w, h, pixels, mask} — same format as raw_sprite entries in sprite_code).
  * Rendered on top of normal sprites. Managed via add/remove_temp_sprite WS msgs.

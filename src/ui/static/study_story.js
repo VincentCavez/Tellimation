@@ -680,7 +680,7 @@
   // Fallback: use scene_entity_order[0], [1], [2] etc.
   function _ent(idx) { return scene_entity_order[idx] || scene_entity_order[0] || ''; }
 
-  // Get entity asset URL for ghost_outline
+  // Get entity asset URL for missing_piece (the floating piece's silhouette)
   function _entityAssetUrl(idx) {
     var eid = _ent(idx);
     var imgs = window._hdSceneImages;
@@ -696,12 +696,12 @@
     { text: "Welcome to the practice! Let me show you the animations I can do. When you see one, it means I want you to say or repeat something about the picture! No need to remember them, I just want you to see them at least once!", audio: "/oral-instructions/tutorial_01.wav", animation: null },
     { text: "If I want you to talk about a character, I will shine a spotlight on them, like this!", audio: "/oral-instructions/tutorial_02.wav", animFn: function() { return { template: 'spotlight', params: { entityPrefix: _ent(0) } }; } },
     { text: "If I am not sure who or what you are talking about, things will glow one by one!", audio: "/oral-instructions/tutorial_03.wav", animFn: function() { return { template: 'sequential_glow', params: { entityPrefixes: scene_entity_order.slice() } }; } },
-    { text: "I can also show a name tag floating above them if they need a name, or want to be called by it!", audio: "/oral-instructions/tutorial_04.wav", animFn: function() { return { template: 'nametag', params: { entityPrefix: _ent(1), labelText: '?' } }; } },
+    { text: "If I turn someone into a dark shadow, it means I want you to tell me who they are, or give them a name!", audio: "/oral-instructions/tutorial_04.wav", animFn: function() { return { template: 'silhouette', params: { entityPrefix: _ent(1) } }; } },
     { text: "When I want you to describe how someone is moving, I show lines of movement!", audio: "/oral-instructions/tutorial_05.wav", animFn: function() { return { template: 'motion_lines', params: { entityPrefix: _ent(2), direction: 'right' } }; } },
     { text: "I can also flip them around to show they are in action!", audio: "/oral-instructions/tutorial_06.wav", animFn: function() { return { template: 'flip', params: { entityPrefix: _ent(0) } }; } },
     { text: "If I want you to describe what something looks like, I will make its colors pop!", audio: "/oral-instructions/tutorial_07.wav", animFn: function() { return { template: 'color_pop', params: { entityPrefix: _ent(1) } }; } },
     { text: "When I want you to tell me how someone is feeling, I show little particles around them!", audio: "/oral-instructions/tutorial_08.wav", animFn: function() { return { template: 'emanation_love', params: { entityPrefix: _ent(1) } }; } },
-    { text: "If something is hiding behind another thing, I can make it see-through so you can see!", audio: "/oral-instructions/tutorial_09.wav", animFn: function() { return { template: 'reveal', params: { entityPrefix: _ent(1) } }; } },
+    { text: "If something is hiding behind another thing, I can lift it up like a flap so you can peek behind!", audio: "/oral-instructions/tutorial_09.wav", animFn: function() { return { template: 'peek', params: { entityPrefix: _ent(1) } }; } },
     { text: "I can also stamp a character to show where they are standing!", audio: "/oral-instructions/tutorial_10.wav", animFn: function() { return { template: 'stamp', params: { entityPrefix: _ent(0) } }; } },
     { text: "If I want you to use the past tense, the picture will look like an old movie!", audio: "/oral-instructions/tutorial_11.wav", animFn: function() { return { template: 'flashback', params: { isIndoor: false } }; } },
     { text: "And if I want you to talk about the future, you will see a day-and-night effect!", audio: "/oral-instructions/tutorial_12.wav", animFn: function() { return { template: 'timelapse', params: { isIndoor: false } }; } },
@@ -709,7 +709,7 @@
     { text: "And if they should be apart, they will push away from each other!", audio: "/oral-instructions/tutorial_14.wav", animFn: function() { return { template: 'repel', params: { entityPrefixA: _ent(1), entityPrefixB: _ent(2) } }; } },
     { text: "When one thing causes something to happen to another, you will see a push!", audio: "/oral-instructions/tutorial_15.wav", animFn: function() { return { template: 'causal_push', params: { entityPrefixA: _ent(2), entityPrefixB: _ent(1) } }; } },
     { text: "When something should not be mentioned, it will break apart into tiny pieces!", audio: "/oral-instructions/tutorial_16.wav", animFn: function() { return { template: 'disintegration', params: { entityPrefix: _ent(2) } }; } },
-    { text: "And if something is missing, you will see a ghostly shape!", audio: "/oral-instructions/tutorial_17.wav", animFn: function() { return { template: 'ghost_outline', params: { entityPrefix: _ent(2), ghostImageUrl: _entityAssetUrl(2) } }; }, hideEntity: 2 },
+    { text: "And if something is missing, a puzzle piece will show where it should be!", audio: "/oral-instructions/tutorial_17.wav", animFn: function() { return { template: 'missing_piece', params: { entityPrefix: _ent(2), pieceImageUrl: _entityAssetUrl(2) } }; }, hideEntity: 2 },
     { text: "If I want a character to say something, a speech bubble will appear!", audio: "/oral-instructions/tutorial_18.wav", animFn: function() { return { template: 'speech_bubble', params: { entityPrefix: _ent(0), text: 'Hello!' } }; } },
     { text: "If I want a character to think something, a thought bubble will appear!", audio: "/oral-instructions/tutorial_19.wav", animFn: function() { return { template: 'thought_bubble', params: { entityPrefix: _ent(1), text: '...' } }; } },
     { text: "When something important or surprising happens, you will see an exclamation mark!", audio: "/oral-instructions/tutorial_20.wav", animFn: function() { return { template: 'alert', params: { entityPrefix: _ent(2) } }; } },
@@ -759,10 +759,10 @@
     }
   }
 
-  // Save original pixel buffer references for restore after ghost_outline
+  // Save original pixel buffer references for restore after missing_piece
   var _savedBuf = null;
 
-  // Redraw HD scene excluding a specific entity (for ghost_outline demo)
+  // Redraw HD scene excluding a specific entity (for missing_piece demo)
   function _redrawSceneWithout(entityId) {
     var sceneImgs = window._hdSceneImages;
     if (!sceneImgs) return;
@@ -901,20 +901,20 @@
 
   // --- Test: play all 25 animations sequentially ---
   var ALL_TEMPLATES = [
-    'spotlight', 'nametag', 'reveal', 'stamp',
+    'spotlight', 'silhouette', 'peek', 'stamp',
     'color_pop', 'emanation_shame', 'emanation_cold', 'emanation_joy',
     'emanation_love', 'emanation_anger', 'emanation_fear',
     'flashback', 'timelapse',
     'motion_lines', 'flip',
     'magnetism', 'repel', 'causal_push',
-    'sequential_glow', 'disintegration', 'ghost_outline',
+    'sequential_glow', 'disintegration', 'missing_piece',
     'speech_bubble', 'thought_bubble', 'alert', 'interjection'
   ];
   var SINGLE_ENTITY = [
-    'spotlight', 'nametag', 'stamp', 'color_pop', 'reveal',
+    'spotlight', 'silhouette', 'stamp', 'color_pop', 'peek',
     'emanation_shame', 'emanation_cold', 'emanation_joy', 'emanation_love', 'emanation_anger', 'emanation_fear',
     'motion_lines', 'flip',
-    'disintegration', 'ghost_outline', 'speech_bubble', 'thought_bubble', 'alert', 'interjection'
+    'disintegration', 'missing_piece', 'speech_bubble', 'thought_bubble', 'alert', 'interjection'
   ];
   var TWO_ENTITY = ['magnetism', 'repel', 'causal_push'];
   var SCENE_WIDE = ['timelapse', 'flashback'];

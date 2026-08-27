@@ -185,7 +185,7 @@ MICRO_AGE_THRESHOLD_LEVEL2 = 9
 ANIMATION_IDS = {
     # I = Identity
     "I1_spotlight": "Scene darkens, target entity pulses gently with luminous halo",
-    "I2_nametag": "Floating label with '...' attached to entity, invites naming",
+    "I2_silhouette": "Entity turns into a flat silhouette then snaps back, asks who or what it is",
     # P = Property
     "P1_color_pop": "Desaturation of everything except target to emphasize visual attributes",
     "P2a_emanation_shame": "Shame/embarrassment particles",
@@ -198,7 +198,7 @@ ANIMATION_IDS = {
     "A1_motion_line": "Directional speed streaks showing direction and speed",
     "A2_flip": "Entity compresses and lurches forward, freezes mid-motion",
     # S = Space
-    "S1_reveal": "Occluding layer becomes semi-transparent to show hidden elements",
+    "S1_peek": "Occluding entity lifts like a flap to expose what is behind it",
     "S2_stamp": "Entity lifts slowly revealing a black silhouette, snaps back elastically, cracks radiate at impact",
     # T = Time
     "T1_flashback": "Target desaturates briefly (palette swap to grey) then re-saturates",
@@ -210,7 +210,7 @@ ANIMATION_IDS = {
     # C = Count
     "C1_sequential_glow": "Objects glow in sequence creating visual count",
     "C2_disintegration": "Entity pixelates progressively then dissolves into particles",
-    "C3_ghost_outline": "Amorphous shape with '?' dissolves to nothing, scaffolds absence",
+    "C3_missing_piece": "Jigsaw hole opens where an absent entity would be; its piece hovers at the edge",
     # D = Discourse
     "D1_speech_bubble": "Pixelated speech bubble with '...' or keyword",
     "D2_thought_bubble": "Pixelated thought bubble with '...' or symbol",
@@ -224,8 +224,8 @@ ANIMATION_IDS = {
 
 MISL_TO_ANIMATIONS: Dict[str, List[str]] = {
     # Macrostructure
-    "character":         ["I1_spotlight", "I2_nametag"],
-    "setting":           ["S1_reveal", "S2_stamp", "T2_timelapse"],
+    "character":         ["I1_spotlight", "I2_silhouette"],
+    "setting":           ["S1_peek", "S2_stamp", "T2_timelapse"],
     "initiating_event":  ["A1_motion_line", "A2_flip", "R3_causal_push", "D3_alert"],
     "internal_response": ["P2a_emanation_shame", "P2b_emanation_cold", "P2c_emanation_joy", "P2d_emanation_love", "P2e_emanation_anger", "P2f_emanation_fear", "D2_thought_bubble", "D3_alert"],
     "plan":              ["D2_thought_bubble"],
@@ -243,7 +243,7 @@ MISL_TO_ANIMATIONS: Dict[str, List[str]] = {
 }
 
 # Count animations apply to any element when the problem is incorrect count.
-COUNT_ANIMATIONS: List[str] = ["C1_sequential_glow", "C2_disintegration", "C3_ghost_outline"]
+COUNT_ANIMATIONS: List[str] = ["C1_sequential_glow", "C2_disintegration", "C3_missing_piece"]
 
 # ============================================================================
 # All MISL element keys (convenience)
@@ -277,7 +277,7 @@ MISL_KEY_TO_CODE: Dict[str, str] = {v: k for k, v in MISL_CODE_TO_KEY.items()}
 
 ANIMATION_ID_TO_TEMPLATE: Dict[str, str] = {
     "I1_spotlight": "spotlight",
-    "I2_nametag": "nametag",
+    "I2_silhouette": "silhouette",
     "P1_color_pop": "color_pop",
     "P2a_emanation_shame": "emanation_shame",
     "P2b_emanation_cold": "emanation_cold",
@@ -287,7 +287,7 @@ ANIMATION_ID_TO_TEMPLATE: Dict[str, str] = {
     "P2f_emanation_fear": "emanation_fear",
     "A1_motion_line": "motion_lines",
     "A2_flip": "flip",
-    "S1_reveal": "reveal",
+    "S1_peek": "peek",
     "S2_stamp": "stamp",
     "T1_flashback": "flashback",
     "T2_timelapse": "timelapse",
@@ -296,7 +296,7 @@ ANIMATION_ID_TO_TEMPLATE: Dict[str, str] = {
     "R3_causal_push": "causal_push",
     "C1_sequential_glow": "sequential_glow",
     "C2_disintegration": "disintegration",
-    "C3_ghost_outline": "ghost_outline",
+    "C3_missing_piece": "missing_piece",
     "D1_speech_bubble": "speech_bubble",
     "D2_thought_bubble": "thought_bubble",
     "D3_alert": "alert",
@@ -314,10 +314,11 @@ ANIMATION_PARAMS: Dict[str, Dict] = {
         "haloColor":    {"type": "rgb", "default": [255, 240, 180], "desc": "Color of the halo around entity"},
         "maxHaloSize":  {"type": "int", "min": 5, "max": 20, "default": 14, "desc": "Maximum halo radius in pixels"},
     },
-    "nametag": {
-        "bgColor":     {"type": "rgb", "default": [40, 40, 55], "desc": "Label background color"},
-        "textColor":   {"type": "rgb", "default": [255, 255, 200], "desc": "Label text color"},
-        "stringColor": {"type": "rgb", "default": [180, 180, 180], "desc": "Connecting string color"},
+    "silhouette": {
+        "holdMs":          {"type": "int", "min": 800, "max": 2000, "default": 1200, "desc": "Duration the silhouette is held before the reveal"},
+        "pulseAmplitude":  {"type": "float", "min": 0, "max": 0.12, "default": 0.05, "desc": "Scale pulse of the silhouette around its anchor (0 = none)"},
+        "cycles":          {"type": "int", "min": 1, "max": 3, "default": 1, "desc": "Number of silhouette/reveal cycles per playback"},
+        "silhouetteColor": {"type": "rgb", "default": [15, 15, 25], "desc": "Flat fill color of the silhouette"},
     },
     "color_pop": {
         "desaturationStrength": {"type": "float", "min": 0, "max": 1, "default": 0.8, "desc": "How much non-target pixels are desaturated"},
@@ -334,8 +335,12 @@ ANIMATION_PARAMS: Dict[str, Dict] = {
     "flip": {
         "speed": {"type": "float", "min": 0.5, "max": 2.0, "default": 1.0, "desc": "Speed multiplier for the flip animation"},
     },
-    "reveal": {
-        "revealAlpha": {"type": "float", "min": 0.3, "max": 0.9, "default": 0.6, "desc": "Transparency level of occluding layer"},
+    "peek": {
+        "entityPrefixB": {"type": "string", "default": "", "desc": "Optional entity ID of the hidden element behind the target"},
+        "hingeSide":     {"type": "enum", "values": ["auto", "left", "right"], "default": "auto", "desc": "Edge the flap rotates around"},
+        "openness":      {"type": "float", "min": 0.7, "max": 0.9, "default": 0.8, "desc": "How far the flap opens (occluder scales to 1 - openness)"},
+        "holdMs":        {"type": "int", "min": 800, "max": 2000, "default": 1200, "desc": "Duration the flap stays open"},
+        "glowStrength":  {"type": "float", "min": 0.3, "max": 1.0, "default": 0.5, "desc": "Halo intensity on the hidden element while exposed"},
     },
     "stamp": {
         "liftPixels": {"type": "int", "min": 10, "max": 30, "default": 22, "desc": "How many pixels the entity lifts up"},
@@ -366,8 +371,11 @@ ANIMATION_PARAMS: Dict[str, Dict] = {
         "driftAmount": {"type": "float", "min": 0, "max": 1, "default": 0.3, "desc": "Horizontal scatter range (fraction of entity width)"},
         "fallSpeed":   {"type": "float", "min": 0.5, "max": 2.0, "default": 1.0, "desc": "Vertical fall speed multiplier"},
     },
-    "ghost_outline": {
-        "puddleColor": {"type": "rgb", "default": [60, 65, 85], "desc": "Color of the dark puddle shape"},
+    "missing_piece": {
+        "holeScale":    {"type": "float", "min": 1.0, "max": 1.6, "default": 1.2, "desc": "Size of the hole relative to the absent entity's bounding box"},
+        "edgePulse":    {"type": "float", "min": 0, "max": 1.0, "default": 0.5, "desc": "Intensity of the pulsing outline on the hole edge"},
+        "pieceOpacity": {"type": "float", "min": 0.5, "max": 1.0, "default": 0.8, "desc": "Opacity of the floating piece"},
+        "holdMs":       {"type": "int", "min": 1000, "max": 2500, "default": 1500, "desc": "Duration the hole stays open"},
     },
     "speech_bubble": {
         "bubbleText": {"type": "string", "default": "...", "desc": "Text to display inside the speech bubble"},
