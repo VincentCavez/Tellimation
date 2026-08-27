@@ -328,6 +328,11 @@ def push_to_google_sheet(participant_id: str) -> bool:
         logger.info("No data files to push for %s", participant_id)
         return False
 
+    return _post_sheet_rows(rows, participant_id)
+
+
+def _post_sheet_rows(rows: list, participant_id: str) -> bool:
+    """POST rows to the Apps Script webhook. Returns True on success."""
     payload = json.dumps({"rows": rows}).encode("utf-8")
     req = urllib.request.Request(
         GOOGLE_SHEET_WEBHOOK,
@@ -357,3 +362,74 @@ def push_to_google_sheet(participant_id: str) -> bool:
     except Exception:
         logger.exception("Failed to push data to Google Sheet for %s", participant_id)
         return False
+
+
+# One Sheets cell holds at most 50,000 characters; a full-session study log
+# already exceeds that (participant 1's PARTIAL test log: 51,581 chars), so
+# whole-log snapshot rows would make appendRow throw and silently lose the
+# push. Scene rows stay small (largest observed scene: ~37k); the margin
+# below covers pathological scenes by splitting them into parts.
+_SHEET_CELL_BUDGET = 40000
+
+
+def push_study_scenes(
+    participant_id: str,
+    is_training: bool,
+    pushed_counts: dict,
+) -> bool:
+    """Push one row per scene whose entry list grew since the last successful
+    push — incremental, bounded-size rows instead of whole-log snapshots.
+
+    Row schema: data_type = "study_scene" | "training_scene",
+    json_data = {"scene_key", "entries", ["part", "parts"]}. All rows of one
+    POST share the Apps Script timestamp; to rebuild a log, keep the LATEST
+    batch per (participant_id, scene_key) and concatenate its parts.
+
+    pushed_counts maps scene_key -> number of entries already pushed; it is
+    owned by the caller (one dict per websocket connection) and only updated
+    when the POST succeeds, so a failed push retries the same scenes later.
+    """
+    if not GOOGLE_SHEET_WEBHOOK:
+        logger.debug("GOOGLE_SHEET_WEBHOOK not set — skipping push")
+        return False
+
+    log = load_study_log(participant_id, is_training)
+    data_type = "training_scene" if is_training else "study_scene"
+
+    rows = []
+    pending: dict = {}
+    for scene_key, entries in log.get("scenes", {}).items():
+        if not isinstance(entries, list) or len(entries) <= pushed_counts.get(scene_key, 0):
+            continue
+        pending[scene_key] = len(entries)
+
+        # Greedy split: one row normally, several "part" rows when a scene
+        # alone would blow the cell budget.
+        chunks = [[]]
+        size = 0
+        for e in entries:
+            es = len(json.dumps(e))
+            if size + es > _SHEET_CELL_BUDGET and chunks[-1]:
+                chunks.append([])
+                size = 0
+            chunks[-1].append(e)
+            size += es
+
+        for i, chunk in enumerate(chunks):
+            data = {"scene_key": scene_key, "entries": chunk}
+            if len(chunks) > 1:
+                data["part"] = i
+                data["parts"] = len(chunks)
+            rows.append({
+                "participant_id": participant_id,
+                "data_type": data_type,
+                "json_data": json.dumps(data),
+            })
+
+    if not rows:
+        return True
+
+    ok = _post_sheet_rows(rows, participant_id)
+    if ok:
+        pushed_counts.update(pending)
+    return ok
