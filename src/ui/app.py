@@ -68,6 +68,7 @@ from src.persistence import (
     create_story,
     append_study_log_entry,
     load_study_log,
+    push_study_scenes,
     push_to_google_sheet,
 )
 from google import genai
@@ -727,6 +728,9 @@ async def study_websocket_endpoint(websocket: WebSocket):
     session.study_animations_enabled = is_animated  # type: ignore[attr-defined]
     session.study_story_key = story_key  # type: ignore[attr-defined]
     session._study_pending_anim_log = None  # type: ignore[attr-defined]
+    # scene_key -> entries already pushed to the Sheet (one dict per connection)
+    _sheet_pushed_counts: Dict[str, int] = {}
+    _is_training_conn = story_key.lower().startswith("training")
     ws = _WebSocketAdapter(websocket)
 
     try:
@@ -770,11 +774,13 @@ async def study_websocket_endpoint(websocket: WebSocket):
                     })
                     # Incremental Sheet push: the Heroku filesystem is ephemeral
                     # (daily dyno restarts wipe data/users/), so waiting for the
-                    # end of the session risks losing the whole run. Push a
-                    # snapshot at every scene change, off the event loop —
-                    # push_to_google_sheet is blocking urllib (~1-2s).
+                    # end of the session risks losing the whole run. One row per
+                    # scene that grew since the last push — bounded-size rows; a
+                    # whole-log snapshot would exceed the 50k Sheets cell limit
+                    # mid-session. Off the event loop: it's blocking urllib.
                     asyncio.get_running_loop().run_in_executor(
-                        None, push_to_google_sheet, _pid
+                        None, push_study_scenes, _pid, _is_training_conn,
+                        _sheet_pushed_counts,
                     )
             elif msg_type == "interrupt":
                 # Child started speaking again before animation was displayed
@@ -794,11 +800,14 @@ async def study_websocket_endpoint(websocket: WebSocket):
         except Exception:
             pass
     finally:
-        # Final snapshot: covers the last scene (no scene_loaded follows it),
+        # Final push: covers the last scene (no scene_loaded follows it),
         # tab closes, and mid-story disconnects.
         if participant:
             try:
-                await asyncio.to_thread(push_to_google_sheet, str(participant))
+                await asyncio.to_thread(
+                    push_study_scenes, str(participant), _is_training_conn,
+                    _sheet_pushed_counts,
+                )
             except Exception:
                 logger.exception("Final Sheet push failed for participant=%s", participant)
 
