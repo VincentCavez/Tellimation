@@ -1803,20 +1803,51 @@ AnimationTemplates.register('missing_piece', function(params) {
     img.src = pieceImageUrl;
   }
 
-  // Procedural jigsaw mask: base rectangle + a round tab on the top edge and a
-  // round notch cut into the right edge. Returns true when (px,py) — local
-  // coords with (0,0) at the rect top-left — is inside the piece shape.
+  // Procedural mask of the classic four-sided jigsaw piece (the standard
+  // puzzle icon): rounded square, mushroom-shaped tabs sticking out of the
+  // top and bottom edges, mushroom-shaped notches bitten into the left and
+  // right edges. Same geometry an SVG path would trace, evaluated per pixel
+  // because the engine draws into a raw pixel buffer. (px,py) are local
+  // coords with (0,0) at the base-square top-left; tabs live at py < 0 and
+  // py >= h. _pieceOverhang() gives the vertical span they add.
+  function _pieceRadius(w, h) {
+    return Math.max(3, Math.min(w, h) * 0.14);   // head/cavity radius
+  }
+  function _pieceOverhang(w, h) {
+    return Math.ceil(_pieceRadius(w, h) * 1.85) + 1;
+  }
   function inPiece(px, py, w, h) {
-    var tabR = Math.max(3, Math.round(Math.min(w, h) * 0.18));
-    // Tab: sticks out above the top edge, centered
-    var tcx = w / 2, tcy = 0;
-    var dtx = px - tcx, dty = py - tcy;
-    if (py < 0) return dtx * dtx + dty * dty <= tabR * tabR;
-    if (px < 0 || px >= w || py >= h) return false;
-    // Notch: bitten out of the right edge, centered vertically
-    var ncx = w, ncy = h / 2;
-    var dnx = px - ncx, dny = py - ncy;
-    if (dnx * dnx + dny * dny <= tabR * tabR) return false;
+    var R = _pieceRadius(w, h);
+    var neck = R * 0.62;                          // half-width of the tab neck
+    var offT = R * 0.85;                          // tab head centre, outside the edge
+    var offN = R * 0.55;                          // notch cavity centre, inside the edge
+    var rc = Math.max(2, Math.min(w, h) * 0.10);  // corner rounding
+
+    function inCircle(cx, cy, r) {
+      var dx = px - cx, dy = py - cy;
+      return dx * dx + dy * dy <= r * r;
+    }
+
+    // Tabs: mushroom head + narrower neck, outside the base square
+    if (py < 0) {
+      return inCircle(w / 2, -offT, R) || (py >= -offT && Math.abs(px - w / 2) <= neck);
+    }
+    if (py >= h) {
+      return inCircle(w / 2, h + offT, R) || (py <= h + offT && Math.abs(px - w / 2) <= neck);
+    }
+    if (px < 0 || px >= w) return false;
+
+    // Notches: cavity circle sunk into each side; shallower than the tab
+    // heads stick out, matching the reference icon's proportions
+    if (inCircle(offN, h / 2, R)) return false;
+    if (inCircle(w - offN, h / 2, R)) return false;
+
+    // Rounded corners
+    if (px < rc && py < rc && !inCircle(rc, rc, rc)) return false;
+    if (px >= w - rc && py < rc && !inCircle(w - rc, rc, rc)) return false;
+    if (px < rc && py >= h - rc && !inCircle(rc, h - rc, rc)) return false;
+    if (px >= w - rc && py >= h - rc && !inCircle(w - rc, h - rc, rc)) return false;
+
     return true;
   }
 
@@ -1832,10 +1863,11 @@ AnimationTemplates.register('missing_piece', function(params) {
     var best = null, bestCount = Infinity;
     for (var yi = 0; yi < yFracs.length; yi++) {
       for (var xi = 0; xi < xFracs.length; xi++) {
+        var overV = _pieceOverhang(holeW, holeH);
         var x0 = Math.round(PW * xFracs[xi] - holeW / 2);
         var y0 = Math.round(PH * yFracs[yi] - holeH / 2);
         x0 = _clamp(x0, 2, PW - holeW - 2);
-        y0 = _clamp(y0, 2, PH - holeH - 2);
+        y0 = _clamp(y0, 2 + overV, PH - holeH - overV - 2);
         var count = 0;
         for (var ty = y0; ty < y0 + holeH; ty += 2) {
           for (var tx = x0; tx < x0 + holeW; tx += 2) {
@@ -1885,17 +1917,17 @@ AnimationTemplates.register('missing_piece', function(params) {
     var hcx = hole.x0 + hw / 2, hcy = hole.y0 + hh / 2;
     var pulse = 0.5 + 0.5 * Math.sin(t * Math.PI * 8);
     var edgeA = (0.35 + 0.65 * edgePulse * pulse) * prog;
-    var tabR = Math.max(3, Math.round(Math.min(hw, hh) * 0.18));
+    var over = _pieceOverhang(hw, hh);
 
-    for (var py = -tabR; py < hh; py++) {
+    for (var py = -over; py < hh + over; py++) {
       var sy = hole.y0 + py;
       if (sy < 0 || sy >= PH) continue;
-      for (var px = 0; px <= hw + 1; px++) {
+      for (var px = 0; px < hw; px++) {
         var sx = hole.x0 + px;
         if (sx < 0 || sx >= PW) continue;
         // Grow from center: only pixels within prog of the half-extent
-        var fx = Math.abs(sx - hcx) / (hw / 2 + tabR);
-        var fy = Math.abs(sy - hcy) / (hh / 2 + tabR);
+        var fx = Math.abs(sx - hcx) / (hw / 2);
+        var fy = Math.abs(sy - hcy) / (hh / 2 + over);
         if (Math.max(fx, fy) > prog) continue;
         if (!inPiece(px, py, hw, hh)) continue;
         var idx = sy * PW + sx;
@@ -1918,14 +1950,17 @@ AnimationTemplates.register('missing_piece', function(params) {
     if (pieceA > 0.03) {
       var pw2 = Math.round(hw * 0.6), ph2 = Math.round(hh * 0.6);
       var margin = 6;
-      var pieceX = hcx < PW / 2 ? margin : PW - pw2 - margin;
+      // Opposite frame edge from the hole — side by side they read as one
+      // blob; across the scene it reads as "the piece is elsewhere"
+      var pieceX = hcx < PW / 2 ? PW - pw2 - margin : margin;
       var bob = Math.round(Math.sin(t * Math.PI * 4) * 3);
-      var pieceY = _clamp(Math.round(hcy - ph2 / 2) + bob, 2, PH - ph2 - 2);
+      var over2 = _pieceOverhang(pw2, ph2);
+      var pieceY = _clamp(Math.round(hcy - ph2 / 2) + bob, 2 + over2, PH - ph2 - over2 - 2);
 
-      for (var py = -Math.round(ph2 * 0.18); py < ph2; py++) {
+      for (var py = -over2; py < ph2 + over2; py++) {
         var sy = pieceY + py;
         if (sy < 0 || sy >= PH) continue;
-        for (var px = 0; px <= pw2 + 1; px++) {
+        for (var px = 0; px < pw2; px++) {
           var sx = pieceX + px;
           if (sx < 0 || sx >= PW) continue;
           if (!inPiece(px, py, pw2, ph2)) continue;
