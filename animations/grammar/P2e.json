@@ -3,7 +3,7 @@
   "name": "Emanation (Anger)",
   "category": "Property",
   "mode": "both",
-  "scaffolding_intent": "Emits anger particles around the entity",
+  "scaffolding_intent": "Emits anger particles around an entity and shifts its tint toward red, showing that it is angry or frustrated",
   "misl_elements": [
     "ENP",
     "ADV",
@@ -48,6 +48,6 @@
     }
   ],
   "code_template": "emanation({target}, veins, {particleCount})",
-  "correction_intent": "Child described the wrong emotion — the character actually feels ANGRY, FRUSTRATED, or IRRITATED (e.g. said 'happy' or 'calm' when the character has clenched fists or a red face).",
-  "suggestion_intent": "Child hasn't expressed that a character feels angry, frustrated, or irritated"
+  "correction_intent": "Child attributed a wrong emotion to a character the scene shows angry, frustrated, or irritated (clenched fists, red face, furrowed brows, shouting, stomping). Target that character. Not for fear; that is P2f.",
+  "suggestion_intent": "A character is visibly angry, frustrated, or irritated (clenched fists, red face, furrowed brows, shouting) and the child has not said so. Target that character. Requires a visible cue of anger."
 }

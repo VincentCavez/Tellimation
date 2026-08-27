@@ -2,11 +2,14 @@
   "id": "D4",
   "name": "Interjection",
   "category": "Discourse",
-  "mode": "correction",
-  "scaffolding_intent": "Displays a comic-style starburst with the problematic word from the child's speech, flagging grammatical or tense errors",
+  "mode": "both",
+  "scaffolding_intent": "Displays a comic-style starburst with a word quoted verbatim from the child's speech: '?' flags it as erroneous, '...' offers it for elaboration",
   "misl_elements": [
     "G",
-    "T"
+    "T",
+    "ENP",
+    "ADV",
+    "SC"
   ],
   "target_type": ["entity","duo","group"],
   "parameters": [
@@ -14,8 +17,15 @@
       "name": "word",
       "type": "string",
       "range": [],
+      "default": "",
+      "description": "Word displayed in the starburst. Must be a verbatim word from the child's utterance. Never empty."
+    },
+    {
+      "name": "marker",
+      "type": "string",
+      "range": ["?", "..."],
       "default": "?",
-      "description": "Word or symbol displayed in the starburst"
+      "description": "'?' for correction, '...' for suggestion"
     },
     {
       "name": "scale",
@@ -28,7 +38,7 @@
       "description": "Size multiplier for the interjection starburst"
     }
   ],
-  "code_template": "interjection({target}, {word})",
-  "correction_intent": "Child made a SEVERE grammatical error: wrong verb conjugation ('he go' instead of 'he goes'), wrong pronoun ('him is' instead of 'he is'), severely broken sentence structure, OR a tense that clearly contradicts the scene description (e.g. past tense 'was cooking' when the scene describes a present action 'is cooking'). Be generous with tense: future ('will be giving') and near-future ('is going to give') are acceptable when the scene shows the present — the child is anticipating. Only flag tense if it is clearly WRONG relative to the scene (e.g. past for present, present for past). Do NOT flag: missing articles, informal speech, sentence fragments, or minor stylistic issues.",
-  "suggestion_intent": "Child could use a more precise, sophisticated, or grammatically stronger word in their narration. For example: replacing a vague verb with a specific one ('walks' → 'strolls', 'looks' → 'examines'), using a more expressive adjective, or choosing a more accurate word to describe what is happening in the scene."
+  "code_template": "interjection({target}, {word}, {marker})",
+  "correction_intent": "Child made a severe grammatical error (wrong conjugation 'he go', wrong pronoun 'him is', broken structure) or used a tense that contradicts the scene (past for a present action). Future and near-future are acceptable for a present scene. Do not flag missing articles, informal speech, or fragments. The word is the erroneous word, quoted verbatim.",
+  "suggestion_intent": "Child said a word that could be elaborated: a bare noun (descriptors), an action verb (adverb), or an emotion or event (a cause with 'because'). The word is quoted verbatim from the child; never propose a word they did not say. Target the entity the word refers to."
 }

@@ -3,7 +3,7 @@
   "name": "Emanation (Love)",
   "category": "Property",
   "mode": "both",
-  "scaffolding_intent": "Emits heart particles around the entity",
+  "scaffolding_intent": "Emits heart particles around an entity and shifts its tint toward pink, showing affection or tenderness",
   "misl_elements": [
     "ENP",
     "ADV",
@@ -48,6 +48,6 @@
     }
   ],
   "code_template": "emanation({target}, hearts, {particleCount})",
-  "correction_intent": "Child described the wrong emotion — the character actually feels LOVE, AFFECTION, or TENDERNESS toward someone or something (e.g. said 'grumpy' or 'bored' when the character is smiling lovingly).",
-  "suggestion_intent": "Child hasn't expressed that a character feels love, affection, or tenderness"
+  "correction_intent": "Child attributed a wrong emotion to a character the scene shows loving or tender (hugging, cuddling a pet, gazing fondly, holding hands, gentle smile). Target that character, or the pair if the affection is mutual. Not for plain happiness or excitement without a loved object; that is another Emanation variant.",
+  "suggestion_intent": "A character visibly shows affection or tenderness toward someone or something (hugging, cuddling, gazing fondly, holding hands) and the child has not said so. Target that character, or the pair. Requires a visible cue of affection."
 }
