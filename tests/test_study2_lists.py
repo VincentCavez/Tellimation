@@ -1,4 +1,4 @@
-"""Design checks for the Study 2 counterbalancing lists."""
+"""Design checks for the Study 2 counterbalancing lists (block 1 only)."""
 
 from collections import Counter
 
@@ -10,20 +10,13 @@ def test_design_has_no_violation():
 
 
 def test_each_target_stimulus_seen_by_two_lists():
-    views = Counter()
-    for lst in build()["lists"]:
-        for e in lst["block1"] + lst["block2"]:
-            if e["role"] == "target":
-                views[e["stimulus_id"]] += 1
+    views = Counter(e["stimulus_id"] for lst in build()["lists"] for e in lst["block1"] if e["role"] == "target")
     assert len(views) == 24
     assert set(views.values()) == {2}
 
 
-def test_block2_scene_rotates_and_is_absent_from_block1():
-    data = build()
-    for lst in data["lists"]:
-        assert lst["block2_scene"] == SCENES[lst["k"]]
-        b1 = {(e["animation_id"], e["scene"]) for e in lst["block1"]}
-        for e in lst["block2"]:
-            assert e["animation_id"] in TARGET_ANIMATIONS
-            assert (e["animation_id"], e["scene"]) not in b1
+def test_every_scene_of_every_animation_in_each_list():
+    for lst in build()["lists"]:
+        assert lst["block2"] == []
+        pairs = {(e["animation_id"], e["scene"]) for e in lst["block1"] if e["role"] == "target"}
+        assert pairs == {(a, s) for a in TARGET_ANIMATIONS for s in SCENES}

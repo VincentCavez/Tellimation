@@ -1,22 +1,17 @@
 #!/usr/bin/env python3
 """Study 2 (Prolific revalidation of I2 / C3 / S1) counterbalancing lists.
 
-Design (see ~/Downloads/study2_prolific_spec.md):
+Design (spec ~/Downloads/study2_prolific_spec.md, block 2 dropped on 2026-09-04:
+it rates the pipeline's decision text, which did not change):
   * 3 target animations x 4 scenes (A-D) x 2 conditions = 24 target stimuli
   * 4 lists (list_id 1-4, k = list_id - 1), 10 participants each
-  * block 1: 9 targets (3 animations x 3 scenes, scene k held out) + 3 fillers
-  * block 2: the held-out scene k of each target animation (Likert)
+  * block 1 only: 12 targets (every animation on all 4 scenes, one condition
+    each) + 3 fillers = 15 forced-choice items
 
-Condition rule (replaces the spec's parity rule, which gave 8/4 per animation):
-  * block 1, list k, animation i, scene j != k:
-        pos = rank of k in sorted({0,1,2,3} - {j})
-        condition = correction if (i + j + pos) even else suggestion
-    -> per animation 6 correction / 6 suggestion across the 4 lists,
-       each (animation, scene) seen in 3 lists with a 2/1 split
-  * block 2, list k, animation i, scene k:
-        condition = suggestion if (i + k) even else correction
-    -> the minority block-1 condition, so every one of the 24 target stimuli
-       is seen by exactly 2 lists (20 participants) across both blocks
+Condition rule:
+  * list k, animation i, scene j: correction if (i + j + k) even else suggestion
+    -> per list and animation 2 correction / 2 suggestion; each of the 24
+       target stimuli is seen by exactly 2 lists (20 participants)
   * fillers, list k: P2f_k, C2_k, T1_k; P2f/T1 correction if k even,
     C2 suggestion if k even -> 2/2 per filler animation, each scene once
 
@@ -56,14 +51,8 @@ def _entry(prefix: str, anim: str, scene: str, condition: str, role: str) -> dic
     }
 
 
-def target_block1_condition(i: int, j: int, k: int) -> str:
-    others = sorted(set(range(len(SCENES))) - {j})
-    pos = others.index(k)
-    return "correction" if (i + j + pos) % 2 == 0 else "suggestion"
-
-
-def target_block2_condition(i: int, k: int) -> str:
-    return "suggestion" if (i + k) % 2 == 0 else "correction"
+def target_condition(i: int, j: int, k: int) -> str:
+    return "correction" if (i + j + k) % 2 == 0 else "suggestion"
 
 
 def filler_condition(anim: str, k: int) -> str:
@@ -75,13 +64,9 @@ def filler_condition(anim: str, k: int) -> str:
 
 def build_list(k: int) -> dict:
     block1 = []
-    block2 = []
     for i, anim in enumerate(TARGET_ANIMATIONS):
         for j, scene in enumerate(SCENES):
-            if j == k:
-                block2.append(_entry(TARGET_PREFIX, anim, scene, target_block2_condition(i, k), "target"))
-            else:
-                block1.append(_entry(TARGET_PREFIX, anim, scene, target_block1_condition(i, j, k), "target"))
+            block1.append(_entry(TARGET_PREFIX, anim, scene, target_condition(i, j, k), "target"))
     for anim in FILLER_ANIMATIONS:
         block1.append(_entry(FILLER_PREFIX, anim, SCENES[k], filler_condition(anim, k), "filler"))
     first_slot = k * PARTICIPANTS_PER_LIST + 1
@@ -89,11 +74,10 @@ def build_list(k: int) -> dict:
         "list_id": k + 1,
         "k": k,
         "slots": f"{first_slot}-{first_slot + PARTICIPANTS_PER_LIST - 1}",
-        "block2_scene": SCENES[k],
         "n_correction_block1": sum(e["condition"] == "correction" for e in block1),
         "n_suggestion_block1": sum(e["condition"] == "suggestion" for e in block1),
         "block1": block1,
-        "block2": block2,
+        "block2": [],
     }
 
 
@@ -108,13 +92,12 @@ def build() -> dict:
             "target_animations": TARGET_ANIMATIONS,
             "filler_animations": FILLER_ANIMATIONS,
             "n_scenes_per_animation": len(SCENES),
-            "n_block1_per_participant": 12,
-            "n_block2_per_participant": 3,
+            "n_block1_per_participant": 15,
+            "n_block2_per_participant": 0,
             "slot_to_list": "list_id = ceil(slot / 10)",
             "block1_order": "randomised per participant, no two consecutive items of the same animation",
             "condition_rule": (
-                "block1: pos = rank of k in sorted({0..3} - {j}); correction iff (i+j+pos) even. "
-                "block2: suggestion iff (i+k) even. "
+                "targets: correction iff (i_animation + i_scene + k) even. "
                 "fillers: scene k; P2f/T1 correction iff k even, C2 suggestion iff k even."
             ),
         },
@@ -130,25 +113,22 @@ def verify(data: dict) -> list[str]:
         problems.append(f"expected {N_LISTS} lists, got {len(lists)}")
 
     b1_stim = Counter()
-    b2_stim = Counter()
     b1_anim_cond = Counter()
-    b2_anim_cond = Counter()
     filler_scene = Counter()
     filler_cond = Counter()
     for lst in lists:
-        if len(lst["block1"]) != 12:
+        if len(lst["block1"]) != 15:
             problems.append(f"list {lst['list_id']}: block1 has {len(lst['block1'])} items")
-        if len(lst["block2"]) != 3:
-            problems.append(f"list {lst['list_id']}: block2 has {len(lst['block2'])} items")
-        ids = [e["stimulus_id"] for e in lst["block1"] + lst["block2"]]
+        if lst["block2"]:
+            problems.append(f"list {lst['list_id']}: block2 should be empty")
+        ids = [e["stimulus_id"] for e in lst["block1"]]
         if len(set(ids)) != len(ids):
             problems.append(f"list {lst['list_id']}: duplicate stimulus")
-        scenes_b1 = {(e["animation_id"], e["scene"]) for e in lst["block1"]}
-        for e in lst["block2"]:
-            if (e["animation_id"], e["scene"]) in scenes_b1:
-                problems.append(f"list {lst['list_id']}: block2 scene {e['scene_id']} also in block1")
-            b2_stim[e["stimulus_id"]] += 1
-            b2_anim_cond[(e["animation_id"], e["condition"])] += 1
+        scenes = Counter((e["animation_id"], e["scene"]) for e in lst["block1"] if e["role"] == "target")
+        for anim in TARGET_ANIMATIONS:
+            for scene in SCENES:
+                if scenes[(anim, scene)] != 1:
+                    problems.append(f"list {lst['list_id']}: {anim}_{scene} seen {scenes[(anim, scene)]} times")
         per_list = Counter()
         for e in lst["block1"]:
             if e["role"] == "target":
@@ -160,23 +140,18 @@ def verify(data: dict) -> list[str]:
                 filler_cond[(e["animation_id"], e["condition"])] += 1
         for anim in TARGET_ANIMATIONS:
             for cond in ("correction", "suggestion"):
-                if per_list[(anim, cond)] < 1:
-                    problems.append(f"list {lst['list_id']}: {anim} never seen in {cond}")
+                if per_list[(anim, cond)] != 2:
+                    problems.append(f"list {lst['list_id']}: {anim}/{cond} seen {per_list[(anim, cond)]} times (expected 2)")
 
     for anim in TARGET_ANIMATIONS:
         for cond in ("correction", "suggestion"):
-            if b1_anim_cond[(anim, cond)] != 6:
-                problems.append(f"block1 {anim}/{cond}: {b1_anim_cond[(anim, cond)]} views (expected 6)")
-            if b2_anim_cond[(anim, cond)] != 2:
-                problems.append(f"block2 {anim}/{cond}: {b2_anim_cond[(anim, cond)]} views (expected 2)")
+            if b1_anim_cond[(anim, cond)] != 8:
+                problems.append(f"{anim}/{cond}: {b1_anim_cond[(anim, cond)]} list views (expected 8)")
         for scene in SCENES:
             for cond in ("correction", "suggestion"):
                 sid = f"{TARGET_PREFIX}_{anim}_{scene}_{cond}"
-                total = b1_stim[sid] + b2_stim[sid]
-                if total != 2:
-                    problems.append(f"{sid}: seen by {total} lists across blocks (expected 2)")
-                if b1_stim[sid] not in (1, 2):
-                    problems.append(f"{sid}: {b1_stim[sid]} block1 lists (expected 1 or 2)")
+                if b1_stim[sid] != 2:
+                    problems.append(f"{sid}: seen by {b1_stim[sid]} lists (expected 2)")
     for anim in FILLER_ANIMATIONS:
         for scene in SCENES:
             if filler_scene[(anim, scene)] != 1:
@@ -189,18 +164,12 @@ def verify(data: dict) -> list[str]:
 
 def print_summary(data: dict) -> None:
     for lst in data["lists"]:
-        print(f"list {lst['list_id']} (k={lst['k']}, slots {lst['slots']}, block2 scene {lst['block2_scene']}) "
+        print(f"list {lst['list_id']} (k={lst['k']}, slots {lst['slots']}) "
               f"block1 {lst['n_correction_block1']}c/{lst['n_suggestion_block1']}s")
         for e in lst["block1"]:
-            print(f"   b1 {e['stimulus_id']:28s} {e['role']}")
-        for e in lst["block2"]:
-            print(f"   b2 {e['stimulus_id']:28s}")
-    views = Counter()
-    for lst in data["lists"]:
-        for e in lst["block1"] + lst["block2"]:
-            if e["role"] == "target":
-                views[e["stimulus_id"]] += 1
-    print("target stimulus -> number of lists (both blocks):")
+            print(f"   {e['stimulus_id']:28s} {e['role']}")
+    views = Counter(e["stimulus_id"] for lst in data["lists"] for e in lst["block1"] if e["role"] == "target")
+    print("target stimulus -> number of lists:")
     for sid in sorted(views):
         print(f"   {sid:28s} {views[sid]}")
 

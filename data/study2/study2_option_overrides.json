@@ -1,0 +1,13 @@
+{
+  "_note": "Study 1 option texts corrected for Study 2 (scene mismatches spotted at review).",
+  "study2_I2_C_correction": {
+    "T": "Mention the child by name"
+  },
+  "study2_C3_B_correction": {
+    "T": "Correct the claim that they are alone — their child is joining"
+  },
+  "study2_C3_C_suggestion": {
+    "T": "Mention that someone seems to be missing",
+    "D1": "Describe the man in detail"
+  }
+}
