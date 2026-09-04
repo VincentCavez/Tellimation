@@ -4,14 +4,7 @@
  * DEPLOYMENT INSTRUCTIONS:
  * 1. Create a new Google Sheets spreadsheet
  * 2. Create 3 sheets named: "state", "responses_block1", "responses_block2"
- * 3. In the "state" sheet, add headers in row 1:
- *    slot | list_id | participant_id | prolific_id | assigned_at | completed_at
- * 4. Pre-populate rows 2-81 with slot (1-80), list_id (1-8, 10 each), participant_id (1-80)
- *    Slot 1-10 → list_id 1, slot 11-20 → list_id 2, etc.
- * 5. In "responses_block1", add headers:
- *    prolific_id | slot | block | stimulus_id | scene_id | animation_id | condition | is_catch | selected_option_code | selected_option_text | option_display_order | response_time_ms | video_play_count | timestamp
- * 6. In "responses_block2", add headers:
- *    prolific_id | slot | block | stimulus_id | scene_id | animation_id | condition | likert_rating | pipeline_intent | response_time_ms | timestamp
+ * 3-6. Headers and state rows: run setupSheets(nSlots, perList) below (see SETUP)
  * 7. Go to Extensions > Apps Script
  * 8. Paste this code into Code.gs
  * 9. Deploy > New deployment > Web app
@@ -19,24 +12,43 @@
  *    - Who has access: Anyone
  * 10. Copy the deployment URL into CONFIG.API_BASE in app.js
  *
- * PRE-POPULATE STATE SHEET (run once from the Apps Script editor):
- *   Study 1: setupStateSheet(80, 10)  -> 8 lists
- *   Study 2: setupStateSheet(40, 10)  -> 4 lists (new spreadsheet, same 3 sheets
- *            and headers; deploy as a new web app and paste its URL into
- *            data/study2/study2_config.json -> api_base)
+ * SETUP (run once from the Apps Script editor, after creating the 3 empty
+ * sheets "state", "responses_block1", "responses_block2"):
+ *   Study 1: setupSheets(80, 10)  -> headers + 80 slots, 8 lists
+ *   Study 2: setupSheets(40, 10)  -> headers + 40 slots, 4 lists
+ * Then deploy as a new web app and paste its URL into
+ * data/study2/study2_config.json -> api_base.
  */
-function setupStateSheet(nSlots, perList) {
+var HEADERS = {
+  state: ['slot', 'list_id', 'participant_id', 'prolific_id', 'assigned_at', 'completed_at'],
+  responses_block1: ['prolific_id', 'slot', 'block', 'stimulus_id', 'scene_id', 'animation_id',
+    'condition', 'is_catch', 'selected_option_code', 'selected_option_text',
+    'option_display_order', 'response_time_ms', 'video_play_count', 'timestamp'],
+  responses_block2: ['prolific_id', 'slot', 'block', 'stimulus_id', 'scene_id', 'animation_id',
+    'condition', 'likert_rating', 'pipeline_intent', 'response_time_ms', 'timestamp']
+};
+
+function setupSheets(nSlots, perList) {
   nSlots = nSlots || 40;
   perList = perList || 10;
-  var sheet = SpreadsheetApp.getActive().getSheetByName('state');
+  var ss = SpreadsheetApp.getActive();
+  Object.keys(HEADERS).forEach(function (name) {
+    var sheet = ss.getSheetByName(name) || ss.insertSheet(name);
+    sheet.getRange(1, 1, 1, HEADERS[name].length).setValues([HEADERS[name]]).setFontWeight('bold');
+    sheet.setFrozenRows(1);
+  });
+  var rows = [];
   for (var i = 1; i <= nSlots; i++) {
-    var listId = Math.ceil(i / perList);
-    sheet.getRange(i + 1, 1).setValue(i);          // slot
-    sheet.getRange(i + 1, 2).setValue(listId);      // list_id
-    sheet.getRange(i + 1, 3).setValue(i);           // participant_id
+    rows.push([i, Math.ceil(i / perList), i, '', '', '']);   // slot, list_id, participant_id
   }
+  var state = ss.getSheetByName('state');
+  state.getRange(2, 1, rows.length, 6).setValues(rows);
 }
 
+// Kept for reference: Study 1 was set up with this (state rows only).
+function setupStateSheet(nSlots, perList) {
+  setupSheets(nSlots, perList);
+}
 
 function doPost(e) {
   var data = JSON.parse(e.postData.contents);
