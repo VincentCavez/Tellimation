@@ -1,5 +1,5 @@
 /**
- * Tellimations Study 1 — Google Apps Script Backend
+ * Tellimations Study 1 / Study 2 — Google Apps Script Backend (one deployment per study)
  *
  * DEPLOYMENT INSTRUCTIONS:
  * 1. Create a new Google Sheets spreadsheet
@@ -19,17 +19,24 @@
  *    - Who has access: Anyone
  * 10. Copy the deployment URL into CONFIG.API_BASE in app.js
  *
- * PRE-POPULATE STATE SHEET SCRIPT (run once):
- * function setupStateSheet() {
- *   var sheet = SpreadsheetApp.getActive().getSheetByName('state');
- *   for (var i = 1; i <= 80; i++) {
- *     var listId = Math.ceil(i / 10);
- *     sheet.getRange(i + 1, 1).setValue(i);          // slot
- *     sheet.getRange(i + 1, 2).setValue(listId);      // list_id
- *     sheet.getRange(i + 1, 3).setValue(i);           // participant_id
- *   }
- * }
+ * PRE-POPULATE STATE SHEET (run once from the Apps Script editor):
+ *   Study 1: setupStateSheet(80, 10)  -> 8 lists
+ *   Study 2: setupStateSheet(40, 10)  -> 4 lists (new spreadsheet, same 3 sheets
+ *            and headers; deploy as a new web app and paste its URL into
+ *            data/study2/study2_config.json -> api_base)
  */
+function setupStateSheet(nSlots, perList) {
+  nSlots = nSlots || 40;
+  perList = perList || 10;
+  var sheet = SpreadsheetApp.getActive().getSheetByName('state');
+  for (var i = 1; i <= nSlots; i++) {
+    var listId = Math.ceil(i / perList);
+    sheet.getRange(i + 1, 1).setValue(i);          // slot
+    sheet.getRange(i + 1, 2).setValue(listId);      // list_id
+    sheet.getRange(i + 1, 3).setValue(i);           // participant_id
+  }
+}
+
 
 function doPost(e) {
   var data = JSON.parse(e.postData.contents);

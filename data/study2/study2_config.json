@@ -1,0 +1,16 @@
+{
+  "study": 2,
+  "api_base": "REPLACE_WITH_STUDY2_APPS_SCRIPT_DEPLOYMENT_URL",
+  "completion_code": "REPLACE_WITH_PROLIFIC_COMPLETION_CODE",
+  "lists_file": "../data/study2/study2_lists.json",
+  "stimuli_file": "../data/study2/study2_all_stimuli.json",
+  "video_dir": "../data/study2_videos/",
+  "image_dir": "../data/prolific_gen/",
+  "storage_prefix": "tellimations_s2",
+  "no_adjacent_same_animation": true,
+  "texts": {
+    "text-part1": "<strong>Part 1</strong> (~4 min): Watch 12 short animations and choose what you would say about each scene.",
+    "text-part2": "<strong>Part 2</strong> (~1 min): Read 3 descriptions and rate how appropriate they are.",
+    "text-transition": "Great job! Now for Part 2 (3 short items)."
+  }
+}

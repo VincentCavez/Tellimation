@@ -1,0 +1,1655 @@
+{
+  "metadata": {
+    "study": "study2",
+    "n_targets": 24,
+    "n_fillers": 24,
+    "target_animations": [
+      "I2",
+      "C3",
+      "S1"
+    ],
+    "filler_animations": [
+      "P2f",
+      "C2",
+      "T1"
+    ],
+    "source": "data/study1_all_stimuli.json",
+    "note": "Target narrator texts and options are the Study 1 ones; only the video and the correction pipeline_intent change."
+  },
+  "stimuli": [
+    {
+      "stimulus_id": "study2_I2_A_correction",
+      "scene_id": "study2_I2_A",
+      "condition": "correction",
+      "narrator_text": "The teacher is sitting at a desk talking to the girl with glasses near the bookshelf.",
+      "errors_description": "(1) boy_glasses is called 'student teacher' instead of 'boy with glasses' [Identity/Role]. Targets boy_glasses.",
+      "target_animation": "I2",
+      "target_entities": [
+        "boy_glasses"
+      ],
+      "target_category": "Identity",
+      "options": {
+        "T": "Mention the girl with glasses near the bookshelf by name",
+        "E1": "Correct what the teacher is doing — the teacher is not sitting",
+        "E2": "Correct where the teacher is standing — not near the bookshelf",
+        "D1": "Mention the globe in the background",
+        "D2": "Describe the other students at their desks"
+      },
+      "narrator_text_block2": "The teacher in the blue blouse is talking to the little student teacher near the whiteboard.",
+      "pipeline_intent": "The system detected that you used the wrong title for the boy with glasses and decided to turn him into a dark silhouette for a moment to make you say who he really is.",
+      "pipeline_animation_id": "I2",
+      "pipeline_target_entities": [
+        "boy_glasses"
+      ],
+      "source_scene_id": "study1_I2_A",
+      "animation_id": "I2",
+      "role": "target",
+      "study1_pipeline_intent": "The system detected that you used the wrong title for the boy with glasses and decided to display a nametag over him to clarify his identity."
+    },
+    {
+      "stimulus_id": "study2_I2_A_suggestion",
+      "scene_id": "study2_I2_A",
+      "condition": "suggestion",
+      "narrator_text": "A teacher is standing near a whiteboard. Some students are sitting at their desks.",
+      "target_misl": "CH",
+      "options": {
+        "T": "Give a name to the girl with glasses near the bookshelf",
+        "D1": "Describe the student's posture or expression",
+        "D2": "Identify or describe the teacher more specifically",
+        "D3": "Mention the globe or bookshelf in the background",
+        "D4": "Describe what is written on the whiteboard"
+      },
+      "mention_counts": {
+        "CH": 0,
+        "S": 3,
+        "IE": 3,
+        "IR": 3,
+        "P": 3,
+        "A": 3,
+        "CO": 3,
+        "ENP": 3,
+        "ADV": 3,
+        "SC": 3,
+        "CC": 3,
+        "M": 3,
+        "L": 3,
+        "G": 3,
+        "T": 3
+      },
+      "pipeline_intent": "You've mentioned the teacher and the students, but you could give a name to the girl with the red headband sitting near the bookshelf.",
+      "pipeline_animation_id": "I2",
+      "pipeline_target_entities": [
+        "girl_headband"
+      ],
+      "source_scene_id": "study1_I2_A",
+      "animation_id": "I2",
+      "role": "target",
+      "study1_pipeline_intent": "You've mentioned the teacher and the students, but you could give a name to the girl with the red headband sitting near the bookshelf."
+    },
+    {
+      "stimulus_id": "study2_I2_B_correction",
+      "scene_id": "study2_I2_B",
+      "condition": "correction",
+      "narrator_text": "The boy in the bow tie is wearing the paper crown at the birthday party. The father brings a cake.",
+      "errors_description": "(1) birthday_girl is called 'the little queen' instead of 'the birthday girl' [Identity/Role]. Targets birthday_girl.",
+      "target_animation": "I2",
+      "target_entities": [
+        "birthday_girl"
+      ],
+      "target_category": "Identity",
+      "options": {
+        "T": "Mention the birthday girl by name",
+        "E1": "Correct who is carrying the cake — it is not the father",
+        "E2": "Correct what the boy in the bow tie is doing",
+        "D1": "Mention the pile of wrapped presents",
+        "D2": "Describe the party decorations"
+      },
+      "narrator_text_block2": "The little queen is celebrating with her friends. The mother brings a cake.",
+      "pipeline_intent": "The system detected that you used the wrong title for the girl wearing the crown and decided to turn her into a dark silhouette for a moment to make you say who she really is, the birthday girl.",
+      "pipeline_animation_id": "I2",
+      "pipeline_target_entities": [
+        "birthday_girl"
+      ],
+      "source_scene_id": "study1_I2_B",
+      "animation_id": "I2",
+      "role": "target",
+      "study1_pipeline_intent": "The system detected that you used the wrong title for the girl wearing the crown and decided to highlight her name to show she is the birthday girl."
+    },
+    {
+      "stimulus_id": "study2_I2_B_suggestion",
+      "scene_id": "study2_I2_B",
+      "condition": "suggestion",
+      "narrator_text": "There is a birthday party in a decorated room. Someone is carrying a chocolate cake with candles. Balloons are tied to chairs.",
+      "target_misl": "CH",
+      "options": {
+        "T": "Give a name to the birthday girl",
+        "D1": "Describe what the birthday child is wearing",
+        "D2": "Identify the other children at the party",
+        "D3": "Describe the cake in more detail",
+        "D4": "Say what the children might be feeling"
+      },
+      "mention_counts": {
+        "CH": 0,
+        "S": 3,
+        "IE": 3,
+        "IR": 3,
+        "P": 3,
+        "A": 3,
+        "CO": 3,
+        "ENP": 3,
+        "ADV": 3,
+        "SC": 3,
+        "CC": 3,
+        "M": 3,
+        "L": 3,
+        "G": 3,
+        "T": 3
+      },
+      "pipeline_intent": "You've described the party and the cake, but you could give a special name to the young girl wearing the golden crown.",
+      "pipeline_animation_id": "I2",
+      "pipeline_target_entities": [
+        "birthday_girl"
+      ],
+      "source_scene_id": "study1_I2_B",
+      "animation_id": "I2",
+      "role": "target",
+      "study1_pipeline_intent": "You've described the party and the cake, but you could give a special name to the young girl wearing the golden crown."
+    },
+    {
+      "stimulus_id": "study2_I2_C_correction",
+      "scene_id": "study2_I2_C",
+      "condition": "correction",
+      "narrator_text": "The child in the black helmet stands next to a white fire truck with a spotted dog.",
+      "errors_description": "(1) child is called 'junior firefighter' when they are just a visiting child [Identity/Role]. Targets child.",
+      "target_animation": "I2",
+      "target_entities": [
+        "child"
+      ],
+      "target_category": "Identity",
+      "options": {
+        "T": "Mention the firefighter by name",
+        "E1": "Correct the color of the fire truck — it is not white",
+        "E2": "Correct what the firefighter is doing",
+        "D1": "Mention the fire hoses on the wall",
+        "D2": "Describe the brass pole in the corner"
+      },
+      "narrator_text_block2": "The junior firefighter in the red helmet stands next to the fire truck with the dalmatian.",
+      "pipeline_intent": "The system detected that you used the wrong title for the boy and decided to turn him into a dark silhouette for a moment to make you say who he really is.",
+      "pipeline_animation_id": "I2",
+      "pipeline_target_entities": [
+        "child"
+      ],
+      "source_scene_id": "study1_I2_C",
+      "animation_id": "I2",
+      "role": "target",
+      "study1_pipeline_intent": "The system detected that you used the wrong title for the boy and decided to highlight him with a nametag to clarify his identity."
+    },
+    {
+      "stimulus_id": "study2_I2_C_suggestion",
+      "scene_id": "study2_I2_C",
+      "condition": "suggestion",
+      "narrator_text": "A firefighter stands next to a red fire truck at a fire station. A dalmatian sits nearby.",
+      "target_misl": "CH",
+      "options": {
+        "T": "Give a name to the firefighter",
+        "D1": "Describe what the child is wearing or doing",
+        "D2": "Describe the firefighter's gear in more detail",
+        "D3": "Mention the equipment hung on the walls",
+        "D4": "Describe the fire station layout"
+      },
+      "mention_counts": {
+        "CH": 0,
+        "S": 3,
+        "IE": 3,
+        "IR": 3,
+        "P": 3,
+        "A": 3,
+        "CO": 3,
+        "ENP": 3,
+        "ADV": 3,
+        "SC": 3,
+        "CC": 3,
+        "M": 3,
+        "L": 3,
+        "G": 3,
+        "T": 3
+      },
+      "pipeline_intent": "You mentioned the firefighter standing by the red truck, but you could give him a name to help tell your story.",
+      "pipeline_animation_id": "I2",
+      "pipeline_target_entities": [
+        "firefighter"
+      ],
+      "source_scene_id": "study1_I2_C",
+      "animation_id": "I2",
+      "role": "target",
+      "study1_pipeline_intent": "You mentioned the firefighter standing by the red truck, but you could give him a name to help tell your story."
+    },
+    {
+      "stimulus_id": "study2_I2_D_correction",
+      "scene_id": "study2_I2_D",
+      "condition": "correction",
+      "narrator_text": "The cellist in the white bow tie conducts the orchestra while a boy plays violin.",
+      "errors_description": "(1) conductor is called 'pianist' instead of 'conductor' [Identity/Role]. Targets conductor.",
+      "target_animation": "I2",
+      "target_entities": [
+        "conductor"
+      ],
+      "target_category": "Identity",
+      "options": {
+        "T": "Mention the conductor by name",
+        "E1": "Correct who is playing the violin — it is not a boy",
+        "E2": "Correct what the cellist is actually doing",
+        "D1": "Mention the red velvet curtains",
+        "D2": "Describe the music stands and other instruments"
+      },
+      "narrator_text_block2": "The pianist in the black tuxedo leads the orchestra while a young woman plays violin.",
+      "pipeline_intent": "The system detected that you used the wrong professional title for the person leading the orchestra and decided to turn him into a dark silhouette for a moment to make you say what he really is, a conductor.",
+      "pipeline_animation_id": "I2",
+      "pipeline_target_entities": [
+        "conductor"
+      ],
+      "source_scene_id": "study1_I2_D",
+      "animation_id": "I2",
+      "role": "target",
+      "study1_pipeline_intent": "The system detected that you used the wrong professional title for the person leading the orchestra and decided to display a nametag to clarify that he is a conductor."
+    },
+    {
+      "stimulus_id": "study2_I2_D_suggestion",
+      "scene_id": "study2_I2_D",
+      "condition": "suggestion",
+      "narrator_text": "Musicians are on a concert hall stage. Someone plays a cello, and someone else plays a violin. Warm lights shine on the stage.",
+      "target_misl": "CH",
+      "options": {
+        "T": "Give a name to the conductor",
+        "D1": "Describe what the conductor is doing or wearing",
+        "D2": "Describe the violinist or cellist more specifically",
+        "D3": "Describe the concert hall setting",
+        "D4": "Say what mood the music creates"
+      },
+      "mention_counts": {
+        "CH": 0,
+        "S": 3,
+        "IE": 3,
+        "IR": 3,
+        "P": 3,
+        "A": 3,
+        "CO": 3,
+        "ENP": 3,
+        "ADV": 3,
+        "SC": 3,
+        "CC": 3,
+        "M": 3,
+        "L": 3,
+        "G": 3,
+        "T": 3
+      },
+      "pipeline_intent": "You mentioned the people playing the violin and the cello, but you could give a name to the conductor standing in the middle of the stage.",
+      "pipeline_animation_id": "I2",
+      "pipeline_target_entities": [
+        "conductor"
+      ],
+      "source_scene_id": "study1_I2_D",
+      "animation_id": "I2",
+      "role": "target",
+      "study1_pipeline_intent": "You mentioned the people playing the violin and the cello, but you could give a name to the conductor standing in the middle of the stage."
+    },
+    {
+      "stimulus_id": "study2_C3_A_correction",
+      "scene_id": "study2_C3_A",
+      "condition": "correction",
+      "narrator_text": "The girl came alone to the beach to build a sand house near the pelican.",
+      "errors_description": "(1) alone→someone else implied [Count] (2) sand house→sandcastle [Property] (3) pelican→seagull [Identity]. Targets #1.",
+      "target_animation": "C3",
+      "target_entities": [
+        "towel"
+      ],
+      "target_category": "Count",
+      "options": {
+        "T": "Correct the claim that the girl came alone — someone else should be here",
+        "E1": "Correct the name of what the girl is building",
+        "E2": "Correct the type of bird on the rock",
+        "D1": "Mention the cooler near the towel",
+        "D2": "Describe the ocean waves"
+      },
+      "narrator_text_block2": "The girl came alone to the beach to build a sand house near the pelican.",
+      "pipeline_intent": "The system detected that you said the girl was alone and decided to open a puzzle-piece-shaped hole in the scene, with the missing piece showing the silhouette of a boy who isn't here, to remind you that she has company.",
+      "pipeline_animation_id": "C3",
+      "pipeline_target_entities": [
+        "towel"
+      ],
+      "source_scene_id": "study1_C3_A",
+      "animation_id": "C3",
+      "role": "target",
+      "study1_pipeline_intent": "The system detected that you said the girl was alone and decided to show a ghost outline of a child that isn't in this scene to remind you that she has company."
+    },
+    {
+      "stimulus_id": "study2_C3_A_suggestion",
+      "scene_id": "study2_C3_A",
+      "condition": "suggestion",
+      "narrator_text": "A girl is building a sandcastle on a beach. A seagull stands on a rock. There is a towel on the sand.",
+      "target_misl": "CH",
+      "options": {
+        "T": "Mention that someone seems to be missing — the towel suggests another person",
+        "D1": "Describe what is on the towel (sunglasses, hat)",
+        "D2": "Mention additional animals or people you might expect at a beach",
+        "D3": "Describe the cooler",
+        "D4": "Say what the girl might be thinking about"
+      },
+      "mention_counts": {
+        "CH": 0,
+        "S": 3,
+        "IE": 3,
+        "IR": 3,
+        "P": 3,
+        "A": 3,
+        "CO": 3,
+        "ENP": 3,
+        "ADV": 3,
+        "SC": 3,
+        "CC": 3,
+        "M": 3,
+        "L": 3,
+        "G": 3,
+        "T": 3
+      },
+      "pipeline_intent": "You mentioned the girl and the towel, but you could also mention that the towel might belong to a boy who has gone for a swim.",
+      "pipeline_animation_id": "C3",
+      "pipeline_target_entities": [
+        "scene"
+      ],
+      "source_scene_id": "study1_C3_A",
+      "animation_id": "C3",
+      "role": "target",
+      "study1_pipeline_intent": "You mentioned the girl and the towel, but you could also mention that the towel might belong to a boy who has gone for a swim."
+    },
+    {
+      "stimulus_id": "study2_C3_B_correction",
+      "scene_id": "study2_C3_B",
+      "condition": "correction",
+      "narrator_text": "The father and mother are having dinner alone this evening.",
+      "errors_description": "(1) everyone seated→one chair empty [Count] (2) all chairs taken→one has untouched place setting [Count] (3) no detail about the food. Targets empty chair.",
+      "target_animation": "C3",
+      "target_entities": [
+        "empty_chair"
+      ],
+      "target_category": "Count",
+      "options": {
+        "T": "Correct the claim that they are alone — one chair is empty",
+        "E1": "Correct the description of the food being served",
+        "E2": "Correct how many people are at the table",
+        "D1": "Mention the chandelier overhead",
+        "D2": "Describe the candles on the sideboard"
+      },
+      "narrator_text_block2": "The father is standing to carve the turkey while the mother eats her soup, they are alone this evening.",
+      "pipeline_intent": "The system detected that you incorrectly claimed the father and mother were alone this evening, so it opened a puzzle-piece-shaped hole at the table, with the missing piece showing the silhouette of their child who will be joining them.",
+      "pipeline_animation_id": "C3",
+      "pipeline_target_entities": [
+        "empty_chair"
+      ],
+      "source_scene_id": "study1_C3_B",
+      "animation_id": "C3",
+      "role": "target",
+      "study1_pipeline_intent": "The system detected that you incorrectly claimed all the father and mother were alone this evening, so it will show a ghost outline of their child who will be joining them."
+    },
+    {
+      "stimulus_id": "study2_C3_B_suggestion",
+      "scene_id": "study2_C3_B",
+      "condition": "suggestion",
+      "narrator_text": "A father carves a roast at the dinner table. A mother serves salad. The table is set for four people.",
+      "target_misl": "CH",
+      "options": {
+        "T": "Mention that someone seems to be missing — one place setting is untouched",
+        "D1": "Describe the empty chair's place setting in detail",
+        "D2": "Mention other people who might be expected for dinner",
+        "D3": "Describe the food on the table",
+        "D4": "Say what the parents might be discussing"
+      },
+      "mention_counts": {
+        "CH": 0,
+        "S": 3,
+        "IE": 3,
+        "IR": 3,
+        "P": 3,
+        "A": 3,
+        "CO": 3,
+        "ENP": 3,
+        "ADV": 3,
+        "SC": 3,
+        "CC": 3,
+        "M": 3,
+        "L": 3,
+        "G": 3,
+        "T": 3
+      },
+      "pipeline_intent": "You described the father carving the roast and the mother eating her soup, but you could also mention that one place setting is untouched, as if someone is missing from the table.",
+      "pipeline_animation_id": "C3",
+      "pipeline_target_entities": [
+        "father",
+        "mother"
+      ],
+      "source_scene_id": "study1_C3_B",
+      "animation_id": "C3",
+      "role": "target",
+      "study1_pipeline_intent": "You described the father carving the roast and the mother eating her soup, but you could also mention that one place setting is untouched, as if someone is missing from the table."
+    },
+    {
+      "stimulus_id": "study2_C3_C_correction",
+      "scene_id": "study2_C3_C",
+      "condition": "correction",
+      "narrator_text": "The old man in the red cardigan sits alone on the bench reading under the oak tree.",
+      "errors_description": "(1) alone→companion implied by jacket/glasses [Count] (2) red→brown cardigan [Property] (3) oak→maple tree [Identity]. Targets #1.",
+      "target_animation": "C3",
+      "target_entities": [
+        "empty_spot"
+      ],
+      "target_category": "Count",
+      "options": {
+        "T": "Correct the claim that the man is alone — someone else was sitting here",
+        "E1": "Correct the color of the man's cardigan — it is not red",
+        "E2": "Correct the type of tree — it is not an oak",
+        "D1": "Mention the rose bushes behind the bench",
+        "D2": "Describe the fountain in the distance"
+      },
+      "narrator_text_block2": "The old man has been sitting alone on the bench all day, reading under the maple tree.",
+      "pipeline_intent": "The system detected that you said the old man was alone and decided to open a puzzle-piece-shaped hole beside him on the bench, with the missing piece showing the silhouette of the woman who usually sits there.",
+      "pipeline_animation_id": "C3",
+      "pipeline_target_entities": [
+        "empty_spot"
+      ],
+      "source_scene_id": "study1_C3_C",
+      "animation_id": "C3",
+      "role": "target",
+      "study1_pipeline_intent": "The system detected that you mentioned a maple tree that isn't in this scene and decided to highlight an empty spot with a ghost outline to show that the tree you're talking about is missing."
+    },
+    {
+      "stimulus_id": "study2_C3_C_suggestion",
+      "scene_id": "study2_C3_C",
+      "condition": "suggestion",
+      "narrator_text": "An old man reads a book on a park bench under a maple tree. Autumn leaves cover the ground.",
+      "target_misl": "CH",
+      "options": {
+        "T": "Mention that someone seems to be missing — the jacket suggests another person",
+        "D1": "Describe the jacket and glasses case in detail",
+        "D2": "Mention other visitors you might expect in the park",
+        "D3": "Describe the autumn scenery",
+        "D4": "Say what the man might be thinking about"
+      },
+      "mention_counts": {
+        "CH": 0,
+        "S": 3,
+        "IE": 3,
+        "IR": 3,
+        "P": 3,
+        "A": 3,
+        "CO": 3,
+        "ENP": 3,
+        "ADV": 3,
+        "SC": 3,
+        "CC": 3,
+        "M": 3,
+        "L": 3,
+        "G": 3,
+        "T": 3
+      },
+      "pipeline_intent": "You've described the old man reading his book, but you could mention that his wife might be joining him soon.",
+      "pipeline_animation_id": "C3",
+      "pipeline_target_entities": [
+        "old_man"
+      ],
+      "source_scene_id": "study1_C3_C",
+      "animation_id": "C3",
+      "role": "target",
+      "study1_pipeline_intent": "You've described the old man reading his book, but you could mention that his wife might be joining him soon."
+    },
+    {
+      "stimulus_id": "study2_C3_D_correction",
+      "scene_id": "study2_C3_D",
+      "condition": "correction",
+      "narrator_text": "The old man in denim overalls works alone in the workshop, carefully sanding a small wooden shelf. The golden retriever is asleep under the workbench.",
+      "errors_description": "(1) alone→child implied by red hoodie and goggles on stool [Count] (2) wooden shelf→birdhouse [Identity] (3) asleep under workbench→lying at his feet watching him [Property]. Targets #1.",
+      "target_animation": "C3",
+      "target_entities": [
+        "child_belongings"
+      ],
+      "target_category": "Count",
+      "options": {
+        "T": "Correct the claim that the man is working alone — a child was here and their things are still on the stool",
+        "E1": "Correct what the man is sanding — it is not a shelf",
+        "E2": "Correct what the dog is doing — it is not asleep under the workbench",
+        "D1": "Mention the tools hanging on the pegboard behind him",
+        "D2": "Describe the small wooden projects on the shelves along the wall"
+      },
+      "narrator_text_block2": "The grandpa in denim overalls works alone in the workshop, building a little wooden birdhouse. The golden dog is lying on the floor watching him.",
+      "pipeline_intent": "The system detected that you said the grandpa was working alone and decided to open a puzzle-piece-shaped hole beside him, with the missing piece showing the silhouette of the boy whose hoodie is still on the stool, since he isn't in the workshop.",
+      "pipeline_animation_id": "C3",
+      "pipeline_target_entities": [
+        "child_belongings"
+      ],
+      "source_scene_id": "study1_C3_D",
+      "animation_id": "C3",
+      "role": "target",
+      "study1_pipeline_intent": "The system detected that you mentioned your belongings from a different scene and decided to show a ghost outline of them since they aren't in the workshop."
+    },
+    {
+      "stimulus_id": "study2_C3_D_suggestion",
+      "scene_id": "study2_C3_D",
+      "condition": "suggestion",
+      "narrator_text": "An old man in denim overalls sands a small wooden birdhouse at a cluttered workbench. A golden retriever lies at his feet, watching him work.",
+      "target_misl": "CH",
+      "options": {
+        "T": "Mention that someone seems to be missing — the red hoodie and safety goggles on the stool suggest a child was here",
+        "D1": "Describe the child's belongings on the stool in more detail",
+        "D2": "Mention the tools hanging on the pegboard",
+        "D3": "Describe the other wooden projects on the shelves",
+        "D4": "Say what the birdhouse might be intended for"
+      },
+      "mention_counts": {
+        "CH": 0,
+        "S": 3,
+        "IE": 3,
+        "IR": 3,
+        "P": 3,
+        "A": 3,
+        "CO": 3,
+        "ENP": 3,
+        "ADV": 3,
+        "SC": 3,
+        "CC": 3,
+        "M": 3,
+        "L": 3,
+        "G": 3,
+        "T": 3
+      },
+      "pipeline_intent": "You've described the grandfather and his dog, but you could also mention that a boy might have been helping him, since there is a red hoodie left on the stool.",
+      "pipeline_animation_id": "C3",
+      "pipeline_target_entities": [
+        "scene"
+      ],
+      "source_scene_id": "study1_C3_D",
+      "animation_id": "C3",
+      "role": "target",
+      "study1_pipeline_intent": "You've described the grandfather and his dog, but you could also mention that a boy might have been helping him, since there is a red hoodie left on the stool."
+    },
+    {
+      "stimulus_id": "study2_S1_A_correction",
+      "scene_id": "study2_S1_A",
+      "condition": "correction",
+      "narrator_text": "The grandmother is baking in the kitchen. The dog sleeps on a sofa. Outside the window, it is sunny.",
+      "errors_description": "(1) baking→stirring pot [Action] (2) dog→cat [Identity] (3) sunny→snowy [Space/Property]. Targets #3.",
+      "target_animation": "S1",
+      "target_entities": [
+        "window"
+      ],
+      "target_category": "Space",
+      "options": {
+        "T": "Correct what the animal is sitting on - it is not a sofa",
+        "E1": "Correct what the grandmother is doing — she is not baking",
+        "E2": "Correct the animal on the chair — it is not a dog",
+        "D1": "Describe the pot on the stove",
+        "D2": "Describe the grandmother's appearance or clothing"
+      },
+      "narrator_text_block2": "The grandmother is stirring a pot in the kitchen. The cat sleeps on a chair. Outside the window, it is sunny.",
+      "pipeline_intent": "The system detected that you described the weather outside as sunny when it is actually snowing and decided to lift the grandmother aside like a flap to show you the snowy view through the window behind her.",
+      "pipeline_animation_id": "S1",
+      "pipeline_target_entities": [
+        "window"
+      ],
+      "source_scene_id": "study1_S1_A",
+      "animation_id": "S1",
+      "role": "target",
+      "study1_pipeline_intent": "The system detected that you described the weather outside as sunny when it is actually snowing and decided to draw your attention to the view through the window to show the winter scene."
+    },
+    {
+      "stimulus_id": "study2_S1_A_suggestion",
+      "scene_id": "study2_S1_A",
+      "condition": "suggestion",
+      "narrator_text": "The grandmother is cooking something in the kitchen. There is a cat sleeping on the chair.",
+      "target_misl": "S",
+      "options": {
+        "T": "Describe something in the scene that is hidden behind the grandmother",
+        "D1": "Describe the grandmother's appearance or clothing",
+        "D2": "Describe what is inside the pot on the stove",
+        "D3": "Add more detail about the cat",
+        "D4": "Say what the grandmother might be saying out loud"
+      },
+      "mention_counts": {
+        "CH": 3,
+        "S": 0,
+        "IE": 3,
+        "IR": 3,
+        "P": 3,
+        "A": 3,
+        "CO": 3,
+        "ENP": 3,
+        "ADV": 3,
+        "SC": 3,
+        "CC": 3,
+        "M": 3,
+        "L": 3,
+        "G": 3,
+        "T": 3
+      },
+      "pipeline_intent": "You've talked about the grandmother and the cat, but you could also mention the copper pans hanging on the wall behind her.",
+      "pipeline_animation_id": "S1",
+      "pipeline_target_entities": [
+        "scene"
+      ],
+      "source_scene_id": "study1_S1_A",
+      "animation_id": "S1",
+      "role": "target",
+      "study1_pipeline_intent": "You've talked about the grandmother and the cat, but you could also mention the copper pans hanging on the wall behind her."
+    },
+    {
+      "stimulus_id": "study2_S1_B_correction",
+      "scene_id": "study2_S1_B",
+      "condition": "correction",
+      "narrator_text": "The librarian in a red cardigan stands near the bookshelves. The walls are plain with nothing behind the curtains.",
+      "errors_description": "(1) red→navy cardigan [Property] (2) near bookshelves→in front of curtains [Space] (3) nothing behind→secret garden [Space]. Targets #3.",
+      "target_animation": "S1",
+      "target_entities": [
+        "garden"
+      ],
+      "target_category": "Space",
+      "options": {
+        "T": "Correct the claim — there IS something hidden behind the curtains",
+        "E1": "Correct the color of the librarian's cardigan",
+        "E2": "Correct where the librarian is standing",
+        "D1": "Describe the reading desk with the green lamp",
+        "D2": "Mention the Persian rug on the floor"
+      },
+      "narrator_text_block2": "The librarian in a yellow cardigan stands in front of the curtains. There is nothing behind the curtains.",
+      "pipeline_intent": "The system detected that you said there was nothing behind the curtains and decided to lift the librarian aside like a flap to show you the secret garden hidden behind the curtains.",
+      "pipeline_animation_id": "S1",
+      "pipeline_target_entities": [
+        "garden"
+      ],
+      "source_scene_id": "study1_S1_B",
+      "animation_id": "S1",
+      "role": "target",
+      "study1_pipeline_intent": "The system detected that you said there was nothing behind the curtains and chose to reveal the garden and stone path that are actually there."
+    },
+    {
+      "stimulus_id": "study2_S1_B_suggestion",
+      "scene_id": "study2_S1_B",
+      "condition": "suggestion",
+      "narrator_text": "A librarian stands in a grand old library with floor-to-ceiling bookshelves. Heavy velvet curtains hang along the back wall.",
+      "target_misl": "S",
+      "options": {
+        "T": "Describe something hidden behind the librarian or the curtains",
+        "D1": "Describe the librarian's appearance in more detail",
+        "D2": "Describe the books on the shelves",
+        "D3": "Describe the reading desk and lamp",
+        "D4": "Say what the librarian might be doing"
+      },
+      "mention_counts": {
+        "CH": 3,
+        "S": 0,
+        "IE": 3,
+        "IR": 3,
+        "P": 3,
+        "A": 3,
+        "CO": 3,
+        "ENP": 3,
+        "ADV": 3,
+        "SC": 3,
+        "CC": 3,
+        "M": 3,
+        "L": 3,
+        "G": 3,
+        "T": 3
+      },
+      "pipeline_intent": "You've introduced the librarian and the heavy curtains, but you could also describe the sunny garden and stone fountain that can be seen through the doorway.",
+      "pipeline_animation_id": "S1",
+      "pipeline_target_entities": [
+        "scene"
+      ],
+      "source_scene_id": "study1_S1_B",
+      "animation_id": "S1",
+      "role": "target",
+      "study1_pipeline_intent": "You've introduced the librarian and the heavy curtains, but you could also describe the sunny garden and stone fountain that can be seen through the doorway."
+    },
+    {
+      "stimulus_id": "study2_S1_C_correction",
+      "scene_id": "study2_S1_C",
+      "condition": "correction",
+      "narrator_text": "The shelf has only large colorful toy boxes. There is nothing special hidden behind them.",
+      "errors_description": "(1) only large boxes→music box hidden behind [Space] (2) nothing hidden→music box IS there [Space] (3) no mention of price tags. Targets: hidden music box.",
+      "target_animation": "S1",
+      "target_entities": [
+        "hidden_toy"
+      ],
+      "target_category": "Space",
+      "options": {
+        "T": "Correct the claim — there IS something hidden behind the large box",
+        "E1": "Correct the description of the shelf contents",
+        "E2": "Correct the number of boxes on display",
+        "D1": "Mention the NEW sign on the shelf",
+        "D2": "Describe the price tags on the boxes"
+      },
+      "narrator_text_block2": "The shelf has lots of different toy boxes with little price tags on the wood, but there is nothing special hidden behind them.",
+      "pipeline_intent": "The system detected that you said there was nothing hidden behind the boxes and decided to lift the large box aside like a flap to show you the music box hidden behind it.",
+      "pipeline_animation_id": "S1",
+      "pipeline_target_entities": [
+        "hidden_toy"
+      ],
+      "source_scene_id": "study1_S1_C",
+      "animation_id": "S1",
+      "role": "target",
+      "study1_pipeline_intent": "The system detected that you said there was nothing hidden behind the boxes and decided to reveal the secret toy inside the music box to show you it is there."
+    },
+    {
+      "stimulus_id": "study2_S1_C_suggestion",
+      "scene_id": "study2_S1_C",
+      "condition": "suggestion",
+      "narrator_text": "A toy store shelf is packed with large, colorful toy boxes. A race car set box takes up most of the space at the front.",
+      "target_misl": "S",
+      "options": {
+        "T": "Describe something hidden behind the large box at the front",
+        "D1": "Describe the race car set box in detail",
+        "D2": "Describe the other toy boxes on the shelf",
+        "D3": "Mention the price tags and NEW sign",
+        "D4": "Say who might shop in this aisle"
+      },
+      "mention_counts": {
+        "CH": 3,
+        "S": 0,
+        "IE": 3,
+        "IR": 3,
+        "P": 3,
+        "A": 3,
+        "CO": 3,
+        "ENP": 3,
+        "ADV": 3,
+        "SC": 3,
+        "CC": 3,
+        "M": 3,
+        "L": 3,
+        "G": 3,
+        "T": 3
+      },
+      "pipeline_intent": "You've described the toy store and the large race car box, but you could also mention the small ballerina hidden inside the music box next to it.",
+      "pipeline_animation_id": "S1",
+      "pipeline_target_entities": [
+        "scene"
+      ],
+      "source_scene_id": "study1_S1_C",
+      "animation_id": "S1",
+      "role": "target",
+      "study1_pipeline_intent": "You've described the toy store and the large race car box, but you could also mention the small ballerina hidden inside the music box next to it."
+    },
+    {
+      "stimulus_id": "study2_S1_D_correction",
+      "scene_id": "study2_S1_D",
+      "condition": "correction",
+      "narrator_text": "The tall man in a gray coat stands in a plain alley with bare brick walls and nothing behind him.",
+      "errors_description": "(1) plain→colorful mural behind him [Space] (2) nothing behind→vibrant artwork [Space] (3) bare brick→painted wall. Targets: mural behind him.",
+      "target_animation": "S1",
+      "target_entities": [
+        "mural"
+      ],
+      "target_category": "Space",
+      "options": {
+        "T": "Correct the claim — the wall behind the man is not plain",
+        "E1": "Correct the description of the alley walls",
+        "E2": "Correct what is visible at the edges of the man's figure",
+        "D1": "Mention the trash bins in the alley",
+        "D2": "Describe the fire escape above"
+      },
+      "narrator_text_block2": "The man in the green coat stands in an alley with brick walls and nothing behind him.",
+      "pipeline_intent": "The system detected that you said there was nothing behind the man and decided to lift him aside like a flap to show you the colorful mural on the wall behind him.",
+      "pipeline_animation_id": "S1",
+      "pipeline_target_entities": [
+        "mural"
+      ],
+      "source_scene_id": "study1_S1_D",
+      "animation_id": "S1",
+      "role": "target",
+      "study1_pipeline_intent": "The system detected that you said there was nothing behind the man and decided to reveal the colorful mural on the wall to show what is actually there."
+    },
+    {
+      "stimulus_id": "study2_S1_D_suggestion",
+      "scene_id": "study2_S1_D",
+      "condition": "suggestion",
+      "narrator_text": "A tall man in a long coat stands in the center of an alley with his hands in his pockets. He is positioned directly in front of a wall.",
+      "target_misl": "S",
+      "options": {
+        "T": "Describe something hidden behind the man on the wall",
+        "D1": "Describe the man's appearance in more detail",
+        "D2": "Describe the alley setting",
+        "D3": "Mention the trash bins and fire escape",
+        "D4": "Say where the man might be going"
+      },
+      "mention_counts": {
+        "CH": 3,
+        "S": 0,
+        "IE": 3,
+        "IR": 3,
+        "P": 3,
+        "A": 3,
+        "CO": 3,
+        "ENP": 3,
+        "ADV": 3,
+        "SC": 3,
+        "CC": 3,
+        "M": 3,
+        "L": 3,
+        "G": 3,
+        "T": 3
+      },
+      "pipeline_intent": "You've described the man standing in the alley, but you could also mention the colorful mural with the blue wing and swirling patterns on the wall behind him.",
+      "pipeline_animation_id": "S1",
+      "pipeline_target_entities": [
+        "scene"
+      ],
+      "source_scene_id": "study1_S1_D",
+      "animation_id": "S1",
+      "role": "target",
+      "study1_pipeline_intent": "You've described the man standing in the alley, but you could also mention the colorful mural with the blue wing and swirling patterns on the wall behind him."
+    },
+    {
+      "stimulus_id": "study1_C2_A_correction",
+      "scene_id": "study1_C2_A",
+      "condition": "correction",
+      "narrator_text": "On the farm there is a brown barn with animals: a cow, a pig, a horse, and a tractor.",
+      "errors_description": "(1) brown→red barn [Property] (2) horse→none [Count] (3) tractor doesn't belong. Targets tractor.",
+      "target_animation": "C2",
+      "target_entities": [
+        "tractor"
+      ],
+      "target_category": "Count",
+      "options": {
+        "T": "Remove the tractor from the narration — it does not belong",
+        "E1": "Correct the color of the barn — it is not brown",
+        "E2": "Remove the horse — there is no horse in the scene",
+        "D1": "Mention the chicken that was not listed",
+        "D2": "Describe where the animals are relative to each other"
+      },
+      "narrator_text_block2": "On the farm there is a red barn with a cow, a pig, and two tractors.",
+      "pipeline_intent": "The system detected that you said there were two tractors instead of one, so it used an animation to make the extra tractor vanish to show the correct number.",
+      "pipeline_animation_id": "C2",
+      "pipeline_target_entities": [
+        "tractor"
+      ],
+      "source_scene_id": "study1_C2_A",
+      "animation_id": "C2",
+      "role": "filler"
+    },
+    {
+      "stimulus_id": "study1_C2_A_suggestion",
+      "scene_id": "study1_C2_A",
+      "condition": "suggestion",
+      "narrator_text": "There is a cow grazing in a field on a farm. A pig is resting near a mud puddle. A tractor is parked by the barn.",
+      "target_misl": "CH",
+      "options": {
+        "T": "Mention that the tractor is about to leave or will soon be gone from the scene",
+        "D1": "Describe the tractor's appearance or color",
+        "D2": "Mention that the chicken will soon fly away",
+        "D3": "Describe the red barn in the background",
+        "D4": "Say how the cow and pig feel about each other"
+      },
+      "mention_counts": {
+        "CH": 0,
+        "S": 3,
+        "IE": 3,
+        "IR": 3,
+        "P": 3,
+        "A": 3,
+        "CO": 3,
+        "ENP": 3,
+        "ADV": 3,
+        "SC": 3,
+        "CC": 3,
+        "M": 3,
+        "L": 3,
+        "G": 3,
+        "T": 3
+      },
+      "pipeline_intent": "You described the cow, pig, and tractor well, but you could also mention that the green tractor is about to drive away from the barn.",
+      "pipeline_animation_id": "C2",
+      "pipeline_target_entities": [
+        "tractor"
+      ],
+      "source_scene_id": "study1_C2_A",
+      "animation_id": "C2",
+      "role": "filler"
+    },
+    {
+      "stimulus_id": "study1_C2_B_correction",
+      "scene_id": "study1_C2_B",
+      "condition": "correction",
+      "narrator_text": "In the toy box there is a teddy bear, a doll, a block tower, and a toy car.",
+      "errors_description": "(1) toy car→none [Count] (2) shoe doesn't belong [Count] (3) block tower is beside the box, not in it [Space]. Targets shoe.",
+      "target_animation": "C2",
+      "target_entities": [
+        "shoe"
+      ],
+      "target_category": "Count",
+      "options": {
+        "T": "Remove the teddy bear from the narration — it does not belong with the toys",
+        "E1": "Remove the toy car — there is no toy car",
+        "E2": "Correct where the block tower is — it is not inside the box",
+        "D1": "Mention the crayons and coloring book on the floor",
+        "D2": "Describe the colorful rug"
+      },
+      "narrator_text_block2": "In the toy box there is a teddy bear, and on the rug there is a doll, a block tower, and two shoes.",
+      "pipeline_intent": "The system detected that you mentioned two shoes instead of one and decided to make the extra shoe crumble away to show the correct amount.",
+      "pipeline_animation_id": "C2",
+      "pipeline_target_entities": [
+        "shoe"
+      ],
+      "source_scene_id": "study1_C2_B",
+      "animation_id": "C2",
+      "role": "filler"
+    },
+    {
+      "stimulus_id": "study1_C2_B_suggestion",
+      "scene_id": "study1_C2_B",
+      "condition": "suggestion",
+      "narrator_text": "There is a toy box in a playroom. A rag doll and some blocks are inside and around it. There is also a teddy bear.",
+      "target_misl": "CH",
+      "options": {
+        "T": "Mention that the teddy bear does not belong or will be removed from the toy box",
+        "D1": "Describe the teddy bear in more detail",
+        "D2": "Mention that the blocks will be put away soon",
+        "D3": "Describe the rag doll in more detail",
+        "D4": "Say who the toys belong to"
+      },
+      "mention_counts": {
+        "CH": 0,
+        "S": 3,
+        "IE": 3,
+        "IR": 3,
+        "P": 3,
+        "A": 3,
+        "CO": 3,
+        "ENP": 3,
+        "ADV": 3,
+        "SC": 3,
+        "CC": 3,
+        "M": 3,
+        "L": 3,
+        "G": 3,
+        "T": 3
+      },
+      "pipeline_intent": "You mentioned the teddy bear sitting in the chest, but you could add that he doesn't belong there and might be taken out.",
+      "pipeline_animation_id": "C2",
+      "pipeline_target_entities": [
+        "teddy"
+      ],
+      "source_scene_id": "study1_C2_B",
+      "animation_id": "C2",
+      "role": "filler"
+    },
+    {
+      "stimulus_id": "study1_C2_C_correction",
+      "scene_id": "study1_C2_C",
+      "condition": "correction",
+      "narrator_text": "In the fruit bowl there is an apple, a banana, a tennis ball, and a pear.",
+      "errors_description": "(1) pear→none [Count] (2) tennis ball doesn't belong [Count] (3) miscount. Targets tennis ball.",
+      "target_animation": "C2",
+      "target_entities": [
+        "tennis_ball"
+      ],
+      "target_category": "Count",
+      "options": {
+        "T": "Remove the tennis ball — it is not a fruit and does not belong",
+        "E1": "Remove the pear — there is no pear in the bowl",
+        "E2": "Correct the number of fruits in the bowl",
+        "D1": "Mention the vase of daisies beside the bowl",
+        "D2": "Describe the morning light through the window"
+      },
+      "narrator_text_block2": "In the fruit bowl there is an apple, a banana, and two tennis balls.",
+      "pipeline_intent": "The system detected that you counted too many tennis balls and decided to make the extra one crumble away to show there is actually only one.",
+      "pipeline_animation_id": "C2",
+      "pipeline_target_entities": [
+        "tennis_ball"
+      ],
+      "source_scene_id": "study1_C2_C",
+      "animation_id": "C2",
+      "role": "filler"
+    },
+    {
+      "stimulus_id": "study1_C2_C_suggestion",
+      "scene_id": "study1_C2_C",
+      "condition": "suggestion",
+      "narrator_text": "There is a fruit bowl on a kitchen counter with an apple and a banana. There is also a green ball among them.",
+      "target_misl": "CH",
+      "options": {
+        "T": "Mention that the tennis ball does not belong or should be removed",
+        "D1": "Describe what the tennis ball looks like",
+        "D2": "Mention that the banana is getting old",
+        "D3": "Describe the vase of flowers nearby",
+        "D4": "Say who left the ball in the bowl"
+      },
+      "mention_counts": {
+        "CH": 0,
+        "S": 3,
+        "IE": 3,
+        "IR": 3,
+        "P": 3,
+        "A": 3,
+        "CO": 3,
+        "ENP": 3,
+        "ADV": 3,
+        "SC": 3,
+        "CC": 3,
+        "M": 3,
+        "L": 3,
+        "G": 3,
+        "T": 3
+      },
+      "pipeline_intent": "You mentioned the apple, banana, and the green ball, but you could explain that the tennis ball doesn't belong in the fruit bowl and should be removed.",
+      "pipeline_animation_id": "C2",
+      "pipeline_target_entities": [
+        "tennis_ball"
+      ],
+      "source_scene_id": "study1_C2_C",
+      "animation_id": "C2",
+      "role": "filler"
+    },
+    {
+      "stimulus_id": "study1_C2_D_correction",
+      "scene_id": "study1_C2_D",
+      "condition": "correction",
+      "narrator_text": "On the shelf there is a red book, a blue book, a green book, a coffee mug, and a dictionary.",
+      "errors_description": "(1) dictionary→none [Count] (2) mug doesn't belong [Count] (3) extra item. Targets mug.",
+      "target_animation": "C2",
+      "target_entities": [
+        "mug"
+      ],
+      "target_category": "Count",
+      "options": {
+        "T": "Remove the coffee mug — it does not belong on the bookshelf",
+        "E1": "Remove the dictionary — there is no dictionary visible",
+        "E2": "Correct the description of the books",
+        "D1": "Mention the desk with the brass lamp",
+        "D2": "Describe the leather reading chair"
+      },
+      "narrator_text_block2": "On the shelf there is a red book, a blue book, a green book, and two coffee mugs.",
+      "pipeline_intent": "The system detected that you counted two coffee mugs instead of one, so it decided to make the extra mug disintegrate to show the correct number.",
+      "pipeline_animation_id": "C2",
+      "pipeline_target_entities": [
+        "mug"
+      ],
+      "source_scene_id": "study1_C2_D",
+      "animation_id": "C2",
+      "role": "filler"
+    },
+    {
+      "stimulus_id": "study1_C2_D_suggestion",
+      "scene_id": "study1_C2_D",
+      "condition": "suggestion",
+      "narrator_text": "There is a bookshelf in a home office with a red book, a blue book, and a green book. A mug sits between the books.",
+      "target_misl": "CH",
+      "options": {
+        "T": "Mention that the mug does not belong on the shelf or should be removed",
+        "D1": "Describe what the mug looks like",
+        "D2": "Mention that one of the books will be taken out",
+        "D3": "Describe the framed photographs on the wall",
+        "D4": "Say who works in this office"
+      },
+      "mention_counts": {
+        "CH": 0,
+        "S": 3,
+        "IE": 3,
+        "IR": 3,
+        "P": 3,
+        "A": 3,
+        "CO": 3,
+        "ENP": 3,
+        "ADV": 3,
+        "SC": 3,
+        "CC": 3,
+        "M": 3,
+        "L": 3,
+        "G": 3,
+        "T": 3
+      },
+      "pipeline_intent": "You described the books and the mug on the shelf, but you could mention that the brown mug doesn't really belong there and should be taken away.",
+      "pipeline_animation_id": "C2",
+      "pipeline_target_entities": [
+        "mug"
+      ],
+      "source_scene_id": "study1_C2_D",
+      "animation_id": "C2",
+      "role": "filler"
+    },
+    {
+      "stimulus_id": "study1_P2f_A_correction",
+      "scene_id": "study1_P2f_A",
+      "condition": "correction",
+      "narrator_text": "The happy boy is standing on the school yard while the teacher sits on a bench.",
+      "errors_description": "(1) happy→sad [IR] (2) standing→sitting [Action] (3) teacher sits→teacher walks [Action]. Targets #1.",
+      "target_animation": "P2f",
+      "target_entities": [
+        "boy"
+      ],
+      "target_category": "Property",
+      "options": {
+        "T": "Correct the emotion — the boy is not happy",
+        "E1": "Correct the boy's posture — he is not standing",
+        "E2": "Correct what the teacher is doing — the teacher is not sitting",
+        "D1": "Mention the ball on the ground",
+        "D2": "Describe the other children in the background"
+      },
+      "narrator_text_block2": "The happy boy is sitting on the school yard while the teacher walks toward him.",
+      "pipeline_intent": "The system detected that you described the boy as happy when he is actually feeling sad and upset, so it decided to show symbols of distress around him to highlight his true feelings.",
+      "pipeline_animation_id": "P2f",
+      "pipeline_target_entities": [
+        "boy"
+      ],
+      "source_scene_id": "study1_P2f_A",
+      "animation_id": "P2f",
+      "role": "filler"
+    },
+    {
+      "stimulus_id": "study1_P2f_A_suggestion",
+      "scene_id": "study1_P2f_A",
+      "condition": "suggestion",
+      "narrator_text": "A boy is sitting on the ground in a school yard. He has a scraped knee. A teacher is walking toward him.",
+      "target_misl": "IR",
+      "options": {
+        "T": "Describe how the boy is feeling",
+        "D1": "Describe the boy's appearance in more detail",
+        "D2": "Describe how the teacher is feeling",
+        "D3": "Mention the other children playing in the background",
+        "D4": "Describe the relationship between the boy and the teacher"
+      },
+      "mention_counts": {
+        "CH": 3,
+        "S": 3,
+        "IE": 3,
+        "IR": 0,
+        "P": 3,
+        "A": 3,
+        "CO": 3,
+        "ENP": 3,
+        "ADV": 3,
+        "SC": 3,
+        "CC": 3,
+        "M": 3,
+        "L": 3,
+        "G": 3,
+        "T": 3
+      },
+      "pipeline_intent": "You mentioned the boy's scraped knee and the teacher walking over, but you could also describe how sad the boy feels or that the teacher looks worried.",
+      "pipeline_animation_id": "P2f",
+      "pipeline_target_entities": [
+        "boy",
+        "teacher"
+      ],
+      "source_scene_id": "study1_P2f_A",
+      "animation_id": "P2f",
+      "role": "filler"
+    },
+    {
+      "stimulus_id": "study1_P2f_B_correction",
+      "scene_id": "study1_P2f_B",
+      "condition": "correction",
+      "narrator_text": "The cheerful girl in the red sweater watches the snow fall from her desk by the window.",
+      "errors_description": "(1) cheerful→sad [IR] (2) red→blue sweater [Property] (3) snow→rain [Property]. Targets #1.",
+      "target_animation": "P2f",
+      "target_entities": [
+        "girl"
+      ],
+      "target_category": "Property",
+      "options": {
+        "T": "Correct the emotion — the girl is not cheerful",
+        "E1": "Correct the color of the girl's sweater",
+        "E2": "Correct the weather — it is not snowing",
+        "D1": "Mention the math workbook on the desk",
+        "D2": "Describe the stuffed rabbit on the window seat"
+      },
+      "narrator_text_block2": "The sad girl in the yellow sweater watches the rain fall from the window sill.",
+      "pipeline_intent": "The system detected that you described the girl as cheerful when she is actually feeling sad, so it decided to show an animation highlighting her true emotional state.",
+      "pipeline_animation_id": "P2f",
+      "pipeline_target_entities": [
+        "girl"
+      ],
+      "source_scene_id": "study1_P2f_B",
+      "animation_id": "P2f",
+      "role": "filler"
+    },
+    {
+      "stimulus_id": "study1_P2f_B_suggestion",
+      "scene_id": "study1_P2f_B",
+      "condition": "suggestion",
+      "narrator_text": "A girl sits on a window seat in her bedroom. Heavy rain streams down the glass outside. A stuffed rabbit lies beside her.",
+      "target_misl": "IR",
+      "options": {
+        "T": "Describe how the girl is feeling",
+        "D1": "Describe the girl's posture or body language",
+        "D2": "Describe the mood created by the rain",
+        "D3": "Mention the homework on the desk",
+        "D4": "Say what the girl might want to do"
+      },
+      "mention_counts": {
+        "CH": 3,
+        "S": 3,
+        "IE": 3,
+        "IR": 0,
+        "P": 3,
+        "A": 3,
+        "CO": 3,
+        "ENP": 3,
+        "ADV": 3,
+        "SC": 3,
+        "CC": 3,
+        "M": 3,
+        "L": 3,
+        "G": 3,
+        "T": 3
+      },
+      "pipeline_intent": "You've described the girl sitting by the window during the storm, but you could also mention that she is feeling sad about the rainy weather and hoping for it to stop.",
+      "pipeline_animation_id": "P2f",
+      "pipeline_target_entities": [
+        "girl"
+      ],
+      "source_scene_id": "study1_P2f_B",
+      "animation_id": "P2f",
+      "role": "filler"
+    },
+    {
+      "stimulus_id": "study1_P2f_C_correction",
+      "scene_id": "study1_P2f_C",
+      "condition": "correction",
+      "narrator_text": "The excited boy in a white sweatshirt sits in the vet clinic holding a full pet carrier and smiling.",
+      "errors_description": "(1) excited→upset [IR] (2) white→gray sweatshirt [Property] (3) full→empty carrier [Property]. Targets #1.",
+      "target_animation": "P2f",
+      "target_entities": [
+        "boy"
+      ],
+      "target_category": "Property",
+      "options": {
+        "T": "Correct the emotion — the boy is not excited or smiling",
+        "E1": "Correct the color of the boy's sweatshirt",
+        "E2": "Correct the carrier — it is not full",
+        "D1": "Mention the pet adoption poster on the wall",
+        "D2": "Describe the reception desk"
+      },
+      "narrator_text_block2": "The happy boy in his striped shirt and overalls sits in the vet clinic holding a pet carrier.",
+      "pipeline_intent": "The system detected that you described the boy as excited when he is actually feeling sad and upset, so it decided to show an animation highlighting his true emotional state.",
+      "pipeline_animation_id": "P2f",
+      "pipeline_target_entities": [
+        "boy"
+      ],
+      "source_scene_id": "study1_P2f_C",
+      "animation_id": "P2f",
+      "role": "filler"
+    },
+    {
+      "stimulus_id": "study1_P2f_C_suggestion",
+      "scene_id": "study1_P2f_C",
+      "condition": "suggestion",
+      "narrator_text": "A boy sits in a veterinary clinic waiting room. An empty pet carrier is on the chair beside him. A pet adoption poster is on the wall.",
+      "target_misl": "IR",
+      "options": {
+        "T": "Describe how the boy is feeling",
+        "D1": "Describe the boy's body language or posture",
+        "D2": "Describe the mood of the waiting room",
+        "D3": "Describe the poster on the wall",
+        "D4": "Say what might have happened to the pet"
+      },
+      "mention_counts": {
+        "CH": 3,
+        "S": 3,
+        "IE": 3,
+        "IR": 0,
+        "P": 3,
+        "A": 3,
+        "CO": 3,
+        "ENP": 3,
+        "ADV": 3,
+        "SC": 3,
+        "CC": 3,
+        "M": 3,
+        "L": 3,
+        "G": 3,
+        "T": 3
+      },
+      "pipeline_intent": "You mentioned the boy and the pet carrier, but you could also describe how he is feeling very sad and worried while he waits.",
+      "pipeline_animation_id": "P2f",
+      "pipeline_target_entities": [
+        "boy"
+      ],
+      "source_scene_id": "study1_P2f_C",
+      "animation_id": "P2f",
+      "role": "filler"
+    },
+    {
+      "stimulus_id": "study1_P2f_D_correction",
+      "scene_id": "study1_P2f_D",
+      "condition": "correction",
+      "narrator_text": "The happy girl in a blue hoodie waves excitedly at her friend arriving with a suitcase.",
+      "errors_description": "(1) happy→sad [IR] (2) blue→pink hoodie [Property] (3) arriving→leaving/walking away [Action]. Targets #1.",
+      "target_animation": "P2f",
+      "target_entities": [
+        "girl"
+      ],
+      "target_category": "Property",
+      "options": {
+        "T": "Correct the emotion — the girl is not happy",
+        "E1": "Correct the color of the girl's hoodie",
+        "E2": "Correct the direction — the friend is leaving, not arriving",
+        "D1": "Mention the moving truck at the curb",
+        "D2": "Describe the SOLD sign in the garden"
+      },
+      "narrator_text_block2": "The happy girl in a yellow sweater waves at her friend leaving with a suitcase.",
+      "pipeline_intent": "The system detected that you described the girl as happy when she is actually feeling sad, so it decided to show symbols of distress around her to highlight her true emotional state.",
+      "pipeline_animation_id": "P2f",
+      "pipeline_target_entities": [
+        "girl"
+      ],
+      "source_scene_id": "study1_P2f_D",
+      "animation_id": "P2f",
+      "role": "filler"
+    },
+    {
+      "stimulus_id": "study1_P2f_D_suggestion",
+      "scene_id": "study1_P2f_D",
+      "condition": "suggestion",
+      "narrator_text": "A girl waves from the sidewalk. Another girl walks away pulling a suitcase toward a moving truck. Boxes are on the front lawn.",
+      "target_misl": "IR",
+      "options": {
+        "T": "Describe how the girl waving feels",
+        "D1": "Describe the girl's body language or expression",
+        "D2": "Describe how the departing friend feels",
+        "D3": "Describe the moving truck and boxes",
+        "D4": "Say why the friend is leaving"
+      },
+      "mention_counts": {
+        "CH": 3,
+        "S": 3,
+        "IE": 3,
+        "IR": 0,
+        "P": 3,
+        "A": 3,
+        "CO": 3,
+        "ENP": 3,
+        "ADV": 3,
+        "SC": 3,
+        "CC": 3,
+        "M": 3,
+        "L": 3,
+        "G": 3,
+        "T": 3
+      },
+      "pipeline_intent": "You noticed the girl waving and her friend walking away, but you could also mention how the girl feels or the single tear on her cheek as she says goodbye.",
+      "pipeline_animation_id": "P2f",
+      "pipeline_target_entities": [
+        "girl"
+      ],
+      "source_scene_id": "study1_P2f_D",
+      "animation_id": "P2f",
+      "role": "filler"
+    },
+    {
+      "stimulus_id": "study1_T1_A_correction",
+      "scene_id": "study1_T1_A",
+      "condition": "correction",
+      "narrator_text": "The baker is about to start baking the bread. A boy approaches the shop. It is summer.",
+      "errors_description": "(1) about to bake→already baked [Time] (2) boy→girl [Identity] (3) 6 PM→3 PM [Property]. Targets #1.",
+      "target_animation": "T1",
+      "target_entities": [
+        "baker"
+      ],
+      "target_category": "Time",
+      "options": {
+        "T": "Correct the timing — the bread is already baked, not about to be baked",
+        "E1": "Correct who is approaching the shop — it is not a boy",
+        "E2": "Correct the season — it is not summer",
+        "D1": "Mention the fallen leaves on the ground",
+        "D2": "Describe the baker's shop"
+      },
+      "narrator_text_block2": "The baker is about to start baking the bread. A girl approaches the shop. It is autumn.",
+      "pipeline_intent": "The system detected that you spoke as if the baking was just beginning and decided to show a flashback to remind you that the bread is already out of the oven.",
+      "pipeline_animation_id": "T1",
+      "pipeline_target_entities": [
+        "baker"
+      ],
+      "source_scene_id": "study1_T1_A",
+      "animation_id": "T1",
+      "role": "filler"
+    },
+    {
+      "stimulus_id": "study1_T1_A_suggestion",
+      "scene_id": "study1_T1_A",
+      "condition": "suggestion",
+      "narrator_text": "A baker is standing outside his shop holding a tray of bread. A girl is approaching the shop.",
+      "target_misl": "T",
+      "options": {
+        "T": "Mention that the baking already happened — the bread was made earlier",
+        "D1": "Describe the bread on the tray in more detail",
+        "D2": "Mention the time shown on the clock tower",
+        "D3": "Describe the fallen leaves and the season",
+        "D4": "Say what the girl might say to the baker"
+      },
+      "mention_counts": {
+        "CH": 3,
+        "S": 3,
+        "IE": 3,
+        "IR": 3,
+        "P": 3,
+        "A": 3,
+        "CO": 3,
+        "ENP": 3,
+        "ADV": 3,
+        "SC": 3,
+        "CC": 3,
+        "M": 3,
+        "L": 3,
+        "G": 3,
+        "T": 0
+      },
+      "pipeline_intent": "You mentioned the baker holding the tray, but you could also say that he has just finished baking those warm loaves of bread.",
+      "pipeline_animation_id": "T1",
+      "pipeline_target_entities": [
+        "scene"
+      ],
+      "source_scene_id": "study1_T1_A",
+      "animation_id": "T1",
+      "role": "filler"
+    },
+    {
+      "stimulus_id": "study1_T1_B_correction",
+      "scene_id": "study1_T1_B",
+      "condition": "correction",
+      "narrator_text": "The boy is about to open his presents at the start of his birthday party. The cake is freshly set on the table.",
+      "errors_description": "(1) about to open→already opened [Time] (2) start→aftermath [Time] (3) cake freshly set→mostly eaten [Property]. Targets #1.",
+      "target_animation": "T1",
+      "target_entities": [
+        "boy"
+      ],
+      "target_category": "Time",
+      "options": {
+        "T": "Correct the timing — the presents have already been opened",
+        "E1": "Correct the description of the party — it is not the start",
+        "E2": "Correct the cake — it is not freshly set",
+        "D1": "Describe the deflated balloons",
+        "D2": "Mention the lopsided birthday banner"
+      },
+      "narrator_text_block2": "The boy is about to open his presents at the end of his birthday party. The cake is all gone and there are only crumbs on the table.",
+      "pipeline_intent": "The system detected that you described the boy as being about to open his presents when he has already finished opening them and decided to show a flashback to clarify the order of events.",
+      "pipeline_animation_id": "T1",
+      "pipeline_target_entities": [
+        "boy"
+      ],
+      "source_scene_id": "study1_T1_B",
+      "animation_id": "T1",
+      "role": "filler"
+    },
+    {
+      "stimulus_id": "study1_T1_B_suggestion",
+      "scene_id": "study1_T1_B",
+      "condition": "suggestion",
+      "narrator_text": "A boy sits on the carpet holding a new toy robot. Torn wrapping paper is scattered around him. A birthday banner hangs on the wall.",
+      "target_misl": "T",
+      "options": {
+        "T": "Mention that the unwrapping already happened — the presents were opened earlier",
+        "D1": "Describe the toy robot in the boy's hands",
+        "D2": "Describe the time of day or atmosphere",
+        "D3": "Describe the party mess on the table",
+        "D4": "Say how the boy feels about his present"
+      },
+      "mention_counts": {
+        "CH": 3,
+        "S": 3,
+        "IE": 3,
+        "IR": 3,
+        "P": 3,
+        "A": 3,
+        "CO": 3,
+        "ENP": 3,
+        "ADV": 3,
+        "SC": 3,
+        "CC": 3,
+        "M": 3,
+        "L": 3,
+        "G": 3,
+        "T": 0
+      },
+      "pipeline_intent": "You mentioned the boy and the scattered paper, but you could also say that he has just finished unwrapping his new toy robot.",
+      "pipeline_animation_id": "T1",
+      "pipeline_target_entities": [
+        "scene"
+      ],
+      "source_scene_id": "study1_T1_B",
+      "animation_id": "T1",
+      "role": "filler"
+    },
+    {
+      "stimulus_id": "study1_T1_C_correction",
+      "scene_id": "study1_T1_C",
+      "condition": "correction",
+      "narrator_text": "The girl is about to build a snowman in the front yard on a snowy winter morning.",
+      "errors_description": "(1) about to build→already melted [Time] (2) snowy→mild/melting [Property] (3) winter morning→late winter [Time]. Targets #1.",
+      "target_animation": "T1",
+      "target_entities": [
+        "puddle"
+      ],
+      "target_category": "Time",
+      "options": {
+        "T": "Correct the timing — the snowman was already built and has melted",
+        "E1": "Correct the weather — it is not a snowy morning",
+        "E2": "Correct the season details",
+        "D1": "Describe the SOLD sign in the garden",
+        "D2": "Mention the patches of old snow by the fence"
+      },
+      "narrator_text_block2": "The girl is about to build a snowman in the yard on a mild late winter day.",
+      "pipeline_intent": "The system detected that you described the girl preparing to build a snowman when the puddle shows that one has already melted, so it decided to show a flashback of the snowman that used to be there.",
+      "pipeline_animation_id": "T1",
+      "pipeline_target_entities": [
+        "puddle"
+      ],
+      "source_scene_id": "study1_T1_C",
+      "animation_id": "T1",
+      "role": "filler"
+    },
+    {
+      "stimulus_id": "study1_T1_C_suggestion",
+      "scene_id": "study1_T1_C",
+      "condition": "suggestion",
+      "narrator_text": "A girl stands in a front yard looking at a puddle on the grass. A scarf, a carrot, and some coal stones lie in the puddle. Patchy snow is on the ground.",
+      "target_misl": "T",
+      "options": {
+        "T": "Mention that a snowman was here before — it has already melted",
+        "D1": "Describe the remains in the puddle in detail",
+        "D2": "Describe the current weather or temperature",
+        "D3": "Describe the front yard and fence",
+        "D4": "Say how the girl feels looking at the remains"
+      },
+      "mention_counts": {
+        "CH": 3,
+        "S": 3,
+        "IE": 3,
+        "IR": 3,
+        "P": 3,
+        "A": 3,
+        "CO": 3,
+        "ENP": 3,
+        "ADV": 3,
+        "SC": 3,
+        "CC": 3,
+        "M": 3,
+        "L": 3,
+        "G": 3,
+        "T": 0
+      },
+      "pipeline_intent": "You described the scarf and carrot in the puddle, but you could mention that a snowman used to be standing there before it melted away.",
+      "pipeline_animation_id": "T1",
+      "pipeline_target_entities": [
+        "scene"
+      ],
+      "source_scene_id": "study1_T1_C",
+      "animation_id": "T1",
+      "role": "filler"
+    },
+    {
+      "stimulus_id": "study1_T1_D_correction",
+      "scene_id": "study1_T1_D",
+      "condition": "correction",
+      "narrator_text": "The fans are cheering as the exciting game begins in the packed stadium. The scoreboard is blank.",
+      "errors_description": "(1) game begins→already over [Time] (2) packed→nearly empty [Property] (3) blank scoreboard→shows final score [Property]. Targets #1.",
+      "target_animation": "T1",
+      "target_entities": [
+        "scoreboard"
+      ],
+      "target_category": "Time",
+      "options": {
+        "T": "Correct the timing — the game is already over, not just beginning",
+        "E1": "Correct the stadium — it is not packed",
+        "E2": "Correct the scoreboard — it is not blank",
+        "D1": "Describe the confetti on the steps",
+        "D2": "Mention the janitor sweeping the stands"
+      },
+      "narrator_text_block2": "The stadium is empty while the man cleans up, but the scoreboard shows the game is just starting.",
+      "pipeline_intent": "The system detected that you described the game as just beginning when the messy stadium shows it is already over, and decided to use a flashback animation on the scoreboard to show the event occurred in the past.",
+      "pipeline_animation_id": "T1",
+      "pipeline_target_entities": [
+        "scoreboard"
+      ],
+      "source_scene_id": "study1_T1_D",
+      "animation_id": "T1",
+      "role": "filler"
+    },
+    {
+      "stimulus_id": "study1_T1_D_suggestion",
+      "scene_id": "study1_T1_D",
+      "condition": "suggestion",
+      "narrator_text": "A janitor sweeps between empty rows of seats in a stadium. The scoreboard shows HOME 3 - VISITORS 2. Confetti and litter are scattered on the steps.",
+      "target_misl": "T",
+      "options": {
+        "T": "Mention that the game already happened — the excitement is over",
+        "D1": "Describe the score and what it tells us",
+        "D2": "Describe the time of day (evening, lights still on)",
+        "D3": "Describe the mess left by the fans",
+        "D4": "Say how the janitor feels about the empty stadium"
+      },
+      "mention_counts": {
+        "CH": 3,
+        "S": 3,
+        "IE": 3,
+        "IR": 3,
+        "P": 3,
+        "A": 3,
+        "CO": 3,
+        "ENP": 3,
+        "ADV": 3,
+        "SC": 3,
+        "CC": 3,
+        "M": 3,
+        "L": 3,
+        "G": 3,
+        "T": 0
+      },
+      "pipeline_intent": "You've described the janitor cleaning up the litter, but you could mention that the exciting game is already over and the fans have all gone home.",
+      "pipeline_animation_id": "T1",
+      "pipeline_target_entities": [
+        "scene"
+      ],
+      "source_scene_id": "study1_T1_D",
+      "animation_id": "T1",
+      "role": "filler"
+    }
+  ]
+}

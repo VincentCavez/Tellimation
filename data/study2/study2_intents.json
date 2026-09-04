@@ -1,0 +1,15 @@
+{
+  "_note": "Rewritten pipeline_intent for the 12 correction stimuli (the new animations). Suggestion intents do not describe the animation in Study 1 and are kept verbatim.",
+  "study2_I2_A_correction": "The system detected that you used the wrong title for the boy with glasses and decided to turn him into a dark silhouette for a moment to make you say who he really is.",
+  "study2_I2_B_correction": "The system detected that you used the wrong title for the girl wearing the crown and decided to turn her into a dark silhouette for a moment to make you say who she really is, the birthday girl.",
+  "study2_I2_C_correction": "The system detected that you used the wrong title for the boy and decided to turn him into a dark silhouette for a moment to make you say who he really is.",
+  "study2_I2_D_correction": "The system detected that you used the wrong professional title for the person leading the orchestra and decided to turn him into a dark silhouette for a moment to make you say what he really is, a conductor.",
+  "study2_C3_A_correction": "The system detected that you said the girl was alone and decided to open a puzzle-piece-shaped hole in the scene, with the missing piece showing the silhouette of a boy who isn't here, to remind you that she has company.",
+  "study2_C3_B_correction": "The system detected that you incorrectly claimed the father and mother were alone this evening, so it opened a puzzle-piece-shaped hole at the table, with the missing piece showing the silhouette of their child who will be joining them.",
+  "study2_C3_C_correction": "The system detected that you said the old man was alone and decided to open a puzzle-piece-shaped hole beside him on the bench, with the missing piece showing the silhouette of the woman who usually sits there.",
+  "study2_C3_D_correction": "The system detected that you said the grandpa was working alone and decided to open a puzzle-piece-shaped hole beside him, with the missing piece showing the silhouette of the boy whose hoodie is still on the stool, since he isn't in the workshop.",
+  "study2_S1_A_correction": "The system detected that you described the weather outside as sunny when it is actually snowing and decided to lift the grandmother aside like a flap to show you the snowy view through the window behind her.",
+  "study2_S1_B_correction": "The system detected that you said there was nothing behind the curtains and decided to lift the librarian aside like a flap to show you the secret garden hidden behind the curtains.",
+  "study2_S1_C_correction": "The system detected that you said there was nothing hidden behind the boxes and decided to lift the large box aside like a flap to show you the music box hidden behind it.",
+  "study2_S1_D_correction": "The system detected that you said there was nothing behind the man and decided to lift him aside like a flap to show you the colorful mural on the wall behind him."
+}

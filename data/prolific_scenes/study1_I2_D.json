@@ -98,5 +98,6 @@
         }
       }
     }
-  ]
+  ],
+  "video_target": "conductor"
 }

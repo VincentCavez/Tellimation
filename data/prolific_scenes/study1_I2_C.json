@@ -91,5 +91,6 @@
         }
       }
     }
-  ]
+  ],
+  "video_target": "child"
 }
