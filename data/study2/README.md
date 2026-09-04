@@ -46,9 +46,9 @@ in `data/study2_videos/` were recorded that way (3.5-3.7 s each, like Study 1).
 ## Deployment
 
 1. New Google Sheets spreadsheet with sheets `state`, `responses_block1`,
-   `responses_block2` and the headers listed at the top of `survey/apps_script.js`.
+   `responses_block2` (empty).
 2. Extensions → Apps Script, paste `survey/apps_script.js`, run
-   `setupStateSheet(40, 10)` once, deploy as web app (execute as me, anyone).
+   `setupSheets(40, 10)` once (writes the headers and the 40 state rows), deploy as web app (execute as me, anyone).
 3. Paste the deployment URL into `study2_config.json` → `api_base`, and the
    Prolific completion code into `completion_code`.
 4. Commit and push (`data/study2/`, `data/study2_videos/`, `survey/`); GitHub

@@ -1,6 +1,6 @@
 {
   "study": 2,
-  "api_base": "REPLACE_WITH_STUDY2_APPS_SCRIPT_DEPLOYMENT_URL",
+  "api_base": "https://script.google.com/macros/s/AKfycbwavnihRAGLCHhNQVJFQT8cZYVjaqz79f_4APwM0KGSbcO_Q33E8u8kL8P6CPHrVdwZrQ/exec",
   "completion_code": "REPLACE_WITH_PROLIFIC_COMPLETION_CODE",
   "lists_file": "../data/study2/study2_lists.json",
   "stimuli_file": "../data/study2/study2_all_stimuli.json",
