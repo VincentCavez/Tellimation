@@ -18,7 +18,7 @@ pipeline's decision text, which did not change. Spec:
 | `study2_intents.json` | hand-written | rewritten correction intents (unused since block 2 was dropped; kept in the stimuli file) |
 | `study2_option_overrides.json` | hand-written | Study 1 option texts corrected for the scenes |
 | `study2_config.json` | hand-written | survey configuration loaded by `survey/index.html?study=2` |
-| `../study2_videos/` | `video_ui` batch + copies | `study2_{I2,C3,S1}_{A-D}.mp4` (new visuals) and the 12 filler videos copied byte-for-byte from `data/prolific_videos/` |
+| `../study2_videos/` | `video_ui` batch + copies | `study2_{I2,C3,S1}_{A-D}.mp4` (new visuals) and the 12 filler videos copied from `data/prolific_videos/` (`study1_C2_A.mp4` re-recorded: the Study 1 file showed the tractor popping in during the first frames) |
 | `private/study1_prolific_ids.txt` | from the Study 1 `state` sheet | 82 Prolific IDs to exclude (git-ignored) |
 | `analysis/` | `scripts/analysis/prolific_study.py` | CSV outputs (git-ignored) |
 

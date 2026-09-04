@@ -8,9 +8,9 @@ Targets (24): study1_{I2,C3,S1}_{A-D}_{correction,suggestion} copied with
     same task; only the animation video changes)
   * pipeline_intent of the correction stimuli replaced from
     data/study2/study2_intents.json (describes the new animation)
-  * a few option texts corrected from data/study2/study2_option_overrides.json
-    (Study 1 wording that did not match the scene); the originals are kept
-    in study1_options
+  * narrator/option texts corrected from data/study2/study2_option_overrides.json
+    (Study 1 wording that did not match the scene, targets and fillers alike);
+    the originals are kept in study1_narrator_text / study1_options
 Fillers (24): study1_{P2f,C2,T1}_{A-D}_* copied verbatim, ids unchanged.
 
 Usage:
@@ -39,6 +39,16 @@ def animation_of(stim: dict) -> str:
     return stim.get("target_animation") or stim.get("pipeline_animation_id") or stim["scene_id"].split("_")[1]
 
 
+def apply_overrides(stim: dict, override: dict) -> None:
+    """Replace narrator_text and/or option texts, keeping the Study 1 originals."""
+    if "narrator_text" in override:
+        stim["study1_narrator_text"] = stim["narrator_text"]
+        stim["narrator_text"] = override["narrator_text"]
+    for code, text in override.get("options", {}).items():
+        stim.setdefault("study1_options", dict(stim["options"]))
+        stim["options"][code] = text
+
+
 def main() -> None:
     with open(STUDY1_STIMULI) as f:
         study1 = json.load(f)["stimuli"]
@@ -60,9 +70,7 @@ def main() -> None:
             new["study1_pipeline_intent"] = stim["pipeline_intent"]
             if stim["condition"] == "correction":
                 new["pipeline_intent"] = intents.pop(new["stimulus_id"])
-            for code, text in overrides.pop(new["stimulus_id"], {}).items():
-                new.setdefault("study1_options", dict(stim["options"]))
-                new["options"][code] = text
+            apply_overrides(new, overrides.pop(new["stimulus_id"], {}))
             if OLD_ANIMATION_WORDS.search(new["pipeline_intent"]):
                 raise SystemExit(f"{new['stimulus_id']}: intent still describes the old animation: {new['pipeline_intent']}")
             targets.append(new)
@@ -71,6 +79,7 @@ def main() -> None:
             new["source_scene_id"] = stim["scene_id"]
             new["animation_id"] = anim
             new["role"] = "filler"
+            apply_overrides(new, overrides.pop(new["stimulus_id"], {}))
             fillers.append(new)
     if intents:
         raise SystemExit(f"unused intents: {sorted(intents)}")
