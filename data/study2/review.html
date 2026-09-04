@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Study 2 review</title>
+<style>
+  :root { color-scheme: light; }
+  body { margin: 0; font: 14px/1.45 -apple-system, system-ui, sans-serif; background: #f4f4f6; color: #222; }
+  header { position: sticky; top: 0; background: #fff; border-bottom: 1px solid #ddd; padding: 10px 20px; display: flex; gap: 18px; align-items: center; flex-wrap: wrap; z-index: 2; }
+  header h1 { font-size: 16px; margin: 0 12px 0 0; }
+  header label { cursor: pointer; }
+  header a { color: #345; }
+  main { padding: 16px 20px; display: grid; gap: 18px; }
+  .card { background: #fff; border: 1px solid #ddd; border-radius: 8px; display: grid; grid-template-columns: 560px 1fr; gap: 16px; padding: 14px; }
+  .card.filler { opacity: .85; }
+  .media h2 { font-size: 15px; margin: 0 0 8px; }
+  .media h2 small { color: #777; font-weight: normal; margin-left: 8px; }
+  video { width: 100%; background: #000; border-radius: 4px; display: block; }
+  .conds { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .cond { border: 1px solid #e3e3e3; border-radius: 6px; padding: 10px 12px; }
+  .cond h3 { margin: 0 0 6px; font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: #555; }
+  .narr { font-style: italic; color: #333; margin: 0 0 8px; }
+  ul { list-style: none; padding: 0; margin: 0; }
+  li { padding: 3px 6px; border-radius: 4px; margin: 2px 0; }
+  li code { display: inline-block; width: 24px; color: #777; }
+  li.T { background: #e3f6e6; font-weight: 600; }
+  li.E1, li.E2 { background: #fff5dd; }
+  .missing { color: #b00; }
+  @media (max-width: 1100px) { .card { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Study 2 — stimuli review</h1>
+  <label><input type="checkbox" id="show-fillers"> show fillers (P2f, C2, T1, Study 1 videos)</label>
+  <label><input type="checkbox" id="loop" checked> loop videos</label>
+  <span id="count"></span>
+</header>
+<main id="main">Loading…</main>
+<script>
+(async () => {
+  const esc0 = (t) => String(t).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+  const main0 = document.getElementById('main');
+  if (location.protocol === 'file:') {
+    main0.innerHTML = '<p class="missing">Opened as a local file: the browser blocks fetch(). Serve the repo (python3 -m http.server 8080 at the repo root, then http://localhost:8080/data/study2/review.html) or push and open it on GitHub Pages.</p>';
+    return;
+  }
+  let data;
+  try {
+    data = await fetch('study2_all_stimuli.json').then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); });
+  } catch (e) {
+    main0.innerHTML = `<p class="missing">Could not load study2_all_stimuli.json (${esc0(e.message)}).</p>`;
+    return;
+  }
+  const byScene = new Map();
+  for (const s of data.stimuli) {
+    if (!byScene.has(s.scene_id)) byScene.set(s.scene_id, { role: s.role, source: s.source_scene_id, anim: s.animation_id });
+    byScene.get(s.scene_id)[s.condition] = s;
+  }
+  const order = ['I2', 'C3', 'S1', 'P2f', 'C2', 'T1'];
+  const scenes = [...byScene.entries()].sort((a, b) => order.indexOf(a[1].anim) - order.indexOf(b[1].anim) || a[0].localeCompare(b[0]));
+  const names = { I2: 'Silhouette', C3: 'Missing Piece', S1: 'Peek', P2f: 'Emanation (fear) — filler', C2: 'Disintegration — filler', T1: 'Flashback — filler' };
+  const codes = ['T', 'E1', 'E2', 'D1', 'D2', 'D3', 'D4'];
+  const esc = (t) => String(t).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+  const cond = (s, label) => !s ? '' : `<div class="cond"><h3>${label}</h3><p class="narr">“${esc(s.narrator_text)}”</p><ul>${
+    codes.filter((c) => s.options[c]).map((c) => `<li class="${c}"><code>${c}</code>${esc(s.options[c])}</li>`).join('')}</ul></div>`;
+  const main = document.getElementById('main');
+  main.innerHTML = scenes.map(([sid, sc]) => `
+    <section class="card ${sc.role}" data-role="${sc.role}">
+      <div class="media">
+        <h2>${sid}<small>${sc.anim} — ${names[sc.anim] || ''}</small></h2>
+        <video src="../study2_videos/${sid}.mp4" controls muted autoplay loop playsinline
+               onerror="this.outerHTML='<p class=missing>video missing: ../study2_videos/${sid}.mp4</p>'"></video>
+      </div>
+      <div class="conds">${cond(sc.correction, 'Correction')}${cond(sc.suggestion, 'Suggestion')}</div>
+    </section>`).join('');
+  const fillers = document.getElementById('show-fillers');
+  const apply = () => {
+    document.querySelectorAll('.card.filler').forEach((el) => { el.hidden = !fillers.checked; });
+    const shown = [...document.querySelectorAll('.card')].filter((el) => !el.hidden).length;
+    document.getElementById('count').textContent = `${shown} scenes`;
+  };
+  fillers.onchange = apply; apply();
+  document.getElementById('loop').onchange = (e) => document.querySelectorAll('video').forEach((v) => { v.loop = e.target.checked; });
+})();
+</script>
+</body>
+</html>
