@@ -1,13 +1,88 @@
 {
-  "_note": "Study 1 option texts corrected for Study 2 (scene mismatches spotted at review).",
+  "_note": "Study 1 texts corrected for Study 2 (scene mismatches spotted at review). Keys: narrator_text and/or options{code}. Originals kept in study1_narrator_text / study1_options.",
+  "study2_I2_A_correction": {
+    "narrator_text": "The teacher is sitting at a desk, talking to the boy with glasses, near the bookshelf.",
+    "options": {
+      "T": "Mention the boy with glasses by name"
+    }
+  },
+  "study2_I2_A_suggestion": {
+    "options": {
+      "T": "Give a name to the boy with glasses",
+      "D4": "Describe the whiteboard"
+    }
+  },
   "study2_I2_C_correction": {
-    "T": "Mention the child by name"
+    "options": {
+      "T": "Mention the child by name"
+    }
+  },
+  "study2_I2_C_suggestion": {
+    "options": {
+      "T": "Give a name to the child"
+    }
+  },
+  "study2_I2_D_correction": {
+    "options": {
+      "D2": "Describe the music stands"
+    }
+  },
+  "study2_C3_A_suggestion": {
+    "options": {
+      "T": "Mention that someone seems to be missing"
+    }
   },
   "study2_C3_B_correction": {
-    "T": "Correct the claim that they are alone — their child is joining"
+    "options": {
+      "T": "Correct the claim that they are alone — their child is joining"
+    }
+  },
+  "study2_C3_B_suggestion": {
+    "options": {
+      "T": "Mention that someone seems to be missing"
+    }
   },
   "study2_C3_C_suggestion": {
-    "T": "Mention that someone seems to be missing",
-    "D1": "Describe the man in detail"
+    "options": {
+      "T": "Mention that someone seems to be missing",
+      "D1": "Describe the man in detail"
+    }
+  },
+  "study2_C3_D_correction": {
+    "options": {
+      "T": "Correct the claim that the man is working alone — a child was here"
+    }
+  },
+  "study2_C3_D_suggestion": {
+    "options": {
+      "T": "Mention that someone seems to be missing",
+      "D1": "Describe the child"
+    }
+  },
+  "study2_S1_A_suggestion": {
+    "options": {
+      "T": "Describe something in the scene that is hidden behind the cat"
+    }
+  },
+  "study1_P2f_D_suggestion": {
+    "narrator_text": "A girl waves from the sidewalk. Another girl walks away pulling a suitcase. Boxes are on the front lawn."
+  },
+  "study1_C2_B_correction": {
+    "narrator_text": "In front of the toy box there is a teddy bear, a doll, a block tower, and a toy car.",
+    "options": {
+      "T": "Remove the teddy bear from the narration"
+    }
+  },
+  "study1_C2_C_correction": {
+    "narrator_text": "There are several fruits in the bowl: an apple, a banana, a tennis ball, and a pear."
+  },
+  "study1_C2_C_suggestion": {
+    "narrator_text": "There is a fruit bowl on a kitchen counter with an apple and a banana. There is also a green ball among them."
+  },
+  "study1_C2_D_correction": {
+    "narrator_text": "On the shelf there are several things I can read: a red book, a blue book, a green book, a coffee mug, and a dictionary."
+  },
+  "study1_T1_D_suggestion": {
+    "narrator_text": "A janitor sweeps the grass in a stadium. It is the middle of the day."
   }
 }

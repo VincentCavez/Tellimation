@@ -21,7 +21,7 @@
       "stimulus_id": "study2_I2_A_correction",
       "scene_id": "study2_I2_A",
       "condition": "correction",
-      "narrator_text": "The teacher is sitting at a desk talking to the girl with glasses near the bookshelf.",
+      "narrator_text": "The teacher is sitting at a desk, talking to the boy with glasses, near the bookshelf.",
       "errors_description": "(1) boy_glasses is called 'student teacher' instead of 'boy with glasses' [Identity/Role]. Targets boy_glasses.",
       "target_animation": "I2",
       "target_entities": [
@@ -29,7 +29,7 @@
       ],
       "target_category": "Identity",
       "options": {
-        "T": "Mention the girl with glasses near the bookshelf by name",
+        "T": "Mention the boy with glasses by name",
         "E1": "Correct what the teacher is doing — the teacher is not sitting",
         "E2": "Correct where the teacher is standing — not near the bookshelf",
         "D1": "Mention the globe in the background",
@@ -44,7 +44,15 @@
       "source_scene_id": "study1_I2_A",
       "animation_id": "I2",
       "role": "target",
-      "study1_pipeline_intent": "The system detected that you used the wrong title for the boy with glasses and decided to display a nametag over him to clarify his identity."
+      "study1_pipeline_intent": "The system detected that you used the wrong title for the boy with glasses and decided to display a nametag over him to clarify his identity.",
+      "study1_narrator_text": "The teacher is sitting at a desk talking to the girl with glasses near the bookshelf.",
+      "study1_options": {
+        "T": "Mention the girl with glasses near the bookshelf by name",
+        "E1": "Correct what the teacher is doing — the teacher is not sitting",
+        "E2": "Correct where the teacher is standing — not near the bookshelf",
+        "D1": "Mention the globe in the background",
+        "D2": "Describe the other students at their desks"
+      }
     },
     {
       "stimulus_id": "study2_I2_A_suggestion",
@@ -53,11 +61,11 @@
       "narrator_text": "A teacher is standing near a whiteboard. Some students are sitting at their desks.",
       "target_misl": "CH",
       "options": {
-        "T": "Give a name to the girl with glasses near the bookshelf",
+        "T": "Give a name to the boy with glasses",
         "D1": "Describe the student's posture or expression",
         "D2": "Identify or describe the teacher more specifically",
         "D3": "Mention the globe or bookshelf in the background",
-        "D4": "Describe what is written on the whiteboard"
+        "D4": "Describe the whiteboard"
       },
       "mention_counts": {
         "CH": 0,
@@ -84,7 +92,14 @@
       "source_scene_id": "study1_I2_A",
       "animation_id": "I2",
       "role": "target",
-      "study1_pipeline_intent": "You've mentioned the teacher and the students, but you could give a name to the girl with the red headband sitting near the bookshelf."
+      "study1_pipeline_intent": "You've mentioned the teacher and the students, but you could give a name to the girl with the red headband sitting near the bookshelf.",
+      "study1_options": {
+        "T": "Give a name to the girl with glasses near the bookshelf",
+        "D1": "Describe the student's posture or expression",
+        "D2": "Identify or describe the teacher more specifically",
+        "D3": "Mention the globe or bookshelf in the background",
+        "D4": "Describe what is written on the whiteboard"
+      }
     },
     {
       "stimulus_id": "study2_I2_B_correction",
@@ -198,7 +213,7 @@
       "narrator_text": "A firefighter stands next to a red fire truck at a fire station. A dalmatian sits nearby.",
       "target_misl": "CH",
       "options": {
-        "T": "Give a name to the firefighter",
+        "T": "Give a name to the child",
         "D1": "Describe what the child is wearing or doing",
         "D2": "Describe the firefighter's gear in more detail",
         "D3": "Mention the equipment hung on the walls",
@@ -229,7 +244,14 @@
       "source_scene_id": "study1_I2_C",
       "animation_id": "I2",
       "role": "target",
-      "study1_pipeline_intent": "You mentioned the firefighter standing by the red truck, but you could give him a name to help tell your story."
+      "study1_pipeline_intent": "You mentioned the firefighter standing by the red truck, but you could give him a name to help tell your story.",
+      "study1_options": {
+        "T": "Give a name to the firefighter",
+        "D1": "Describe what the child is wearing or doing",
+        "D2": "Describe the firefighter's gear in more detail",
+        "D3": "Mention the equipment hung on the walls",
+        "D4": "Describe the fire station layout"
+      }
     },
     {
       "stimulus_id": "study2_I2_D_correction",
@@ -247,7 +269,7 @@
         "E1": "Correct who is playing the violin — it is not a boy",
         "E2": "Correct what the cellist is actually doing",
         "D1": "Mention the red velvet curtains",
-        "D2": "Describe the music stands and other instruments"
+        "D2": "Describe the music stands"
       },
       "narrator_text_block2": "The pianist in the black tuxedo leads the orchestra while a young woman plays violin.",
       "pipeline_intent": "The system detected that you used the wrong professional title for the person leading the orchestra and decided to turn him into a dark silhouette for a moment to make you say what he really is, a conductor.",
@@ -258,7 +280,14 @@
       "source_scene_id": "study1_I2_D",
       "animation_id": "I2",
       "role": "target",
-      "study1_pipeline_intent": "The system detected that you used the wrong professional title for the person leading the orchestra and decided to display a nametag to clarify that he is a conductor."
+      "study1_pipeline_intent": "The system detected that you used the wrong professional title for the person leading the orchestra and decided to display a nametag to clarify that he is a conductor.",
+      "study1_options": {
+        "T": "Mention the conductor by name",
+        "E1": "Correct who is playing the violin — it is not a boy",
+        "E2": "Correct what the cellist is actually doing",
+        "D1": "Mention the red velvet curtains",
+        "D2": "Describe the music stands and other instruments"
+      }
     },
     {
       "stimulus_id": "study2_I2_D_suggestion",
@@ -336,7 +365,7 @@
       "narrator_text": "A girl is building a sandcastle on a beach. A seagull stands on a rock. There is a towel on the sand.",
       "target_misl": "CH",
       "options": {
-        "T": "Mention that someone seems to be missing — the towel suggests another person",
+        "T": "Mention that someone seems to be missing",
         "D1": "Describe what is on the towel (sunglasses, hat)",
         "D2": "Mention additional animals or people you might expect at a beach",
         "D3": "Describe the cooler",
@@ -367,7 +396,14 @@
       "source_scene_id": "study1_C3_A",
       "animation_id": "C3",
       "role": "target",
-      "study1_pipeline_intent": "You mentioned the girl and the towel, but you could also mention that the towel might belong to a boy who has gone for a swim."
+      "study1_pipeline_intent": "You mentioned the girl and the towel, but you could also mention that the towel might belong to a boy who has gone for a swim.",
+      "study1_options": {
+        "T": "Mention that someone seems to be missing — the towel suggests another person",
+        "D1": "Describe what is on the towel (sunglasses, hat)",
+        "D2": "Mention additional animals or people you might expect at a beach",
+        "D3": "Describe the cooler",
+        "D4": "Say what the girl might be thinking about"
+      }
     },
     {
       "stimulus_id": "study2_C3_B_correction",
@@ -412,7 +448,7 @@
       "narrator_text": "A father carves a roast at the dinner table. A mother serves salad. The table is set for four people.",
       "target_misl": "CH",
       "options": {
-        "T": "Mention that someone seems to be missing — one place setting is untouched",
+        "T": "Mention that someone seems to be missing",
         "D1": "Describe the empty chair's place setting in detail",
         "D2": "Mention other people who might be expected for dinner",
         "D3": "Describe the food on the table",
@@ -444,7 +480,14 @@
       "source_scene_id": "study1_C3_B",
       "animation_id": "C3",
       "role": "target",
-      "study1_pipeline_intent": "You described the father carving the roast and the mother eating her soup, but you could also mention that one place setting is untouched, as if someone is missing from the table."
+      "study1_pipeline_intent": "You described the father carving the roast and the mother eating her soup, but you could also mention that one place setting is untouched, as if someone is missing from the table.",
+      "study1_options": {
+        "T": "Mention that someone seems to be missing — one place setting is untouched",
+        "D1": "Describe the empty chair's place setting in detail",
+        "D2": "Mention other people who might be expected for dinner",
+        "D3": "Describe the food on the table",
+        "D4": "Say what the parents might be discussing"
+      }
     },
     {
       "stimulus_id": "study2_C3_C_correction",
@@ -534,7 +577,7 @@
       ],
       "target_category": "Count",
       "options": {
-        "T": "Correct the claim that the man is working alone — a child was here and their things are still on the stool",
+        "T": "Correct the claim that the man is working alone — a child was here",
         "E1": "Correct what the man is sanding — it is not a shelf",
         "E2": "Correct what the dog is doing — it is not asleep under the workbench",
         "D1": "Mention the tools hanging on the pegboard behind him",
@@ -549,7 +592,14 @@
       "source_scene_id": "study1_C3_D",
       "animation_id": "C3",
       "role": "target",
-      "study1_pipeline_intent": "The system detected that you mentioned your belongings from a different scene and decided to show a ghost outline of them since they aren't in the workshop."
+      "study1_pipeline_intent": "The system detected that you mentioned your belongings from a different scene and decided to show a ghost outline of them since they aren't in the workshop.",
+      "study1_options": {
+        "T": "Correct the claim that the man is working alone — a child was here and their things are still on the stool",
+        "E1": "Correct what the man is sanding — it is not a shelf",
+        "E2": "Correct what the dog is doing — it is not asleep under the workbench",
+        "D1": "Mention the tools hanging on the pegboard behind him",
+        "D2": "Describe the small wooden projects on the shelves along the wall"
+      }
     },
     {
       "stimulus_id": "study2_C3_D_suggestion",
@@ -558,8 +608,8 @@
       "narrator_text": "An old man in denim overalls sands a small wooden birdhouse at a cluttered workbench. A golden retriever lies at his feet, watching him work.",
       "target_misl": "CH",
       "options": {
-        "T": "Mention that someone seems to be missing — the red hoodie and safety goggles on the stool suggest a child was here",
-        "D1": "Describe the child's belongings on the stool in more detail",
+        "T": "Mention that someone seems to be missing",
+        "D1": "Describe the child",
         "D2": "Mention the tools hanging on the pegboard",
         "D3": "Describe the other wooden projects on the shelves",
         "D4": "Say what the birdhouse might be intended for"
@@ -589,7 +639,14 @@
       "source_scene_id": "study1_C3_D",
       "animation_id": "C3",
       "role": "target",
-      "study1_pipeline_intent": "You've described the grandfather and his dog, but you could also mention that a boy might have been helping him, since there is a red hoodie left on the stool."
+      "study1_pipeline_intent": "You've described the grandfather and his dog, but you could also mention that a boy might have been helping him, since there is a red hoodie left on the stool.",
+      "study1_options": {
+        "T": "Mention that someone seems to be missing — the red hoodie and safety goggles on the stool suggest a child was here",
+        "D1": "Describe the child's belongings on the stool in more detail",
+        "D2": "Mention the tools hanging on the pegboard",
+        "D3": "Describe the other wooden projects on the shelves",
+        "D4": "Say what the birdhouse might be intended for"
+      }
     },
     {
       "stimulus_id": "study2_S1_A_correction",
@@ -627,7 +684,7 @@
       "narrator_text": "The grandmother is cooking something in the kitchen. There is a cat sleeping on the chair.",
       "target_misl": "S",
       "options": {
-        "T": "Describe something in the scene that is hidden behind the grandmother",
+        "T": "Describe something in the scene that is hidden behind the cat",
         "D1": "Describe the grandmother's appearance or clothing",
         "D2": "Describe what is inside the pot on the stove",
         "D3": "Add more detail about the cat",
@@ -658,7 +715,14 @@
       "source_scene_id": "study1_S1_A",
       "animation_id": "S1",
       "role": "target",
-      "study1_pipeline_intent": "You've talked about the grandmother and the cat, but you could also mention the copper pans hanging on the wall behind her."
+      "study1_pipeline_intent": "You've talked about the grandmother and the cat, but you could also mention the copper pans hanging on the wall behind her.",
+      "study1_options": {
+        "T": "Describe something in the scene that is hidden behind the grandmother",
+        "D1": "Describe the grandmother's appearance or clothing",
+        "D2": "Describe what is inside the pot on the stove",
+        "D3": "Add more detail about the cat",
+        "D4": "Say what the grandmother might be saying out loud"
+      }
     },
     {
       "stimulus_id": "study2_S1_B_correction",
@@ -938,7 +1002,7 @@
       "stimulus_id": "study1_C2_B_correction",
       "scene_id": "study1_C2_B",
       "condition": "correction",
-      "narrator_text": "In the toy box there is a teddy bear, a doll, a block tower, and a toy car.",
+      "narrator_text": "In front of the toy box there is a teddy bear, a doll, a block tower, and a toy car.",
       "errors_description": "(1) toy car→none [Count] (2) shoe doesn't belong [Count] (3) block tower is beside the box, not in it [Space]. Targets shoe.",
       "target_animation": "C2",
       "target_entities": [
@@ -946,7 +1010,7 @@
       ],
       "target_category": "Count",
       "options": {
-        "T": "Remove the teddy bear from the narration — it does not belong with the toys",
+        "T": "Remove the teddy bear from the narration",
         "E1": "Remove the toy car — there is no toy car",
         "E2": "Correct where the block tower is — it is not inside the box",
         "D1": "Mention the crayons and coloring book on the floor",
@@ -960,7 +1024,15 @@
       ],
       "source_scene_id": "study1_C2_B",
       "animation_id": "C2",
-      "role": "filler"
+      "role": "filler",
+      "study1_narrator_text": "In the toy box there is a teddy bear, a doll, a block tower, and a toy car.",
+      "study1_options": {
+        "T": "Remove the teddy bear from the narration — it does not belong with the toys",
+        "E1": "Remove the toy car — there is no toy car",
+        "E2": "Correct where the block tower is — it is not inside the box",
+        "D1": "Mention the crayons and coloring book on the floor",
+        "D2": "Describe the colorful rug"
+      }
     },
     {
       "stimulus_id": "study1_C2_B_suggestion",
@@ -1005,7 +1077,7 @@
       "stimulus_id": "study1_C2_C_correction",
       "scene_id": "study1_C2_C",
       "condition": "correction",
-      "narrator_text": "In the fruit bowl there is an apple, a banana, a tennis ball, and a pear.",
+      "narrator_text": "There are several fruits in the bowl: an apple, a banana, a tennis ball, and a pear.",
       "errors_description": "(1) pear→none [Count] (2) tennis ball doesn't belong [Count] (3) miscount. Targets tennis ball.",
       "target_animation": "C2",
       "target_entities": [
@@ -1027,7 +1099,8 @@
       ],
       "source_scene_id": "study1_C2_C",
       "animation_id": "C2",
-      "role": "filler"
+      "role": "filler",
+      "study1_narrator_text": "In the fruit bowl there is an apple, a banana, a tennis ball, and a pear."
     },
     {
       "stimulus_id": "study1_C2_C_suggestion",
@@ -1066,13 +1139,14 @@
       ],
       "source_scene_id": "study1_C2_C",
       "animation_id": "C2",
-      "role": "filler"
+      "role": "filler",
+      "study1_narrator_text": "There is a fruit bowl on a kitchen counter with an apple and a banana. There is also a green ball among them."
     },
     {
       "stimulus_id": "study1_C2_D_correction",
       "scene_id": "study1_C2_D",
       "condition": "correction",
-      "narrator_text": "On the shelf there is a red book, a blue book, a green book, a coffee mug, and a dictionary.",
+      "narrator_text": "On the shelf there are several things I can read: a red book, a blue book, a green book, a coffee mug, and a dictionary.",
       "errors_description": "(1) dictionary→none [Count] (2) mug doesn't belong [Count] (3) extra item. Targets mug.",
       "target_animation": "C2",
       "target_entities": [
@@ -1094,7 +1168,8 @@
       ],
       "source_scene_id": "study1_C2_D",
       "animation_id": "C2",
-      "role": "filler"
+      "role": "filler",
+      "study1_narrator_text": "On the shelf there is a red book, a blue book, a green book, a coffee mug, and a dictionary."
     },
     {
       "stimulus_id": "study1_C2_D_suggestion",
@@ -1369,7 +1444,7 @@
       "stimulus_id": "study1_P2f_D_suggestion",
       "scene_id": "study1_P2f_D",
       "condition": "suggestion",
-      "narrator_text": "A girl waves from the sidewalk. Another girl walks away pulling a suitcase toward a moving truck. Boxes are on the front lawn.",
+      "narrator_text": "A girl waves from the sidewalk. Another girl walks away pulling a suitcase. Boxes are on the front lawn.",
       "target_misl": "IR",
       "options": {
         "T": "Describe how the girl waving feels",
@@ -1402,7 +1477,8 @@
       ],
       "source_scene_id": "study1_P2f_D",
       "animation_id": "P2f",
-      "role": "filler"
+      "role": "filler",
+      "study1_narrator_text": "A girl waves from the sidewalk. Another girl walks away pulling a suitcase toward a moving truck. Boxes are on the front lawn."
     },
     {
       "stimulus_id": "study1_T1_A_correction",
@@ -1637,7 +1713,7 @@
       "stimulus_id": "study1_T1_D_suggestion",
       "scene_id": "study1_T1_D",
       "condition": "suggestion",
-      "narrator_text": "A janitor sweeps between empty rows of seats in a stadium. The scoreboard shows HOME 3 - VISITORS 2. Confetti and litter are scattered on the steps.",
+      "narrator_text": "A janitor sweeps the grass in a stadium. It is the middle of the day.",
       "target_misl": "T",
       "options": {
         "T": "Mention that the game already happened — the excitement is over",
@@ -1670,7 +1746,8 @@
       ],
       "source_scene_id": "study1_T1_D",
       "animation_id": "T1",
-      "role": "filler"
+      "role": "filler",
+      "study1_narrator_text": "A janitor sweeps between empty rows of seats in a stadium. The scoreboard shows HOME 3 - VISITORS 2. Confetti and litter are scattered on the steps."
     }
   ]
 }
