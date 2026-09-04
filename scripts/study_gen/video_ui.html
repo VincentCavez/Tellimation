@@ -153,7 +153,17 @@ const FPS = 30;
 // Default: current visuals (I2 silhouette / C3 missing_piece / S1 peek).
 // Open with ?legacy to regenerate the study-1 videos byte-comparable
 // (nametag / ghost_outline / reveal, from animation_templates_legacy.js).
-const USE_LEGACY = new URLSearchParams(location.search).has('legacy');
+const URL_PARAMS = new URLSearchParams(location.search);
+const USE_LEGACY = URL_PARAMS.has('legacy');
+// ?only=I2,C3,S1 restricts the sidebar and the batch to those animation types.
+// ?prefix=study2_ renames the output files (study1_I2_A.mp4 -> study2_I2_A.mp4).
+const ONLY_TYPES = (URL_PARAMS.get('only') || '').split(',').map(s => s.trim()).filter(Boolean);
+const FILE_PREFIX = URL_PARAMS.get('prefix') || '';
+// ?save=study2_videos also writes each MP4 to data/<dir>/ server-side.
+const SAVE_DIR = URL_PARAMS.get('save') || '';
+function outputName(storyId) {
+  return FILE_PREFIX ? storyId.replace(/^study1_/, FILE_PREFIX) : storyId;
+}
 const ANIM_TYPE_TO_TEMPLATE = {
   A1: 'motion_lines', A2: 'flip',
   C1: 'sequential_glow', C2: 'disintegration',
@@ -186,6 +196,7 @@ const ANIM_NAMES = {
 async function init() {
   const resp = await fetch('/api/scenes');
   allScenes = await resp.json();
+  if (ONLY_TYPES.length) allScenes = allScenes.filter(s => ONLY_TYPES.includes(s.anim_type));
   renderSidebar();
 }
 
@@ -657,8 +668,15 @@ function autoSelectTarget() {
   const inScene = currentScene.entities.filter(e => e.in_scene && e.asset_url);
   const ghost = currentScene.entities.find(e => !e.in_scene && e.asset_url);
 
-  if (atype === 'C3' && ghost) {
+  // Scene-level video_target pins the animated entity (reproducible batches,
+  // e.g. the Study 1 nametag target reused for the Study 2 silhouette)
+  if (currentScene.video_target && [...sel.options].some(o => o.value === currentScene.video_target)) {
+    sel.value = currentScene.video_target;
+  } else if (atype === 'C3' && ghost) {
     sel.value = ghost.name;
+  } else if (atype === 'S1' && currentScene.peek_hidden) {
+    const occluder = inScene.find(e => e.name !== currentScene.peek_hidden);
+    sel.value = occluder ? occluder.name : inScene[0].name;
   } else if (inScene.length > 0) {
     sel.value = inScene[0].name;
   }
@@ -731,6 +749,14 @@ function buildAnimSpec() {
     params.entityPrefix = targetName;
     if (ghost) {
       params.pieceImageUrl = ghost.asset_url;
+    }
+  }
+  // Peek: the target is the occluder; the hidden element (scene-level
+  // peek_hidden, an extracted in-scene entity) gets the halo while exposed
+  else if (templateName === 'peek') {
+    params.entityPrefix = targetName;
+    if (currentScene.peek_hidden && inScene.includes(currentScene.peek_hidden)) {
+      params.entityPrefixB = currentScene.peek_hidden;
     }
   }
   // Text-based templates
@@ -810,7 +836,7 @@ document.getElementById('btn-record').addEventListener('click', () => {
 
 document.getElementById('btn-download').addEventListener('click', () => {
   if (!recordedBlob) return;
-  downloadBlob(recordedBlob, `${currentScene.story_id}.mp4`);
+  downloadBlob(recordedBlob, `${outputName(currentScene.story_id)}.mp4`);
 });
 
 document.getElementById('btn-batch').addEventListener('click', () => {
@@ -838,6 +864,7 @@ async function convertToMp4(webmBlob, filename) {
   const form = new FormData();
   form.append('video', webmBlob, 'input.webm');
   form.append('filename', filename);
+  if (SAVE_DIR) form.append('save_dir', SAVE_DIR);
   const resp = await fetch('/api/convert_mp4', { method: 'POST', body: form });
   if (!resp.ok) {
     const err = await resp.json();
@@ -869,7 +896,7 @@ async function recordVideo() {
   try {
     const webm = await captureWebm();
     document.getElementById('info-status').textContent = 'Converting to MP4...';
-    const mp4 = await convertToMp4(webm, currentScene.story_id);
+    const mp4 = await convertToMp4(webm, outputName(currentScene.story_id));
     recordedBlob = mp4;
 
     document.getElementById('btn-download').style.display = '';
@@ -911,8 +938,8 @@ async function startBatch() {
       const webm = await captureWebm();
 
       stEl.textContent = 'converting';
-      const mp4 = await convertToMp4(webm, s.story_id);
-      downloadBlob(mp4, `${s.story_id}.mp4`);
+      const mp4 = await convertToMp4(webm, outputName(s.story_id));
+      if (!SAVE_DIR) downloadBlob(mp4, `${outputName(s.story_id)}.mp4`);
 
       stEl.textContent = 'done'; stEl.className = 'st done';
     } catch (e) {

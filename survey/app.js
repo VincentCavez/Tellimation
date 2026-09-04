@@ -1,5 +1,7 @@
 /* ============================================================
-   Tellimations Study 1 — Prolific Survey
+   Tellimations Study 1 / Study 2 — Prolific Survey
+   Default = Study 1. `?study=2` loads data/study2/study2_config.json
+   (lists, stimuli, videos, API, texts) on top of CONFIG.
    ============================================================ */
 
 (function () {
@@ -32,7 +34,36 @@
 
     // Demo mode: set to true to skip API calls and use mock assignment
     demoMode: false,
+
+    // Per-study overrides (see applyStudyConfig)
+    study: 1,
+    storagePrefix: 'tellimations',
+    noAdjacentSameAnimation: false,
+    studyConfigPath: (n) => `../data/study${n}/study${n}_config.json`,
   };
+
+  // Study 2+: override CONFIG from a JSON file so the flow stays identical.
+  function applyStudyConfig(cfg) {
+    CONFIG.study = cfg.study;
+    if (cfg.api_base) CONFIG.API_BASE = cfg.api_base;
+    if (cfg.completion_code) {
+      CONFIG.completionCode = cfg.completion_code;
+      CONFIG.prolificReturnUrl = `https://app.prolific.com/submissions/complete?cc=${cfg.completion_code}`;
+    }
+    CONFIG.dataFiles = {
+      counterbalancing: cfg.lists_file,
+      block2: cfg.block2_file || null,
+      allStimuli: cfg.stimuli_file,
+    };
+    if (cfg.video_dir) CONFIG.videoPath = (sceneId) => `${cfg.video_dir}${sceneId}.mp4`;
+    if (cfg.image_dir) CONFIG.imagePath = (sceneId) => `${cfg.image_dir}${sceneId}/hd/scene_1_full.png`;
+    CONFIG.storagePrefix = cfg.storage_prefix || `tellimations_s${cfg.study}`;
+    CONFIG.noAdjacentSameAnimation = !!cfg.no_adjacent_same_animation;
+    for (const [id, html] of Object.entries(cfg.texts || {})) {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = html;
+    }
+  }
 
   // ==================== SEEDED RNG ====================
 
@@ -100,7 +131,9 @@
   async function loadAllData() {
     const [counterbalancing, block2, allStimuli] = await Promise.all([
       fetch(CONFIG.dataFiles.counterbalancing).then((r) => r.json()),
-      fetch(CONFIG.dataFiles.block2).then((r) => r.json()),
+      CONFIG.dataFiles.block2
+        ? fetch(CONFIG.dataFiles.block2).then((r) => r.json())
+        : Promise.resolve(null),
       fetch(CONFIG.dataFiles.allStimuli).then((r) => r.json()),
     ]);
 
@@ -120,55 +153,77 @@
     );
     if (!list) throw new Error(`List ${state.listId} not found`);
 
-    const trials = [];
-    for (const entry of list.stimuli) {
-      const sceneId = `study1_${entry.animation_id}_${entry.scene}`;
-      const stimulusId = `${sceneId}_${entry.condition}`;
-      const stim = state.allStimuliMap.get(stimulusId);
-      if (!stim) {
-        console.warn(`Stimulus not found: ${stimulusId}`);
-        continue;
-      }
-      trials.push({
-        ...stim,
-        animation_id: entry.animation_id,
-        scene: entry.scene,
-        is_catch: false,
-        imagePath: CONFIG.imagePath(sceneId),
-        videoPath: CONFIG.videoPath(sceneId),
-      });
-    }
+    // Study 1 lists carry `stimuli` (ids derived), Study 2 lists carry
+    // explicit `block1` / `block2` entries with stimulus_id + scene_id.
+    const trials = trialsFromEntries(list.block1 || list.stimuli);
 
     // Shuffle with seeded RNG
     const seed = hashString(state.prolificId + '_block1');
-    state.block1Trials = seededShuffle(trials, seed);
+    state.block1Trials = CONFIG.noAdjacentSameAnimation
+      ? shuffleNoAdjacent(trials, seed)
+      : seededShuffle(trials, seed);
   }
 
-  function buildBlock2Trials() {
-    const participant = state.block2Assignments.participants.find(
-      (p) => p.participant_id === state.participantId
-    );
-    if (!participant) throw new Error(`Participant ${state.participantId} not found`);
-
+  function trialsFromEntries(entries) {
     const trials = [];
-    for (const entry of participant.stimuli) {
-      const sceneId = `study1_${entry.animation_id}_${entry.scene}`;
-      const stimulusId = `${sceneId}_${entry.condition}`;
+    for (const entry of entries) {
+      const sceneId = entry.scene_id || `study1_${entry.animation_id}_${entry.scene}`;
+      const stimulusId = entry.stimulus_id || `${sceneId}_${entry.condition}`;
       const stim = state.allStimuliMap.get(stimulusId);
       if (!stim) {
         console.warn(`Stimulus not found: ${stimulusId}`);
         continue;
       }
+      // Study 2 targets reuse Study 1 scene images (source_scene_id)
+      const imageSceneId = stim.source_scene_id || sceneId;
       trials.push({
         ...stim,
         animation_id: entry.animation_id,
         scene: entry.scene,
         is_catch: false,
-        imagePath: CONFIG.imagePath(sceneId),
+        imagePath: CONFIG.imagePath(imageSceneId),
         videoPath: CONFIG.videoPath(sceneId),
         pipeline_intent: stim.pipeline_intent || null,
       });
     }
+    return trials;
+  }
+
+  // Seeded shuffle re-drawn until no two consecutive trials share an animation.
+  function shuffleNoAdjacent(trials, seed) {
+    for (let attempt = 0; attempt < 1000; attempt++) {
+      const order = seededShuffle(trials, seed + attempt);
+      let ok = true;
+      for (let i = 1; i < order.length; i++) {
+        if (order[i].animation_id === order[i - 1].animation_id) {
+          ok = false;
+          break;
+        }
+      }
+      if (ok) return order;
+    }
+    console.warn('shuffleNoAdjacent: constraint not satisfied after 1000 draws');
+    return seededShuffle(trials, seed);
+  }
+
+  function buildBlock2Trials() {
+    let entries;
+    if (state.block2Assignments) {
+      // Study 1: per-participant block 2 file
+      const participant = state.block2Assignments.participants.find(
+        (p) => p.participant_id === state.participantId
+      );
+      if (!participant) throw new Error(`Participant ${state.participantId} not found`);
+      entries = participant.stimuli;
+    } else {
+      // Study 2: block 2 defined at the list level
+      const list = state.counterbalancingLists.lists.find(
+        (l) => l.list_id === state.listId
+      );
+      if (!list || !list.block2) throw new Error(`Block 2 for list ${state.listId} not found`);
+      entries = list.block2;
+    }
+    const trials = trialsFromEntries(entries);
 
     const seed = hashString(state.prolificId + '_block2');
     state.block2Trials = seededShuffle(trials, seed);
@@ -201,7 +256,7 @@
     if (!state.prolificId) return;
     try {
       localStorage.setItem(
-        `tellimations_pending_${state.prolificId}`,
+        `${CONFIG.storagePrefix}_pending_${state.prolificId}`,
         JSON.stringify(state.pendingResponses)
       );
     } catch (e) {
@@ -212,7 +267,7 @@
   function loadPendingFromStorage() {
     if (!state.prolificId) return;
     try {
-      const data = localStorage.getItem(`tellimations_pending_${state.prolificId}`);
+      const data = localStorage.getItem(`${CONFIG.storagePrefix}_pending_${state.prolificId}`);
       if (data) {
         const parsed = JSON.parse(data);
         if (Array.isArray(parsed) && parsed.length > 0) {
@@ -281,7 +336,7 @@
     if (!state.prolificId) return;
     try {
       localStorage.setItem(
-        `tellimations_session_${state.prolificId}`,
+        `${CONFIG.storagePrefix}_session_${state.prolificId}`,
         JSON.stringify({
           slot: state.slot,
           listId: state.listId,
@@ -298,7 +353,7 @@
   function loadSession() {
     if (!state.prolificId) return null;
     try {
-      const data = localStorage.getItem(`tellimations_session_${state.prolificId}`);
+      const data = localStorage.getItem(`${CONFIG.storagePrefix}_session_${state.prolificId}`);
       return data ? JSON.parse(data) : null;
     } catch (e) {
       return null;
@@ -737,8 +792,8 @@
 
     // Clear session storage
     try {
-      localStorage.removeItem(`tellimations_session_${state.prolificId}`);
-      localStorage.removeItem(`tellimations_pending_${state.prolificId}`);
+      localStorage.removeItem(`${CONFIG.storagePrefix}_session_${state.prolificId}`);
+      localStorage.removeItem(`${CONFIG.storagePrefix}_pending_${state.prolificId}`);
     } catch (e) {
       // ignore
     }
@@ -790,6 +845,12 @@
     }
 
     try {
+      const study = parseInt(params.get('study') || '1', 10);
+      if (study > 1) {
+        const cfg = await fetch(CONFIG.studyConfigPath(study)).then((r) => r.json());
+        applyStudyConfig(cfg);
+        console.log(`[Survey] Study ${study} config applied`);
+      }
       await loadAllData();
       console.log(`[Survey] Data loaded: ${state.allStimuliMap.size} stimuli`);
       transition('WELCOME');

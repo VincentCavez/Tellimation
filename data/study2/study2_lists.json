@@ -1,0 +1,554 @@
+{
+  "design": {
+    "study": "study2",
+    "n_lists": 4,
+    "n_participants_per_list": 10,
+    "n_participants_total": 40,
+    "target_animations": [
+      "I2",
+      "C3",
+      "S1"
+    ],
+    "filler_animations": [
+      "P2f",
+      "C2",
+      "T1"
+    ],
+    "n_scenes_per_animation": 4,
+    "n_block1_per_participant": 12,
+    "n_block2_per_participant": 3,
+    "slot_to_list": "list_id = ceil(slot / 10)",
+    "block1_order": "randomised per participant, no two consecutive items of the same animation",
+    "condition_rule": "block1: pos = rank of k in sorted({0..3} - {j}); correction iff (i+j+pos) even. block2: suggestion iff (i+k) even. fillers: scene k; P2f/T1 correction iff k even, C2 suggestion iff k even."
+  },
+  "lists": [
+    {
+      "list_id": 1,
+      "k": 0,
+      "slots": "1-10",
+      "block2_scene": "A",
+      "n_correction_block1": 6,
+      "n_suggestion_block1": 6,
+      "block1": [
+        {
+          "stimulus_id": "study2_I2_B_suggestion",
+          "scene_id": "study2_I2_B",
+          "animation_id": "I2",
+          "scene": "B",
+          "condition": "suggestion",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study2_I2_C_correction",
+          "scene_id": "study2_I2_C",
+          "animation_id": "I2",
+          "scene": "C",
+          "condition": "correction",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study2_I2_D_suggestion",
+          "scene_id": "study2_I2_D",
+          "animation_id": "I2",
+          "scene": "D",
+          "condition": "suggestion",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study2_C3_B_correction",
+          "scene_id": "study2_C3_B",
+          "animation_id": "C3",
+          "scene": "B",
+          "condition": "correction",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study2_C3_C_suggestion",
+          "scene_id": "study2_C3_C",
+          "animation_id": "C3",
+          "scene": "C",
+          "condition": "suggestion",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study2_C3_D_correction",
+          "scene_id": "study2_C3_D",
+          "animation_id": "C3",
+          "scene": "D",
+          "condition": "correction",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study2_S1_B_suggestion",
+          "scene_id": "study2_S1_B",
+          "animation_id": "S1",
+          "scene": "B",
+          "condition": "suggestion",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study2_S1_C_correction",
+          "scene_id": "study2_S1_C",
+          "animation_id": "S1",
+          "scene": "C",
+          "condition": "correction",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study2_S1_D_suggestion",
+          "scene_id": "study2_S1_D",
+          "animation_id": "S1",
+          "scene": "D",
+          "condition": "suggestion",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study1_P2f_A_correction",
+          "scene_id": "study1_P2f_A",
+          "animation_id": "P2f",
+          "scene": "A",
+          "condition": "correction",
+          "role": "filler"
+        },
+        {
+          "stimulus_id": "study1_C2_A_suggestion",
+          "scene_id": "study1_C2_A",
+          "animation_id": "C2",
+          "scene": "A",
+          "condition": "suggestion",
+          "role": "filler"
+        },
+        {
+          "stimulus_id": "study1_T1_A_correction",
+          "scene_id": "study1_T1_A",
+          "animation_id": "T1",
+          "scene": "A",
+          "condition": "correction",
+          "role": "filler"
+        }
+      ],
+      "block2": [
+        {
+          "stimulus_id": "study2_I2_A_suggestion",
+          "scene_id": "study2_I2_A",
+          "animation_id": "I2",
+          "scene": "A",
+          "condition": "suggestion",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study2_C3_A_correction",
+          "scene_id": "study2_C3_A",
+          "animation_id": "C3",
+          "scene": "A",
+          "condition": "correction",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study2_S1_A_suggestion",
+          "scene_id": "study2_S1_A",
+          "animation_id": "S1",
+          "scene": "A",
+          "condition": "suggestion",
+          "role": "target"
+        }
+      ]
+    },
+    {
+      "list_id": 2,
+      "k": 1,
+      "slots": "11-20",
+      "block2_scene": "B",
+      "n_correction_block1": 6,
+      "n_suggestion_block1": 6,
+      "block1": [
+        {
+          "stimulus_id": "study2_I2_A_correction",
+          "scene_id": "study2_I2_A",
+          "animation_id": "I2",
+          "scene": "A",
+          "condition": "correction",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study2_I2_C_suggestion",
+          "scene_id": "study2_I2_C",
+          "animation_id": "I2",
+          "scene": "C",
+          "condition": "suggestion",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study2_I2_D_correction",
+          "scene_id": "study2_I2_D",
+          "animation_id": "I2",
+          "scene": "D",
+          "condition": "correction",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study2_C3_A_suggestion",
+          "scene_id": "study2_C3_A",
+          "animation_id": "C3",
+          "scene": "A",
+          "condition": "suggestion",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study2_C3_C_correction",
+          "scene_id": "study2_C3_C",
+          "animation_id": "C3",
+          "scene": "C",
+          "condition": "correction",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study2_C3_D_suggestion",
+          "scene_id": "study2_C3_D",
+          "animation_id": "C3",
+          "scene": "D",
+          "condition": "suggestion",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study2_S1_A_correction",
+          "scene_id": "study2_S1_A",
+          "animation_id": "S1",
+          "scene": "A",
+          "condition": "correction",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study2_S1_C_suggestion",
+          "scene_id": "study2_S1_C",
+          "animation_id": "S1",
+          "scene": "C",
+          "condition": "suggestion",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study2_S1_D_correction",
+          "scene_id": "study2_S1_D",
+          "animation_id": "S1",
+          "scene": "D",
+          "condition": "correction",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study1_P2f_B_suggestion",
+          "scene_id": "study1_P2f_B",
+          "animation_id": "P2f",
+          "scene": "B",
+          "condition": "suggestion",
+          "role": "filler"
+        },
+        {
+          "stimulus_id": "study1_C2_B_correction",
+          "scene_id": "study1_C2_B",
+          "animation_id": "C2",
+          "scene": "B",
+          "condition": "correction",
+          "role": "filler"
+        },
+        {
+          "stimulus_id": "study1_T1_B_suggestion",
+          "scene_id": "study1_T1_B",
+          "animation_id": "T1",
+          "scene": "B",
+          "condition": "suggestion",
+          "role": "filler"
+        }
+      ],
+      "block2": [
+        {
+          "stimulus_id": "study2_I2_B_correction",
+          "scene_id": "study2_I2_B",
+          "animation_id": "I2",
+          "scene": "B",
+          "condition": "correction",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study2_C3_B_suggestion",
+          "scene_id": "study2_C3_B",
+          "animation_id": "C3",
+          "scene": "B",
+          "condition": "suggestion",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study2_S1_B_correction",
+          "scene_id": "study2_S1_B",
+          "animation_id": "S1",
+          "scene": "B",
+          "condition": "correction",
+          "role": "target"
+        }
+      ]
+    },
+    {
+      "list_id": 3,
+      "k": 2,
+      "slots": "21-30",
+      "block2_scene": "C",
+      "n_correction_block1": 6,
+      "n_suggestion_block1": 6,
+      "block1": [
+        {
+          "stimulus_id": "study2_I2_A_suggestion",
+          "scene_id": "study2_I2_A",
+          "animation_id": "I2",
+          "scene": "A",
+          "condition": "suggestion",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study2_I2_B_correction",
+          "scene_id": "study2_I2_B",
+          "animation_id": "I2",
+          "scene": "B",
+          "condition": "correction",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study2_I2_D_suggestion",
+          "scene_id": "study2_I2_D",
+          "animation_id": "I2",
+          "scene": "D",
+          "condition": "suggestion",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study2_C3_A_correction",
+          "scene_id": "study2_C3_A",
+          "animation_id": "C3",
+          "scene": "A",
+          "condition": "correction",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study2_C3_B_suggestion",
+          "scene_id": "study2_C3_B",
+          "animation_id": "C3",
+          "scene": "B",
+          "condition": "suggestion",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study2_C3_D_correction",
+          "scene_id": "study2_C3_D",
+          "animation_id": "C3",
+          "scene": "D",
+          "condition": "correction",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study2_S1_A_suggestion",
+          "scene_id": "study2_S1_A",
+          "animation_id": "S1",
+          "scene": "A",
+          "condition": "suggestion",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study2_S1_B_correction",
+          "scene_id": "study2_S1_B",
+          "animation_id": "S1",
+          "scene": "B",
+          "condition": "correction",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study2_S1_D_suggestion",
+          "scene_id": "study2_S1_D",
+          "animation_id": "S1",
+          "scene": "D",
+          "condition": "suggestion",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study1_P2f_C_correction",
+          "scene_id": "study1_P2f_C",
+          "animation_id": "P2f",
+          "scene": "C",
+          "condition": "correction",
+          "role": "filler"
+        },
+        {
+          "stimulus_id": "study1_C2_C_suggestion",
+          "scene_id": "study1_C2_C",
+          "animation_id": "C2",
+          "scene": "C",
+          "condition": "suggestion",
+          "role": "filler"
+        },
+        {
+          "stimulus_id": "study1_T1_C_correction",
+          "scene_id": "study1_T1_C",
+          "animation_id": "T1",
+          "scene": "C",
+          "condition": "correction",
+          "role": "filler"
+        }
+      ],
+      "block2": [
+        {
+          "stimulus_id": "study2_I2_C_suggestion",
+          "scene_id": "study2_I2_C",
+          "animation_id": "I2",
+          "scene": "C",
+          "condition": "suggestion",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study2_C3_C_correction",
+          "scene_id": "study2_C3_C",
+          "animation_id": "C3",
+          "scene": "C",
+          "condition": "correction",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study2_S1_C_suggestion",
+          "scene_id": "study2_S1_C",
+          "animation_id": "S1",
+          "scene": "C",
+          "condition": "suggestion",
+          "role": "target"
+        }
+      ]
+    },
+    {
+      "list_id": 4,
+      "k": 3,
+      "slots": "31-40",
+      "block2_scene": "D",
+      "n_correction_block1": 6,
+      "n_suggestion_block1": 6,
+      "block1": [
+        {
+          "stimulus_id": "study2_I2_A_correction",
+          "scene_id": "study2_I2_A",
+          "animation_id": "I2",
+          "scene": "A",
+          "condition": "correction",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study2_I2_B_suggestion",
+          "scene_id": "study2_I2_B",
+          "animation_id": "I2",
+          "scene": "B",
+          "condition": "suggestion",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study2_I2_C_correction",
+          "scene_id": "study2_I2_C",
+          "animation_id": "I2",
+          "scene": "C",
+          "condition": "correction",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study2_C3_A_suggestion",
+          "scene_id": "study2_C3_A",
+          "animation_id": "C3",
+          "scene": "A",
+          "condition": "suggestion",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study2_C3_B_correction",
+          "scene_id": "study2_C3_B",
+          "animation_id": "C3",
+          "scene": "B",
+          "condition": "correction",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study2_C3_C_suggestion",
+          "scene_id": "study2_C3_C",
+          "animation_id": "C3",
+          "scene": "C",
+          "condition": "suggestion",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study2_S1_A_correction",
+          "scene_id": "study2_S1_A",
+          "animation_id": "S1",
+          "scene": "A",
+          "condition": "correction",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study2_S1_B_suggestion",
+          "scene_id": "study2_S1_B",
+          "animation_id": "S1",
+          "scene": "B",
+          "condition": "suggestion",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study2_S1_C_correction",
+          "scene_id": "study2_S1_C",
+          "animation_id": "S1",
+          "scene": "C",
+          "condition": "correction",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study1_P2f_D_suggestion",
+          "scene_id": "study1_P2f_D",
+          "animation_id": "P2f",
+          "scene": "D",
+          "condition": "suggestion",
+          "role": "filler"
+        },
+        {
+          "stimulus_id": "study1_C2_D_correction",
+          "scene_id": "study1_C2_D",
+          "animation_id": "C2",
+          "scene": "D",
+          "condition": "correction",
+          "role": "filler"
+        },
+        {
+          "stimulus_id": "study1_T1_D_suggestion",
+          "scene_id": "study1_T1_D",
+          "animation_id": "T1",
+          "scene": "D",
+          "condition": "suggestion",
+          "role": "filler"
+        }
+      ],
+      "block2": [
+        {
+          "stimulus_id": "study2_I2_D_correction",
+          "scene_id": "study2_I2_D",
+          "animation_id": "I2",
+          "scene": "D",
+          "condition": "correction",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study2_C3_D_suggestion",
+          "scene_id": "study2_C3_D",
+          "animation_id": "C3",
+          "scene": "D",
+          "condition": "suggestion",
+          "role": "target"
+        },
+        {
+          "stimulus_id": "study2_S1_D_correction",
+          "scene_id": "study2_S1_D",
+          "animation_id": "S1",
+          "scene": "D",
+          "condition": "correction",
+          "role": "target"
+        }
+      ]
+    }
+  ]
+}

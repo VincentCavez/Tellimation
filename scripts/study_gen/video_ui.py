@@ -217,6 +217,12 @@ def api_scene_data(story_id: str):
     # Pass through optional scene-level params (e.g. interjection_word for D4)
     if "interjection_word" in data:
         result["interjection_word"] = data["interjection_word"]
+    # S1 peek: name of the extracted entity hidden behind the occluder (halo target)
+    if "peek_hidden" in data:
+        result["peek_hidden"] = data["peek_hidden"]
+    # Entity animated in the study video (pins the target selector)
+    if "video_target" in data:
+        result["video_target"] = data["video_target"]
 
     return jsonify(result)
 
@@ -249,6 +255,11 @@ def api_convert_mp4():
 
     video = request.files["video"]
     filename = request.form.get("filename", "video")
+    # Optional: also write the MP4 under data/<save_dir>/ (one path segment,
+    # e.g. study2_videos) so batches need no browser downloads.
+    save_dir = request.form.get("save_dir", "").strip()
+    if save_dir and ("/" in save_dir or save_dir.startswith(".")):
+        return jsonify({"error": "invalid save_dir"}), 400
 
     with tempfile.TemporaryDirectory() as tmp:
         webm_path = Path(tmp) / "input.webm"
@@ -272,6 +283,13 @@ def api_convert_mp4():
         if result.returncode != 0:
             logger.error("ffmpeg error: %s", result.stderr[-500:])
             return jsonify({"error": "ffmpeg conversion failed", "detail": result.stderr[-300:]}), 500
+
+        if save_dir:
+            dest_dir = PROJECT_ROOT / "data" / save_dir
+            dest_dir.mkdir(parents=True, exist_ok=True)
+            dest = dest_dir / f"{filename}.mp4"
+            dest.write_bytes(mp4_path.read_bytes())
+            logger.info("saved %s (%d bytes)", dest, dest.stat().st_size)
 
         return send_file(str(mp4_path), mimetype="video/mp4", as_attachment=True,
                          download_name=f"{filename}.mp4")

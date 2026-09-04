@@ -20,3 +20,8 @@ data/old/
 data/study1_utterances.pdf
 supplemental/
 supplemental.zip
+
+# Study 2 (Prolific revalidation of I2/C3/S1): data/study2_videos/ IS tracked
+# (served by GitHub Pages). Participant identifiers stay out of the repo.
+data/study2/private/
+data/study2/analysis/
