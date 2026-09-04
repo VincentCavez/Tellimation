@@ -220,8 +220,9 @@
       const list = state.counterbalancingLists.lists.find(
         (l) => l.list_id === state.listId
       );
-      if (!list || !list.block2) throw new Error(`Block 2 for list ${state.listId} not found`);
-      entries = list.block2;
+      // (empty block2 = the study has no Likert block)
+      if (!list) throw new Error(`List ${state.listId} not found`);
+      entries = list.block2 || [];
     }
     const trials = trialsFromEntries(entries);
 
@@ -538,7 +539,7 @@
 
         // Transition to appropriate block
         if (state.currentBlock === 2) {
-          transition('BLOCK2_TRIAL');
+          transition(state.block2Trials.length ? 'BLOCK2_TRIAL' : 'COMPLETING');
         } else {
           transition('BLOCK1_TRIAL');
         }
@@ -665,7 +666,7 @@
         state.currentBlock = 2;
         state.currentTrialIndex = 0;
         saveSession();
-        transition('BLOCK1_TRANSITION');
+        transition(state.block2Trials.length ? 'BLOCK1_TRANSITION' : 'COMPLETING');
       } else {
         renderBlock1Trial();
       }

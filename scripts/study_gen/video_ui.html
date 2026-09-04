@@ -158,6 +158,8 @@ const USE_LEGACY = URL_PARAMS.has('legacy');
 // ?only=I2,C3,S1 restricts the sidebar and the batch to those animation types.
 // ?prefix=study2_ renames the output files (study1_I2_A.mp4 -> study2_I2_A.mp4).
 const ONLY_TYPES = (URL_PARAMS.get('only') || '').split(',').map(s => s.trim()).filter(Boolean);
+// ?scenes=study1_S1_B,study1_C3_A restricts to specific scene ids.
+const ONLY_SCENES = (URL_PARAMS.get('scenes') || '').split(',').map(s => s.trim()).filter(Boolean);
 const FILE_PREFIX = URL_PARAMS.get('prefix') || '';
 // ?save=study2_videos also writes each MP4 to data/<dir>/ server-side.
 const SAVE_DIR = URL_PARAMS.get('save') || '';
@@ -197,6 +199,7 @@ async function init() {
   const resp = await fetch('/api/scenes');
   allScenes = await resp.json();
   if (ONLY_TYPES.length) allScenes = allScenes.filter(s => ONLY_TYPES.includes(s.anim_type));
+  if (ONLY_SCENES.length) allScenes = allScenes.filter(s => ONLY_SCENES.includes(s.story_id));
   renderSidebar();
 }
 
@@ -267,6 +270,10 @@ async function loadScene(storyId) {
 
   // Init layer order: in-scene entities in JSON order
   layerOrder = currentScene.entities.filter(e => e.in_scene && e.asset_url).map(e => e.name);
+  // The hidden element of a peek scene must sit behind its occluder
+  if (currentScene.peek_hidden && layerOrder.includes(currentScene.peek_hidden)) {
+    layerOrder = [currentScene.peek_hidden, ...layerOrder.filter(n => n !== currentScene.peek_hidden)];
+  }
   layerVisible = {};
   for (const e of currentScene.entities) { layerVisible[e.name] = true; }
   renderLayerPanel();

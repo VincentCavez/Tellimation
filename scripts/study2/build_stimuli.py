@@ -8,6 +8,9 @@ Targets (24): study1_{I2,C3,S1}_{A-D}_{correction,suggestion} copied with
     same task; only the animation video changes)
   * pipeline_intent of the correction stimuli replaced from
     data/study2/study2_intents.json (describes the new animation)
+  * a few option texts corrected from data/study2/study2_option_overrides.json
+    (Study 1 wording that did not match the scene); the originals are kept
+    in study1_options
 Fillers (24): study1_{P2f,C2,T1}_{A-D}_* copied verbatim, ids unchanged.
 
 Usage:
@@ -24,6 +27,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 STUDY1_STIMULI = PROJECT_ROOT / "data" / "study1_all_stimuli.json"
 INTENTS_PATH = PROJECT_ROOT / "data" / "study2" / "study2_intents.json"
+OVERRIDES_PATH = PROJECT_ROOT / "data" / "study2" / "study2_option_overrides.json"
 OUTPUT_PATH = PROJECT_ROOT / "data" / "study2" / "study2_all_stimuli.json"
 
 TARGET_ANIMATIONS = ["I2", "C3", "S1"]
@@ -40,6 +44,8 @@ def main() -> None:
         study1 = json.load(f)["stimuli"]
     with open(INTENTS_PATH) as f:
         intents = {k: v for k, v in json.load(f).items() if not k.startswith("_")}
+    with open(OVERRIDES_PATH) as f:
+        overrides = {k: v for k, v in json.load(f).items() if not k.startswith("_")}
 
     targets, fillers = [], []
     for stim in study1:
@@ -54,6 +60,9 @@ def main() -> None:
             new["study1_pipeline_intent"] = stim["pipeline_intent"]
             if stim["condition"] == "correction":
                 new["pipeline_intent"] = intents.pop(new["stimulus_id"])
+            for code, text in overrides.pop(new["stimulus_id"], {}).items():
+                new.setdefault("study1_options", dict(stim["options"]))
+                new["options"][code] = text
             if OLD_ANIMATION_WORDS.search(new["pipeline_intent"]):
                 raise SystemExit(f"{new['stimulus_id']}: intent still describes the old animation: {new['pipeline_intent']}")
             targets.append(new)
@@ -65,6 +74,8 @@ def main() -> None:
             fillers.append(new)
     if intents:
         raise SystemExit(f"unused intents: {sorted(intents)}")
+    if overrides:
+        raise SystemExit(f"unused option overrides: {sorted(overrides)}")
     if len(targets) != 24 or len(fillers) != 24:
         raise SystemExit(f"expected 24 targets and 24 fillers, got {len(targets)} / {len(fillers)}")
 

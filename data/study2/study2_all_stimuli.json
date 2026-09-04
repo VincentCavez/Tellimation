@@ -167,7 +167,7 @@
       ],
       "target_category": "Identity",
       "options": {
-        "T": "Mention the firefighter by name",
+        "T": "Mention the child by name",
         "E1": "Correct the color of the fire truck — it is not white",
         "E2": "Correct what the firefighter is doing",
         "D1": "Mention the fire hoses on the wall",
@@ -182,7 +182,14 @@
       "source_scene_id": "study1_I2_C",
       "animation_id": "I2",
       "role": "target",
-      "study1_pipeline_intent": "The system detected that you used the wrong title for the boy and decided to highlight him with a nametag to clarify his identity."
+      "study1_pipeline_intent": "The system detected that you used the wrong title for the boy and decided to highlight him with a nametag to clarify his identity.",
+      "study1_options": {
+        "T": "Mention the firefighter by name",
+        "E1": "Correct the color of the fire truck — it is not white",
+        "E2": "Correct what the firefighter is doing",
+        "D1": "Mention the fire hoses on the wall",
+        "D2": "Describe the brass pole in the corner"
+      }
     },
     {
       "stimulus_id": "study2_I2_C_suggestion",
@@ -374,7 +381,7 @@
       ],
       "target_category": "Count",
       "options": {
-        "T": "Correct the claim that they are alone — one chair is empty",
+        "T": "Correct the claim that they are alone — their child is joining",
         "E1": "Correct the description of the food being served",
         "E2": "Correct how many people are at the table",
         "D1": "Mention the chandelier overhead",
@@ -389,7 +396,14 @@
       "source_scene_id": "study1_C3_B",
       "animation_id": "C3",
       "role": "target",
-      "study1_pipeline_intent": "The system detected that you incorrectly claimed all the father and mother were alone this evening, so it will show a ghost outline of their child who will be joining them."
+      "study1_pipeline_intent": "The system detected that you incorrectly claimed all the father and mother were alone this evening, so it will show a ghost outline of their child who will be joining them.",
+      "study1_options": {
+        "T": "Correct the claim that they are alone — one chair is empty",
+        "E1": "Correct the description of the food being served",
+        "E2": "Correct how many people are at the table",
+        "D1": "Mention the chandelier overhead",
+        "D2": "Describe the candles on the sideboard"
+      }
     },
     {
       "stimulus_id": "study2_C3_B_suggestion",
@@ -468,8 +482,8 @@
       "narrator_text": "An old man reads a book on a park bench under a maple tree. Autumn leaves cover the ground.",
       "target_misl": "CH",
       "options": {
-        "T": "Mention that someone seems to be missing — the jacket suggests another person",
-        "D1": "Describe the jacket and glasses case in detail",
+        "T": "Mention that someone seems to be missing",
+        "D1": "Describe the man in detail",
         "D2": "Mention other visitors you might expect in the park",
         "D3": "Describe the autumn scenery",
         "D4": "Say what the man might be thinking about"
@@ -499,7 +513,14 @@
       "source_scene_id": "study1_C3_C",
       "animation_id": "C3",
       "role": "target",
-      "study1_pipeline_intent": "You've described the old man reading his book, but you could mention that his wife might be joining him soon."
+      "study1_pipeline_intent": "You've described the old man reading his book, but you could mention that his wife might be joining him soon.",
+      "study1_options": {
+        "T": "Mention that someone seems to be missing — the jacket suggests another person",
+        "D1": "Describe the jacket and glasses case in detail",
+        "D2": "Mention other visitors you might expect in the park",
+        "D3": "Describe the autumn scenery",
+        "D4": "Say what the man might be thinking about"
+      }
     },
     {
       "stimulus_id": "study2_C3_D_correction",

@@ -11,7 +11,7 @@ Study 2 analyses (spec, "Plan d'analyse"):
   2. partial credit in the correction condition (T / E1-E2 / D1-D2)
   3. item analysis per scene (A-D)
   4. fillers P2f / C2 / T1: Study 2 vs Study 1
-  5. Likert (block 2): mean and distribution per animation, vs Study 1
+  5. Likert (block 2): only if block-2 files are given (Study 2 dropped block 2)
   6. response_time_ms and video_play_count (medians)
 
 Usage:
@@ -321,21 +321,22 @@ def analyse_block2(s1: list[dict], s2: list[dict] | None, out: Path | None) -> N
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--s1-block1", type=Path, required=True)
-    parser.add_argument("--s1-block2", type=Path, required=True)
+    parser.add_argument("--s1-block2", type=Path, help="optional: Study 2 has no Likert block")
     parser.add_argument("--s2-block1", type=Path)
     parser.add_argument("--s2-block2", type=Path)
     parser.add_argument("--out", type=Path, default=None, help="directory for CSV outputs")
     args = parser.parse_args()
 
     s1_b1 = load_csv(args.s1_block1.expanduser())
-    s1_b2 = load_csv(args.s1_block2.expanduser())
+    s1_b2 = load_csv(args.s1_block2.expanduser()) if args.s1_block2 else []
     s2_b1 = load_csv(args.s2_block1.expanduser()) if args.s2_block1 else None
     s2_b2 = load_csv(args.s2_block2.expanduser()) if args.s2_block2 else None
     print(f"Study 1: {len(s1_b1)} block-1 rows, {len(s1_b2)} block-2 rows"
           + (f"; Study 2: {len(s2_b1)} block-1 rows, {len(s2_b2) if s2_b2 else 0} block-2 rows" if s2_b1 else ""))
 
     analyse_block1(s1_b1, s2_b1, args.out)
-    analyse_block2(s1_b2, s2_b2, args.out)
+    if s1_b2 or s2_b2:
+        analyse_block2(s1_b2, s2_b2, args.out)
 
 
 if __name__ == "__main__":

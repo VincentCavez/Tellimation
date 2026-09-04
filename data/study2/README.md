@@ -2,27 +2,30 @@
 
 Between-subjects replication of Study 1 for the three replaced animations
 (I2 Nametag → Silhouette, C3 Ghost Outline → Missing Piece, S1 Reveal → Peek),
-same protocol, same scenes, same narrator texts and options; only the videos
-and the correction `pipeline_intent` change. 40 participants, 4 lists of 10,
-~5 minutes: block 1 = 12 forced-choice items (9 targets + 3 fillers), block 2 =
-3 Likert items. Spec: `~/Downloads/study2_prolific_spec.md`.
+same forced-choice protocol, same scenes, same narrator texts and options; only
+the videos change. 40 participants, 4 lists of 10, ~5 minutes, block 1 only:
+15 forced-choice items = 12 targets (3 animations × scenes A-D, one condition
+each) + 3 fillers. The Likert block 2 of Study 1 is dropped: it rates the
+pipeline's decision text, which did not change. Spec:
+`~/Downloads/study2_prolific_spec.md` (block 2 and its scene rotation no longer apply).
 
 ## Files
 
 | File | Built by | Content |
 |---|---|---|
-| `study2_lists.json` | `python3 -m scripts.study2.build_lists --verify` | 4 lists: block 1 (12) and block 2 (3) per list, slot→list mapping, condition rule |
+| `study2_lists.json` | `python3 -m scripts.study2.build_lists --verify` | 4 lists: 15 block-1 items per list (`block2` empty), slot→list mapping, condition rule |
 | `study2_all_stimuli.json` | `python3 -m scripts.study2.build_stimuli` | 24 targets (`study2_*`, from the Study 1 entries) + 24 fillers (`study1_{P2f,C2,T1}_*`, verbatim) |
-| `study2_intents.json` | hand-written | the 12 rewritten correction intents |
+| `study2_intents.json` | hand-written | rewritten correction intents (unused since block 2 was dropped; kept in the stimuli file) |
+| `study2_option_overrides.json` | hand-written | Study 1 option texts corrected for the scenes |
 | `study2_config.json` | hand-written | survey configuration loaded by `survey/index.html?study=2` |
 | `../study2_videos/` | `video_ui` batch + copies | `study2_{I2,C3,S1}_{A-D}.mp4` (new visuals) and the 12 filler videos copied byte-for-byte from `data/prolific_videos/` |
 | `private/study1_prolific_ids.txt` | from the Study 1 `state` sheet | 82 Prolific IDs to exclude (git-ignored) |
 | `analysis/` | `scripts/analysis/prolific_study.py` | CSV outputs (git-ignored) |
 
-Condition rule: the spec's parity rule gives 8/4 per animation in block 1; the
-rule implemented in `build_lists.py` gives 6/6 per animation and every one of
-the 24 target stimuli is seen by exactly 2 lists (20 participants) across both
-blocks. `tests/test_study2_lists.py` checks it.
+Condition rule: list k, animation i, scene j → correction iff (i + j + k) even.
+Each list shows every animation on its 4 scenes with 2 corrections and
+2 suggestions; each of the 24 target stimuli is seen by exactly 2 lists
+(20 participants). `tests/test_study2_lists.py` checks it.
 
 ## Recording the 12 target videos
 
@@ -67,6 +70,5 @@ Export each response sheet with **File → Download → Comma-separated values**
 ```
 python3 -m scripts.analysis.prolific_study \
   --s1-block1 "~/Downloads/Prolific data - responses_block1.csv" \
-  --s1-block2 "~/Downloads/Prolific data - responses_block2.csv" \
-  --s2-block1 study2_block1.csv --s2-block2 study2_block2.csv
+  --s2-block1 study2_block1.csv
 ```

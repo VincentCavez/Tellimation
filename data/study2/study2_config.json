@@ -9,8 +9,8 @@
   "storage_prefix": "tellimations_s2",
   "no_adjacent_same_animation": true,
   "texts": {
-    "text-part1": "<strong>Part 1</strong> (~4 min): Watch 12 short animations and choose what you would say about each scene.",
-    "text-part2": "<strong>Part 2</strong> (~1 min): Read 3 descriptions and rate how appropriate they are.",
-    "text-transition": "Great job! Now for Part 2 (3 short items)."
+    "text-parts-intro": "The study is a single part of about 5 minutes:",
+    "text-part1": "Watch 15 short animations and, for each one, choose what you would say about the scene.",
+    "text-part2": ""
   }
 }
