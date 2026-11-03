@@ -100,13 +100,12 @@
 
       case 'study_log':
         console.log('[' + msg.tag + '] ' + msg.text);
-        if (msg.tag === 'MISTAKES') window._gotMistakes = true;
-        if (msg.tag === 'OPTIONS') window._gotOptions = true;
-        if (window._gotMistakes && window._gotOptions) {
-          NarrationClient.assessmentDone();
-          window._gotMistakes = false;
-          window._gotOptions = false;
-        }
+        break;
+
+      // End of the server's assessment cycle (animation, if any, already sent):
+      // speaking after this no longer counts as interrupting it
+      case 'study_turn_done':
+        NarrationClient.assessmentDone();
         break;
 
       case 'error':
