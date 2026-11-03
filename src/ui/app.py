@@ -33,14 +33,16 @@ if _gcp_b64 and not os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"):
     _creds_file.close()
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = _creds_file.name
 
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
-from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from starlette.websockets import WebSocketState
 
+from src.analytics.analysis_pdf import build_analysis_pdf
 from src.analytics.session_report import generate_report
 from src.generation.scene_generator import STORY_THEMES, generate_scene_assets
 from src.generation.scene_neg_generator import generate_scene_manifest
@@ -254,9 +256,10 @@ if _study_assets_dir and (_study_assets_dir / "oral_instructions").is_dir():
 # HTML page routes
 # ---------------------------------------------------------------------------
 
-@app.get("/", response_class=RedirectResponse)
-async def root_redirect():
-    return RedirectResponse(url="/study")
+@app.get("/", response_class=HTMLResponse)
+async def home_page():
+    """Open home: no login, every story (2 practices + A-D) playable."""
+    return (TEMPLATES_DIR / "home.html").read_text()
 
 
 @app.get("/selection", response_class=HTMLResponse)
@@ -278,14 +281,15 @@ async def admin_page():
 # Study pages
 # ---------------------------------------------------------------------------
 
+# Legacy participant flow (login -> assigned order), kept for later waves.
 @app.get("/study", response_class=HTMLResponse)
 async def study_login_page():
-    return (TEMPLATES_DIR / "study_login.html").read_text()
+    return (TEMPLATES_DIR / "legacy" / "study_login.html").read_text()
 
 
 @app.get("/study/landing", response_class=HTMLResponse)
 async def study_landing_page():
-    return (TEMPLATES_DIR / "study_landing.html").read_text()
+    return (TEMPLATES_DIR / "legacy" / "study_landing.html").read_text()
 
 
 @app.get("/study/questionnaire", response_class=HTMLResponse)
@@ -551,20 +555,9 @@ def _load_study_scene(data_dir: Path, story_meta: Dict[str, Any], scene_num: int
         return None
 
 
-@app.get("/api/study/assignment")
-async def study_assignment(participant: int):
-    """Return the study assignment for a participant number."""
-    _load_study_config()
-    key = str(participant)
-    assignment = (_STUDY_ASSIGNMENTS or {}).get(key)
-    if not assignment:
-        return JSONResponse(status_code=404, content={"error": "Unknown participant number"})
-
+def _study_story_cards() -> Dict[str, Dict[str, Any]]:
+    """Name, scene count and first-scene thumbnail for stories A-D."""
     stories_config = _STUDY_STORIES or {}
-    raw_order = assignment["order"]
-    order_labels, animated_set = _parse_study_order(raw_order)
-
-    # Load first scene of each story for thumbnails
     data_dir = _find_data_dir()
     stories: Dict[str, Any] = {}
     for label in ["A", "B", "C", "D"]:
@@ -572,7 +565,6 @@ async def study_assignment(participant: int):
         scene_data: Dict[str, Any] = {
             "name": story_meta.get("name", f"Story {label}"),
             "scene_count": story_meta.get("scene_count", 0),
-            "animated": label in animated_set,
         }
         if data_dir:
             full_scene = _load_study_scene(data_dir, story_meta, 1)
@@ -586,10 +578,14 @@ async def study_assignment(participant: int):
                 else:
                     scene_data["sprite_code"] = full_scene.get("sprite_code", {})
         stories[label] = scene_data
+    return stories
 
-    # Load training scenes (HD format)
+
+def _study_training_cards() -> List[Dict[str, Any]]:
+    """Name and thumbnail for each practice story (HD format)."""
+    data_dir = _find_data_dir()
     training_scenes: List[Dict[str, Any]] = []
-    training_config = stories_config.get("training", [])
+    training_config = (_STUDY_STORIES or {}).get("training", [])
     for idx, t_entry in enumerate(training_config):
         image_dir_rel = t_entry.get("image_dir", "")
         if data_dir and image_dir_rel:
@@ -602,8 +598,36 @@ async def study_assignment(participant: int):
                     "thumbnail_url": f"/study-assets/{story_key}/hd/scene_1_full.png",
                     "format": "hd",
                 })
-            else:
-                training_scenes.append({"name": t_entry.get("name", f"Practice {idx+1}")})
+                continue
+        training_scenes.append({"name": t_entry.get("name", f"Practice {idx+1}")})
+    return training_scenes
+
+
+@app.get("/api/study/catalog")
+async def study_catalog():
+    """Every playable story, for the open home page (no participant)."""
+    _load_study_config()
+    return JSONResponse(content={
+        "stories": _study_story_cards(),
+        "training_scenes": _study_training_cards(),
+    })
+
+
+@app.get("/api/study/assignment")
+async def study_assignment(participant: int):
+    """Return the study assignment for a participant number."""
+    _load_study_config()
+    key = str(participant)
+    assignment = (_STUDY_ASSIGNMENTS or {}).get(key)
+    if not assignment:
+        return JSONResponse(status_code=404, content={"error": "Unknown participant number"})
+
+    raw_order = assignment["order"]
+    order_labels, animated_set = _parse_study_order(raw_order)
+    stories = _study_story_cards()
+    for label, card in stories.items():
+        card["animated"] = label in animated_set
+    training_scenes = _study_training_cards()
 
     return JSONResponse(content={
         "participant": participant,
@@ -627,11 +651,13 @@ async def study_scene(story: str, scene: int):
     story_meta = stories_config.get(story_key) or stories_config.get(story.lower())
 
     # Training: list of scene defs, indexed by scene number
+    training_num = None
     if story.lower() == "training" and isinstance(story_meta, list):
         if scene < 1 or scene > len(story_meta):
             return JSONResponse(status_code=400, content={"error": f"Training scene {scene} out of range (1-{len(story_meta)})"})
         story_meta = story_meta[scene - 1]
         story_meta.setdefault("scene_count", 1)
+        training_num = scene
         scene = 1  # each training entry is a single scene
 
     if not story_meta or not isinstance(story_meta, dict):
@@ -649,7 +675,27 @@ async def study_scene(story: str, scene: int):
     if not full_scene:
         return JSONResponse(status_code=404, content={"error": f"Scene {story}/{scene} not found on disk"})
 
+    if training_num is not None:
+        # Logs key scenes by scene_number: keep practice 2 apart from practice 1
+        full_scene["scene_number"] = training_num
     return JSONResponse(content=full_scene)
+
+
+_PARTICIPANT_ID_RE = re.compile(r"^[A-Za-z0-9_-]{1,40}$")
+
+
+@app.get("/api/analysis.pdf")
+async def analysis_pdf(participant: str):
+    """Readable PDF of a participant's study logs (home page download)."""
+    if not _PARTICIPANT_ID_RE.match(participant):
+        return JSONResponse(status_code=400, content={"error": "Invalid participant"})
+    pdf = await asyncio.to_thread(build_analysis_pdf, participant)
+    filename = f"tellimations_analysis_{datetime.now().strftime('%Y-%m-%d')}.pdf"
+    return Response(
+        content=pdf,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
 
 
 @app.get("/api/simulation-scene")

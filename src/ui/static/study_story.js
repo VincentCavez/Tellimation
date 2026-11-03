@@ -7,7 +7,13 @@
   'use strict';
 
   // --- Session data ---
+  var fromHome = new URLSearchParams(window.location.search).get('from') === 'home';
+  // Open home has no login: it sets a per-browser "free-xxxx" id before linking here
   var participantNumber = sessionStorage.getItem('participant_number');
+  if (!participantNumber && fromHome) {
+    try { participantNumber = localStorage.getItem('home_participant'); } catch (e) {}
+    participantNumber = participantNumber || 'free';
+  }
   if (!participantNumber) {
     window.location.href = '/study';
     return;
@@ -17,13 +23,17 @@
   var isAnimated = new URLSearchParams(window.location.search).get('animated') === 'true';
   var sceneCount = parseInt(new URLSearchParams(window.location.search).get('scenes') || '5', 10);
   var storyName = decodeURIComponent(new URLSearchParams(window.location.search).get('name') || 'Story');
+  // Open home (/) passes from=home; the legacy participant flow returns to its landing
+  var homeUrl = fromHome ? '/' : '/study/landing';
+  // start lets the open home launch practice 2 alone (training scenes are 1-indexed)
+  var startScene = parseInt(new URLSearchParams(window.location.search).get('start') || '1', 10);
 
   if (!storyKey) {
-    window.location.href = '/study/landing';
+    window.location.href = homeUrl;
     return;
   }
 
-  var currentScene = 1;
+  var currentScene = startScene;
   var _tutorialActive = (storyKey === 'training' && currentScene === 1);
   var _tutorialStarted = false;
 
@@ -36,6 +46,7 @@
 
   storyNameEl.textContent = storyName;
   sceneTotalEl.textContent = sceneCount;
+  document.querySelector('.story-scene-label .home-link').href = homeUrl;
 
   // --- Engine setup ---
   var canvas = document.getElementById('scene-canvas');
@@ -1020,6 +1031,6 @@
     var completed = JSON.parse(sessionStorage.getItem('study_completed') || '{}');
     completed[storyKey] = true;
     sessionStorage.setItem('study_completed', JSON.stringify(completed));
-    window.location.href = '/study/landing';
+    window.location.href = homeUrl;
   });
 })();

@@ -826,3 +826,25 @@ a { color: var(--teal); text-decoration: none; }
 .ptt-hint.ptt-hint-retry {
   color: var(--yellow, #e0a030);
 }
+
+/* ---- Open home page ---- */
+.home-page .study-block { max-width: 100%; }
+.home-page .thumbnail-row { flex-wrap: wrap; }
+.home-block-title {
+  font-family: var(--font);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #000;
+}
+.home-slot {
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+.home-slot:hover { transform: translateY(-3px); }
+.home-slot .thumbnail-label { font-size: 0.85rem; color: #333; }
+
+.home-download {
+  text-decoration: none;
+  font-size: 0.95rem;
+  padding: 10px 24px;
+}
