@@ -25,13 +25,13 @@
   },
   "training": [
     {
-      "name": "Practice Story 1",
+      "name": "Tutorial",
       "image_dir": "data/study_gen/training_1",
       "story_def": "data/study_scenes/training_1.json",
       "scene_count": 1
     },
     {
-      "name": "Practice Story 2",
+      "name": "Practice Story",
       "image_dir": "data/study_gen/training_2",
       "story_def": "data/study_scenes/training_2.json",
       "scene_count": 1
