@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SHIELD</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/static/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css?v=14">
+</head>
+<body class="home-body">
+  <div class="falling-pixels-bg" id="falling-pixels"></div>
+
+  <div class="study-landing-container home-page register-page">
+    <header class="home-header">
+      <h1 class="home-title" aria-label="SHIELD">
+        <span class="c-red">S</span><span class="c-yellow">H</span><span class="c-blue">I</span><span class="c-teal">E</span><span class="c-red">L</span><span class="c-yellow">D</span>
+      </h1>
+      <p class="home-subtitle">
+        <b class="c-red">S</b>torytelling <b class="c-yellow">H</b>elper for <b class="c-blue">I</b>nteractive
+        and <b class="c-teal">E</b>xpressive <b class="c-red">L</b>iteracy <b class="c-yellow">D</b>evelopment
+      </p>
+    </header>
+
+    <section class="register-authors">
+      <p class="register-names">
+        <span>Vincent Cavez<sup>1</sup>,</span> <span>Marielle Zheng<sup>1</sup>,</span>
+        <span>Momin Siddiqui<sup>2</sup>,</span> <span>Abbie L Olszewski<sup>3</sup>,</span>
+        <span>Srirangaraj Setlur<sup>4</sup>,</span> <span>Maneesh Agrawala<sup>1</sup>,</span>
+        <span>Hari Subramonyam<sup>1</sup></span>
+      </p>
+      <p class="register-affils">
+        <span><sup>1</sup>Stanford University</span>
+        <span><sup>2</sup>Georgia Institute of Technology</span>
+        <span><sup>3</sup>University of Nevada, Reno</span>
+        <span><sup>4</sup>University of Buffalo</span>
+      </p>
+    </section>
+
+    <section class="study-block register-block">
+      <p class="register-about">
+        SHIELD helps children build their oral storytelling skills. The child looks at
+        an illustrated scene and tells, out loud, what is happening. SHIELD listens,
+        transcribes the story and compares it with the picture. When something is
+        missing, unclear or could be said better (a character left out, a vague word,
+        a grammar slip), the scene itself reacts with a short animation that draws the
+        child's attention to it, so they can notice it and say it again in their own
+        words, without ever being given the answer. At the end, you can download a
+        readable analysis of the session.
+      </p>
+    </section>
+
+    <section class="study-block register-block">
+      <div class="home-block-title">Try SHIELD for free</div>
+      <p class="register-offer">
+        In exchange for your email and a few words on why SHIELD interests you, we cover
+        the first <b>$50 of API costs</b> (speech recognition and AI models) so you can try
+        it. Once this credit is used up, you will need to enter your own API key to keep
+        using SHIELD.
+      </p>
+      <p class="register-offer">
+        By continuing, you agree that we may contact you later to take part in studies
+        about SHIELD or similar applications.
+      </p>
+
+      <form id="register-form" class="register-form" novalidate>
+        <label for="reg-email">Email</label>
+        <input type="email" id="reg-email" name="email" autocomplete="email" maxlength="254" required>
+
+        <label for="reg-interest">Why are you interested in SHIELD?</label>
+        <textarea id="reg-interest" name="interest" rows="3" maxlength="1000" required
+                  placeholder="e.g. I am a speech-language pathologist working with 8-year-olds…"></textarea>
+
+        <p class="register-error" id="reg-error" role="alert"></p>
+        <button type="submit" class="btn btn-red" id="reg-submit">Agree and start</button>
+      </form>
+    </section>
+  </div>
+
+  <script src="/static/register.js?v=1"></script>
+  <script>
+    // Falling pixels animation in margins
+    const colors = ['#DB0038', '#F7C200', '#519DD9', '#53BAC1', '#EDEDED'];
+    const pixelsContainer = document.getElementById('falling-pixels');
+    let activePixels = 0;
+    const maxPixels = 8;
+
+    function createPixel() {
+      if (activePixels >= maxPixels) return;
+      const pixel = document.createElement('div');
+      pixel.className = 'falling-pixel';
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      pixel.style.backgroundColor = color;
+      const side = Math.random() < 0.5 ? 'left' : 'right';
+      const x = side === 'left' ? Math.random() * 40 : 100 - Math.random() * 40;
+      pixel.style.left = x + '%';
+      pixel.style.top = '-20px';
+      const duration = 3 + Math.random() * 3;
+      pixel.style.animation = `fall ${duration}s linear forwards`;
+      pixelsContainer.appendChild(pixel);
+      activePixels++;
+      setTimeout(() => { pixel.remove(); activePixels--; }, duration * 1000);
+    }
+    setInterval(createPixel, 600);
+  </script>
+</body>
+</html>

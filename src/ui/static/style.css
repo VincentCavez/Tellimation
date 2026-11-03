@@ -939,3 +939,53 @@ a { color: var(--teal); text-decoration: none; }
   font-size: 0.95rem;
   padding: 10px 24px;
 }
+
+/* ---- Login (registration) page ---- */
+.register-page { max-width: 760px; gap: 1.4rem; }
+.register-authors { text-align: center; color: #3a302a; }
+.register-names {
+  font-size: clamp(0.9rem, 2.3vw, 1.05rem);
+  font-weight: 700;
+  line-height: 1.5;
+}
+.register-affils {
+  margin-top: 0.3rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.2rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #6b6058;
+}
+.register-authors sup { font-size: 0.7em; margin-right: 1px; }
+.register-names span, .register-affils span { white-space: nowrap; }
+.register-page .register-block {
+  align-items: stretch;
+  padding: 1.4rem 1.6rem;
+  color: #3a302a;
+  line-height: 1.55;
+}
+.register-about { font-size: 1rem; }
+.register-offer { font-size: 0.95rem; }
+.register-form { display: flex; flex-direction: column; gap: 0.4rem; margin-top: 0.4rem; }
+.register-form label { font-weight: 800; font-size: 0.95rem; margin-top: 0.4rem; }
+.register-form input,
+.register-form textarea {
+  font-family: var(--home-font);
+  font-size: 1rem;
+  color: #2b2420;
+  background: #fffaf5;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  padding: 0.6rem 0.8rem;
+  resize: vertical;
+}
+.register-form input:focus,
+.register-form textarea:focus { outline: none; border-color: var(--blue); }
+.register-error { min-height: 1.2em; color: var(--red); font-weight: 700; font-size: 0.9rem; }
+.register-form .btn { align-self: center; padding: 10px 28px; font-size: 1rem; }
+.register-form .btn:disabled { opacity: 0.6; cursor: default; }
+@media (max-width: 520px) {
+  .register-page .register-block { padding: 1.2rem 1rem; }
+}
