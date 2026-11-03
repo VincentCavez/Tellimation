@@ -690,7 +690,7 @@ async def analysis_pdf(participant: str):
     if not _PARTICIPANT_ID_RE.match(participant):
         return JSONResponse(status_code=400, content={"error": "Invalid participant"})
     pdf = await asyncio.to_thread(build_analysis_pdf, participant)
-    filename = f"tellimations_analysis_{datetime.now().strftime('%Y-%m-%d')}.pdf"
+    filename = f"shield_analysis_{datetime.now().strftime('%Y-%m-%d')}.pdf"
     return Response(
         content=pdf,
         media_type="application/pdf",

@@ -257,7 +257,7 @@ def build_analysis_pdf(participant_id: str) -> bytes:
     shown_corr = sum(1 for t in shown if (t.get("selected") or {}).get("source") == "error")
 
     story = [
-        Paragraph("My Tellimations analysis", st["title"]),
+        Paragraph("My SHIELD analysis", st["title"]),
         Paragraph(f"Generated on {datetime.now().strftime('%d %B %Y, %H:%M')}", st["subtitle"]),
     ]
 
@@ -341,7 +341,7 @@ def build_analysis_pdf(participant_id: str) -> bytes:
 def _render(flowables: List[Any]) -> bytes:
     buf = io.BytesIO()
     doc = SimpleDocTemplate(
-        buf, pagesize=A4, title="My Tellimations analysis",
+        buf, pagesize=A4, title="My SHIELD analysis",
         leftMargin=2 * cm, rightMargin=2 * cm, topMargin=1.8 * cm, bottomMargin=1.8 * cm,
     )
     doc.build(flowables)
