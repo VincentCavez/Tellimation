@@ -38,7 +38,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
-from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, Response
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from starlette.websockets import WebSocketState
 
@@ -255,6 +255,12 @@ if _study_assets_dir and (_study_assets_dir / "oral_instructions").is_dir():
 # ---------------------------------------------------------------------------
 # HTML page routes
 # ---------------------------------------------------------------------------
+
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon():
+    """SHIELD shield icon, for pages that don't link the SVG one."""
+    return FileResponse(STATIC_DIR / "favicon.ico", media_type="image/x-icon")
+
 
 @app.get("/", response_class=HTMLResponse)
 async def home_page():
