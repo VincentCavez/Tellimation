@@ -25,3 +25,6 @@ supplemental.zip
 # (served by GitHub Pages). Participant identifiers stay out of the repo.
 data/study2/private/
 data/study2/analysis/
+
+# Repaired study logs (participant data, scripts/analysis/fix_displayed_flag.py)
+data/displayed_fix/

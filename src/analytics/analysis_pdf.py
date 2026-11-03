@@ -79,7 +79,7 @@ def _animation_names() -> Dict[str, str]:
 
 
 def _story_names() -> Dict[str, str]:
-    """Story key -> title, e.g. "A" -> "The Balloon Seller", "training_2" -> "Practice Story 2"."""
+    """Story key -> title, e.g. "A" -> "The Balloon Seller", "training_1" -> "Tutorial"."""
     try:
         cfg = json.loads(_STORIES_PATH.read_text())
     except (json.JSONDecodeError, OSError):
