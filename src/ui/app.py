@@ -1889,6 +1889,14 @@ async def _handle_study_audio(
     except Exception:
         logger.exception("[study] Assessment/animation failed")
 
+    # Release the client's assessment gate: a PTT press after this is a new
+    # turn, not an interruption. (The gate used to wait for both MISTAKES and
+    # OPTIONS, so turns without corrections were all logged displayed=false.)
+    try:
+        await ws.send_json({"type": "study_turn_done"})
+    except Exception:
+        logger.debug("[study] Could not send study_turn_done", exc_info=True)
+
 
 # ---------------------------------------------------------------------------
 # Audio handling (interactive loop)

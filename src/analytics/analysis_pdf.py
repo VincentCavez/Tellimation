@@ -194,21 +194,32 @@ def _table(rows: List[List[Any]], widths: List[float]) -> Table:
 
 
 def _feedback_lines(turn: Dict[str, Any], anim_names: Dict[str, str]) -> List[str]:
-    """Plain-language description of what the system did after an utterance."""
+    """Plain-language description of what the system did after an utterance.
+
+    At most one animation per sentence: a correction always wins over an idea,
+    so when both exist the idea is listed but marked as not animated.
+    """
+    action = turn.get("action")
+    sel = turn.get("selected") or {}
+    source = sel.get("source")
+    animated = action in ("triggered", "control_suppressed")
+
     lines = []
     for c in turn.get("corrections", []):
         lines.append(f"<font color='#DB0038'><b>Correction:</b></font> {escape(c.get('rationale') or '')}")
     for s in turn.get("suggestions", []):
-        lines.append(f"<font color='#519DD9'><b>Idea to enrich the story:</b></font> {escape(s.get('rationale') or '')}")
+        line = f"<font color='#519DD9'><b>Idea to enrich the story:</b></font> {escape(s.get('rationale') or '')}"
+        if animated and source == "error":
+            line += " <font color='#666666'>(not animated: the correction came first)</font>"
+        lines.append(line)
 
-    action = turn.get("action")
-    sel = turn.get("selected") or {}
     targets = ", ".join(sel.get("targets") or []) or "the scene"
     name = _anim_label(sel.get("animation_id"), anim_names)
+    reason = "the correction" if source == "error" else "the idea"
     if action == "triggered":
-        line = f"<b>Animation shown:</b> {escape(name)} on {escape(targets)}"
+        line = f"<b>Animation shown for {reason}:</b> {escape(name)} on {escape(targets)}"
         if turn.get("displayed") is False:
-            line += " <font color='#666666'>(interrupted before it played)</font>"
+            line += " <font color='#666666'>(you spoke again before it appeared)</font>"
         resolved = turn.get("resolved")
         if resolved is True:
             line += " &nbsp;<font color='#27ae60'><b>-> addressed in the next sentence</b></font>"
@@ -216,7 +227,8 @@ def _feedback_lines(turn: Dict[str, Any], anim_names: Dict[str, str]) -> List[st
             line += " &nbsp;<font color='#666666'>-> not addressed in the next sentence</font>"
         lines.append(line)
     elif action == "control_suppressed":
-        lines.append(f"<font color='#666666'>Animations off: {escape(name)} on {escape(targets)} would have been shown.</font>")
+        lines.append(f"<font color='#666666'>Animations off: {escape(name)} on {escape(targets)} "
+                     f"would have been shown for {reason}.</font>")
         if turn.get("resolved") is True:
             lines.append("<font color='#27ae60'>-> addressed anyway in the next sentence</font>")
     elif action == "no_action" and not lines:
@@ -240,6 +252,9 @@ def build_analysis_pdf(participant_id: str) -> bytes:
     judged = [t for t in shown if t.get("resolved") is not None]
     n_corr = sum(len(t.get("corrections", [])) for t in turns)
     n_sugg = sum(len(t.get("suggestions", [])) for t in turns)
+    corr_turns = sum(1 for t in turns if t.get("corrections"))
+    sugg_turns = sum(1 for t in turns if t.get("suggestions"))
+    shown_corr = sum(1 for t in shown if (t.get("selected") or {}).get("source") == "error")
 
     story = [
         Paragraph("My Tellimations analysis", st["title"]),
@@ -260,14 +275,15 @@ def build_analysis_pdf(participant_id: str) -> bytes:
         if name not in played:
             played.append(name)
     story.append(Paragraph("Overview", st["h1"]))
+    # The last animation of a scene has no next sentence to judge it by
     rate = f"{len(resolved)} of {len(judged)}" if judged else "-"
     story.append(_table([
         ["Stories played", ", ".join(played)],
         ["Scenes told", str(len(scenes))],
         ["Sentences spoken", f"{len(turns)}  ({words} words, {words / len(turns):.1f} per sentence)"],
-        ["Corrections (wrong or unclear)", str(n_corr)],
-        ["Ideas to enrich the story", str(n_sugg)],
-        ["Animations shown", str(len(shown))],
+        ["Corrections (wrong or unclear)", f"{n_corr}, in {corr_turns} sentences"],
+        ["Ideas to enrich the story", f"{n_sugg}, in {sugg_turns} sentences"],
+        ["Animations shown", f"{len(shown)}: {shown_corr} for a correction, {len(shown) - shown_corr} for an idea"],
         ["Animations addressed right after", rate],
     ], [6 * cm, 11 * cm]))
 
@@ -314,7 +330,9 @@ def build_analysis_pdf(participant_id: str) -> bytes:
 
     story.append(Spacer(1, 12))
     story.append(Paragraph(
-        "“Addressed” means the sentence that followed an animation was judged to answer it. "
+        "At most one animation follows each sentence; when there is both a correction and an idea, "
+        "the correction is animated. “Addressed” means the sentence that followed an animation "
+        "was judged to answer it (the last animation of a scene has no next sentence). "
         "Corrections and ideas are the system's automatic reading of each sentence and can be wrong.",
         st["note"]))
     return _render(story)
