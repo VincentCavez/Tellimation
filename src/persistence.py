@@ -289,7 +289,12 @@ def load_story_first_scenes(participant_id: str) -> List[Dict[str, Any]]:
 # Google Sheet push (via Apps Script webhook)
 # ---------------------------------------------------------------------------
 
-GOOGLE_SHEET_WEBHOOK = os.environ.get("GOOGLE_SHEET_WEBHOOK", "")
+# Sheet pushes via the Apps Script webhook are switched off (Nov 2026): logs
+# stay local and are exported through the home page's PDF analysis instead.
+# Set to True to send profile/logs/questionnaire to the Sheet again.
+SHEET_PUSH_ENABLED = False
+
+GOOGLE_SHEET_WEBHOOK = os.environ.get("GOOGLE_SHEET_WEBHOOK", "") if SHEET_PUSH_ENABLED else ""
 
 
 def push_to_google_sheet(participant_id: str) -> bool:
