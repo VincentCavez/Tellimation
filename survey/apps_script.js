@@ -103,17 +103,26 @@ function handleAssign(data) {
     }
 
     // Find first unassigned slot
-    for (var i = 1; i < values.length; i++) {
-      if (!values[i][3]) {  // prolific_id column (D) is empty
-        sheet.getRange(i + 1, 4).setValue(prolificId);
-        sheet.getRange(i + 1, 5).setValue(new Date().toISOString());
-        lock.releaseLock();
-        return {
-          slot: values[i][0],
-          list_id: values[i][1],
-          participant_id: values[i][2]
-        };
+    var row = findFreeRow(values);
+    if (row < 0) {
+      // Full: recycle the oldest slot assigned more than STALE_MINUTES ago and
+      // never completed (a dropout). Archived in "abandoned" by releaseSlot.
+      row = findStaleRow(values);
+      if (row >= 0) {
+        releaseSlot(values[row][0]);
+        SpreadsheetApp.flush();
       }
+    }
+    if (row >= 0) {
+      sheet.getRange(row + 1, 4).setValue(prolificId);
+      sheet.getRange(row + 1, 5).setValue(new Date().toISOString());
+      SpreadsheetApp.flush();   // make the write visible to the next locked call
+      lock.releaseLock();
+      return {
+        slot: values[row][0],
+        list_id: values[row][1],
+        participant_id: values[row][2]
+      };
     }
 
     lock.releaseLock();
@@ -168,15 +177,87 @@ function handleRespond(data) {
   return { ok: true };
 }
 
+// A slot assigned this long ago and not completed is considered abandoned
+// (the study takes ~5 min; Prolific's own timeout is longer).
+var STALE_MINUTES = 30;
+
+function findFreeRow(values) {
+  for (var i = 1; i < values.length; i++) {
+    if (values[i][0] !== '' && !values[i][3]) return i;   // prolific_id (D) empty
+  }
+  return -1;
+}
+
+function findStaleRow(values) {
+  var cutoff = Date.now() - STALE_MINUTES * 60 * 1000;
+  var best = -1, bestTime = Infinity;
+  for (var i = 1; i < values.length; i++) {
+    if (!values[i][3] || values[i][5]) continue;          // free or completed
+    var t = values[i][4] ? new Date(values[i][4]).getTime() : 0;
+    if (t && t < cutoff && t < bestTime) { best = i; bestTime = t; }
+  }
+  return best;
+}
+
 /**
- * Mark a participant slot as completed.
+ * Free the slot of a participant who dropped out, so a new participant can
+ * take it. Run from the Apps Script editor: releaseSlot(5).
+ * The dropped participant is archived in sheet "abandoned" with
+ * participant_id = 1000 + slot (their rows in responses_block1 keep their
+ * prolific_id; the analysis keeps only complete participants).
+ */
+function releaseSlot(slot) {
+  var ss = SpreadsheetApp.getActive();
+  var sheet = ss.getSheetByName('state');
+  var values = sheet.getDataRange().getValues();
+  for (var i = 1; i < values.length; i++) {
+    if (values[i][0] === slot) {
+      if (!values[i][3]) return 'slot ' + slot + ' is already free';
+      if (values[i][5]) return 'slot ' + slot + ' is completed, not released';
+      var archive = ss.getSheetByName('abandoned') || ss.insertSheet('abandoned');
+      if (archive.getLastRow() === 0) {
+        archive.appendRow(['slot', 'list_id', 'participant_id', 'prolific_id', 'assigned_at', 'released_at']);
+      }
+      archive.appendRow([values[i][0], values[i][1], 1000 + values[i][0], values[i][3], values[i][4], new Date().toISOString()]);
+      sheet.getRange(i + 1, 4, 1, 3).clearContent();   // prolific_id, assigned_at, completed_at
+      SpreadsheetApp.flush();
+      return 'slot ' + slot + ' released (' + values[i][3] + ')';
+    }
+  }
+  return 'slot ' + slot + ' not found';
+}
+
+/**
+ * Release every slot assigned more than `hours` ago (default 2) and not
+ * completed. Run manually when Prolific shows returned/timed-out submissions:
+ * releaseStale(2).
+ */
+function releaseStale(hours) {
+  hours = hours || 2;
+  var sheet = SpreadsheetApp.getActive().getSheetByName('state');
+  var values = sheet.getDataRange().getValues();
+  var cutoff = Date.now() - hours * 3600 * 1000;
+  var released = [];
+  for (var i = 1; i < values.length; i++) {
+    var assignedAt = values[i][4] ? new Date(values[i][4]).getTime() : 0;
+    if (values[i][3] && !values[i][5] && assignedAt && assignedAt < cutoff) {
+      released.push(releaseSlot(values[i][0]));
+    }
+  }
+  Logger.log(released.length ? released.join('\n') : 'nothing to release');
+  return released;
+}
+
+/**
+ * Mark a participant slot as completed (matched on slot AND prolific_id, so a
+ * recycled slot is never completed on behalf of its previous occupant).
  */
 function handleComplete(data) {
   var sheet = SpreadsheetApp.getActive().getSheetByName('state');
   var values = sheet.getDataRange().getValues();
 
   for (var i = 1; i < values.length; i++) {
-    if (values[i][0] === data.slot) {
+    if (values[i][0] === data.slot && (!data.prolific_id || values[i][3] === data.prolific_id)) {
       sheet.getRange(i + 1, 6).setValue(new Date().toISOString());
       return { ok: true };
     }

@@ -6,8 +6,12 @@
 
   // One id per browser (the legacy flow uses 9-16), so the analysis PDF only
   // covers what was played here. Kept in localStorage to survive tab closes.
-  var participantId = null;
-  try { participantId = localStorage.getItem('home_participant'); } catch (e) {}
+  // The login page's cookie wins, so the id survives a cleared localStorage.
+  var cookie = document.cookie.match(/(?:^|;\s*)shield_participant=([A-Za-z0-9_-]+)/);
+  var participantId = cookie ? cookie[1] : null;
+  if (!participantId) {
+    try { participantId = localStorage.getItem('home_participant'); } catch (e) {}
+  }
   if (!participantId) {
     participantId = 'free-' + Math.random().toString(16).slice(2, 10);
     try { localStorage.setItem('home_participant', participantId); } catch (e) {}

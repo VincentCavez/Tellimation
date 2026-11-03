@@ -1,0 +1,26 @@
+category,anim_id,animation,decision,n,mean_rating,ci_lo,ci_hi,pct_ge4,corr_mean,sugg_mean
+Identity,I1,Spotlight,wrong or unmentioned entity or setting,32,4.19,3.62,4.59,78.12,3.94,4.44
+Identity,I2,Silhouette,wrong or missing name or role,32,3.78,3.34,4.28,62.5,3.88,3.69
+Count,C1,Sequential Glow,miscounted or uncounted group,32,4.47,4.09,4.81,90.62,4.44,4.5
+Count,C2,Disintegration,entity mentioned that is not in the scene,32,2.84,2.31,3.47,40.62,2.62,3.06
+Count,C3,Missing Piece,entity absent from this scene but in the story,32,2.12,1.56,2.66,25.0,1.44,2.81
+Property,P1,Color Pop,wrong or missing visible attribute,32,4.22,3.97,4.47,75.0,4.38,4.06
+Property,P2a,"Emanation (heat, shame)",hot object or shame missed,32,3.81,2.87,4.56,71.88,3.5,4.12
+Property,P2b,Emanation (cold),cold object or coldness missed,32,3.78,3.34,4.22,62.5,3.75,3.81
+Property,P2c,Emanation (joy),joy missed or misattributed,32,3.44,2.88,3.88,56.25,3.5,3.38
+Property,P2d,Emanation (love),affection missed or misattributed,32,4.06,3.69,4.44,84.38,3.81,4.31
+Property,P2e,Emanation (anger),anger missed or misattributed,32,4.22,3.94,4.5,81.25,4.38,4.06
+Property,P2f,Emanation (fear),fear missed or misattributed,32,3.88,3.03,4.5,68.75,3.56,4.19
+Action,A1,Motion Lines,wrong or unmentioned movement,32,4.03,3.56,4.47,68.75,4.12,3.94
+Action,A2,Flip,wrong or unmentioned non-movement action,32,3.88,3.25,4.44,71.88,3.56,4.19
+Space,S1,Peek,hidden element denied or unmentioned,32,3.75,3.31,4.12,65.62,3.44,4.06
+Space,S2,Stamp,entity misplaced or location unmentioned,32,4.41,4.03,4.75,87.5,4.19,4.62
+Time,T1,Flashback,past event not marked as past,32,3.78,3.44,4.12,62.5,3.69,3.88
+Time,T2,Timelapse,ongoing or upcoming process described as instant,32,3.19,2.84,3.56,46.88,3.38,3.0
+Relation,R1,Magnetism,entities together described as apart,32,3.78,3.19,4.41,68.75,3.25,4.31
+Relation,R2,Repel,entities apart described as together,32,4.06,3.41,4.56,71.88,3.75,4.38
+Relation,R3,Causal Push,"cause wrong, reversed, or unmentioned",31,3.55,2.81,4.22,61.29,3.53,3.56
+Discourse,D1,Speech Bubble,speech misattributed or unmentioned,32,3.19,2.5,3.81,46.88,2.5,3.88
+Discourse,D2,Thought Bubble,feeling or intention contradicted or unmentioned,32,4.09,3.78,4.34,75.0,3.88,4.31
+Discourse,D3,Alert,key event wrong or unmentioned,32,4.44,4.06,4.66,93.75,4.62,4.25
+Discourse,D4,Interjection,grammatical error or word to elaborate,32,3.56,2.91,4.12,62.5,3.0,4.12

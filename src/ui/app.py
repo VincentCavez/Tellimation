@@ -72,6 +72,7 @@ from src.persistence import (
     load_study_log,
     push_study_scenes,
     save_and_push_questionnaire,
+    save_registration,
     push_to_google_sheet,
 )
 from google import genai
@@ -256,16 +257,30 @@ if _study_assets_dir and (_study_assets_dir / "oral_instructions").is_dir():
 # HTML page routes
 # ---------------------------------------------------------------------------
 
+_PARTICIPANT_ID_RE = re.compile(r"^[A-Za-z0-9_-]{1,40}$")
+
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
     """SHIELD shield icon, for pages that don't link the SVG one."""
     return FileResponse(STATIC_DIR / "favicon.ico", media_type="image/x-icon")
 
 
+# Set by /api/register; its value is the visitor's participant id.
+_REGISTERED_COOKIE = "shield_participant"
+
+
 @app.get("/", response_class=HTMLResponse)
-async def home_page():
-    """Open home: no login, every story (2 practices + A-D) playable."""
+async def home_page(request: Request):
+    """Home: every story (2 practices + A-D) playable, once registered."""
+    if not _PARTICIPANT_ID_RE.match(request.cookies.get(_REGISTERED_COOKIE, "")):
+        return RedirectResponse("/login", status_code=302)
     return (TEMPLATES_DIR / "home.html").read_text()
+
+
+@app.get("/login", response_class=HTMLResponse)
+async def login_page():
+    """Registration: email + interest in exchange for free API credit."""
+    return (TEMPLATES_DIR / "register.html").read_text()
 
 
 @app.get("/selection", response_class=HTMLResponse)
@@ -287,19 +302,33 @@ async def admin_page():
 # Study pages
 # ---------------------------------------------------------------------------
 
-# Legacy participant flow (login -> assigned order), kept for later waves.
+# Legacy participant flow (login -> assigned order -> questionnaire), switched
+# off in Nov 2026: its pages redirect to the home and its APIs answer 404.
+# Set to True to run a study wave with participant numbers again.
+LEGACY_STUDY_ENABLED = False
+
+def _legacy_off() -> JSONResponse:
+    return JSONResponse(status_code=404, content={"error": "Study flow disabled"})
+
+
 @app.get("/study", response_class=HTMLResponse)
 async def study_login_page():
+    if not LEGACY_STUDY_ENABLED:
+        return RedirectResponse("/", status_code=302)
     return (TEMPLATES_DIR / "legacy" / "study_login.html").read_text()
 
 
 @app.get("/study/landing", response_class=HTMLResponse)
 async def study_landing_page():
+    if not LEGACY_STUDY_ENABLED:
+        return RedirectResponse("/", status_code=302)
     return (TEMPLATES_DIR / "legacy" / "study_landing.html").read_text()
 
 
 @app.get("/study/questionnaire", response_class=HTMLResponse)
 async def study_questionnaire_page():
+    if not LEGACY_STUDY_ENABLED:
+        return RedirectResponse("/", status_code=302)
     return (TEMPLATES_DIR / "study_questionnaire.html").read_text()
 
 
@@ -424,6 +453,8 @@ _QUESTIONNAIRE_ITEMS = 12
 @app.post("/api/study/questionnaire")
 async def study_questionnaire_submit(request: Request):
     """Persist + push the end-of-session questionnaire (12 Likert items)."""
+    if not LEGACY_STUDY_ENABLED:
+        return _legacy_off()
     body = await request.json()
     participant = str(body.get("participant", "")).strip()
     answers = body.get("answers") or {}
@@ -448,6 +479,31 @@ async def study_questionnaire_submit(request: Request):
     return JSONResponse(content={"status": "ok", "pushed": ok})
 
 
+_EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+_INTEREST_MAX = 1000
+
+
+@app.post("/api/register")
+async def register(request: Request):
+    """Login page submit: store email + interest, then open the home."""
+    body = await request.json()
+    participant = str(body.get("participant", "")).strip()
+    email = str(body.get("email", "")).strip()
+    interest = str(body.get("interest", "")).strip()
+
+    if not participant.startswith("free-") or not _PARTICIPANT_ID_RE.match(participant):
+        return JSONResponse(status_code=400, content={"error": "Invalid participant"})
+    if len(email) > 254 or not _EMAIL_RE.match(email):
+        return JSONResponse(status_code=400, content={"error": "Please enter a valid email address."})
+    if not interest:
+        return JSONResponse(status_code=400, content={"error": "Please tell us why you are interested."})
+
+    ok = await asyncio.to_thread(save_registration, participant, email, interest[:_INTEREST_MAX])
+    resp = JSONResponse(content={"status": "ok", "pushed": ok})
+    resp.set_cookie(_REGISTERED_COOKIE, participant, max_age=365 * 24 * 3600, samesite="lax")
+    return resp
+
+
 # Wave 2 gate: IDs 1-8 were consumed by study 1 (spring 2026); reusing one
 # would mix waves in the Google Sheet. Raise/remove for later waves.
 _STUDY_MIN_PARTICIPANT = 9
@@ -456,6 +512,8 @@ _STUDY_MIN_PARTICIPANT = 9
 @app.post("/api/study/validate")
 async def study_validate(request: Request):
     """Validate a study participant number against the assignment table."""
+    if not LEGACY_STUDY_ENABLED:
+        return _legacy_off()
     body = await request.json()
     num = body.get("number")
     try:
@@ -622,6 +680,8 @@ async def study_catalog():
 @app.get("/api/study/assignment")
 async def study_assignment(participant: int):
     """Return the study assignment for a participant number."""
+    if not LEGACY_STUDY_ENABLED:
+        return _legacy_off()
     _load_study_config()
     key = str(participant)
     assignment = (_STUDY_ASSIGNMENTS or {}).get(key)
@@ -685,9 +745,6 @@ async def study_scene(story: str, scene: int):
         # Logs key scenes by scene_number: keep practice 2 apart from practice 1
         full_scene["scene_number"] = training_num
     return JSONResponse(content=full_scene)
-
-
-_PARTICIPANT_ID_RE = re.compile(r"^[A-Za-z0-9_-]{1,40}$")
 
 
 @app.get("/api/analysis.pdf")

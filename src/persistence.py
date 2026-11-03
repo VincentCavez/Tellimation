@@ -296,6 +296,10 @@ SHEET_PUSH_ENABLED = False
 
 GOOGLE_SHEET_WEBHOOK = os.environ.get("GOOGLE_SHEET_WEBHOOK", "") if SHEET_PUSH_ENABLED else ""
 
+# Login-page registrations (email + interest) always go to the Sheet: Heroku's
+# filesystem is wiped on restart, so the Sheet is their only durable copy.
+REGISTRATION_WEBHOOK = os.environ.get("GOOGLE_SHEET_WEBHOOK", "")
+
 
 def push_to_google_sheet(participant_id: str) -> bool:
     """Push participant data (profile + study_log + training_log) to Google Sheet.
@@ -337,11 +341,11 @@ def push_to_google_sheet(participant_id: str) -> bool:
     return _post_sheet_rows(rows, participant_id)
 
 
-def _post_sheet_rows(rows: list, participant_id: str) -> bool:
+def _post_sheet_rows(rows: list, participant_id: str, url: Optional[str] = None) -> bool:
     """POST rows to the Apps Script webhook. Returns True on success."""
     payload = json.dumps({"rows": rows}).encode("utf-8")
     req = urllib.request.Request(
-        GOOGLE_SHEET_WEBHOOK,
+        url or GOOGLE_SHEET_WEBHOOK,
         data=payload,
         headers={"Content-Type": "application/json"},
         method="POST",
@@ -469,3 +473,31 @@ def save_and_push_questionnaire(participant_id: str, answers: Dict[str, int]) ->
         "data_type": "questionnaire",
         "json_data": json.dumps(data),
     }], participant_id)
+
+
+def save_registration(participant_id: str, email: str, interest: str) -> bool:
+    """Store a login-page registration locally and push it to the Sheet.
+
+    One row, data_type "registration", json_data = {"email", "interest", ...}.
+    Returns True if the Sheet push succeeded.
+    """
+    from datetime import datetime, timezone
+
+    data = {
+        "participant": participant_id,
+        "email": email,
+        "interest": interest,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+    (_participant_dir(participant_id) / "registration.json").write_text(
+        json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8"
+    )
+
+    if not REGISTRATION_WEBHOOK:
+        logger.warning("GOOGLE_SHEET_WEBHOOK not set — registration saved locally only")
+        return False
+    return _post_sheet_rows([{
+        "participant_id": participant_id,
+        "data_type": "registration",
+        "json_data": json.dumps(data, ensure_ascii=False),
+    }], participant_id, url=REGISTRATION_WEBHOOK)
