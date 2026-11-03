@@ -444,6 +444,35 @@ a { color: var(--teal); text-decoration: none; }
   transition: color 0.15s;
 }
 .story-scene-label .home-link:hover { color: var(--light); }
+/* Study page: a row above the canvas instead of floating over its corner */
+.story-scene-label.in-flow {
+  position: static;
+  align-self: flex-start;
+}
+/* Back reads as a button (a plain "Back" link was not recognisably clickable) */
+.story-scene-label .btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  margin-right: 10px;
+  padding: 7px 16px;
+  background: #fff;
+  color: #3a302a;
+  border: 2px solid #d8c4af;
+  border-radius: 12px;
+  font-family: 'Nunito', var(--font);
+  font-size: 0.95rem;
+  font-weight: 800;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.15s;
+}
+.story-scene-label .btn-back:hover {
+  background: var(--red);
+  border-color: var(--red);
+  color: #fff;
+  transform: translateY(-1px);
+}
 .story-scene-label .label-sep {
   color: #333;
   margin: 0 4px;
@@ -828,20 +857,82 @@ a { color: var(--teal); text-decoration: none; }
 }
 
 /* ---- Open home page ---- */
-.home-page .study-block { max-width: 100%; }
-.home-page .thumbnail-row { flex-wrap: wrap; }
-.home-block-title {
-  font-family: var(--font);
-  font-size: 1.1rem;
+.home-body {
+  --home-font: 'Nunito', 'Montserrat', sans-serif;
+  --title-font: 'Fredoka', 'Nunito', sans-serif;
+  font-family: var(--home-font);
+}
+.home-body .btn { font-family: var(--home-font); font-weight: 700; }
+.c-red { color: var(--red); }
+.c-yellow { color: #e8a800; }
+.c-blue { color: var(--blue); }
+.c-teal { color: var(--teal); }
+
+.home-header { text-align: center; }
+.home-title {
+  font-family: var(--title-font);
+  font-weight: 700;
+  font-size: clamp(3rem, 9vw, 4.6rem);
+  letter-spacing: 0.08em;
+  line-height: 1;
+}
+.home-subtitle {
+  margin-top: 0.6rem;
+  font-family: var(--home-font);
+  font-size: clamp(0.85rem, 2.2vw, 1.05rem);
   font-weight: 600;
-  color: #000;
+  color: #6b6058;
+}
+.home-subtitle b { font-weight: 800; }
+
+.home-page { padding-left: 16px; padding-right: 16px; gap: 1.6rem; }
+.home-page .study-block {
+  width: 100%;
+  max-width: 100%;
+  padding: 1.4rem 1rem 1.2rem;
+  gap: 0.9rem;
+}
+/* Same 4-column grid for both rows, so practices and stories share a card
+   size and the 4 stories always fit on one line */
+.home-page .thumbnail-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.8rem;
+  width: 100%;
+}
+.home-page #training-thumbnails {
+  grid-template-columns: repeat(2, calc((100% - 3 * 0.8rem) / 4));
+  justify-content: center;
+}
+.home-page .thumbnail-row .thumbnail-card {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1376 / 768;
+  padding: 7px;
+  border-radius: 14px;
+}
+.home-block-title {
+  font-family: var(--title-font);
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: #3a302a;
 }
 .home-slot {
+  min-width: 0;
+  padding: 0;
   cursor: pointer;
   transition: transform 0.15s ease;
 }
 .home-slot:hover { transform: translateY(-3px); }
-.home-slot .thumbnail-label { font-size: 0.85rem; color: #333; }
+.home-slot .thumbnail-label {
+  margin-top: 6px;
+  font-family: var(--home-font);
+  font-size: clamp(0.7rem, 1.8vw, 0.9rem);
+  font-weight: 700;
+  color: #3a302a;
+  line-height: 1.2;
+}
+.home-slot .study-story-check { font-family: var(--home-font); }
 
 .home-download {
   text-decoration: none;
