@@ -281,6 +281,7 @@ practice.
 
 class TestPromptContent:
     def test_system_prompt_has_five_sections(self):
+        """The system prompt contains the five report sections."""
         assert "## 1. Recurring Error Patterns" in REPORT_SYSTEM_PROMPT
         assert "## 2. Animation Effectiveness" in REPORT_SYSTEM_PROMPT
         assert "## 3. SKILL Progress" in REPORT_SYSTEM_PROMPT
@@ -288,22 +289,28 @@ class TestPromptContent:
         assert "## 5. Recommendations for Next Session" in REPORT_SYSTEM_PROMPT
 
     def test_system_prompt_mentions_slp(self):
+        """The system prompt addresses speech-language pathologists."""
         assert "SLP" in REPORT_SYSTEM_PROMPT or "speech-language" in REPORT_SYSTEM_PROMPT
 
     def test_system_prompt_requires_markdown(self):
+        """The system prompt asks for Markdown output."""
         assert "Markdown" in REPORT_SYSTEM_PROMPT
 
     def test_system_prompt_mentions_correction_rate(self):
+        """The system prompt mentions the correction rate."""
         assert "correction" in REPORT_SYSTEM_PROMPT.lower()
 
     def test_system_prompt_mentions_skill(self):
+        """The system prompt mentions SKILL."""
         assert "SKILL" in REPORT_SYSTEM_PROMPT
 
     def test_user_prompt_has_placeholders(self):
+        """The user prompt template contains the session log and profile placeholders."""
         assert "{session_log_json}" in REPORT_USER_PROMPT
         assert "{student_profile_json}" in REPORT_USER_PROMPT
 
     def test_user_prompt_format_succeeds(self):
+        """The user prompt template formats with the session log and profile JSON."""
         result = REPORT_USER_PROMPT.format(
             session_log_json='{"test": 1}',
             student_profile_json='{"test": 2}',
@@ -319,14 +326,17 @@ class TestPromptContent:
 class TestGenerateReport:
     @pytest.fixture
     def profile(self):
+        """A sample student profile."""
         return _make_student_profile()
 
     @pytest.fixture
     def session_log(self):
+        """A sample session log."""
         return _make_session_log()
 
     @patch("src.analytics.session_report.genai.Client")
     def test_returns_markdown_report(self, mock_client_cls, profile, session_log):
+        """generate_report returns the Markdown report text."""
         mock_client = _make_mock_client(SAMPLE_REPORT)
         mock_client_cls.return_value = mock_client
 
@@ -345,6 +355,7 @@ class TestGenerateReport:
 
     @patch("src.analytics.session_report.genai.Client")
     def test_strips_markdown_fences(self, mock_client_cls, profile, session_log):
+        """A ```markdown fence around the report is stripped."""
         fenced = "```markdown\n" + SAMPLE_REPORT + "\n```"
         mock_client = _make_mock_client(fenced)
         mock_client_cls.return_value = mock_client
@@ -359,6 +370,7 @@ class TestGenerateReport:
 
     @patch("src.analytics.session_report.genai.Client")
     def test_strips_md_fences(self, mock_client_cls, profile, session_log):
+        """A ```md fence around the report is stripped."""
         fenced = "```md\n" + SAMPLE_REPORT + "\n```"
         mock_client = _make_mock_client(fenced)
         mock_client_cls.return_value = mock_client
@@ -373,6 +385,7 @@ class TestGenerateReport:
 
     @patch("src.analytics.session_report.genai.Client")
     def test_gemini_called_with_correct_model(self, mock_client_cls, profile, session_log):
+        """generate_report calls Gemini with the expected model."""
         mock_client = _make_mock_client(SAMPLE_REPORT)
         mock_client_cls.return_value = mock_client
 
@@ -386,6 +399,7 @@ class TestGenerateReport:
 
     @patch("src.analytics.session_report.genai.Client")
     def test_gemini_called_with_medium_thinking(self, mock_client_cls, profile, session_log):
+        """generate_report requests medium thinking."""
         mock_client = _make_mock_client(SAMPLE_REPORT)
         mock_client_cls.return_value = mock_client
 
@@ -400,6 +414,7 @@ class TestGenerateReport:
 
     @patch("src.analytics.session_report.genai.Client")
     def test_user_prompt_contains_session_data(self, mock_client_cls, profile, session_log):
+        """The user prompt sent to Gemini contains the session and profile data."""
         mock_client = _make_mock_client(SAMPLE_REPORT)
         mock_client_cls.return_value = mock_client
 
@@ -420,6 +435,7 @@ class TestGenerateReport:
 
     @patch("src.analytics.session_report.genai.Client")
     def test_system_prompt_passed_as_instruction(self, mock_client_cls, profile, session_log):
+        """The system prompt is passed as the system instruction."""
         mock_client = _make_mock_client(SAMPLE_REPORT)
         mock_client_cls.return_value = mock_client
 
@@ -434,6 +450,7 @@ class TestGenerateReport:
 
     @patch("src.analytics.session_report.genai.Client")
     def test_api_key_forwarded(self, mock_client_cls, profile, session_log):
+        """The API key is forwarded to the Gemini client."""
         mock_client = _make_mock_client(SAMPLE_REPORT)
         mock_client_cls.return_value = mock_client
 
@@ -446,6 +463,7 @@ class TestGenerateReport:
 
     @patch("src.analytics.session_report.genai.Client")
     def test_empty_session_log(self, mock_client_cls, profile):
+        """An empty session log still produces a report."""
         mock_client = _make_mock_client("# Session Report\n\nNo data.")
         mock_client_cls.return_value = mock_client
 
@@ -458,6 +476,7 @@ class TestGenerateReport:
 
     @patch("src.analytics.session_report.genai.Client")
     def test_empty_profile(self, mock_client_cls, session_log):
+        """An empty student profile still produces a report."""
         mock_client = _make_mock_client(SAMPLE_REPORT)
         mock_client_cls.return_value = mock_client
 
@@ -478,13 +497,16 @@ class TestGenerateReport:
 class TestReportEndpoint:
     @pytest.fixture
     def client(self):
+        """A test client for the app."""
         from starlette.testclient import TestClient
         from src.ui.app import app
         return TestClient(app)
 
     @patch("src.ui.app.generate_report")
     def test_returns_report(self, mock_gen_report, client):
+        """The report endpoint returns the generated report."""
         async def fake_report(api_key, session_log, student_profile):
+            """Stand-in generator returning the sample report."""
             return SAMPLE_REPORT
 
         mock_gen_report.side_effect = fake_report
@@ -503,6 +525,7 @@ class TestReportEndpoint:
 
     @patch("src.ui.app.generate_report")
     def test_missing_api_key_returns_400(self, mock_gen_report, client):
+        """A missing api_key returns 400 without calling the generator."""
         resp = client.post("/api/report", json={
             "session_log": {},
             "student_profile": {},
@@ -514,7 +537,9 @@ class TestReportEndpoint:
 
     @patch("src.ui.app.generate_report")
     def test_generation_error_returns_500(self, mock_gen_report, client):
+        """A generator failure returns 500 with an error message."""
         async def fail(*args, **kwargs):
+            """Stand-in generator that always fails."""
             raise RuntimeError("Gemini API error")
 
         mock_gen_report.side_effect = fail
@@ -530,7 +555,9 @@ class TestReportEndpoint:
 
     @patch("src.ui.app.generate_report")
     def test_empty_body_with_key(self, mock_gen_report, client):
+        """A body with only an API key still returns a report."""
         async def fake_report(api_key, session_log, student_profile):
+            """Stand-in generator returning a minimal report."""
             return "# Session Report\n\nMinimal."
 
         mock_gen_report.side_effect = fake_report
@@ -544,9 +571,11 @@ class TestReportEndpoint:
 
     @patch("src.ui.app.generate_report")
     def test_profile_validated_from_dict(self, mock_gen_report, client):
+        """The student profile dict is validated into a StudentProfile before generation."""
         received_profile = []
 
         async def capture_report(api_key, session_log, student_profile):
+            """Stand-in generator that records the received profile."""
             received_profile.append(student_profile)
             return "# Report"
 

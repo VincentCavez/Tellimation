@@ -30,6 +30,7 @@
     const btnOk = document.getElementById('btn-ok');
     const numInput = document.getElementById('participant-number');
 
+    // Validates the participant number (9-16) with the server, stores it in sessionStorage and goes to the study landing page.
     async function proceed() {
       const num = parseInt(numInput.value, 10);
       if (!num || num < 9 || num > 16) { numInput.focus(); return; }
@@ -65,6 +66,7 @@
     let activePixels = 0;
     const maxPixels = 8;
 
+    // Spawns one falling pixel in a side margin (random colour, side and duration), capped at maxPixels.
     function createPixel() {
       if (activePixels >= maxPixels) return;
       const pixel = document.createElement('div');

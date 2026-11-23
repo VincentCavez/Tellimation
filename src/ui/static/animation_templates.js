@@ -648,6 +648,7 @@ function _drawEmanationSprite(buf, PW, PH, type, cx, cy, size, alpha) {
   if (alpha < 0.05) return;
   // HD scale: all sprites ×3 with per-instance random variation
   var hdSize = size * 3;
+  // Blend an RGB color into the pixel at idx with alpha a, ignoring out-of-range indices.
   var _blend = function(idx, r, g, b, a) {
     if (idx < 0 || idx >= buf.length) return;
     _blendPixel(buf, idx, r, g, b, a);
@@ -891,6 +892,7 @@ function _buildEmanation(params, pType, defaultTint) {
   var waves = 4;
   var perWave = Math.ceil(totalSprites / waves);
   var _seed = 12345 + prefix.length * 7;
+  // Seeded pseudo-random generator (LCG) returning a float in [0, 1].
   function _rand() { _seed = (_seed * 16807 + 0) % 2147483647; return (_seed & 0xffff) / 0xffff; }
 
   for (var w = 0; w < waves; w++) {
@@ -951,26 +953,32 @@ function _buildEmanation(params, pType, defaultTint) {
   };
 }
 
+// Shame emanation: steam wisps rising from the entity.
 AnimationTemplates.register('emanation_shame', _perTargetWrapper(function(params) {
   return _buildEmanation(params, 'steam', [80, -40, -80]);
 }), 2500);
 
+// Cold emanation: frost snowflakes around the entity.
 AnimationTemplates.register('emanation_cold', _perTargetWrapper(function(params) {
   return _buildEmanation(params, 'frost', [-80, 0, 110]);
 }), 2500);
 
+// Joy emanation: sparkles around the entity.
 AnimationTemplates.register('emanation_joy', _perTargetWrapper(function(params) {
   return _buildEmanation(params, 'sparkle', [60, 60, 40]);
 }), 2500);
 
+// Love emanation: floating hearts.
 AnimationTemplates.register('emanation_love', _perTargetWrapper(function(params) {
   return _buildEmanation(params, 'hearts', [80, -25, 25]);
 }), 2500);
 
+// Anger emanation: anger veins.
 AnimationTemplates.register('emanation_anger', _perTargetWrapper(function(params) {
   return _buildEmanation(params, 'veins', [100, -35, -35]);
 }), 2500);
 
+// Fear emanation: sweat drops.
 AnimationTemplates.register('emanation_fear', _perTargetWrapper(function(params) {
   return _buildEmanation(params, 'drops', [60, 60, 80]);
 }), 2500);
@@ -1013,6 +1021,7 @@ AnimationTemplates.register('flashback', function(params) {
     // Change scratches every ~3 frames for a flickering look
     var scratchGroup = Math.floor(frame / 3);
     var seed = (scratchGroup * 7919 + 31337) % 2147483647;
+    // Seeded pseudo-random generator (LCG) returning a float in [0, 1].
     function rng() { seed = (seed * 16807 + 31) % 2147483647; return (seed & 0x7fffffff) / 0x7fffffff; }
 
     var numScratches = Math.max(1, Math.min(5, scratchCount === 0 ? 0 : 1 + Math.floor(rng() * scratchCount)));
@@ -1760,6 +1769,7 @@ AnimationTemplates.register('missing_piece', function(params) {
   var imgLoading = false, imgReady = false;
   var mask = null, contour = null, imgW = 0, imgH = 0;
 
+  // Load the piece image once and extract its opaque mask and contour (async, via onload).
   function loadPieceImage() {
     if (imgLoading || !pieceImageUrl) return;
     imgLoading = true;
@@ -1813,9 +1823,11 @@ AnimationTemplates.register('missing_piece', function(params) {
   function _pieceRadius(w, h) {
     return Math.max(3, Math.min(w, h) * 0.14);   // head/cavity radius
   }
+  // Vertical extent (px) that the jigsaw tab and notch add beyond the piece rectangle.
   function _pieceOverhang(w, h) {
     return Math.ceil(_pieceRadius(w, h) * 1.85) + 1;
   }
+  // True if (px, py) lies inside the jigsaw piece outline of size w x h (rounded corners plus tab/notch).
   function inPiece(px, py, w, h) {
     var R = _pieceRadius(w, h);
     var neck = R * 0.62;                          // half-width of the tab neck
@@ -1823,6 +1835,7 @@ AnimationTemplates.register('missing_piece', function(params) {
     var offN = R * 0.55;                          // notch cavity centre, inside the edge
     var rc = Math.max(2, Math.min(w, h) * 0.10);  // corner rounding
 
+    // True if (px, py) falls inside the circle at (cx, cy) of radius r.
     function inCircle(cx, cy, r) {
       var dx = px - cx, dy = py - cy;
       return dx * dx + dy * dy <= r * r;
@@ -1853,6 +1866,7 @@ AnimationTemplates.register('missing_piece', function(params) {
 
   var cachedHole = null; // { x0, y0, w, h }
 
+  // Pick the candidate hole position covering the fewest entity pixels; returns {x0, y0, w, h}.
   function placeHole(buf, PW, PH, holeW, holeH) {
     // The entity is absent from this scene: sweep a grid of candidate spots
     // (same spirit as the old ghost_outline empty-spot search) and take the
@@ -2415,6 +2429,7 @@ AnimationTemplates.register('thought_bubble', _perTargetWrapper(function(params)
     { dx: 35,  dy:  4, r: 14 },  // right side
   ];
 
+  // True if (px, py) falls inside the cloud made of overlapping circles around (bcx, bcy), grown by extra.
   function inCloud(px, py, bcx, bcy, extra) {
     for (var ci = 0; ci < CC.length; ci++) {
       var cdx = px - (bcx + CC[ci].dx), cdy = py - (bcy + CC[ci].dy);
@@ -2687,12 +2702,14 @@ AnimationTemplates.register('interjection', _perTargetWrapper(function(params) {
     var rrx = Math.round(cachedRX * scale), rry = Math.round(cachedRY * scale);
     var spikeH = Math.round(cachedSpikeH * scale);
 
+    // Radius of the inner ellipse at the given angle.
     function rInner(angle) {
       var cosA = Math.cos(angle), sinA = Math.sin(angle);
       var d = Math.sqrt((rry * cosA) * (rry * cosA) + (rrx * sinA) * (rrx * sinA));
       return d > 0.001 ? (rrx * rry / d) : rrx;
     }
 
+    // Radius of the burst outline at the given angle, with interpolated spikes added to the inner radius.
     function rBurst(angle) {
       var ri = rInner(angle);
       var norm = ((angle / (2 * Math.PI)) % 1 + 1) % 1;

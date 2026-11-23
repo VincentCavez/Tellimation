@@ -71,6 +71,7 @@ _grammars_cache: Optional[Dict[str, Dict[str, Any]]] = None
 
 
 def load_stimuli() -> List[Dict[str, Any]]:
+    """Load the stimuli list (cached)."""
     global _stimuli_cache
     if _stimuli_cache is None:
         with open(STIMULI_PATH, "r", encoding="utf-8") as f:
@@ -79,6 +80,7 @@ def load_stimuli() -> List[Dict[str, Any]]:
 
 
 def load_scene(scene_id: str) -> Dict[str, Any]:
+    """Load the scene JSON of a scene id (cached)."""
     if scene_id not in _scenes_cache:
         path = SCENES_DIR / f"{scene_id}.json"
         with open(path, "r", encoding="utf-8") as f:
@@ -87,6 +89,7 @@ def load_scene(scene_id: str) -> Dict[str, Any]:
 
 
 def load_scene_image_path(scene_id: str) -> Optional[Path]:
+    """Path of the scene's HD image, or None if missing."""
     p = IMAGES_DIR / scene_id / "hd" / "scene_1_full.png"
     return p if p.exists() else None
 
@@ -194,6 +197,7 @@ async def describe_one_scene(client: genai.Client, scene_id: str, force: bool) -
 
 
 async def _run_describe_batch(api_key: str, scene_ids: List[str], concurrency: int, force: bool):
+    """Describe the scenes with the model under the concurrency limit, writing each description into its scene JSON and updating describe_state."""
     describe_state["status"] = "running"
     describe_state["total"] = len(scene_ids)
     describe_state["done"] = 0
@@ -204,6 +208,7 @@ async def _run_describe_batch(api_key: str, scene_ids: List[str], concurrency: i
     sem = asyncio.Semaphore(concurrency)
 
     async def process_one(scene_id: str):
+        """Describe one scene under the concurrency limit and store the description."""
         async with sem:
             describe_state["current"] = scene_id
             try:
@@ -240,6 +245,7 @@ async def _run_describe_batch(api_key: str, scene_ids: List[str], concurrency: i
 
 
 def run_describe_in_thread(api_key: str, scene_ids: List[str], concurrency: int, force: bool):
+    """Run the describe batch in a new event loop (thread target)."""
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     try:
@@ -370,6 +376,7 @@ async def generate_misl_targets_for_scene(
 
 
 async def _run_misl_gen_batch(api_key: str, scene_ids: List[str], concurrency: int, force: bool):
+    """Generate the MISL targets of the scenes under the concurrency limit, writing them into the scene JSONs and updating misl_gen_state."""
     misl_gen_state["status"] = "running"
     misl_gen_state["total"] = len(scene_ids)
     misl_gen_state["done"] = 0
@@ -380,6 +387,7 @@ async def _run_misl_gen_batch(api_key: str, scene_ids: List[str], concurrency: i
     sem = asyncio.Semaphore(concurrency)
 
     async def process_one(scene_id: str):
+        """Generate the MISL targets of one scene under the concurrency limit and store them."""
         async with sem:
             misl_gen_state["current"] = scene_id
             try:
@@ -416,6 +424,7 @@ async def _run_misl_gen_batch(api_key: str, scene_ids: List[str], concurrency: i
 
 
 def run_misl_gen_in_thread(api_key: str, scene_ids: List[str], concurrency: int, force: bool):
+    """Run the MISL generation batch in a new event loop (thread target)."""
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     try:
@@ -669,6 +678,7 @@ results_lock = threading.Lock()
 
 
 def save_results():
+    """Write the results and their summary metadata to the results file."""
     with results_lock:
         data = {
             "metadata": {
@@ -685,6 +695,7 @@ def save_results():
 
 
 def load_results():
+    """Load the results saved by a previous run, if the file exists."""
     global results
     if RESULTS_PATH.exists():
         with open(RESULTS_PATH, "r", encoding="utf-8") as f:
@@ -734,6 +745,7 @@ batch_state: Dict[str, Any] = {
 
 
 def run_batch_in_thread(api_key: str, stimuli: List[Dict], concurrency: int, force: bool):
+    """Run the pipeline batch in a new event loop (thread target)."""
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     try:
@@ -743,6 +755,7 @@ def run_batch_in_thread(api_key: str, stimuli: List[Dict], concurrency: int, for
 
 
 async def _run_batch(api_key: str, stimuli: List[Dict], concurrency: int, force: bool):
+    """Run the pipeline on the stimuli with retries and backoff, skipping successes unless forced, updating batch_state and the results."""
     batch_state["status"] = "running"
     batch_state["total"] = len(stimuli)
     batch_state["done"] = 0
@@ -753,6 +766,7 @@ async def _run_batch(api_key: str, stimuli: List[Dict], concurrency: int, force:
     done_count = 0
 
     async def process_one(stimulus: Dict):
+        """Run the pipeline on one stimulus with retries and store the result."""
         nonlocal done_count
         sid = stimulus["stimulus_id"]
 
@@ -829,11 +843,13 @@ async def _run_batch(api_key: str, stimuli: List[Dict], concurrency: int, force:
 
 @app.route("/")
 def index():
+    """Serve the pipeline UI page."""
     return render_template_string(HTML_TEMPLATE)
 
 
 @app.route("/api/stimuli")
 def api_stimuli():
+    """Return the stimuli with their stored results."""
     stimuli = load_stimuli()
     out = []
     for s in stimuli:
@@ -855,6 +871,7 @@ def api_stimuli():
 
 @app.route("/api/start", methods=["POST"])
 def api_start():
+    """Start a batch run in a thread over all stimuli or one condition (POST body: filter, concurrency, force); 409 if one is running."""
     if batch_state["status"] == "running":
         return jsonify({"error": "Batch already running"}), 409
 
@@ -884,12 +901,14 @@ def api_start():
 
 @app.route("/api/cancel", methods=["POST"])
 def api_cancel():
+    """Cancel the running batch."""
     batch_state["cancelled"] = True
     return jsonify({"ok": True})
 
 
 @app.route("/api/progress")
 def api_progress():
+    """Return the progress of the running batch."""
     with results_lock:
         success = sum(1 for r in results.values() if r.get("status") == "success")
         errors = sum(1 for r in results.values() if r.get("status") == "error")
@@ -910,6 +929,7 @@ def api_progress():
 
 @app.route("/api/result/<stimulus_id>")
 def api_result(stimulus_id: str):
+    """Return the stored result of one stimulus."""
     with results_lock:
         r = results.get(stimulus_id)
     if not r:
@@ -924,6 +944,7 @@ def api_result(stimulus_id: str):
 
 @app.route("/api/retry", methods=["POST"])
 def api_retry():
+    """Re-run the given stimulus ids (POST body: stimulus_ids) in a forced single-worker batch."""
     if batch_state["status"] == "running":
         return jsonify({"error": "Batch already running"}), 409
 
@@ -948,6 +969,7 @@ def api_retry():
 
 @app.route("/api/edit_intent", methods=["POST"])
 def api_edit_intent():
+    """Store an edited pipeline intent for a stimulus (POST body: stimulus_id, pipeline_intent) and save the results."""
     body = request.get_json(force=True)
     sid = body.get("stimulus_id")
     new_intent = body.get("pipeline_intent", "")
@@ -965,6 +987,7 @@ def api_edit_intent():
 
 @app.route("/api/export", methods=["POST"])
 def api_export():
+    """Save the results and export them into the stimuli file."""
     save_results()
     updated = export_to_stimuli()
     return jsonify({"exported_results": str(RESULTS_PATH), "updated_stimuli": updated})
@@ -972,6 +995,7 @@ def api_export():
 
 @app.route("/api/describe/start", methods=["POST"])
 def api_describe_start():
+    """Start a describe batch over the selected scenes in a thread."""
     if describe_state["status"] == "running":
         return jsonify({"error": "Description batch already running"}), 409
 
@@ -996,6 +1020,7 @@ def api_describe_start():
 
 @app.route("/api/describe/progress")
 def api_describe_progress():
+    """Return the progress of the describe batch."""
     return jsonify({
         "status": describe_state["status"],
         "total": describe_state["total"],
@@ -1036,6 +1061,7 @@ def api_describe_status():
 
 @app.route("/api/misl_gen/start", methods=["POST"])
 def api_misl_gen_start():
+    """Start a MISL generation batch over the selected scenes in a thread."""
     if misl_gen_state["status"] == "running":
         return jsonify({"error": "MISL generation already running"}), 409
 
@@ -1060,6 +1086,7 @@ def api_misl_gen_start():
 
 @app.route("/api/misl_gen/progress")
 def api_misl_gen_progress():
+    """Return the progress of the MISL generation batch."""
     return jsonify({
         "status": misl_gen_state["status"],
         "total": misl_gen_state["total"],
@@ -1072,6 +1099,7 @@ def api_misl_gen_progress():
 
 @app.route("/api/image/<scene_id>")
 def api_image(scene_id: str):
+    """Serve the HD image of a scene."""
     p = load_scene_image_path(scene_id)
     if not p:
         return "Not found", 404
@@ -1326,6 +1354,7 @@ async function loadDescStatus() {
     }
 }
 
+// Start the scene description batch on the server and begin polling.
 async function startDescribe() {
     const force = document.getElementById('descForce').checked;
     const concurrency = parseInt(document.getElementById('concurrency').value) || 5;
@@ -1338,6 +1367,7 @@ async function startDescribe() {
     startDescPolling();
 }
 
+// Poll the description batch progress until it ends.
 function startDescPolling() {
     if (descPollInterval) return;
     descPollInterval = setInterval(async () => {
@@ -1368,6 +1398,7 @@ function startDescPolling() {
 // ── MISL targets generation ──
 let mislPollInterval = null;
 
+// Start the MISL target generation batch and begin polling.
 async function startMislGen() {
     const force = document.getElementById('mislForce').checked;
     const concurrency = parseInt(document.getElementById('concurrency').value) || 5;
@@ -1380,6 +1411,7 @@ async function startMislGen() {
     startMislPolling();
 }
 
+// Poll the MISL generation progress until it ends.
 function startMislPolling() {
     if (mislPollInterval) return;
     mislPollInterval = setInterval(async () => {
@@ -1413,15 +1445,18 @@ async function loadStimuli() {
     updateStats();
 }
 
+// Status of a stimulus result (pending when none).
 function getStatus(item) {
     if (!item.result) return 'pending';
     return item.result.status || 'pending';
 }
 
+// True when the stimulus result has validation warnings.
 function hasWarnings(item) {
     return item.result?.validation?.warnings?.length > 0;
 }
 
+// Render the stimuli table according to the active filters.
 function renderTable() {
     const condFilter = document.getElementById('filterCondition').value;
     const statusFilter = document.getElementById('filterStatus').value;
@@ -1458,6 +1493,7 @@ function renderTable() {
     }).join('');
 }
 
+// Update the summary counters.
 function updateStats() {
     let success = 0, errors = 0, warnings = 0, pending = 0;
     let warnCorr = 0, warnSugg = 0;
@@ -1488,6 +1524,7 @@ function updateStats() {
     document.getElementById('segPending').style.width = (pending / total * 100) + '%';
 }
 
+// Start a pipeline batch for the given condition filter and begin polling.
 async function startBatch(filter) {
     const concurrency = parseInt(document.getElementById('concurrency').value) || 5;
     const force = document.getElementById('force').checked;
@@ -1500,10 +1537,12 @@ async function startBatch(filter) {
     startPolling();
 }
 
+// Ask the server to cancel the running batch.
 async function cancelBatch() {
     await fetch('/api/cancel', {method: 'POST'});
 }
 
+// Poll the batch progress until it ends.
 function startPolling() {
     if (pollInterval) return;
     pollInterval = setInterval(async () => {
@@ -1523,6 +1562,7 @@ function startPolling() {
     }, 1500);
 }
 
+// Re-run a single stimulus.
 async function retryOne(sid) {
     await fetch('/api/retry', {
         method: 'POST',
@@ -1532,6 +1572,7 @@ async function retryOne(sid) {
     startPolling();
 }
 
+// Open the detail modal of a stimulus result.
 async function openDetail(sid) {
     const resp = await fetch(`/api/result/${sid}`);
     if (!resp.ok) { alert('No result yet'); return; }
@@ -1589,10 +1630,12 @@ async function openDetail(sid) {
     document.getElementById('modalOverlay').classList.add('active');
 }
 
+// Close the detail modal.
 function closeModal() {
     document.getElementById('modalOverlay').classList.remove('active');
 }
 
+// Save the edited pipeline intent of a stimulus.
 async function saveIntent(sid) {
     const intent = document.getElementById('intentEdit').value;
     await fetch('/api/edit_intent', {
@@ -1604,12 +1647,14 @@ async function saveIntent(sid) {
     closeModal();
 }
 
+// Export the results on the server.
 async function doExport() {
     const resp = await fetch('/api/export', {method: 'POST'});
     const data = await resp.json();
     alert(`Exported: ${data.exported_results}\nUpdated ${data.updated_stimuli} stimuli`);
 }
 
+// After confirmation, write the pipeline intents into the stimuli file.
 async function writeToStimuli() {
     if (!confirm('Write pipeline_intent to study1_all_stimuli.json?')) return;
     const resp = await fetch('/api/export', {method: 'POST'});
@@ -1634,6 +1679,7 @@ loadDescStatus();
 # ---------------------------------------------------------------------------
 
 def main():
+    """Command-line entry point: read the API key, load previous results and start the Flask server."""
     parser = argparse.ArgumentParser(description="Pipeline Batch Runner UI")
     parser.add_argument("--api-key", default=os.environ.get("GEMINI_API_KEY", ""))
     parser.add_argument("--port", type=int, default=5002)

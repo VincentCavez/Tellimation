@@ -23,6 +23,7 @@
         renderScene(chosenScene);
       }
 
+      // Clear the buffer and render a scene: background first, then entity sprites sorted by depth order.
       function renderScene(scene) {
         currentSceneRef = scene;
         buf.clear();
@@ -47,6 +48,7 @@
         }
         entityEids.sort(function(a, b) { return (depthMap[a] || 0) - (depthMap[b] || 0); });
 
+        // Render entity sprites over the background, save their layers, compute distance fields, draw temp sprites and flush to the canvas.
         function renderEntitiesAndFlush() {
           buf.snapshotBackground();
 
@@ -102,6 +104,7 @@
       // -- Entity Drag-and-Drop --
       var drag = { active: false, entityId: null, offsetX: 0, offsetY: 0 };
 
+      // Convert a mouse event to art-grid coordinates.
       function canvasToArt(e) {
         var rect = canvas.getBoundingClientRect();
         return {
@@ -110,6 +113,7 @@
         };
       }
 
+      // Return the top-level entity id at the art-grid position, or null for background or out of bounds.
       function hitTestEntity(artX, artY) {
         if (artX < 0 || artX >= PW || artY < 0 || artY >= PH) return null;
         var e = buf.data[artY * PW + artX].e;
@@ -118,6 +122,7 @@
         return dot >= 0 ? e.substring(0, dot) : e;
       }
 
+      // Move an entity's pixels by (dx, dy) in the buffer, restoring the colors behind the old position.
       function moveEntityPixels(entityId, dx, dy) {
         var layer = buf.entityLayers[entityId];
         if (!layer || layer.length === 0) return;
@@ -209,6 +214,7 @@
         e.preventDefault();
       });
 
+      // Finish a drag and send the entity's new normalized and art-grid position to the server.
       function endDrag() {
         if (!drag.active) return;
         drag.active = false;
@@ -342,6 +348,7 @@
       };
 
       // -- Temp sprite handlers --
+      // Draw a temporary sprite sent by the server on top of the scene.
       function handleAddTempSprite(msg) {
         addTempSprite(msg.id, msg.sprite);
         try {
@@ -352,6 +359,7 @@
         renderer.render();
       }
 
+      // Remove a temporary sprite and restore the background pixels it covered.
       function handleRemoveTempSprite(msg) {
         removeTempSprite(msg.id);
         var prefix = msg.id;
@@ -368,6 +376,7 @@
       }
 
       // -- Animation playback --
+      // Play an animation message in a loop: template, step sequence, or custom code with text overlays.
       function handleAnimation(msg) {
         if (msg.template) {
           animRunner.playLoop({
@@ -421,6 +430,7 @@
       var branchThumbnails = document.getElementById('branch-thumbnails');
       var pttHint = document.getElementById('ptt-hint');
 
+      // Hide push-to-talk and show the loading border while the next scene is prepared.
       function handleSceneTransitioning() {
         // Hide push-to-talk UI
         pttHint.style.display = 'none';
@@ -428,6 +438,7 @@
         canvasWrapper.classList.add('scene-loading');
       }
 
+      // Stop the running animation, show the new scene and bring back push-to-talk.
       function handleSceneReady(scene) {
         // Stop any running animation
         animRunner.stopLoop();
@@ -442,6 +453,7 @@
         pttHint.style.display = '';
       }
 
+      // Hide push-to-talk and ask the server for branch scenes, showing a loading state.
       function handleSceneComplete() {
         // Disable push-to-talk
         pttHint.style.display = 'none';
@@ -456,6 +468,7 @@
         ws.send(JSON.stringify({ type: 'generate_branches' }));
       }
 
+      // Hide push-to-talk and show the end-of-story message in place of the branch picker.
       function handleStoryComplete() {
         // Disable push-to-talk
         pttHint.style.display = 'none';
@@ -468,12 +481,14 @@
           '</div>';
       }
 
+      // Keep push-to-talk visible so the child can narrate the ending.
       function handleEndingChoicePrompt() {
         // PTT stays visible so the child can respond
         pttHint.style.display = '';
         pttHint.textContent = 'Hold Space to tell your ending — or say "keep going"';
       }
 
+      // Hide push-to-talk and show the final "The End!" screen.
       function handleStoryEnded() {
         // Hide PTT
         pttHint.style.display = 'none';
@@ -490,6 +505,7 @@
       // -- Branch selection --
       var currentBranches = [];
 
+      // Display the branch scenes as clickable thumbnails.
       function handleBranches(scenes) {
         currentBranches = scenes;
         branchThumbnails.innerHTML = '';
@@ -502,6 +518,7 @@
         });
       }
 
+      // Show the chosen branch scene, restore push-to-talk and tell the server which branch was picked.
       function selectBranch(index) {
         var scene = currentBranches[index];
         // Hide branch picker, show PTT
@@ -516,6 +533,7 @@
         ws.send(JSON.stringify({ type: 'select_branch', index: index }));
       }
 
+      // Render a scene sent by the server.
       function handleNewScene(scene) {
         renderScene(scene);
       }

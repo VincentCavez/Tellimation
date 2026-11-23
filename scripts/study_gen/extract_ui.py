@@ -174,6 +174,7 @@ async def extract_character(
 
 
 def save_image(image_bytes: bytes, path: Path) -> None:
+    """Save image bytes as PNG, creating the folder."""
     path.parent.mkdir(parents=True, exist_ok=True)
     img = Image.open(io.BytesIO(image_bytes))
     img.save(str(path), format="PNG")
@@ -192,6 +193,7 @@ state: Dict[str, Any] = {
 
 
 def load_story(key: str) -> Dict[str, Any]:
+    """Load the story or Prolific scene JSON for a key."""
     if key in PROLIFIC_FILES:
         path = PROLIFIC_DIR / PROLIFIC_FILES[key]
     else:
@@ -269,6 +271,7 @@ button.regen { background: #e9a045; color: #1a1a2e; }
 <script>
 let storyData = null;
 
+// Load the selected story from the server and render its scenes.
 async function loadStory() {
   const key = document.getElementById('storySelect').value;
   const res = await fetch('/api/load_story?key=' + key);
@@ -279,12 +282,15 @@ async function loadStory() {
   setStatus('Story "' + data.title + '" loaded. ' + data.scenes.length + ' scenes found.');
 }
 
+// Show a message in the status bar.
 function setStatus(msg) { document.getElementById('status').textContent = msg; }
+// Show or hide the loading overlay with a text.
 function showLoading(show, text) {
   document.getElementById('loading').className = show ? 'show' : '';
   if (text) document.getElementById('loadingText').textContent = text;
 }
 
+// Render the scenes with their characters and existing extractions.
 function renderScenes() {
   let html = '';
   for (const scene of storyData.scenes) {
@@ -336,6 +342,7 @@ function renderScenes() {
   document.getElementById('scenesContainer').innerHTML = html;
 }
 
+// HTML card for one extracted character image.
 function extCard(name, path, sceneNum) {
   const bust = '&t=' + Date.now();
   const src = '/api/image?path=' + encodeURIComponent(path) + bust;
@@ -347,6 +354,7 @@ function extCard(name, path, sceneNum) {
     '</div></div>';
 }
 
+// Extract every character of a scene one after the other.
 async function extractAll(sceneNum) {
   const scene = storyData.scenes.find(s => s.scene_number === sceneNum);
   if (!scene) return;
@@ -385,6 +393,7 @@ async function extractAll(sceneNum) {
   setStatus('All extractions done for scene ' + sceneNum + '.');
 }
 
+// Extract a single character from a scene and show the result.
 async function extractOne(sceneNum, charName) {
   showLoading(true, 'Re-extracting ' + charName + ' from scene ' + sceneNum + '...');
   try {
@@ -423,6 +432,7 @@ window.addEventListener('load', loadStory);
 
 @app.route("/")
 def index():
+    """Serve the extractor page with the list of stories and scenes."""
     stories = []
     for key, fname in sorted(STORY_FILES.items()):
         path = STORIES_DIR / fname
@@ -444,6 +454,7 @@ def index():
 
 @app.route("/api/load_story")
 def api_load_story():
+    """Load a story into the server state and return its scenes, characters and existing images."""
     key = request.args.get("key", "A")
     if key not in STORY_FILES and key not in PROLIFIC_FILES:
         return jsonify({"error": f"Unknown story: {key}"})
@@ -495,6 +506,7 @@ def api_load_story():
 
 @app.route("/api/extract")
 def api_extract():
+    """Extract one character from a scene image (query: scene, character) and return the result."""
     scene_num = int(request.args.get("scene", 1))
     char_name = request.args.get("character", "")
 
@@ -527,6 +539,7 @@ async def _extract_async(
     char_desc: str,
     scene_bytes: bytes,
 ) -> Dict[str, Any]:
+    """Extract a character from the scene image with the model, save it and return the result with timing."""
     t0 = time.time()
 
     extract_dir = OUTPUT_BASE / story_id / "extractions"
@@ -547,6 +560,7 @@ async def _extract_async(
 
 @app.route("/api/image")
 def api_image():
+    """Serve a PNG from disk, optionally as a download."""
     path = request.args.get("path", "")
     download = request.args.get("download", "0") == "1"
     if not path or not Path(path).exists():
@@ -559,6 +573,7 @@ def api_image():
 # ---------------------------------------------------------------------------
 
 def main():
+    """Command-line entry point: read the API key and start the Flask server."""
     global client
 
     parser = argparse.ArgumentParser(description="Character Extractor UI")

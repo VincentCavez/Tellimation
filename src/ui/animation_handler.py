@@ -40,8 +40,12 @@ _ORAL_GUIDANCE_TIMEOUT = 10
 # ---------------------------------------------------------------------------
 
 class WSProtocol(Protocol):
-    async def send_json(self, data: Dict[str, Any]) -> None: ...
-    async def send_bytes(self, data: bytes) -> None: ...
+    async def send_json(self, data: Dict[str, Any]) -> None:
+        """Send a JSON message to the client."""
+        ...
+    async def send_bytes(self, data: bytes) -> None:
+        """Send binary data to the client."""
+        ...
 
 
 # ---------------------------------------------------------------------------

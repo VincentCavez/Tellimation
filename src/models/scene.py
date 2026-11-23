@@ -95,12 +95,14 @@ class SceneManifest(BaseModel):
     background: Optional[Background] = None
 
     def get_entity(self, entity_id: str) -> Optional[Entity]:
+        """Return the entity with this id, or None if the scene has no such entity."""
         for e in self.entities:
             if e.id == entity_id:
                 return e
         return None
 
     def entity_ids(self) -> List[str]:
+        """Return the ids of all entities in the scene."""
         return [e.id for e in self.entities]
 
     def get_main_character(self) -> Optional[Entity]:

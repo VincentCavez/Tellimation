@@ -32,6 +32,7 @@ TUTORIAL_TEXTS = [
 
 
 def main():
+    """Synthesize the tutorial audio files (all steps, or only those given on the command line)."""
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     client = texttospeech.TextToSpeechClient()
 

@@ -41,6 +41,7 @@
     let activePixels = 0;
     const maxPixels = 8;
 
+    // Spawns one falling pixel in a side margin (random colour, side and duration), capped at maxPixels.
     function createPixel() {
       if (activePixels >= maxPixels) return;
 

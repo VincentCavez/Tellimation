@@ -117,6 +117,7 @@ def _build_adaptation(names: List[str]) -> Optional[cloud_speech.SpeechAdaptatio
 # ---------------------------------------------------------------------------
 
 async def _transcribe_chirp(audio_bytes: bytes, names: List[str]) -> str:
+    """Transcribe audio with the Chirp speech model, biased toward the given names, and return the text."""
     client = SpeechAsyncClient(client_options={"api_endpoint": API_ENDPOINT})
 
     config = cloud_speech.RecognitionConfig(
@@ -137,6 +138,9 @@ async def _transcribe_chirp(audio_bytes: bytes, names: List[str]) -> str:
     except Exception as exc:
         logger.error("[transcription] Chirp 3 failed: %s", exc)
         return ""
+
+    from src.billing import record_speech
+    record_speech(response.metadata.total_billed_duration.total_seconds())
 
     transcript = ""
     for result in response.results:

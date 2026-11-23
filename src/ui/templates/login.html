@@ -45,6 +45,7 @@
     const codeInput = document.getElementById('participant-code');
     const ageSelect = document.getElementById('child-age');
 
+    // Validates the access code with the server; on success stores participant_id and child_age in sessionStorage and goes to /selection.
     async function proceed() {
       const code = codeInput.value.trim();
       if (!code) { codeInput.focus(); return; }
@@ -81,6 +82,7 @@
     let activePixels = 0;
     const maxPixels = 8;
 
+    // Spawns one falling pixel in a side margin (random colour, side and duration), capped at maxPixels.
     function createPixel() {
       if (activePixels >= maxPixels) return;
 

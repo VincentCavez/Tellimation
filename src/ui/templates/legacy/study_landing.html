@@ -70,6 +70,7 @@
     let activePixels = 0;
     window._maxPixels = 8;
 
+    // Spawns one falling pixel in a side margin (random colour, side and duration), capped at window._maxPixels.
     window._createPixel = function() {
       if (activePixels >= window._maxPixels) return;
       const pixel = document.createElement('div');

@@ -67,6 +67,7 @@
 
   // ==================== SEEDED RNG ====================
 
+  // Deterministic 32-bit unsigned hash of a string (used to seed the shuffles).
   function hashString(str) {
     let h = 0;
     for (let i = 0; i < str.length; i++) {
@@ -75,6 +76,7 @@
     return h >>> 0;
   }
 
+  // Seeded PRNG: returns a function yielding floats in [0, 1).
   function mulberry32(seed) {
     return function () {
       seed |= 0;
@@ -85,6 +87,7 @@
     };
   }
 
+  // Fisher-Yates shuffle of a copy of `arr`, reproducible for a given seed.
   function seededShuffle(arr, seed) {
     const rng = mulberry32(seed);
     const shuffled = arr.slice();
@@ -128,6 +131,7 @@
 
   // ==================== DATA LAYER ====================
 
+  // Fetches the lists, optional block 2 assignments and stimuli files, and fills `state`.
   async function loadAllData() {
     const [counterbalancing, block2, allStimuli] = await Promise.all([
       fetch(CONFIG.dataFiles.counterbalancing).then((r) => r.json()),
@@ -147,6 +151,7 @@
     }
   }
 
+  // Builds the shuffled block 1 trial sequence for the assigned list into `state.block1Trials`.
   function buildBlock1Trials() {
     const list = state.counterbalancingLists.lists.find(
       (l) => l.list_id === state.listId
@@ -164,6 +169,7 @@
       : seededShuffle(trials, seed);
   }
 
+  // Turns list entries into trial objects (stimulus + image/video paths); skips unknown stimuli.
   function trialsFromEntries(entries) {
     const trials = [];
     for (const entry of entries) {
@@ -206,6 +212,7 @@
     return seededShuffle(trials, seed);
   }
 
+  // Builds the shuffled block 2 (Likert) trials into `state.block2Trials`; empty if the study has none.
   function buildBlock2Trials() {
     let entries;
     if (state.block2Assignments) {
@@ -232,6 +239,7 @@
 
   // ==================== API CLIENT ====================
 
+  // POSTs `{action, ...payload}` to the Apps Script backend and returns the JSON; mocked in demo mode.
   async function apiCall(action, payload) {
     if (CONFIG.demoMode) {
       console.log('[DEMO] API call:', action, payload);
@@ -253,6 +261,7 @@
 
   // ==================== RETRY QUEUE ====================
 
+  // Persists the unsent response queue to localStorage (silently ignored if unavailable).
   function savePendingToStorage() {
     if (!state.prolificId) return;
     try {
@@ -265,6 +274,7 @@
     }
   }
 
+  // Restores the unsent response queue from localStorage, if any.
   function loadPendingFromStorage() {
     if (!state.prolificId) return;
     try {
@@ -280,12 +290,14 @@
     }
   }
 
+  // Queues a trial response, persists the queue and tries to send it.
   function submitResponse(payload) {
     state.pendingResponses.push(payload);
     savePendingToStorage();
     flushQueue();
   }
 
+  // Sends queued responses one by one; on failure stops and retries after CONFIG.retryIntervalMs.
   async function flushQueue() {
     if (state.flushingQueue) return;
     state.flushingQueue = true;
@@ -307,6 +319,7 @@
     state.flushingQueue = false;
   }
 
+  // Resolves once the queue is empty or CONFIG.flushTimeoutMs has elapsed.
   async function flushAllPending() {
     return new Promise((resolve) => {
       if (state.pendingResponses.length === 0) {
@@ -333,6 +346,7 @@
 
   // ==================== SESSION PERSISTENCE ====================
 
+  // Saves slot, list and progress to localStorage so a refresh resumes the session.
   function saveSession() {
     if (!state.prolificId) return;
     try {
@@ -351,6 +365,7 @@
     }
   }
 
+  // Returns the saved session object for the current Prolific ID, or null.
   function loadSession() {
     if (!state.prolificId) return null;
     try {
@@ -365,6 +380,7 @@
 
   const preloadPool = [];
 
+  // Preloads the videos of the next two trials into a reused pool of video elements.
   function preloadUpcoming(trials, currentIndex) {
     for (let i = 0; i < 2; i++) {
       const next = trials[currentIndex + 1 + i];
@@ -381,6 +397,7 @@
     }
   }
 
+  // Resets and wires the block 1 video player for a trial (play overlay, play count; options appear after the first end or on error).
   function setupVideoPlayer(trial) {
     const video = document.getElementById('video-player-1');
     const source = document.getElementById('video-source-1');
@@ -455,6 +472,7 @@
 
   // ==================== RENDERING ====================
 
+  // Activates the screen element with the given id and scrolls to top.
   function showScreen(screenId) {
     document.querySelectorAll('.screen').forEach((s) => s.classList.remove('active'));
     const screen = document.getElementById(screenId);
@@ -464,6 +482,7 @@
     }
   }
 
+  // Welcome screen: consent and Prolific ID, then assigns (or resumes) a slot and starts the first block.
   function renderWelcome() {
     showScreen('screen-welcome');
 
@@ -479,6 +498,7 @@
       idInput.value = pid;
     }
 
+    // Enables the start button only when consent is checked and an ID is entered.
     function updateStartButton() {
       startBtn.disabled = !(consentCb.checked && idInput.value.trim().length > 0);
     }
@@ -553,6 +573,7 @@
     };
   }
 
+  // Block 1 screen for the current trial: scene, narration, video and options; sends the response and advances.
   function renderBlock1Trial() {
     showScreen('screen-block1');
 
@@ -673,6 +694,7 @@
     };
   }
 
+  // Screen between the two blocks.
   function renderTransition() {
     showScreen('screen-transition');
     document.getElementById('continue-btn').onclick = () => {
@@ -680,6 +702,7 @@
     };
   }
 
+  // Block 2 screen for the current trial: scene, narration, intent and Likert scale; sends the rating and advances.
   function renderBlock2Trial() {
     showScreen('screen-block2');
 
@@ -764,6 +787,7 @@
     };
   }
 
+  // Completion screen: flushes pending responses, marks the slot complete and clears local session data.
   async function renderCompletion() {
     showScreen('screen-done');
 
@@ -800,6 +824,7 @@
     }
   }
 
+  // Shows the error screen with the given message.
   function renderError(message) {
     document.getElementById('error-message').textContent = message;
     showScreen('screen-error');
@@ -807,6 +832,7 @@
 
   // ==================== STATE MACHINE ====================
 
+  // Sets the survey phase and renders the matching screen.
   function transition(phase) {
     console.log(`[Survey] ${state.phase} → ${phase}`);
     state.phase = phase;
@@ -837,6 +863,7 @@
 
   // ==================== INIT ====================
 
+  // Entry point: reads ?demo and ?study, loads config and data, then shows the welcome screen.
   async function init() {
     // Check demo mode from URL
     const params = new URLSearchParams(window.location.search);

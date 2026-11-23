@@ -185,6 +185,7 @@ async def generate_image(
     label: str = "image",
     reference_images: Optional[List[bytes]] = None,
 ) -> Optional[bytes]:
+    """Generate an image from a prompt, optionally with reference images; returns PNG bytes or None on failure."""
     if reference_images:
         contents: List[Any] = []
         for img_bytes in reference_images:
@@ -230,6 +231,7 @@ async def extract_character(
     scene_image_bytes: bytes,
     character_desc: str,
 ) -> Optional[bytes]:
+    """Extract one character from a scene image with the model; returns PNG bytes or None on failure."""
     prompt = EXTRACT_PROMPT.format(character_description=character_desc)
     contents = [
         types.Part.from_bytes(data=scene_image_bytes, mime_type="image/png"),
@@ -278,6 +280,7 @@ async def extract_character(
 
 
 def save_image(image_bytes: bytes, path: Path) -> None:
+    """Save image bytes as PNG, creating the folder."""
     path.parent.mkdir(parents=True, exist_ok=True)
     img = Image.open(io.BytesIO(image_bytes))
     img.save(str(path), format="PNG")
@@ -481,6 +484,7 @@ def discover_batch_scenes(variant: str) -> List[Path]:
 
 
 def run_batch_in_thread(job_id: str, scene_files: List[Path], regenerate: bool):
+    """Run the batch job in a new event loop (thread target)."""
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     try:
@@ -490,12 +494,14 @@ def run_batch_in_thread(job_id: str, scene_files: List[Path], regenerate: bool):
 
 
 async def _run_batch(job_id: str, scene_files: List[Path], regenerate: bool):
+    """Generate the scenes of the batch job under the concurrency limit, updating the job's progress counters."""
     job = batch_jobs[job_id]
     job["total"] = len(scene_files)
     job["status"] = "running"
     sem = asyncio.Semaphore(BATCH_CONCURRENCY)
 
     async def process_one(scene_path: Path):
+        """Generate one scene file under the concurrency limit and update the job counters."""
         async with sem:
             story_id = None
             try:
@@ -576,6 +582,7 @@ state: Dict[str, Any] = {
 
 
 def load_story(key: str) -> Dict[str, Any]:
+    """Load the story JSON for a key from the training, Prolific or stories folder."""
     entry = STORY_FILES[key]
     if isinstance(entry, tuple):
         subdir, fname = entry
@@ -786,6 +793,7 @@ let batchJobId = null;
 let batchPollTimer = null;
 let flaggedScenes = new Set();
 
+// Start a batch generation job on the server and begin polling it.
 async function startBatch() {
   const variant = document.getElementById('batchVariant').value;
   const regenerate = document.getElementById('batchRegenerate').checked;
@@ -817,6 +825,7 @@ async function startBatch() {
   }
 }
 
+// Poll the batch job progress and update the display until it finishes.
 async function pollBatch() {
   if (!batchJobId) return;
   try {
@@ -848,6 +857,7 @@ async function pollBatch() {
   }
 }
 
+// Render the generated scenes of a batch as a gallery with flag buttons.
 function renderBatchGallery(results) {
   if (!results || results.length === 0) return;
   const bust = '&t=' + Date.now();
@@ -873,6 +883,7 @@ function renderBatchGallery(results) {
   updateFlagCount();
 }
 
+// Flag or unflag a scene for regeneration.
 function toggleFlag(storyId, btn) {
   if (flaggedScenes.has(storyId)) {
     flaggedScenes.delete(storyId);
@@ -886,11 +897,13 @@ function toggleFlag(storyId, btn) {
   updateFlagCount();
 }
 
+// Update the count of flagged scenes.
 function updateFlagCount() {
   const el = document.getElementById('flagCount');
   el.textContent = flaggedScenes.size > 0 ? flaggedScenes.size + ' scene(s) flagged' : '';
 }
 
+// Regenerate the flagged scenes as a new batch job.
 async function regenerateFlagged() {
   if (flaggedScenes.size === 0) return;
   const storyIds = Array.from(flaggedScenes);
@@ -920,6 +933,7 @@ let currentScene = 1;
 let totalScenes = 0;
 let validatedScenes = new Set();
 
+// Load the selected story from the server and reset the scene navigation.
 async function loadStory() {
   const key = document.getElementById('storySelect').value;
   const res = await fetch('/api/load_story?key=' + key);
@@ -939,6 +953,7 @@ async function loadStory() {
   setSingleStatus('Story loaded.' + refsMsg + ' Ready to generate scene 1.');
 }
 
+// Update the scene navigation buttons and indicators.
 function updateSceneNav() {
   let html = '';
   for (let i = 1; i <= totalScenes; i++) {
@@ -948,8 +963,10 @@ function updateSceneNav() {
   document.getElementById('sceneNav').innerHTML = html;
 }
 
+// Go to scene n and refresh the single-scene view.
 function goToScene(n) { currentScene = n; updateSceneNav(); updateSingleUI(); }
 
+// Refresh the single-scene view for the current scene.
 function updateSingleUI() {
   document.getElementById('sceneNum').textContent = currentScene;
   document.getElementById('imagesGrid').innerHTML = '';
@@ -962,19 +979,23 @@ function updateSingleUI() {
   loadExisting();
 }
 
+// Show the images already on disk for the current scene.
 async function loadExisting() {
   const res = await fetch('/api/scene_status?scene=' + currentScene);
   const data = await res.json();
   if (data.has_images) showSingleImages(data);
 }
 
+// Show a message in the single-scene status line.
 function setSingleStatus(msg) { document.getElementById('singleStatus').textContent = msg; }
 
+// Show or hide the loading overlay with a text.
 function showLoading(show, text) {
   document.getElementById('loading').className = show ? 'show' : '';
   if (text) document.getElementById('loadingText').textContent = text;
 }
 
+// Generate the current scene (background and full image).
 async function generateScene() {
   document.getElementById('btnGenScene').disabled = true;
   showLoading(true, 'Generating scene ' + currentScene + '...');
@@ -989,9 +1010,13 @@ async function generateScene() {
   document.getElementById('btnGenScene').disabled = false;
 }
 
+// Regenerate only the background of the current scene.
 async function regenerateBg() { await doGenerate('bg_only'); }
+// Regenerate only the full image of the current scene.
 async function regenerateFull() { await doGenerate('full_only'); }
+// Regenerate the background and the full image of the current scene.
 async function regenerateAll() { await doGenerate('all'); }
+// Request generation of the current scene in the given mode and show the images.
 async function doGenerate(mode) {
   document.getElementById('btnGenScene').disabled = true;
   showLoading(true, 'Generating (' + mode + ')...');
@@ -1006,6 +1031,7 @@ async function doGenerate(mode) {
   document.getElementById('btnGenScene').disabled = false;
 }
 
+// Display the generated images of the current scene.
 function showSingleImages(data) {
   let html = '';
   const bust = '&t=' + Date.now();
@@ -1024,10 +1050,12 @@ function showSingleImages(data) {
   document.getElementById('btnValidate').style.display = currentScene <= totalScenes ? 'inline-block' : 'none';
 }
 
+// HTML card for one image with a download link.
 function imgCard(title, src, path) {
   return '<div class="card"><h4>' + title + '</h4><img src="' + src + '"><div class="downloads"><a href="' + src + '&download=1" download>Download</a></div></div>';
 }
 
+// Mark the current scene as validated and move to the next one.
 function validateScene() {
   validatedScenes.add(currentScene);
   if (currentScene < totalScenes) { currentScene++; updateSceneNav(); updateSingleUI(); setSingleStatus('Scene ' + (currentScene-1) + ' validated.'); }
@@ -1037,6 +1065,7 @@ function validateScene() {
 // ==================== EXTRACTION ====================
 let extractData = [];
 
+// Load the list of scenes available for extraction.
 async function loadExtractScenes() {
   const variant = document.getElementById('extractVariant').value;
   document.getElementById('extractStatus').textContent = 'Loading scenes...';
@@ -1051,6 +1080,7 @@ async function loadExtractScenes() {
   }
 }
 
+// Render the extraction scenes with their characters.
 function renderExtractScenes() {
   let html = '';
   const bust = '&t=' + Date.now();
@@ -1080,6 +1110,7 @@ function renderExtractScenes() {
   document.getElementById('extractContainer').innerHTML = html;
 }
 
+// HTML card for one extracted character image.
 function extCard(name, path, storyId, sceneNum) {
   const bust = '&t=' + Date.now();
   const src = '/api/image?path=' + encodeURIComponent(path) + bust;
@@ -1089,6 +1120,7 @@ function extCard(name, path, storyId, sceneNum) {
     '</div></div>';
 }
 
+// Extract every entity of a scene.
 async function extractAll(storyId, sceneNum) {
   const el = document.getElementById('extractLoading');
   el.style.display = 'block';
@@ -1117,6 +1149,7 @@ async function extractAll(storyId, sceneNum) {
   }
 }
 
+// Extract a single character from a scene and show the result.
 async function extractOne(storyId, sceneNum, charName) {
   const el = document.getElementById('extractLoading');
   el.style.display = 'block';
@@ -1173,6 +1206,7 @@ document.addEventListener('click', function(e) {
 
 @app.route("/")
 def index():
+    """Serve the generator page with the list of stories."""
     stories = []
     for key in sorted(STORY_FILES.keys()):
         try:
@@ -1187,6 +1221,7 @@ def index():
 
 @app.route("/api/load_story")
 def api_load_story():
+    """Load a story into the server state and return its characters, scenes and existing images."""
     key = request.args.get("key", "A")
     if key not in STORY_FILES:
         return jsonify({"error": f"Unknown story: {key}"})
@@ -1214,6 +1249,7 @@ def api_load_story():
 
 @app.route("/api/generate_scene")
 def api_generate_scene():
+    """Generate the images of the loaded story's scene (query: scene, mode) and return the result."""
     scene_num = int(request.args.get("scene", 1))
     data = state["story_data"]
     if not data:
@@ -1239,6 +1275,7 @@ def api_generate_scene():
 
 @app.route("/api/scene_status")
 def api_scene_status():
+    """Return the generation status of a scene, from memory or from the files on disk."""
     scene_num = int(request.args.get("scene", 1))
     if scene_num in state.get("generated", {}):
         return jsonify(state["generated"][scene_num])
@@ -1271,6 +1308,7 @@ def api_scene_status():
 
 @app.route("/api/generate_batch", methods=["POST"])
 def api_generate_batch():
+    """Start a batch generation job in a thread (POST body: variant, regenerate, story_ids) and return its job id."""
     body = request.get_json() or {}
     variant = body.get("variant", "all_new")
     regenerate = body.get("regenerate", False)
@@ -1308,6 +1346,7 @@ def api_generate_batch():
 
 @app.route("/api/batch_progress")
 def api_batch_progress():
+    """Return the progress of a batch job (query: job_id)."""
     job_id = request.args.get("job_id", "")
     if job_id not in batch_jobs:
         return jsonify({"error": "Unknown job"})
@@ -1327,6 +1366,7 @@ def api_batch_progress():
 
 @app.route("/api/extract_list")
 def api_extract_list():
+    """List the Prolific scenes to extract for a variant, with their extraction status."""
     variant = request.args.get("variant", "all")
 
     if variant == "all":
@@ -1366,6 +1406,7 @@ def api_extract_list():
 
 @app.route("/api/extract_all")
 def api_extract_all():
+    """Extract every entity present in a composed scene (query: story_id, scene) and return the results."""
     story_id = request.args.get("story_id", "")
     scene_num = int(request.args.get("scene", 1))
 
@@ -1403,6 +1444,7 @@ async def _extract_all_async(
     entities_in_scene: List[str],
     scene_bytes: bytes,
 ) -> Dict[str, Any]:
+    """Extract each entity of the scene from the scene image and return the results with timing."""
     t0 = time.time()
     extract_dir = OUTPUT_BASE / story_id / "extractions"
     extractions = []
@@ -1427,6 +1469,7 @@ async def _extract_all_async(
 
 @app.route("/api/extract")
 def api_extract():
+    """Extract one character from a scene (query: story_id, scene, character) and return the result."""
     story_id = request.args.get("story_id", "")
     scene_num = int(request.args.get("scene", 1))
     char_name = request.args.get("character", "")
@@ -1456,6 +1499,7 @@ def api_extract():
 async def _extract_one_async(
     story_id: str, scene_num: int, char_name: str, char_desc: str, scene_bytes: bytes,
 ) -> Dict[str, Any]:
+    """Extract one character from the scene image, save it and return the result with timing."""
     t0 = time.time()
     extract_dir = OUTPUT_BASE / story_id / "extractions"
     out_path = extract_dir / f"scene_{scene_num}_{char_name}.png"
@@ -1469,6 +1513,7 @@ async def _extract_one_async(
 
 @app.route("/api/image")
 def api_image():
+    """Serve a PNG from disk, optionally as a download."""
     path = request.args.get("path", "")
     download = request.args.get("download", "0") == "1"
     if not path or not Path(path).exists():
@@ -1481,6 +1526,7 @@ def api_image():
 # ---------------------------------------------------------------------------
 
 def main():
+    """Command-line entry point: read the API key and start the Flask server."""
     global client
 
     parser = argparse.ArgumentParser(description="Scene Generator & Extractor UI")

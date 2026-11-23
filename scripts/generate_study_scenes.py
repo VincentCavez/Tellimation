@@ -52,6 +52,7 @@ STORIES_CONFIG_PATH = PROJECT_ROOT / "config" / "study_stories.json"
 
 
 def load_source() -> Dict[str, Any]:
+    """Load the study source JSON."""
     with open(SOURCE_PATH) as f:
         return json.load(f)
 
@@ -305,6 +306,7 @@ async def generate_story(
 
 
 async def main() -> None:
+    """Command-line entry point: validate the source and generate the scene assets for the selected stories and scenes."""
     parser = argparse.ArgumentParser(description="Generate study scene assets")
     parser.add_argument("--story", type=str, choices=["A", "B", "C", "D"],
                         help="Generate only this story (default: all)")

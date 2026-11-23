@@ -194,6 +194,7 @@
       }
     }
 
+    // Renders the scene's sprite code into a hidden full-size buffer, then draws a 2x-downsampled thumbnail in the card's canvas.
     function renderThumbnailInCard(card, scene) {
       var canvas = card.querySelector('canvas');
       var spriteCode = scene.sprite_code || {};
@@ -212,6 +213,7 @@
       }
       entityEids.sort(function(a, b) { return (depthMap[a] || 0) - (depthMap[b] || 0); });
 
+      // Draws the entities into fullBuf and paints the downsampled result on the card canvas.
       function renderToCanvas(fullBuf) {
         fullBuf.snapshotBackground();
         for (var i = 0; i < entityEids.length; i++) {
@@ -276,6 +278,7 @@
 
     var excluded = {};  // index -> true if excluded
 
+    // Fills a generated card: summary, thumbnail, Download/Exclude buttons and a collapsible manifest.
     function populateCard(index, scene) {
       var card = cards[index];
       card.className = 'admin-card ready';
@@ -309,6 +312,7 @@
       card.appendChild(details);
     }
 
+    // Downloads the scene at `index` as scene_N.json.
     function downloadScene(index) {
       var scene = scenes[index];
       if (!scene) return;
@@ -321,6 +325,7 @@
       URL.revokeObjectURL(url);
     }
 
+    // Toggles whether a card's scene is excluded from the selection and updates the status.
     function toggleExclude(index) {
       var card = cards[index];
       if (excluded[index]) {
@@ -335,6 +340,7 @@
       updateSelectedCount();
     }
 
+    // Scenes that are not excluded.
     function getSelectedScenes() {
       var selected = [];
       for (var i = 0; i < scenes.length; i++) {
@@ -343,6 +349,7 @@
       return selected;
     }
 
+    // Updates the status line with the number of selected scenes.
     function updateSelectedCount() {
       var sel = getSelectedScenes();
       var total = scenes.length;
@@ -354,6 +361,7 @@
       }
     }
 
+    // Marks the card at `index` as failed and shows the error message.
     function markError(index, message) {
       var card = cards[index];
       card.className = 'admin-card error';

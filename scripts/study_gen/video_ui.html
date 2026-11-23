@@ -163,6 +163,7 @@ const ONLY_SCENES = (URL_PARAMS.get('scenes') || '').split(',').map(s => s.trim(
 const FILE_PREFIX = URL_PARAMS.get('prefix') || '';
 // ?save=study2_videos also writes each MP4 to data/<dir>/ server-side.
 const SAVE_DIR = URL_PARAMS.get('save') || '';
+// Output file stem for a story: replaces the study1_ prefix with FILE_PREFIX when one is set.
 function outputName(storyId) {
   return FILE_PREFIX ? storyId.replace(/^study1_/, FILE_PREFIX) : storyId;
 }
@@ -203,6 +204,7 @@ async function init() {
   renderSidebar();
 }
 
+// Rebuilds the scene list in the sidebar, grouped by animation type.
 function renderSidebar() {
   const groups = {};
   for (const s of allScenes) {
@@ -330,6 +332,7 @@ async function loadScene(storyId) {
 
 // ─── HD Pixel Buffer Setup ───
 
+// Cleans the entity image (drops faint white fringe pixels) and stores its mask, contour, bounds and distance field in hdEntityData.
 function computeEntityContour(entityId, img, w, h) {
   var off = document.createElement('canvas');
   off.width = w;
@@ -413,6 +416,7 @@ function computeEntityContour(entityId, img, w, h) {
   };
 }
 
+// Returns the RGBA pixels of the current canvas (background only) downscaled by HD_SCALE.
 function captureBgPixels(fullW, fullH) {
   var aw = Math.ceil(fullW / HD_SCALE);
   var ah = Math.ceil(fullH / HD_SCALE);
@@ -425,6 +429,7 @@ function captureBgPixels(fullW, fullH) {
   return offCtx.getImageData(0, 0, aw, ah).data;
 }
 
+// Builds the low-resolution PixelBuffer from the canvas, tagging each pixel with its entity (or 'bg') from the downscaled entity masks.
 function buildHDPixelBuffer(fullW, fullH, bgPixels) {
   var aw = Math.ceil(fullW / HD_SCALE);
   var ah = Math.ceil(fullH / HD_SCALE);
@@ -563,6 +568,7 @@ function buildHDPixelBuffer(fullW, fullH, bgPixels) {
   return hdBuf;
 }
 
+// Returns a renderer that draws a PixelBuffer onto the main canvas, upscaled to full size.
 function createHDRenderer(fullW, fullH) {
   var aw = Math.ceil(fullW / HD_SCALE);
   var ah = Math.ceil(fullH / HD_SCALE);
@@ -575,6 +581,7 @@ function createHDRenderer(fullW, fullH) {
   return {
     canvas: canvas,
     buf: null,
+    // Copies the pixel buffer to the canvas.
     render: function() {
       var b = this.buf;
       if (!b) return;
@@ -595,6 +602,7 @@ function createHDRenderer(fullW, fullH) {
   };
 }
 
+// Creates the pixel buffer, renderer and AnimationRunner for the current scene.
 function setupAnimations(w, h, bgPixels) {
   buf = buildHDPixelBuffer(w, h, bgPixels);
   renderer = createHDRenderer(w, h);
@@ -605,6 +613,7 @@ function setupAnimations(w, h, bgPixels) {
     'entities:', scene_entity_order.join(', '));
 }
 
+// Redraws the canvas from the layer order and visibility, then rebuilds the animation buffers.
 function rebuildPixelBuffer() {
   // Called when layer order or visibility changes — redraw and rebuild
   if (!currentScene) return;
@@ -669,6 +678,7 @@ function renderLayerPanel() {
   });
 }
 
+// Picks the animated entity in the target dropdown for the scene: video_target, else ghost (C3), occluder (S1) or first entity in scene.
 function autoSelectTarget() {
   const sel = document.getElementById('target-select');
   const atype = currentScene.anim_type;
@@ -689,6 +699,7 @@ function autoSelectTarget() {
   }
 }
 
+// Loads an image into loadedImages[key]; always resolves, even on error.
 function loadImg(key, url) {
   return new Promise((resolve) => {
     const img = new Image();
@@ -824,6 +835,7 @@ async function playAnimation(onComplete) {
   if (onComplete) onComplete();
 }
 
+// Stops the running animation and shows the static scene.
 function stopAnimation() {
   if (runner) runner.stop();
   isPlaying = false;
@@ -867,6 +879,7 @@ function captureWebm() {
   });
 }
 
+// Uploads a WebM blob to /api/convert_mp4 and returns the MP4 blob (optionally saved server-side to SAVE_DIR).
 async function convertToMp4(webmBlob, filename) {
   const form = new FormData();
   form.append('video', webmBlob, 'input.webm');
@@ -880,6 +893,7 @@ async function convertToMp4(webmBlob, filename) {
   return resp.blob();
 }
 
+// Triggers a browser download of the blob under the given filename.
 function downloadBlob(blob, filename) {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);

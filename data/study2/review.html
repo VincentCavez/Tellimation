@@ -40,6 +40,7 @@
 <main id="main">Loading…</main>
 <script>
 (async () => {
+  // Escapes &, < and > for safe HTML insertion.
   const esc0 = (t) => String(t).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
   const main0 = document.getElementById('main');
   if (location.protocol === 'file:') {
@@ -62,7 +63,9 @@
   const scenes = [...byScene.entries()].sort((a, b) => order.indexOf(a[1].anim) - order.indexOf(b[1].anim) || a[0].localeCompare(b[0]));
   const names = { I2: 'Silhouette', C3: 'Missing Piece', S1: 'Peek', P2f: 'Emanation (fear) — filler', C2: 'Disintegration — filler', T1: 'Flashback — filler' };
   const codes = ['T', 'E1', 'E2', 'D1', 'D2', 'D3', 'D4'];
+  // Escapes &, < and > for safe HTML insertion.
   const esc = (t) => String(t).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+  // HTML block for one condition of a scene: narrator text and its answer options (empty if the condition is missing).
   const cond = (s, label) => !s ? '' : `<div class="cond"><h3>${label}</h3><p class="narr">“${esc(s.narrator_text)}”</p><ul>${
     codes.filter((c) => s.options[c]).map((c) => `<li class="${c}"><code>${c}</code>${esc(s.options[c])}</li>`).join('')}</ul></div>`;
   const main = document.getElementById('main');
@@ -76,6 +79,7 @@
       <div class="conds">${cond(sc.correction, 'Correction')}${cond(sc.suggestion, 'Suggestion')}</div>
     </section>`).join('');
   const fillers = document.getElementById('show-fillers');
+  // Shows or hides filler cards according to the checkbox and updates the visible-scene count.
   const apply = () => {
     document.querySelectorAll('.card.filler').forEach((el) => { el.hidden = !fillers.checked; });
     const shown = [...document.querySelectorAll('.card')].filter((el) => !el.hidden).length;

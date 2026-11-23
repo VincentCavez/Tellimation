@@ -130,6 +130,7 @@
 
   var _sceneTransitioning = false;
 
+  // Load a scene: stop the running animation, fetch the scene data from the server, render it and report study_scene_loaded over the WebSocket.
   function loadScene(sceneNum) {
     sceneNumEl.textContent = sceneNum;
 
@@ -212,6 +213,7 @@
     }
     entityEids.sort(function(a, b) { return (depthMap[a] || 0) - (depthMap[b] || 0); });
 
+    // Render the entity sprites over the background, save their layers, compute distance fields and flush to the canvas.
     function renderEntitiesAndFlush() {
       buf.snapshotBackground();
       var N = buf.data.length;
@@ -272,6 +274,7 @@
   var hdEntityData = {};
   window.hdEntityData = hdEntityData;
 
+  // Compute an entity's mask, contour and BFS distance field (max 20 px) from its image's alpha channel, stored for animations.
   function computeEntityContour(entityId, img, w, h) {
     // Draw entity image on offscreen canvas to read pixel data
     var off = document.createElement('canvas');
@@ -365,6 +368,7 @@
 
   // --- Capture bg-only pixels at half resolution (before entities are drawn) ---
   var HD_SCALE = 1; // no downscale: full resolution animation buffer
+  // Return the RGBA pixels of the background image drawn at animation-buffer resolution.
   function captureBgPixels(fullW, fullH) {
     var aw = Math.ceil(fullW / HD_SCALE);
     var ah = Math.ceil(fullH / HD_SCALE);
@@ -534,6 +538,7 @@
   // --- HD Renderer (half-res buffer → full-res canvas via upscale) ---
   var hdRenderer = null;
 
+  // Create a renderer that upscales the animation buffer (set via .buf) onto the main canvas.
   function createHDRenderer(fullW, fullH) {
     var aw = Math.ceil(fullW / HD_SCALE);
     var ah = Math.ceil(fullH / HD_SCALE);
@@ -547,6 +552,7 @@
     return {
       canvas: canvas,
       buf: null,
+      // Convert the HD buffer to RGBA and draw it on the canvas upscaled to full resolution.
       render: function() {
         var b = this.buf;
         if (!b) return;
@@ -645,6 +651,7 @@
     bgImg.src = scene.background_url;
   }
 
+  // Build the HD animation buffer and renderer for the scene, rewire animRunner to them (24 fps) and start the tutorial if pending.
   function setupHDAnimations(w, h, bgPixels) {
     var aw = Math.ceil(w / HD_SCALE);
     var ah = Math.ceil(h / HD_SCALE);
@@ -736,11 +743,13 @@
   var _tutorialWordTimers = [];
   var _tutorialAudio = null;
 
+  // Cancel all pending tutorial word-reveal timers.
   function clearTutorialTimers() {
     for (var i = 0; i < _tutorialWordTimers.length; i++) clearTimeout(_tutorialWordTimers[i]);
     _tutorialWordTimers = [];
   }
 
+  // Reveal tutorial text word by word, paced to the audio duration; calls onDone shortly after the last word.
   function revealTutorialText(text, audioDuration, onDone) {
     clearTutorialTimers();
     var words = text.split(/\s+/);
@@ -817,6 +826,7 @@
     }
   }
 
+  // Play one tutorial step: its audio, text reveal and animation, then show the step buttons.
   function playTutorialStep(stepIdx) {
     _tutorialStep = stepIdx;
     tutorialBtns.style.display = 'none';
@@ -829,6 +839,7 @@
     // Restore full scene if previous step hid an entity
     _restoreFullScene();
 
+    // Reveal the step text, then play its animation (hiding/restoring an entity if set) and show the step buttons.
     function doRevealAndAnim(audioDuration) {
       revealTutorialText(step.text, audioDuration, function() {
         if (anim) {
@@ -854,6 +865,7 @@
     if (step.audio) {
       _tutorialAudio = new Audio(step.audio);
       var fired = false;
+      // Start the tutorial audio once it can play through (runs only once), then reveal text and animation.
       function onReady() {
         if (fired) return;
         fired = true;
@@ -869,11 +881,13 @@
     }
   }
 
+  // Show the Continue/Finish buttons after a tutorial step.
   function showTutorialButtons(stepIdx) {
     tutorialBtns.style.display = 'flex';
     btnTutorialContinue.textContent = (stepIdx >= TUTORIAL_STEPS.length - 1) ? 'Finish' : 'Continue';
   }
 
+  // Hide the study controls and begin the tutorial at its first step.
   function startTutorial() {
     // Hide PTT and buttons
     document.getElementById('ptt-hint').style.display = 'none';
@@ -885,6 +899,7 @@
     playTutorialStep(0);
   }
 
+  // Stop tutorial audio, hide the tutorial panel and bring back the PTT hint and Next Scene button.
   function endTutorial() {
     if (_tutorialAudio) { _tutorialAudio.pause(); _tutorialAudio = null; }
     _tutorialActive = false;
@@ -932,6 +947,7 @@
 
   var stopPlayAll = false;
 
+  // Play every template of ALL_TEMPLATES in sequence on the scene's entities (meant to be called from the console).
   window.playAllAnimations = async function() {
     if (!animRunner || !animRunner.buf) {
       console.error('Animation buffer not ready');
@@ -972,12 +988,14 @@
     console.log('--- All animations complete ---');
   };
 
+  // Stop playAllAnimations and the running animation loop.
   window.stopAnimations = function() {
     stopPlayAll = true;
     animRunner.stopLoop();
   };
 
   // --- Handle WS messages ---
+  // Play an animation message in a loop (animated mode only, ignored during scene transitions).
   function handleAnimation(msg) {
     if (!isAnimated) return;
     if (_sceneTransitioning) return;  // Ignore animations during scene transition
@@ -1003,6 +1021,7 @@
     }
   }
 
+  // Show a temporary sprite sent by the server (animated mode only).
   function handleAddTempSprite(msg) {
     if (!isAnimated) return;
     if (msg.sprite && msg.id) {
@@ -1012,6 +1031,7 @@
     }
   }
 
+  // Remove a temporary sprite and re-render the current scene (animated mode only).
   function handleRemoveTempSprite(msg) {
     if (!isAnimated) return;
     if (msg.id) {

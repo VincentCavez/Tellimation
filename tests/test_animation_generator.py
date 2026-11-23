@@ -94,18 +94,22 @@ def _make_mock_client(response_dict):
 
 class TestPromptContent:
     def test_system_prompt_documents_function_signature(self):
+        """The system prompt documents the animate(buf, PW, PH, t) signature."""
         assert "function animate(buf, PW, PH, t)" in ANIMATION_SYSTEM_PROMPT
 
     def test_system_prompt_documents_pixel_fields(self):
+        """The system prompt documents the pixel fields (colour channels and entity tag)."""
         assert "_r" in ANIMATION_SYSTEM_PROMPT
         assert "_g" in ANIMATION_SYSTEM_PROMPT
         assert "_b" in ANIMATION_SYSTEM_PROMPT
         assert "buf[i].e" in ANIMATION_SYSTEM_PROMPT
 
     def test_system_prompt_documents_prefix_matching(self):
+        """The system prompt documents prefix matching on entity ids."""
         assert "startsWith" in ANIMATION_SYSTEM_PROMPT
 
     def test_system_prompt_contains_all_error_types(self):
+        """The system prompt names every supported error type."""
         for error_type in [
             "SPATIAL", "PROPERTY_COLOR", "PROPERTY_SIZE",
             "PROPERTY_WEIGHT", "PROPERTY_TEMPERATURE",
@@ -131,14 +135,17 @@ class TestPromptContent:
 
     def test_system_prompt_contains_examples(self):
         # At least the 3 required examples
+        """The system prompt includes the required worked examples."""
         assert "color_pop" in ANIMATION_SYSTEM_PROMPT
         assert "vibrating_pulse" in ANIMATION_SYSTEM_PROMPT or "shake" in ANIMATION_SYSTEM_PROMPT.lower()
         assert "settle" in ANIMATION_SYSTEM_PROMPT
 
     def test_system_prompt_requests_duration(self):
+        """The system prompt asks the model to return a duration in milliseconds."""
         assert "duration_ms" in ANIMATION_SYSTEM_PROMPT
 
     def test_user_prompt_has_placeholders(self):
+        """The user prompt template contains all expected placeholders."""
         assert "{error_type}" in ANIMATION_USER_PROMPT
         assert "{entity_id}" in ANIMATION_USER_PROMPT
         assert "{sub_entity}" in ANIMATION_USER_PROMPT
@@ -155,24 +162,29 @@ class TestPromptContent:
 
 class TestFormatSceneContext:
     def test_empty_context(self):
+        """An empty context is rendered as a no-context message."""
         result = _format_scene_context({})
         assert "no scene context" in result or "empty" in result
 
     def test_none_context(self):
+        """A None context is rendered as a no-context message."""
         result = _format_scene_context(None)
         assert "no scene context" in result
 
     def test_with_entities(self):
+        """Entities and their types appear in the formatted context."""
         result = _format_scene_context(SCENE_CONTEXT)
         assert "rabbit_01" in result
         assert "rock_01" in result
         assert "rabbit" in result
 
     def test_with_relations(self):
+        """Relations appear in the formatted context."""
         result = _format_scene_context(SCENE_CONTEXT)
         assert "beside" in result
 
     def test_with_actions(self):
+        """Actions and their manners appear in the formatted context."""
         result = _format_scene_context(SCENE_CONTEXT)
         assert "hop" in result
         assert "quickly" in result
@@ -184,14 +196,17 @@ class TestFormatSceneContext:
 
 class TestExtractJson:
     def test_plain_json(self):
+        """Plain JSON text is parsed as is."""
         data = _extract_json('{"a": 1}')
         assert data == {"a": 1}
 
     def test_fenced_json(self):
+        """JSON wrapped in a markdown fence is parsed."""
         data = _extract_json('```json\n{"a": 1}\n```')
         assert data == {"a": 1}
 
     def test_invalid_json_raises(self):
+        """Text that is not JSON raises JSONDecodeError."""
         with pytest.raises(json.JSONDecodeError):
             _extract_json("not json")
 
@@ -202,6 +217,7 @@ class TestExtractJson:
 
 class TestValidation:
     def test_valid_response(self):
+        """A well-formed response becomes a CachedAnimation with its code, duration and origin."""
         anim = _validate_animation_response(FAKE_ANIMATION_RESPONSE)
         assert isinstance(anim, CachedAnimation)
         assert "function animate" in anim.code
@@ -209,20 +225,24 @@ class TestValidation:
         assert anim.generated_for == "color_pop"
 
     def test_missing_code_raises(self):
+        """A response without code is rejected."""
         with pytest.raises(ValueError, match="code"):
             _validate_animation_response({"duration_ms": 1000})
 
     def test_empty_code_raises(self):
+        """A response with empty code is rejected."""
         with pytest.raises(ValueError, match="code"):
             _validate_animation_response({"code": "", "duration_ms": 1000})
 
     def test_default_duration(self):
+        """A missing duration defaults to 1200 ms."""
         anim = _validate_animation_response({
             "code": "function animate(buf, PW, PH, t) {}",
         })
         assert anim.duration_ms == 1200
 
     def test_non_integer_duration_coerced(self):
+        """A float duration is truncated to an integer."""
         anim = _validate_animation_response({
             "code": "function animate(buf, PW, PH, t) {}",
             "duration_ms": 1500.5,
@@ -350,6 +370,7 @@ class TestGenerateAnimation:
         assert cache.has("rabbit_01.body", "PROPERTY_COLOR")
 
     def test_gemini_called_with_correct_model(self):
+        """generate_animation calls Gemini with the expected model and API key."""
         cache = AnimationCache()
         mock_client = _make_mock_client(FAKE_ANIMATION_RESPONSE)
 

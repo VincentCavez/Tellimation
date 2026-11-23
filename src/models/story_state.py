@@ -38,6 +38,7 @@ class StoryState(BaseModel):
         sprite_code: Optional[Dict[str, Any]] = None,
         accepted_utterances: Optional[List[str]] = None,
     ) -> None:
+        """Append a scene (text, manifest, optional sprites and accepted utterances) to the story."""
         self.scenes.append({
             "scene_id": scene_id,
             "narrative_text": narrative_text,
@@ -81,6 +82,7 @@ class StoryState(BaseModel):
             }
 
     def get_entity_sprite(self, entity_id: str) -> Optional[Union[str, Dict[str, Any]]]:
+        """Return the sprite code of an active entity, or None if absent or empty."""
         entity = self.active_entities.get(entity_id)
         if entity is None:
             return None

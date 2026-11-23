@@ -16,6 +16,9 @@ const PH = Math.ceil(SOURCE_H / K);       // 180  — art grid height
 // ---------------------------------------------------------------------------
 
 class PixelBuffer {
+  /**
+   * Create an empty width x height pixel grid (defaults to the art grid PW x PH).
+   */
   constructor(width = PW, height = PH) {
     this.width = width;
     this.height = height;
@@ -24,6 +27,9 @@ class PixelBuffer {
     this.clear();
   }
 
+  /**
+   * Reset every pixel to black with no entity tag, and drop stored entity layers.
+   */
   clear() {
     for (let i = 0; i < this.data.length; i++) {
       this.data[i] = { r: 0, g: 0, b: 0, e: '', _br: 0, _bg: 0, _bb: 0, _be: '' };
@@ -71,10 +77,16 @@ class PixelBuffer {
 
   // -- internal helpers -----------------------------------------------------
 
+  /**
+   * True if (x, y) lies inside the grid.
+   */
   _inBounds(x, y) {
     return x >= 0 && x < this.width && y >= 0 && y < this.height;
   }
 
+  /**
+   * Set the pixel at (x, y) to the given color and entity tag (rounded, bounds-checked).
+   */
   _set(x, y, r, g, b, entityId) {
     x = Math.round(x);
     y = Math.round(y);
@@ -86,12 +98,18 @@ class PixelBuffer {
     this.data[idx].e = entityId;
   }
 
-  // -- primitive API (matches CLAUDE.md spec) --------------------------------
+  // -- primitive API -------------------------------------------------------------
 
+  /**
+   * Draw a single pixel tagged with entityId.
+   */
   px(x, y, r, g, b, entityId) {
     this._set(x, y, r, g, b, entityId);
   }
 
+  /**
+   * Fill a width x height rectangle with top-left corner (x, y).
+   */
   rect(x, y, width, height, r, g, b, entityId) {
     x = Math.round(x);
     y = Math.round(y);
@@ -102,6 +120,9 @@ class PixelBuffer {
     }
   }
 
+  /**
+   * Fill a circle of the given radius centered on (cx, cy).
+   */
   circ(cx, cy, radius, r, g, b, entityId) {
     cx = Math.round(cx);
     cy = Math.round(cy);
@@ -116,6 +137,9 @@ class PixelBuffer {
     }
   }
 
+  /**
+   * Fill an ellipse with radii rx, ry centered on (cx, cy).
+   */
   ellip(cx, cy, rx, ry, r, g, b, entityId) {
     cx = Math.round(cx);
     cy = Math.round(cy);
@@ -131,6 +155,9 @@ class PixelBuffer {
     }
   }
 
+  /**
+   * Fill a triangle given its three vertices.
+   */
   tri(x1, y1, x2, y2, x3, y3, r, g, b, entityId) {
     // Scanline fill via bounding box + barycentric test
     const minX = Math.floor(Math.min(x1, x2, x3));
@@ -153,6 +180,9 @@ class PixelBuffer {
     }
   }
 
+  /**
+   * Draw a one-pixel line from (x1, y1) to (x2, y2).
+   */
   line(x1, y1, x2, y2, r, g, b, entityId) {
     // Bresenham's line algorithm
     x1 = Math.round(x1);
@@ -174,6 +204,9 @@ class PixelBuffer {
     }
   }
 
+  /**
+   * Draw a line of the given width from (x1, y1) to (x2, y2) as a filled quad.
+   */
   thickLine(x1, y1, x2, y2, width, r, g, b, entityId) {
     const half = width / 2;
     // Direction perpendicular to the line
@@ -210,6 +243,9 @@ class PixelBuffer {
     );
   }
 
+  /**
+   * Draw an arc outline of the given radius between startAngle and endAngle (radians).
+   */
   arc(cx, cy, radius, startAngle, endAngle, r, g, b, entityId) {
     cx = Math.round(cx);
     cy = Math.round(cy);
@@ -236,6 +272,9 @@ class PixelBuffer {
 
   // -- query API ------------------------------------------------------------
 
+  /**
+   * Return a copy of {r, g, b, e} at (x, y); black with empty entity if out of bounds.
+   */
   getPixel(x, y) {
     x = Math.round(x);
     y = Math.round(y);
@@ -244,6 +283,9 @@ class PixelBuffer {
     return { r: p.r, g: p.g, b: p.b, e: p.e };
   }
 
+  /**
+   * Return buffer indices of all pixels whose entity is prefix or one of its sub-entities.
+   */
   getPixelsForPrefix(prefix) {
     const indices = [];
     for (let i = 0; i < this.data.length; i++) {
@@ -255,6 +297,9 @@ class PixelBuffer {
     return indices;
   }
 
+  /**
+   * Bounding box {x1, y1, x2, y2} of an entity and its sub-entities, or null if absent.
+   */
   getEntityBounds(prefix) {
     let x1 = this.width, y1 = this.height, x2 = -1, y2 = -1;
     for (let i = 0; i < this.data.length; i++) {
@@ -272,6 +317,9 @@ class PixelBuffer {
     return { x1, y1, x2, y2 };
   }
 
+  /**
+   * Store the current colors as the background reference (_br/_bg/_bb) used when blanking entities.
+   */
   snapshotBackground() {
     for (let i = 0; i < this.data.length; i++) {
       const p = this.data[i];
@@ -281,6 +329,9 @@ class PixelBuffer {
     }
   }
 
+  /**
+   * Store the current colors as the baseline (_r/_g/_b) that restore() returns to; exposes entity layers on data.
+   */
   snapshot() {
     for (let i = 0; i < this.data.length; i++) {
       const p = this.data[i];
@@ -291,6 +342,9 @@ class PixelBuffer {
     this.data._entityLayers = this.entityLayers;
   }
 
+  /**
+   * Reset pixel colors to the values saved by snapshot().
+   */
   restore() {
     for (let i = 0; i < this.data.length; i++) {
       const p = this.data[i];
@@ -401,6 +455,9 @@ class PixelBuffer {
 // ---------------------------------------------------------------------------
 
 class Renderer {
+  /**
+   * Bind the renderer to a canvas (sized to the source resolution, pixelated) and a PixelBuffer.
+   */
   constructor(canvas, pixelBuffer) {
     this.canvas = canvas;
     this.buf = pixelBuffer;
@@ -416,6 +473,9 @@ class Renderer {
     this.ctx.imageSmoothingEnabled = false;
   }
 
+  /**
+   * Upscale the PixelBuffer to the canvas, drawing each art pixel as a K x K block.
+   */
   render() {
     const artW = this.buf.width;   // 560
     const artH = this.buf.height;  // 360
@@ -454,10 +514,16 @@ class Renderer {
 // ---------------------------------------------------------------------------
 
 class EntityRegistry {
+  /**
+   * Wrap a PixelBuffer to query the entities tagged in it.
+   */
   constructor(pixelBuffer) {
     this.buf = pixelBuffer;
   }
 
+  /**
+   * Return the sorted list of distinct entity ids present in the buffer.
+   */
   getAllEntities() {
     const ids = new Set();
     for (let i = 0; i < this.buf.data.length; i++) {
@@ -467,6 +533,9 @@ class EntityRegistry {
     return Array.from(ids).sort();
   }
 
+  /**
+   * Build a nested object tree of entities from their dot-separated ids.
+   */
   getTree() {
     const entities = this.getAllEntities();
     const tree = {};
@@ -482,6 +551,9 @@ class EntityRegistry {
     return tree;
   }
 
+  /**
+   * Return the sorted ids one level below prefix (top-level ids when prefix is empty).
+   */
   getChildren(prefix) {
     const entities = this.getAllEntities();
     const depth = prefix ? prefix.split('.').length : 0;
@@ -510,6 +582,9 @@ class EntityRegistry {
 // executeSpriteCode
 // ---------------------------------------------------------------------------
 
+/**
+ * Run legacy sprite JS code with the drawing primitives bound; errors are logged, not thrown.
+ */
 function executeSpriteCode(code, pixelBuffer) {
   try {
     const fn = new Function(
@@ -540,6 +615,9 @@ function executeSpriteCode(code, pixelBuffer) {
 // executeRawSprite — render a raw_sprite with direct RGB pixels + entity masks
 // ---------------------------------------------------------------------------
 
+/**
+ * Draw a raw_sprite ({x, y, w, h, pixels, mask}) into the buffer, skipping transparent pixels.
+ */
 function executeRawSprite(spriteData, pixelBuffer) {
   const { x, y, w, h, pixels, mask } = spriteData;
   if (!pixels || !w || !h) return;
@@ -560,6 +638,9 @@ function executeRawSprite(spriteData, pixelBuffer) {
 // executeImageBackground — render a base64 PNG directly into the pixel buffer
 // ---------------------------------------------------------------------------
 
+/**
+ * Decode a base64 PNG background into the buffer (tagging pixels from the mask or 'bg'); returns a Promise.
+ */
 function executeImageBackground(spriteData, pixelBuffer) {
   // Async: Image loading is async in browsers.
   var b64 = spriteData.image_base64;
@@ -612,6 +693,9 @@ function executeImageBackground(spriteData, pixelBuffer) {
 // renderSpriteEntry — detect format and dispatch to the right renderer
 // ---------------------------------------------------------------------------
 
+/**
+ * Render a sprite entry according to its format; returns a Promise for image backgrounds.
+ */
 function renderSpriteEntry(eid, entry, pixelBuffer) {
   if (!entry) return;
   if (entry.format === 'raw_sprite') {
@@ -637,10 +721,16 @@ function renderSpriteEntry(eid, entry, pixelBuffer) {
  */
 var tempSprites = {};
 
+/**
+ * Register a temporary sprite under id.
+ */
 function addTempSprite(id, rawSpriteData) {
   tempSprites[id] = rawSpriteData;
 }
 
+/**
+ * Remove the temporary sprite with this id.
+ */
 function removeTempSprite(id) {
   delete tempSprites[id];
 }

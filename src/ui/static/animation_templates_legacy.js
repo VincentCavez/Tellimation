@@ -252,6 +252,7 @@ AnimationTemplates.register('ghost_outline', function(params) {
   var ghostW = 0, ghostH = 0;
   var ghostScale = 1;
 
+  // Load the ghost image once and extract its opaque mask and contour (async, via onload).
   function loadGhostImage() {
     if (ghostLoading || !ghostImageUrl) return;
     ghostLoading = true;

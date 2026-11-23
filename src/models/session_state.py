@@ -17,6 +17,7 @@ class SessionState:
     """Holds all mutable state for a single WebSocket session."""
 
     def __init__(self, api_key: str, participant_id: str) -> None:
+        """Store the API key and participant id and make sure the participant's data folder exists."""
         self.api_key = api_key
         self.participant_id = participant_id
 

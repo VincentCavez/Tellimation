@@ -14,6 +14,7 @@
   var storyContainer = document.getElementById('story-thumbnails');
   var completed = JSON.parse(sessionStorage.getItem('study_completed') || '{}');
 
+  // Create an empty thumbnail placeholder element.
   function createPlaceholder() {
     var el = document.createElement('div');
     el.className = 'thumbnail-placeholder';
@@ -120,6 +121,7 @@
       for (var j = 0; j < 4; j++) storyContainer.appendChild(createPlaceholder());
     });
 
+  // Return the label of the first story in the assigned order that is not completed, or null.
   function getNextStory() {
     if (!assignmentData) return null;
     for (var i = 0; i < assignmentData.order.length; i++) {
@@ -129,6 +131,7 @@
     return null;
   }
 
+  // Go to the story page for the given label, with its animated flag, scene count and name in the URL.
   function navigateToStory(label) {
     if (!assignmentData) return;
     var storyData = assignmentData.stories[label];
@@ -141,6 +144,7 @@
       + '&name=' + name;
   }
 
+  // Update the Ready button and slot dimming: training first, then only the next story is unlocked.
   function updateReadyButton() {
     var btn = document.getElementById('btn-ready');
     var next = getNextStory();
@@ -208,6 +212,7 @@
 
   var wordTimers = [];
 
+  // Cancel all pending word-reveal timers.
   function clearWordTimers() {
     for (var i = 0; i < wordTimers.length; i++) clearTimeout(wordTimers[i]);
     wordTimers = [];
@@ -218,6 +223,7 @@
   var audioDurations = []; // per-instruction audio durations
   var durationsLoaded = 0;
 
+  // Seconds per character for the word reveal (from total audio duration, 0.05 fallback).
   function computeCharRate() {
     if (totalAudioDuration > 0 && totalCharCount > 0) {
       return totalAudioDuration / totalCharCount; // seconds per character
@@ -225,6 +231,7 @@
     return 0.05; // fallback: 50ms per char
   }
 
+  // Reveal the words of an instruction one by one, paced by character count.
   function revealWords(slot, instrIdx) {
     clearWordTimers();
     var spans = slot.querySelectorAll('.instr-word');
@@ -240,6 +247,7 @@
     }
   }
 
+  // Build the word spans for instruction idx, show its panel and play its audio.
   function showInstruction(idx) {
     var slotId = 'instr-slot-' + idx;
     var slot = document.getElementById(slotId);
@@ -267,6 +275,7 @@
     playInstructionAudio(idx, slot);
   }
 
+  // Play the audio of instruction idx and start the word reveal once it can play; reveals all words if playback fails.
   function playInstructionAudio(idx, slot) {
     if (currentAudio) { currentAudio.pause(); currentAudio = null; }
     clearWordTimers();
@@ -285,6 +294,7 @@
     }
   }
 
+  // Hide the words of the current instruction and play it again.
   function replayCurrentInstruction() {
     var slotId = 'instr-slot-' + instrIndex;
     var slot = document.getElementById(slotId);
@@ -295,6 +305,7 @@
     playInstructionAudio(instrIndex, slot);
   }
 
+  // Fetch the instruction texts and audio; show the initial instructions or the transitional messages as needed.
   function initInstructions() {
     // Always fetch — we need the data for post-training too
     fetch('/api/study/instructions')
@@ -349,6 +360,7 @@
           })(ai);
         }
 
+        // Show the first instruction and wire the Next and Replay buttons (called once all audio durations are known).
         function startInstructions() {
         // Show first instruction
         showInstruction(0);
@@ -393,6 +405,7 @@
       });
   }
 
+  // Set the Next button label to "Got it!" on the last instruction, "Next" otherwise.
   function updateNextButton() {
     var btns = document.querySelectorAll('.btn-next-panel');
     for (var i = 0; i < btns.length; i++) {
@@ -426,6 +439,7 @@
     return count;
   }
 
+  // Show the between-stories message once for each newly completed story (1 to 3).
   function checkBetweenStories() {
     if (!betweenStoriesParagraph) return;
     if (!postTrainingShown) return; // post-training takes priority
@@ -484,6 +498,7 @@
     }
   }
 
+  // Show a message with its audio in the top-left instruction panel; onDismiss is called right away to mark it as shown.
   function showCenterMessage(text, audioUrl, onDismiss) {
     // Use top-left panel (same position as initial instructions)
     var panel = document.getElementById('instruction-left');

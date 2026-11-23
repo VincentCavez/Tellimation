@@ -28,6 +28,10 @@ var HEADERS = {
     'condition', 'likert_rating', 'pipeline_intent', 'response_time_ms', 'timestamp']
 };
 
+/**
+ * Creates the sheets in HEADERS (with a bold frozen header row) and fills the "state" sheet
+ * with `nSlots` slot rows, `perList` slots per list (defaults 40 and 10).
+ */
 function setupSheets(nSlots, perList) {
   nSlots = nSlots || 40;
   perList = perList || 10;
@@ -50,6 +54,7 @@ function setupStateSheet(nSlots, perList) {
   setupSheets(nSlots, perList);
 }
 
+/** Web app entry point: routes the JSON body's `action` (assign, respond, complete) to its handler and returns the result as JSON. */
 function doPost(e) {
   var data = JSON.parse(e.postData.contents);
   var action = data.action;
@@ -181,6 +186,7 @@ function handleRespond(data) {
 // (the study takes ~5 min; Prolific's own timeout is longer).
 var STALE_MINUTES = 30;
 
+/** Index of the first state row with a slot number and no prolific_id, or -1. */
 function findFreeRow(values) {
   for (var i = 1; i < values.length; i++) {
     if (values[i][0] !== '' && !values[i][3]) return i;   // prolific_id (D) empty
@@ -188,6 +194,7 @@ function findFreeRow(values) {
   return -1;
 }
 
+/** Index of the oldest assigned, uncompleted state row older than STALE_MINUTES, or -1. */
 function findStaleRow(values) {
   var cutoff = Date.now() - STALE_MINUTES * 60 * 1000;
   var best = -1, bestTime = Infinity;

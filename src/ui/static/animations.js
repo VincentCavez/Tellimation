@@ -6,6 +6,9 @@
 // ---------------------------------------------------------------------------
 
 class AnimationRunner {
+  /**
+   * Create a runner that animates on pixelBuffer and draws through renderer.
+   */
   constructor(pixelBuffer, renderer) {
     this.buf = pixelBuffer;
     this.renderer = renderer;
@@ -92,6 +95,9 @@ class AnimationRunner {
       const frameInterval = this.frameInterval || 0;
       let lastFrameTime = 0;
 
+      /**
+       * Per-frame callback: applies the animation at the elapsed normalized time and renders.
+       */
       const tick = (now) => {
         if (!this.isPlaying || !this.buf) return;
 
@@ -145,6 +151,9 @@ class AnimationRunner {
       ? codeOrSpec.duration_ms
       : (durationMs || 1200);
 
+    /**
+     * Play the animation once and schedule the next iteration while looping.
+     */
     var runOnce = function() {
       if (!self._looping) return;
       self.play(codeOrSpec, dur).then(function() {
@@ -170,10 +179,16 @@ class AnimationRunner {
       totalDur += (steps[i].duration_ms || 1200);
     }
 
+    /**
+     * Play every step in order, then wait 2x the total duration and restart while looping.
+     */
     var runSequence = function() {
       if (!self._looping) return;
 
       var idx = 0;
+      /**
+       * Play the next step and chain the following one when it finishes.
+       */
       var runStep = function() {
         if (!self._looping || idx >= steps.length) {
           // All steps done — wait 2× total duration, then restart
@@ -209,12 +224,18 @@ class AnimationRunner {
     this.stop();
   }
 
+  /**
+   * Stop the current animation if one is playing.
+   */
   stop() {
     if (this.isPlaying) {
       this._finish();
     }
   }
 
+  /**
+   * End playback: cancel the frame request, restore the original pixels and resolve the pending promise.
+   */
   _finish() {
     this.isPlaying = false;
     if (this._rafId !== null) {

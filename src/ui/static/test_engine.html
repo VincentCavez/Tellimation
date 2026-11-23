@@ -50,6 +50,7 @@
     const results = document.getElementById('results');
     let passed = 0, failed = 0;
 
+    // Appends a PASS/FAIL line to the results list and updates the counters.
     function assert(condition, label) {
       const el = document.createElement('div');
       el.className = 'test';

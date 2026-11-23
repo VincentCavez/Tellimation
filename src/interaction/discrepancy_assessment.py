@@ -148,6 +148,7 @@ def _build_misl_taxonomy() -> str:
 def _build_names_text(
     character_names: Optional[Dict[str, str]],
 ) -> str:
+    """Format the entity-to-name mapping as prompt lines (empty text when no names are given)."""
     if character_names:
         names_lines = []
         for eid, name in character_names.items():
@@ -157,6 +158,7 @@ def _build_names_text(
 
 
 def _build_story_text(story_so_far: List[str]) -> str:
+    """Format the child's previous utterances as a numbered list for the prompt."""
     if story_so_far:
         return "\n".join(
             f'{i+1}. "{utt}"' for i, utt in enumerate(story_so_far)
@@ -233,6 +235,7 @@ _CORRECTION_INTENTS_TEXT: Optional[str] = None
 
 
 def _get_correction_intents() -> str:
+    """Return the correction intents prompt text, loading it on first use."""
     global _CORRECTION_INTENTS_TEXT
     if _CORRECTION_INTENTS_TEXT is None:
         _CORRECTION_INTENTS_TEXT = _load_correction_intents()
@@ -348,6 +351,7 @@ _SUGGESTION_INTENTS_ALL: Optional[List[Dict[str, Any]]] = None
 
 
 def _get_suggestion_intents_all() -> List[Dict[str, Any]]:
+    """Return all suggestion intents, loading them on first use."""
     global _SUGGESTION_INTENTS_ALL
     if _SUGGESTION_INTENTS_ALL is None:
         _SUGGESTION_INTENTS_ALL = _load_suggestion_intents_all()
@@ -713,6 +717,7 @@ async def assess_utterance(
 
     # --- Run correction, enrichment, and resolution in parallel ---
     async def _run_corrections():
+        """Run the correction assessment, returning the result of assess_corrections."""
         try:
             return await assess_corrections(
                 api_key=api_key,
@@ -727,6 +732,7 @@ async def assess_utterance(
             return [], []
 
     async def _run_enrichment():
+        """Run the enrichment assessment, returning the result of assess_enrichment."""
         try:
             return await assess_enrichment(
                 api_key=api_key,
@@ -744,6 +750,7 @@ async def assess_utterance(
             return []
 
     async def _run_resolution():
+        """Run the resolution assessment, returning the result of assess_resolution."""
         return await assess_resolution(
             api_key=api_key,
             utterance_text=utterance_text,

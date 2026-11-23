@@ -97,6 +97,9 @@ var ScenePicker = (function() {
     }
     entityEids.sort(function(a, b) { return (depthMap[a] || 0) - (depthMap[b] || 0); });
 
+    /**
+     * Render the entity sprites into fullBuf, downsample it and draw the result on the thumbnail canvas.
+     */
     function renderToCanvas(fullBuf) {
       fullBuf.snapshotBackground();
       // Render all entity sprites (sync)

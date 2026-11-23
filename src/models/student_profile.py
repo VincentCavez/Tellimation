@@ -159,6 +159,7 @@ class StudentProfile(BaseModel):
     _recent_errors: Dict[str, List[int]] = {}
 
     def model_post_init(self, __context: object) -> None:
+        """Initialize the private recent-errors history."""
         self._recent_errors = {}
 
     # ------------------------------------------------------------------
@@ -210,6 +211,7 @@ class StudentProfile(BaseModel):
     # ------------------------------------------------------------------
 
     def record_errors(self, discrepancies: List[Discrepancy]) -> None:
+        """Count the errors of one utterance, flag entities hit repeatedly and record a 0 for absent error types."""
         self.total_utterances += 1
         entity_hit: Dict[str, int] = {}
         for d in discrepancies:
@@ -230,6 +232,7 @@ class StudentProfile(BaseModel):
                 self._recent_errors[error_type].append(0)
 
     def update_trends(self) -> None:
+        """Recompute each error type's trend from a sliding window of recent utterances."""
         window = 5
         self.error_trend = {}
         for error_type, history in self._recent_errors.items():
@@ -344,6 +347,7 @@ class StudentProfile(BaseModel):
         return ineffective
 
     def get_weak_areas(self) -> List[str]:
+        """Return the error types with the highest error rates per utterance."""
         if self.total_utterances == 0:
             return []
         error_rates = {
@@ -354,6 +358,7 @@ class StudentProfile(BaseModel):
         return [et for et in sorted_types if error_rates[et] > 0.2]
 
     def to_prompt_context(self) -> str:
+        """Format the profile as a prompt section for the assessment model."""
         lines = ["## Student Profile"]
         lines.append(f"Age: {self.age}")
         lines.append(f"Utterances so far: {self.total_utterances}")

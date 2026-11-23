@@ -27,6 +27,7 @@ class NEG(BaseModel):
     skill_coverage_check: str = "PENDING"
 
     def get_targets_for_entity(self, entity_id: str) -> List[NarrativeTarget]:
+        """Return the narrative targets attached to the given entity."""
         return [t for t in self.targets if t.entity_id == entity_id]
 
 
@@ -96,9 +97,11 @@ class SceneNEG(BaseModel):
     min_coverage: float = 0.7
 
     def get_waypoints_by_salience(self) -> List[NarrativeWaypoint]:
+        """Return the waypoints sorted by decreasing salience."""
         return sorted(self.waypoints, key=lambda w: w.salience, reverse=True)
 
     def get_critical_waypoints(self) -> List[NarrativeWaypoint]:
+        """Return the waypoints flagged as critical."""
         return [w for w in self.waypoints if w.is_critical]
 
 

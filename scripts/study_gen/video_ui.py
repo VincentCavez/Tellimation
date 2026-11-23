@@ -135,11 +135,13 @@ def discover_scenes() -> list[dict[str, Any]]:
 
 @app.route("/")
 def index():
+    """Serve the video preview page."""
     return send_file(str(HTML_TEMPLATE_PATH), mimetype="text/html")
 
 
 @app.route("/api/scenes")
 def api_scenes():
+    """Return the discovered Prolific scenes."""
     return jsonify(discover_scenes())
 
 
@@ -229,6 +231,7 @@ def api_scene_data(story_id: str):
 
 @app.route("/image/<story_id>/<path:subpath>")
 def serve_image(story_id: str, subpath: str):
+    """Serve an image of a story from its folder."""
     img_path = PROLIFIC_GEN / story_id / subpath
     if not img_path.exists():
         return "Not found", 404
@@ -302,6 +305,7 @@ def api_convert_mp4():
 
 
 def main():
+    """Command-line entry point: start the Flask server."""
     import argparse
     parser = argparse.ArgumentParser(description="Video preview & download UI")
     parser.add_argument("--port", type=int, default=5557)

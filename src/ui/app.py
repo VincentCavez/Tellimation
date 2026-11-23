@@ -72,9 +72,21 @@ from src.persistence import (
     load_study_log,
     push_study_scenes,
     save_and_push_questionnaire,
-    save_registration,
     push_to_google_sheet,
 )
+from src import billing
+from src.accounts import (
+    GOOGLE_CLIENT_ID,
+    FLUSH_SECONDS,
+    SESSION_COOKIE,
+    SESSION_MAX_AGE,
+    make_session,
+    participant_for,
+    read_session,
+    store as account_store,
+    verify_google_credential,
+)
+from config.pricing import FREE_CREDIT_USD
 from google import genai
 from google.genai import types
 
@@ -199,6 +211,7 @@ def _resolve_piece_image_url(story_key: str, entity_id: str) -> str:
 
 
 def _find_data_dir() -> Path | None:
+    """Walk up from BASE_DIR to find the data/ directory, or return None."""
     p = BASE_DIR.resolve()
     for _ in range(8):
         if (p / "data").exists():
@@ -208,6 +221,7 @@ def _find_data_dir() -> Path | None:
 
 
 def _save_simulation_cache(scene: dict) -> None:
+    """Save the simulation scene cache and a numbered manifest + NEG folder under data/."""
     data_dir = _find_data_dir()
     if data_dir is None:
         logger.warning("Could not find data/ directory to save simulation cache")
@@ -233,6 +247,26 @@ def _save_simulation_cache(scene: dict) -> None:
     logger.info("Simulation scene manifest+NEG saved to %s", folder)
 
 app = FastAPI(title="Tellimations")
+
+
+async def _flush_accounts_loop() -> None:
+    """Write metered spend to the accounts Sheet every FLUSH_SECONDS."""
+    while True:
+        await asyncio.sleep(FLUSH_SECONDS)
+        await asyncio.to_thread(account_store.flush)
+
+
+@app.on_event("startup")
+async def _start_account_flush() -> None:
+    """Start the periodic accounts flush task at startup."""
+    asyncio.create_task(_flush_accounts_loop())
+
+
+@app.on_event("shutdown")
+async def _final_account_flush() -> None:
+    """Flush pending account changes at shutdown."""
+    await asyncio.to_thread(account_store.flush)
+
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 # Serve HD study images from data/study_gen/
@@ -257,44 +291,53 @@ if _study_assets_dir and (_study_assets_dir / "oral_instructions").is_dir():
 # HTML page routes
 # ---------------------------------------------------------------------------
 
-_PARTICIPANT_ID_RE = re.compile(r"^[A-Za-z0-9_-]{1,40}$")
-
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
     """SHIELD shield icon, for pages that don't link the SVG one."""
     return FileResponse(STATIC_DIR / "favicon.ico", media_type="image/x-icon")
 
 
-# Set by /api/register; its value is the visitor's participant id.
-_REGISTERED_COOKIE = "shield_participant"
+def _signed_in(cookies) -> Optional[str]:
+    """Participant id of the signed-in, registered visitor, else None.
+
+    Blocking on the very first call (the store reads the Sheet once).
+    """
+    participant = read_session(cookies.get(SESSION_COOKIE))
+    if participant and account_store.get(participant) is not None:
+        return participant
+    return None
 
 
 @app.get("/", response_class=HTMLResponse)
 async def home_page(request: Request):
-    """Home: every story (2 practices + A-D) playable, once registered."""
-    if not _PARTICIPANT_ID_RE.match(request.cookies.get(_REGISTERED_COOKIE, "")):
+    """Home: every story (2 practices + A-D) playable, once signed in."""
+    if not await asyncio.to_thread(_signed_in, request.cookies):
         return RedirectResponse("/login", status_code=302)
     return (TEMPLATES_DIR / "home.html").read_text()
 
 
 @app.get("/login", response_class=HTMLResponse)
 async def login_page():
-    """Registration: email + interest in exchange for free API credit."""
-    return (TEMPLATES_DIR / "register.html").read_text()
+    """Sign in with Google + interest, in exchange for free API credit."""
+    html = (TEMPLATES_DIR / "register.html").read_text()
+    return html.replace("{{GOOGLE_CLIENT_ID}}", GOOGLE_CLIENT_ID)
 
 
 @app.get("/selection", response_class=HTMLResponse)
 async def selection_page():
+    """Serve the scene selection page."""
     return (TEMPLATES_DIR / "selection.html").read_text()
 
 
 @app.get("/story", response_class=HTMLResponse)
 async def story_page():
+    """Serve the story page."""
     return (TEMPLATES_DIR / "story.html").read_text()
 
 
 @app.get("/admin", response_class=HTMLResponse)
 async def admin_page():
+    """Serve the admin page."""
     return (TEMPLATES_DIR / "admin.html").read_text()
 
 
@@ -308,11 +351,13 @@ async def admin_page():
 LEGACY_STUDY_ENABLED = False
 
 def _legacy_off() -> JSONResponse:
+    """Return the 404 response used when the legacy study flow is disabled."""
     return JSONResponse(status_code=404, content={"error": "Study flow disabled"})
 
 
 @app.get("/study", response_class=HTMLResponse)
 async def study_login_page():
+    """Serve the legacy study login page, or redirect home when the legacy flow is disabled."""
     if not LEGACY_STUDY_ENABLED:
         return RedirectResponse("/", status_code=302)
     return (TEMPLATES_DIR / "legacy" / "study_login.html").read_text()
@@ -320,6 +365,7 @@ async def study_login_page():
 
 @app.get("/study/landing", response_class=HTMLResponse)
 async def study_landing_page():
+    """Serve the legacy study landing page, or redirect home when the legacy flow is disabled."""
     if not LEGACY_STUDY_ENABLED:
         return RedirectResponse("/", status_code=302)
     return (TEMPLATES_DIR / "legacy" / "study_landing.html").read_text()
@@ -327,6 +373,7 @@ async def study_landing_page():
 
 @app.get("/study/questionnaire", response_class=HTMLResponse)
 async def study_questionnaire_page():
+    """Serve the study questionnaire page, or redirect home when the legacy flow is disabled."""
     if not LEGACY_STUDY_ENABLED:
         return RedirectResponse("/", status_code=302)
     return (TEMPLATES_DIR / "study_questionnaire.html").read_text()
@@ -334,6 +381,7 @@ async def study_questionnaire_page():
 
 @app.get("/study/story", response_class=HTMLResponse)
 async def study_story_page():
+    """Serve the study story page."""
     return (TEMPLATES_DIR / "study_story.html").read_text()
 
 
@@ -479,29 +527,65 @@ async def study_questionnaire_submit(request: Request):
     return JSONResponse(content={"status": "ok", "pushed": ok})
 
 
-_EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 _INTEREST_MAX = 1000
 
 
-@app.post("/api/register")
-async def register(request: Request):
-    """Login page submit: store email + interest, then open the home."""
+@app.post("/api/auth/google")
+async def auth_google(request: Request):
+    """Login page: verify the Google ID token, register on first visit, open a session.
+
+    A first visit needs `interest`; a returning visitor only signs in.
+    """
     body = await request.json()
-    participant = str(body.get("participant", "")).strip()
-    email = str(body.get("email", "")).strip()
-    interest = str(body.get("interest", "")).strip()
+    interest = str(body.get("interest", "")).strip()[:_INTEREST_MAX]
+    try:
+        user = await asyncio.to_thread(verify_google_credential, str(body.get("credential", "")))
+    except ValueError as exc:
+        return JSONResponse(status_code=401, content={"error": str(exc) or "Google sign-in failed."})
 
-    if not participant.startswith("free-") or not _PARTICIPANT_ID_RE.match(participant):
-        return JSONResponse(status_code=400, content={"error": "Invalid participant"})
-    if len(email) > 254 or not _EMAIL_RE.match(email):
-        return JSONResponse(status_code=400, content={"error": "Please enter a valid email address."})
-    if not interest:
-        return JSONResponse(status_code=400, content={"error": "Please tell us why you are interested."})
+    participant = participant_for(user["sub"])
+    if await asyncio.to_thread(account_store.get, participant) is None:
+        if not interest:
+            return JSONResponse(status_code=400, content={
+                "error": "Please tell us why you are interested in SHIELD.",
+                "need_interest": True,
+            })
+        try:
+            await asyncio.to_thread(account_store.register, participant,
+                                    user["email"], user["name"], interest)
+        except Exception:
+            logger.exception("Registration failed for %s", user["email"])
+            return JSONResponse(status_code=503, content={
+                "error": "We could not save your registration. Please try again later."})
 
-    ok = await asyncio.to_thread(save_registration, participant, email, interest[:_INTEREST_MAX])
-    resp = JSONResponse(content={"status": "ok", "pushed": ok})
-    resp.set_cookie(_REGISTERED_COOKIE, participant, max_age=365 * 24 * 3600, samesite="lax")
+    resp = JSONResponse(content={"status": "ok"})
+    resp.set_cookie(SESSION_COOKIE, make_session(participant), max_age=SESSION_MAX_AGE,
+                    httponly=True, samesite="lax", secure=request.url.scheme == "https")
     return resp
+
+
+@app.post("/api/logout")
+async def logout():
+    """Clear the session cookie."""
+    resp = JSONResponse(content={"status": "ok"})
+    resp.delete_cookie(SESSION_COOKIE)
+    return resp
+
+
+@app.get("/api/me")
+async def me(request: Request):
+    """The signed-in visitor: participant id (logs) and free credit left."""
+    participant = await asyncio.to_thread(_signed_in, request.cookies)
+    if not participant:
+        return JSONResponse(status_code=401, content={"error": "Not signed in"})
+    rec = account_store.get(participant)
+    return {
+        "participant": participant,
+        "email": rec["email"],
+        "name": rec["name"],
+        "credit_total": FREE_CREDIT_USD,
+        "credit_left": round(max(0.0, FREE_CREDIT_USD - rec["spend_usd"]), 2),
+    }
 
 
 # Wave 2 gate: IDs 1-8 were consumed by study 1 (spring 2026); reusing one
@@ -748,10 +832,11 @@ async def study_scene(story: str, scene: int):
 
 
 @app.get("/api/analysis.pdf")
-async def analysis_pdf(participant: str):
-    """Readable PDF of a participant's study logs (home page download)."""
-    if not _PARTICIPANT_ID_RE.match(participant):
-        return JSONResponse(status_code=400, content={"error": "Invalid participant"})
+async def analysis_pdf(request: Request):
+    """Readable PDF of the signed-in visitor's study logs (home page download)."""
+    participant = await asyncio.to_thread(_signed_in, request.cookies)
+    if not participant:
+        return JSONResponse(status_code=401, content={"error": "Not signed in"})
     pdf = await asyncio.to_thread(build_analysis_pdf, participant)
     filename = f"shield_analysis_{datetime.now().strftime('%Y-%m-%d')}.pdf"
     return Response(
@@ -822,9 +907,11 @@ class _WebSocketAdapter:
     """Adapts FastAPI WebSocket to a simpler interface."""
 
     def __init__(self, ws: WebSocket) -> None:
+        """Wrap a WebSocket so sends are skipped once it is disconnected."""
         self._ws = ws
 
     async def send_json(self, data: Dict[str, Any]) -> None:
+        """Send JSON to the client if still connected, ignoring send errors."""
         try:
             if self._ws.client_state == WebSocketState.CONNECTED:
                 await self._ws.send_json(data)
@@ -832,6 +919,7 @@ class _WebSocketAdapter:
             pass  # client disconnected
 
     async def send_bytes(self, data: bytes) -> None:
+        """Send bytes to the client if still connected, ignoring send errors."""
         try:
             if self._ws.client_state == WebSocketState.CONNECTED:
                 await self._ws.send_bytes(data)
@@ -858,6 +946,13 @@ async def study_websocket_endpoint(websocket: WebSocket):
     api_key = os.environ.get("GEMINI_API_KEY", "")
     participant = websocket.query_params.get("participant", "")
     story_key = websocket.query_params.get("story", "")
+
+    # Signed-in visitor: their account owns the logs and pays the API calls
+    account = await asyncio.to_thread(_signed_in, websocket.cookies)
+    if account:
+        participant = account
+        account_store.touch(account)
+    billing.metered(account)
     is_animated = websocket.query_params.get("animated", "0") == "1"
 
     if not api_key:
@@ -955,10 +1050,13 @@ async def study_websocket_endpoint(websocket: WebSocket):
                 )
             except Exception:
                 logger.exception("Final Sheet push failed for participant=%s", participant)
+        if account:
+            await asyncio.to_thread(account_store.flush)
 
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
+    """Main WebSocket endpoint: handle one participant's session messages until disconnect."""
     await websocket.accept()
 
     api_key = os.environ.get("GEMINI_API_KEY", "")
@@ -969,6 +1067,8 @@ async def websocket_endpoint(websocket: WebSocket):
         await websocket.send_json({"type": "error", "message": "Missing API key"})
         await websocket.close()
         return
+
+    billing.metered(await asyncio.to_thread(_signed_in, websocket.cookies))
 
     session = SessionState(api_key, participant_id)
 
@@ -1113,6 +1213,7 @@ async def _handle_generate_initial_scenes(
     themes = random.sample(STORY_THEMES, min(n, len(STORY_THEMES)))
 
     async def _gen_one(index: int) -> None:
+        """Generate scene number index and send its result to the client."""
         try:
             theme = themes[index]
             t_scene = time.time()
@@ -1145,6 +1246,7 @@ async def _handle_generate_initial_scenes(
             })
 
             async def _progress_cb(step: str) -> None:
+                """Send a generation step update for this scene to the client."""
                 await ws.send_json({
                     "type": "generation_step",
                     "scene_index": index,
@@ -1327,6 +1429,7 @@ async def _handle_generate_scene(
         })
 
         async def _progress_cb(step: str) -> None:
+            """Send a generation step update to the client."""
             await ws.send_json({"type": "generation_step", "step": step})
 
         assets = await generate_scene_assets(
@@ -1698,6 +1801,7 @@ async def _handle_study_audio(
         # ── Step 4: Parallel paths ──
         # Path A: Corrections (Gemini)
         async def _run_corrections():
+            """Run the correction assessment on the transcription, returning the result of assess_corrections."""
             try:
                 return await assess_corrections(
                     api_key=session.api_key,
@@ -1713,6 +1817,7 @@ async def _handle_study_audio(
 
         # Path B: Deterministic selector → Enrichment (Gemini)
         async def _run_enrichment_path():
+            """Select MISL candidates and run the enrichment assessment (empty list without MISL targets)."""
             if not misl_targets:
                 return []
             macro_sel, micro_cands, sel_trace = select_misl_candidates(
@@ -1765,10 +1870,13 @@ async def _handle_study_audio(
 
         # Sanitize target_entities: map Gemini-invented IDs to valid ones
         from src.interaction.discrepancy_assessment import sanitize_target_entities
-        for d in corrections:
-            d.target_entities = sanitize_target_entities(d.target_entities, entities_in_scene or [])
-        for d in suggestions:
-            d.target_entities = sanitize_target_entities(d.target_entities, entities_in_scene or [])
+        # C3 (missing piece) targets an entity that is ABSENT from this scene:
+        # checking it against the scene's entities would always drop it, so it
+        # is checked against the story's other entities instead.
+        _absent_ids = [e for e in (_scene.get("characters") or {}) if e not in (entities_in_scene or [])]
+        for d in list(corrections) + list(suggestions):
+            valid_ids = _absent_ids if d.animation_id == "C3" and _absent_ids else (entities_in_scene or [])
+            d.target_entities = sanitize_target_entities(d.target_entities, valid_ids)
 
         # Register name assignments
         if name_assignments:
@@ -1885,8 +1993,7 @@ async def _handle_study_audio(
 
             # For animations with no targets → use ALL scene entities
             if not targets:
-                if scene_data and "entities_in_scene" in scene_data:
-                    targets = scene_data["entities_in_scene"]
+                targets = list(entities_in_scene or [])
 
             # Log with rationale + animation
             tag = "CORRECTION" if chosen_source == "error" else "SUGGESTION"
@@ -1917,10 +2024,12 @@ async def _handle_study_audio(
 
             # C3 missing_piece: the target entity is absent from this scene —
             # resolve its cut-out from another scene of the story so the piece
-            # can carry its silhouette
-            if template == "missing_piece" and targets:
+            # can carry its silhouette. Only the discrepancy's own target counts:
+            # the all-entities fallback above names entities that are present,
+            # and the piece is then drawn without a silhouette.
+            if template == "missing_piece" and chosen_disc.target_entities:
                 anim_params["pieceImageUrl"] = _resolve_piece_image_url(
-                    getattr(session, "study_story_key", ""), targets[0]
+                    getattr(session, "study_story_key", ""), chosen_disc.target_entities[0]
                 )
 
             # Send ONE animation — adapt params to template target expectations
@@ -2063,6 +2172,7 @@ async def _handle_audio(
 
         # ── Step 5: Parallel paths ──
         async def _run_corrections():
+            """Run the correction assessment on the transcription, returning the result of assess_corrections."""
             try:
                 return await assess_corrections(
                     api_key=session.api_key,
@@ -2077,6 +2187,7 @@ async def _handle_audio(
                 return [], []
 
         async def _run_enrichment_path():
+            """Select MISL candidates and run the enrichment assessment (empty list without MISL targets)."""
             if not misl_targets:
                 # No misl_targets → skip enrichment (no legacy fallback)
                 return []

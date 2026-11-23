@@ -22,6 +22,7 @@ from src.models.animation_cache import AnimationCache, CachedAnimation
 
 class TestScene:
     def test_entity_json_roundtrip(self):
+        """An Entity survives a JSON round trip."""
         e = Entity(
             id="cat_01",
             type="cat",
@@ -38,6 +39,7 @@ class TestScene:
         assert restored == e
 
     def test_manifest_get_entity(self):
+        """get_entity returns the entity with the given id."""
         m = SceneManifest(
             scene_id="s1",
             entities=[
@@ -50,6 +52,7 @@ class TestScene:
         assert m.get_entity("missing") is None
 
     def test_manifest_entity_ids(self):
+        """entity_ids lists the ids of all entities."""
         m = SceneManifest(
             scene_id="s1",
             entities=[
@@ -60,6 +63,7 @@ class TestScene:
         assert m.entity_ids() == ["x", "y"]
 
     def test_manifest_json_roundtrip(self):
+        """A SceneManifest survives a JSON round trip."""
         m = SceneManifest(
             scene_id="scene_01",
             entities=[
@@ -99,12 +103,14 @@ class TestScene:
 
 class TestAssessment:
     def test_assessment_response_defaults(self):
+        """An empty AssessmentResponse has no errors or opportunities and is acceptable."""
         resp = AssessmentResponse()
         assert resp.factual_errors == []
         assert resp.misl_opportunities == []
         assert resp.utterance_is_acceptable is True
 
     def test_assessment_response_with_errors(self):
+        """An AssessmentResponse holds factual errors."""
         resp = AssessmentResponse(
             factual_errors=[
                 FactualError(
@@ -120,6 +126,7 @@ class TestAssessment:
         assert resp.utterance_is_acceptable is False
 
     def test_assessment_response_with_opportunities(self):
+        """An AssessmentResponse holds MISL opportunities."""
         resp = AssessmentResponse(
             misl_opportunities=[
                 MISLOpportunity(
@@ -133,6 +140,7 @@ class TestAssessment:
         assert resp.misl_opportunities[0].dimension == "elaborated_noun_phrases"
 
     def test_scene_log_tracks_assessments(self):
+        """A SceneLog records story entries and assessments."""
         log = SceneLog(scene_id="scene_01", scene_manifest={"entities": []})
         log.story.append(SceneStoryEntry(utterance_text="a cat"))
         log.assessments.append(SceneAssessmentEntry(
@@ -144,6 +152,7 @@ class TestAssessment:
         assert log.misl_opportunities_given == 0
 
     def test_scene_log_json_roundtrip(self):
+        """A SceneLog survives a JSON round trip."""
         log = SceneLog(scene_id="s1", scene_manifest={})
         log.story.append(SceneStoryEntry(utterance_text="hello"))
         data = json.loads(log.model_dump_json())
@@ -158,6 +167,7 @@ class TestAssessment:
 
 class TestStoryState:
     def test_add_scene_stores_scene_and_sprites(self):
+        """add_scene stores the scene and registers its sprites."""
         state = StoryState(session_id="s1", participant_id="P01")
         state.add_scene(
             scene_id="scene_01",
@@ -172,6 +182,7 @@ class TestStoryState:
         assert state.active_entities["rabbit_01"].first_appeared == "scene_01"
 
     def test_add_scene_updates_existing_entity_sprite(self):
+        """add_scene updates an existing entity's sprite but keeps first_appeared."""
         state = StoryState(session_id="s1")
         state.active_entities["rabbit_01"] = ActiveEntity(
             type="rabbit",
@@ -189,6 +200,7 @@ class TestStoryState:
         assert state.active_entities["rabbit_01"].first_appeared == "scene_01"
 
     def test_get_entity_sprite(self):
+        """get_entity_sprite returns the sprite code, or None for an unknown entity."""
         state = StoryState()
         assert state.get_entity_sprite("nope") is None
         state.active_entities["owl_01"] = ActiveEntity(
@@ -197,11 +209,13 @@ class TestStoryState:
         assert state.get_entity_sprite("owl_01") == "ellip(...);"
 
     def test_get_entity_sprite_returns_none_for_empty_code(self):
+        """get_entity_sprite returns None when the stored code is empty."""
         state = StoryState()
         state.active_entities["owl_01"] = ActiveEntity(type="owl", sprite_code="")
         assert state.get_entity_sprite("owl_01") is None
 
     def test_carry_over_entities(self):
+        """carry_over_entities splits manifest entities into carried-over and new ones and updates positions."""
         state = StoryState()
         state.active_entities["rabbit_01"] = ActiveEntity(
             type="rabbit",
@@ -235,6 +249,7 @@ class TestStoryState:
         assert state.active_entities["rabbit_01"].last_position == {"x": 0.09, "y": 0.11}
 
     def test_json_roundtrip(self):
+        """A StoryState survives a JSON round trip."""
         state = StoryState(
             session_id="s1",
             participant_id="P01",
@@ -258,9 +273,11 @@ class TestStoryState:
 
 class TestStudentProfile:
     def _make_discrepancy(self, error_type: str, entity_id: str = "cat_01") -> Discrepancy:
+        """Build a Discrepancy of the given type and entity."""
         return Discrepancy(type=error_type, entity_id=entity_id, severity=0.7)
 
     def test_record_errors_increments_counts(self):
+        """record_errors increments the count of each error type."""
         p = StudentProfile()
         p.record_errors([
             self._make_discrepancy("PROPERTY_COLOR"),
@@ -272,6 +289,7 @@ class TestStudentProfile:
         assert p.total_utterances == 1
 
     def test_record_errors_tracks_difficult_entities(self):
+        """Two errors on one entity in one utterance mark it as difficult."""
         p = StudentProfile()
         # Two errors on same entity in one utterance -> difficult
         p.record_errors([
@@ -281,11 +299,13 @@ class TestStudentProfile:
         assert "cat_01" in p.difficult_entities
 
     def test_record_errors_single_error_not_difficult(self):
+        """A single error on an entity does not mark it as difficult."""
         p = StudentProfile()
         p.record_errors([self._make_discrepancy("SPATIAL", "tree_01")])
         assert "tree_01" not in p.difficult_entities
 
     def test_get_weak_areas(self):
+        """get_weak_areas returns the error types whose rate exceeds the threshold."""
         p = StudentProfile()
         # 5 utterances, property_color in every one = rate 1.0
         for _ in range(5):
@@ -297,16 +317,19 @@ class TestStudentProfile:
         assert "PROPERTY_COLOR" in weak
 
     def test_get_weak_areas_empty_when_no_utterances(self):
+        """get_weak_areas is empty when no utterance was recorded."""
         p = StudentProfile()
         assert p.get_weak_areas() == []
 
     def test_update_trends_insufficient_data(self):
+        """Trends are insufficient_data when there is too little history."""
         p = StudentProfile()
         p.record_errors([self._make_discrepancy("PROPERTY_COLOR")])
         p.update_trends()
         assert p.error_trend["PROPERTY_COLOR"] == "insufficient_data"
 
     def test_update_trends_stable(self):
+        """A constant error rate gives a stable trend."""
         p = StudentProfile()
         # 10 utterances all with the same error -> stable
         for _ in range(10):
@@ -315,6 +338,7 @@ class TestStudentProfile:
         assert p.error_trend["PROPERTY_COLOR"] == "stable"
 
     def test_update_trends_decreasing(self):
+        """An error that stops occurring gives a decreasing trend."""
         p = StudentProfile()
         # First 5 utterances: always error
         for _ in range(5):
@@ -326,6 +350,7 @@ class TestStudentProfile:
         assert p.error_trend["PROPERTY_COLOR"] == "decreasing"
 
     def test_update_trends_increasing(self):
+        """An error that starts occurring gives an increasing trend."""
         p = StudentProfile()
         # First 5: no error (but we need the type to exist first)
         p.record_errors([self._make_discrepancy("SPATIAL")])
@@ -338,6 +363,7 @@ class TestStudentProfile:
         assert p.error_trend["SPATIAL"] == "increasing"
 
     def test_to_prompt_context_contains_key_info(self):
+        """to_prompt_context includes the key profile figures."""
         p = StudentProfile(
             error_counts={"PROPERTY_COLOR": 5, "SPATIAL": 2},
             total_utterances=10,
@@ -353,6 +379,7 @@ class TestStudentProfile:
         assert "Corrections after animation: 7" in ctx
 
     def test_json_roundtrip(self):
+        """A StudentProfile survives a JSON round trip."""
         p = StudentProfile(
             error_counts={"PROPERTY_COLOR": 3},
             error_trend={"PROPERTY_COLOR": "stable"},
@@ -374,6 +401,7 @@ class TestStudentProfile:
 
 class TestAnimationCache:
     def test_store_and_exact_lookup(self):
+        """A stored animation is found by exact lookup."""
         cache = AnimationCache()
         anim = CachedAnimation(
             mode="use_default", template="spotlight",
@@ -385,6 +413,7 @@ class TestAnimationCache:
         assert result.template == "spotlight"
 
     def test_has(self):
+        """has reports whether an animation is stored for an entity and error type."""
         cache = AnimationCache()
         cache.store("a", "X", CachedAnimation(template="spotlight"))
         assert cache.has("a", "X") is True
@@ -392,6 +421,7 @@ class TestAnimationCache:
         assert cache.has("b", "X") is False
 
     def test_lookup_miss(self):
+        """lookup returns None when nothing is stored."""
         cache = AnimationCache()
         assert cache.lookup("cat_01", "SPATIAL") is None
 
@@ -426,6 +456,7 @@ class TestAnimationCache:
         assert cache.lookup("rabbit_01", "SPATIAL") is None
 
     def test_exact_match_takes_priority(self):
+        """An exact entity match wins over a parent entity match."""
         cache = AnimationCache()
         cache.store("cat_01.body", "PROPERTY_COLOR", CachedAnimation(template="color_pop"))
         cache.store("cat_01", "PROPERTY_COLOR", CachedAnimation(template="spotlight"))
@@ -434,6 +465,7 @@ class TestAnimationCache:
         assert result.template == "spotlight"
 
     def test_custom_code_mode(self):
+        """A custom_code animation keeps its code and duration."""
         cache = AnimationCache()
         anim = CachedAnimation(
             mode="custom_code",
@@ -448,6 +480,7 @@ class TestAnimationCache:
         assert "animate" in result.code
 
     def test_sequence_mode(self):
+        """A sequence animation keeps its steps."""
         cache = AnimationCache()
         anim = CachedAnimation(
             mode="sequence",
@@ -465,6 +498,7 @@ class TestAnimationCache:
         assert len(result.steps) == 2
 
     def test_json_roundtrip(self):
+        """An AnimationCache survives a JSON round trip."""
         cache = AnimationCache()
         cache.store(
             "owl_01.body",
@@ -489,6 +523,7 @@ class TestAnimationCache:
 
 class TestAnimationDecision:
     def test_defaults(self):
+        """A new AnimationDecision has empty or pending defaults."""
         d = AnimationDecision()
         assert d.mode == ""
         assert d.outcome == "pending"
@@ -497,6 +532,7 @@ class TestAnimationDecision:
         assert d.steps == []
 
     def test_use_default_decision(self):
+        """A use_default decision keeps its fields."""
         d = AnimationDecision(
             mode="use_default",
             animation_id="I1_spotlight",
@@ -509,6 +545,7 @@ class TestAnimationDecision:
         assert d.template == "spotlight"
 
     def test_adjust_params_decision(self):
+        """An adjust_params decision keeps its parameters."""
         d = AnimationDecision(
             mode="adjust_params",
             animation_id="P2_emanation",
@@ -520,6 +557,7 @@ class TestAnimationDecision:
         assert d.params["particleCount"] == 25
 
     def test_sequence_decision(self):
+        """A sequence decision keeps its steps."""
         d = AnimationDecision(
             mode="sequence",
             animation_id="A2+D2",
@@ -533,6 +571,7 @@ class TestAnimationDecision:
         assert d.steps[0]["template"] == "anticipation"
 
     def test_outcome_tracking(self):
+        """Outcome and voice-escalation fields can be updated."""
         d = AnimationDecision(mode="use_default", outcome="pending")
         d.outcome = "success"
         assert d.outcome == "success"
@@ -542,6 +581,7 @@ class TestAnimationDecision:
         assert d.escalated_to_voice is True
 
     def test_json_roundtrip(self):
+        """An AnimationDecision survives a JSON round trip."""
         d = AnimationDecision(
             mode="adjust_params",
             animation_id="P1_color_pop",
@@ -559,6 +599,7 @@ class TestAnimationDecision:
         assert restored.outcome == "success"
 
     def test_student_profile_has_decisions_list(self):
+        """A StudentProfile holds a list of animation decisions."""
         p = StudentProfile()
         assert p.animation_decisions == []
         p.animation_decisions.append(AnimationDecision(

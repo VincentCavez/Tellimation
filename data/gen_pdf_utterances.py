@@ -47,6 +47,7 @@ COL_SUGG_TAG = colors.HexColor("#2980b9")
 
 # ── Styles ─────────────────────────────────────────────────────────────────────
 def make_styles():
+    """Build the ReportLab paragraph styles used by the utterances PDF."""
     s = {}
     base = dict(fontName="Helvetica", alignment=TA_LEFT, spaceAfter=0, spaceBefore=0)
 
@@ -90,6 +91,7 @@ ANIM_ORDER = ["I1", "I2", "C1", "C2", "C3", "C4", "P1", "P2a", "P2b",
               "P2c", "P2d", "P2e", "P2f", "T1", "T2", "T3", "T4", "T5"]
 
 def scene_sort_key(scene_id: str):
+    """Sort key ordering scene ids by animation name, then by scene letter."""
     # scene_id = "study1_{anim}_{letter}"
     parts = scene_id.replace("study1_", "").rsplit("_", 1)
     anim = parts[0] if len(parts) > 0 else ""
@@ -103,6 +105,7 @@ def scene_sort_key(scene_id: str):
 
 # ── Page header/footer callback ────────────────────────────────────────────────
 def make_page_template(doc, styles):
+    """Build the page template with its header line and footer for the PDF."""
     frame = Frame(
         doc.leftMargin, doc.bottomMargin,
         doc.width, doc.height,
@@ -110,6 +113,7 @@ def make_page_template(doc, styles):
     )
 
     def on_page(canvas, doc):
+        """Draw the header line and page number on each page."""
         canvas.saveState()
         # Header line
         canvas.setStrokeColor(COL_PAGE_HDR)
@@ -227,6 +231,7 @@ def build_scene_block(scene_id, scene_data, correction, suggestion, styles):
 
 # ── Main ───────────────────────────────────────────────────────────────────────
 def main():
+    """Read the stimuli file and generate the utterances PDF."""
     # Load stimuli
     with open(STIMULI_FILE) as f:
         data = json.load(f)

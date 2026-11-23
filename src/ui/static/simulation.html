@@ -403,6 +403,7 @@
       logEl.prepend(line);
     }
 
+    // Sets the status text in the top bar.
     function setStatus(msg) {
       statusEl.textContent = msg;
     }
@@ -471,6 +472,7 @@
       }
       entityEids.sort(function(a, b) { return (depthMap[a] || 0) - (depthMap[b] || 0); });
 
+      // Draws the entities back to front, saving each entity's layer data, then renders the buffer.
       function renderEntitiesAndFlush() {
         buf.snapshotBackground(); // _br = background for all pixels
 
@@ -529,6 +531,7 @@
       negEl.textContent = JSON.stringify(scene.neg, null, 2);
     }
 
+    // Re-renders the current scene, if any.
     function redrawScene() {
       if (currentScene) {
         renderScene(currentScene);
@@ -656,9 +659,12 @@
     var MULTI_ENTITY = ['sequential_glow'];
     var WORD_ONLY = [];
 
+    // Value of the entity A dropdown.
     function getEntityA() { return document.getElementById('entityA').value; }
+    // Value of the entity B dropdown.
     function getEntityB() { return document.getElementById('entityB').value; }
 
+    // Builds the animation spec ({template, params}) for a template from the selected entities and parameter fields.
     function buildSpec(templateName) {
       var params = {};
       var a = getEntityA();
@@ -689,6 +695,7 @@
       return { template: templateName, params: params };
     }
 
+    // Plays one template on the loaded scene and logs the outcome.
     function playTemplate(templateName) {
       if (!currentScene) { log('Load a scene first', 'log-warn'); return; }
       var spec = buildSpec(templateName);
@@ -700,6 +707,7 @@
       });
     }
 
+    // Stops the running animation and any play-all loop.
     function stopAnim() {
       runner.stop();
       stopPlayAll = true;
@@ -720,6 +728,7 @@
       'speech_bubble', 'thought_bubble', 'alert', 'interjection'
     ];
 
+    // Plays every template in ALL_TEMPLATES in sequence until finished or stopped.
     async function playAll() {
       if (!currentScene) { log('Load a scene first', 'log-warn'); return; }
       stopPlayAll = false;
@@ -756,6 +765,7 @@
       return checks;
     }
 
+    // Compares the sampled pixels with the current buffer; logs and returns whether they all match.
     function verifyState(before, label) {
       var allMatch = true;
       for (var i = 0; i < before.length; i++) {
@@ -771,6 +781,7 @@
       return allMatch;
     }
 
+    // Plays every template briefly and logs whether each one restores the scene pixels.
     async function runSnapshotTest() {
       if (!currentScene) { log('Load a scene first', 'log-warn'); return; }
       log('--- Snapshot/Restore test: all 20 templates ---');
@@ -797,6 +808,7 @@
     // =====================================================================
     var isRecording = false;
 
+    // Enables or disables the animation, download and load/generate buttons.
     function setButtonsDisabled(disabled) {
       var btns = document.querySelectorAll('.anim-btn, .dl-btn, .btn-generate, .btn-load-saved');
       for (var i = 0; i < btns.length; i++) btns[i].disabled = disabled;
@@ -806,6 +818,7 @@
     function waitWithRender(ms) {
       return new Promise(function(resolve) {
         var start = performance.now();
+        // Renders one frame and schedules the next until the delay has elapsed.
         function tick() {
           renderer.render();
           if (performance.now() - start < ms) {
@@ -818,6 +831,7 @@
       });
     }
 
+    // Records 1 s of static scene, the animation, then 1 s static from the canvas and downloads it as MP4 or WebM.
     async function downloadAnimation(templateName) {
       if (!currentScene) { log('Load a scene first', 'log-warn'); return; }
       if (isRecording) { log('Recording already in progress', 'log-warn'); return; }

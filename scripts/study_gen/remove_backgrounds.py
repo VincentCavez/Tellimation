@@ -45,6 +45,7 @@ def find_extractions() -> list[tuple[Path, Path]]:
 
 
 def process_one(src: Path, dst: Path) -> bool:
+    """Send src to the background-removal API and save the RGBA PNG to dst; returns True on success."""
     try:
         with open(src, "rb") as f:
             resp = requests.post(
@@ -69,6 +70,7 @@ def process_one(src: Path, dst: Path) -> bool:
 
 
 def main() -> None:
+    """Command-line entry point: remove backgrounds with the withoutbg Docker API using a thread pool (--dry-run lists the work only)."""
     parser = argparse.ArgumentParser(description="Remove backgrounds via withoutbg Docker API")
     parser.add_argument("--workers", type=int, default=4)
     parser.add_argument("--dry-run", action="store_true")

@@ -1,4 +1,3 @@
-.claude/worktrees/
 __pycache__/
 *.pyc
 .pytest_cache/
@@ -28,3 +27,19 @@ data/study2/analysis/
 
 # Repaired study logs (participant data, scripts/analysis/fix_displayed_flag.py)
 data/displayed_fix/
+
+# Child-study Sheet exports and merged CSV (participant data,
+# scripts/analysis/merge_session_logs.py)
+session transcripts/
+
+# Simulated narrators run through the pipeline (scripts/simulation): generated
+# output, not participant data.
+data/simulated_sessions*/
+
+# Local accounts store (dev only; production uses the accounts Sheet)
+data/accounts/
+
+# Resolution re-coding: gaps and coder sheets hold participant transcripts
+# (scripts/resolution_coding/build_gaps_csv.py, make_coding_items.py)
+scripts/resolution_coding/gaps.csv
+scripts/resolution_coding/coding/

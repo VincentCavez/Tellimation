@@ -34,6 +34,7 @@
       };
       var sceneProgressMap = {};
 
+      // Record this scene's generation step weight and update the overall progress bar and label.
       function updateProgress(sceneIndex, totalScenes, stepName) {
         sceneProgressMap[sceneIndex] = stepWeights[stepName] || 0;
         var total = 0;
@@ -43,6 +44,7 @@
         progressLabel.textContent = stepLabels[stepName] || 'Working...';
       }
 
+      // Show the generation progress bar and hide the scene cards.
       function showProgress() {
         progressContainer.style.display = '';
         container.style.display = 'none';
@@ -50,6 +52,7 @@
         progressLabel.textContent = 'Preparing your stories...';
       }
 
+      // Hide the progress bar and show the scene cards again.
       function hideProgress() {
         progressContainer.style.display = 'none';
         container.style.display = '';
@@ -60,6 +63,7 @@
       var ws = null;
       var defaultScenesLoaded = false;
 
+      // Open the WebSocket to the server with the participant id and child age.
       function connectWs() {
         ws = new WebSocket(
           protocol + '//' + location.host + '/ws'
@@ -100,6 +104,7 @@
           connectWs();
         });
 
+      // Handle a server WebSocket message (e.g. generation progress, generated scenes); binary frames are ignored.
       function onWsMessage(event) {
         if (event.data instanceof ArrayBuffer || event.data instanceof Blob) return;
         var msg = JSON.parse(event.data);
@@ -165,12 +170,14 @@
         }
       }
 
+      // Show a reload prompt when the WebSocket connection fails.
       function onWsError() {
         hideProgress();
         container.style.display = '';
         container.innerHTML = '<p style="color:var(--red)">Connection error. Please reload.</p>';
       }
 
+      // Add a clickable thumbnail card for a scene that selects it on click.
       function appendThumbnail(scene, index) {
         var card = ScenePicker.createThumbnailCard(scene);
         card.addEventListener('click', function() { selectScene(index); });
@@ -178,6 +185,7 @@
         container.appendChild(card);
       }
 
+      // Mark the scene as chosen (once), store its story index and send the selection to the server.
       function selectScene(index) {
         if (pendingSelectIndex !== null) return;
         pendingSelectIndex = index;

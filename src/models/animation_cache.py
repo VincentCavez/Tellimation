@@ -23,14 +23,17 @@ class AnimationCache(BaseModel):
     def store(
         self, entity_id: str, error_type: str, animation: CachedAnimation
     ) -> None:
+        """Cache an animation for an entity and error type, replacing any previous entry."""
         if entity_id not in self.cache:
             self.cache[entity_id] = {}
         self.cache[entity_id][error_type] = animation
 
     def has(self, entity_id: str, error_type: str) -> bool:
+        """Return True if a cached animation exists for this entity and error type."""
         return self.lookup(entity_id, error_type) is not None
 
     def lookup(self, entity_id: str, error_type: str) -> Optional[CachedAnimation]:
+        """Return the cached animation for an entity and error type (exact match first), or None."""
         # Exact match
         entry = self.cache.get(entity_id, {}).get(error_type)
         if entry is not None:

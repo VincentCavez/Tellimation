@@ -214,6 +214,7 @@ def _load_grammar() -> None:
 
 
 def _ensure_loaded() -> None:
+    """Load the animation grammar on first use."""
     if not _loaded:
         _load_grammar()
 

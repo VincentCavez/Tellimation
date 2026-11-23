@@ -124,6 +124,7 @@
     const logEl = document.getElementById('log');
     const statusEl = document.getElementById('status');
 
+    // Prepends a timestamped line to the log panel with the given CSS class.
     function log(msg, cls = 'log-info') {
       const line = document.createElement('div');
       line.className = cls;
@@ -131,6 +132,7 @@
       logEl.prepend(line);
     }
 
+    // Sets the status label to Playing or Idle according to the runner.
     function updateStatus() {
       if (runner.isPlaying) {
         statusEl.textContent = 'Playing...';
@@ -194,6 +196,7 @@
       return checks;
     }
 
+    // Compares the sampled pixels with a fresh capture; logs and returns whether they all match.
     function verifyState(before, label) {
       const after = captureState();
       let allMatch = true;
@@ -230,6 +233,7 @@
       verifyState(before, `${name} restore`);
     }
 
+    // Plays the code from the custom textarea, then checks that pixels are restored.
     async function playCustom() {
       const code = document.getElementById('customCode').value;
       log('Playing custom animation (1500ms)...');

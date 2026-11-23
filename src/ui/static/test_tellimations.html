@@ -231,6 +231,7 @@ var _stopPlayAll = false;
 
 // ── Logging ──
 
+// Prepends a timestamped line to the log panel with the given CSS class (default log-info).
 function log(msg, cls) {
   cls = cls || 'log-info';
   var line = document.createElement('div');
@@ -239,6 +240,7 @@ function log(msg, cls) {
   logEl.prepend(line);
 }
 
+// Sets the status label to `text`, or to Playing/Idle according to the runner when no text is given.
 function updateStatus(text) {
   if (text) {
     statusEl.textContent = text;
@@ -255,6 +257,7 @@ function updateStatus(text) {
 // Scene Drawing (art-grid: 560×360, flat entity IDs)
 // ═══════════════════════════════════════════════════════════════════
 
+// Draws the fox, owl and mushroom scene into the pixel buffer (560x360 art grid) and renders it.
 function drawScene() {
   buf.clear();
 
@@ -337,6 +340,7 @@ drawScene();
 // Snapshot / Restore Verification
 // ═══════════════════════════════════════════════════════════════════
 
+// Samples the colours of a few fixed pixels, to compare before and after an animation.
 function captureState() {
   var checks = [];
   var positions = [
@@ -356,6 +360,7 @@ function captureState() {
   return checks;
 }
 
+// Compares the sampled pixels with a fresh capture; logs and returns whether they all match.
 function verifyState(before, label) {
   var after = captureState();
   var allMatch = true;
@@ -432,6 +437,7 @@ var TEMPLATE_CONFIG = {
 // Play a Template
 // ═══════════════════════════════════════════════════════════════════
 
+// Builds the animation spec (template, params, duration) for a template from the target and option fields; null if unknown.
 function buildSpec(templateName) {
   var cfg = TEMPLATE_CONFIG[templateName];
   if (!cfg) {
@@ -478,6 +484,7 @@ function buildSpec(templateName) {
   };
 }
 
+// Plays one template, then checks that the scene pixels are restored.
 async function playT(templateName) {
   var spec = buildSpec(templateName);
   if (!spec) return;
@@ -509,6 +516,7 @@ async function playT(templateName) {
 // Play All Sequentially
 // ═══════════════════════════════════════════════════════════════════
 
+// Plays every template in TEMPLATE_ORDER in sequence, checking pixel restoration after each, until stopped.
 async function playAll() {
   _stopPlayAll = false;
   log('--- Playing all 20 templates sequentially ---', 'log-info');
@@ -553,6 +561,7 @@ async function playAll() {
 // Verification (fast, no visual delay)
 // ═══════════════════════════════════════════════════════════════════
 
+// Runs every template with a short delay and logs how many restore the scene correctly.
 async function runVerification() {
   log('--- Snapshot/Restore verification (fast) ---', 'log-info');
   var passed = 0, failed = 0;
@@ -588,6 +597,7 @@ async function runVerification() {
 // Utility
 // ═══════════════════════════════════════════════════════════════════
 
+// Stops the play-all loop and the running animation.
 function stopAnim() {
   _stopPlayAll = true;
   runner.stop();
@@ -595,6 +605,7 @@ function stopAnim() {
   log('Stopped.', 'log-warn');
 }
 
+// Stops any animation and redraws the base scene.
 function redraw() {
   runner.stop();
   drawScene();

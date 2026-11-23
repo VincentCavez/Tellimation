@@ -1,36 +1,49 @@
-// Tellimations open home page
-// No login: every story (2 practices + A-D) is directly playable, in any order.
+// SHIELD home page (signed-in visitors; the server redirects others to /login)
+// Every story (2 practices + A-D) is directly playable, in any order.
 
 (function() {
   'use strict';
 
-  // One id per browser (the legacy flow uses 9-16), so the analysis PDF only
-  // covers what was played here. Kept in localStorage to survive tab closes.
-  // The login page's cookie wins, so the id survives a cleared localStorage.
-  var cookie = document.cookie.match(/(?:^|;\s*)shield_participant=([A-Za-z0-9_-]+)/);
-  var participantId = cookie ? cookie[1] : null;
-  if (!participantId) {
-    try { participantId = localStorage.getItem('home_participant'); } catch (e) {}
-  }
-  if (!participantId) {
-    participantId = 'free-' + Math.random().toString(16).slice(2, 10);
-    try { localStorage.setItem('home_participant', participantId); } catch (e) {}
-  }
-  sessionStorage.setItem('participant_number', participantId);
+  // The visitor's participant id comes from their Google account (session
+  // cookie); the server also derives it there for the logs and the PDF.
+  var accountEl = document.getElementById('home-account');
+  fetch('/api/me')
+    .then(function(resp) {
+      if (resp.status === 401) { window.location.href = '/login'; return null; }
+      return resp.json();
+    })
+    .then(function(me) {
+      if (!me) return;
+      sessionStorage.setItem('participant_number', me.participant);
+      accountEl.textContent = '';
+      accountEl.append('Signed in as ');
+      var who = document.createElement('b');
+      who.textContent = me.email;
+      accountEl.append(who, ' \u00b7 $' + me.credit_left.toFixed(2) + ' of free credit left \u00b7 ');
+      var out = document.createElement('button');
+      out.type = 'button';
+      out.textContent = 'Sign out';
+      out.addEventListener('click', function() {
+        fetch('/api/logout', { method: 'POST' }).then(function() { window.location.href = '/login'; });
+      });
+      accountEl.appendChild(out);
+    })
+    .catch(function(err) { console.error('[home] /api/me', err); });
 
-  document.getElementById('btn-download').href =
-    '/api/analysis.pdf?participant=' + encodeURIComponent(participantId);
+  document.getElementById('btn-download').href = '/api/analysis.pdf';
 
   var trainingContainer = document.getElementById('training-thumbnails');
   var storyContainer = document.getElementById('story-thumbnails');
   var completed = JSON.parse(sessionStorage.getItem('study_completed') || '{}');
 
+  // Create an empty thumbnail placeholder element.
   function createPlaceholder() {
     var el = document.createElement('div');
     el.className = 'thumbnail-placeholder';
     return el;
   }
 
+  // Create a thumbnail card from scene data (image URL, sprite code, or placeholder fallback).
   function createThumbnail(data) {
     if (data && data.thumbnail_url) {
       var card = document.createElement('div');

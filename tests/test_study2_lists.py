@@ -6,16 +6,19 @@ from scripts.study2.build_lists import SCENES, TARGET_ANIMATIONS, build, verify
 
 
 def test_design_has_no_violation():
+    """The built design has no violation."""
     assert verify(build()) == []
 
 
 def test_each_target_stimulus_seen_by_two_lists():
+    """Each target stimulus is seen by exactly two lists."""
     views = Counter(e["stimulus_id"] for lst in build()["lists"] for e in lst["block1"] if e["role"] == "target")
     assert len(views) == 24
     assert set(views.values()) == {2}
 
 
 def test_every_scene_of_every_animation_in_each_list():
+    """Every list contains every animation and scene pair as a target, with no second block."""
     for lst in build()["lists"]:
         assert lst["block2"] == []
         pairs = {(e["animation_id"], e["scene"]) for e in lst["block1"] if e["role"] == "target"}

@@ -40,6 +40,7 @@ FILLER_PREFIX = "study1"
 
 
 def _entry(prefix: str, anim: str, scene: str, condition: str, role: str) -> dict:
+    """Build one stimulus entry of a list."""
     scene_id = f"{prefix}_{anim}_{scene}"
     return {
         "stimulus_id": f"{scene_id}_{condition}",
@@ -52,10 +53,12 @@ def _entry(prefix: str, anim: str, scene: str, condition: str, role: str) -> dic
 
 
 def target_condition(i: int, j: int, k: int) -> str:
+    """Condition (correction or suggestion) of a target stimulus in list k, balanced over animations and scenes."""
     return "correction" if (i + j + k) % 2 == 0 else "suggestion"
 
 
 def filler_condition(anim: str, k: int) -> str:
+    """Condition of a filler stimulus in list k, alternating with k (inverted for C2)."""
     even_is_correction = anim != "C2"
     if k % 2 == 0:
         return "correction" if even_is_correction else "suggestion"
@@ -63,6 +66,7 @@ def filler_condition(anim: str, k: int) -> str:
 
 
 def build_list(k: int) -> dict:
+    """Build list k: its block 1 stimuli (targets then fillers) and counts."""
     block1 = []
     for i, anim in enumerate(TARGET_ANIMATIONS):
         for j, scene in enumerate(SCENES):
@@ -82,6 +86,7 @@ def build_list(k: int) -> dict:
 
 
 def build() -> dict:
+    """Build the whole Study 2 design: the lists and the design summary."""
     lists = [build_list(k) for k in range(N_LISTS)]
     return {
         "design": {
@@ -163,6 +168,7 @@ def verify(data: dict) -> list[str]:
 
 
 def print_summary(data: dict) -> None:
+    """Print the stimuli of each list and how many lists show each target stimulus."""
     for lst in data["lists"]:
         print(f"list {lst['list_id']} (k={lst['k']}, slots {lst['slots']}) "
               f"block1 {lst['n_correction_block1']}c/{lst['n_suggestion_block1']}s")
@@ -175,6 +181,7 @@ def print_summary(data: dict) -> None:
 
 
 def main() -> None:
+    """Command-line entry point: build the lists, check the design (exit 1 on violation) and write the output."""
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--verify", action="store_true", help="check the design and print counts")
     parser.add_argument("--output", type=Path, default=OUTPUT_PATH)

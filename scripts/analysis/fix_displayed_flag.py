@@ -60,6 +60,7 @@ csv.field_size_limit(sys.maxsize)
 
 
 def _ts(s: str) -> datetime:
+    """Parse an ISO timestamp, accepting a trailing 'Z'."""
     return datetime.fromisoformat(s.replace("Z", "+00:00"))
 
 
@@ -107,6 +108,7 @@ def load_logs(paths: List[Path]) -> Dict[str, Dict[str, Dict[str, Any]]]:
 # ---------------------------------------------------------------------------
 
 def _story_of(scene_key: str) -> str:
+    """Story name of a scene key such as 'A_scene_3'."""
     return scene_key.rsplit("_scene_", 1)[0]
 
 
@@ -177,6 +179,7 @@ def fix_log(pid: str, kind: str, log: Dict[str, Any]) -> List[Dict[str, Any]]:
 # ---------------------------------------------------------------------------
 
 def main(argv: Optional[List[str]] = None) -> None:
+    """Command-line entry point: repair the displayed flag in the given logs and write the report and fixed logs to --out."""
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("inputs", nargs="+", type=Path)
     ap.add_argument("--out", type=Path, default=Path("data/displayed_fix"))

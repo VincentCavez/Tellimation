@@ -409,6 +409,7 @@ async def generate_character_refs(
 
 
 async def main() -> None:
+    """Command-line entry point: generate HD (and optionally pixel-art) images of a story's scenes, with character reference sheets."""
     parser = argparse.ArgumentParser(description="Generate Story A test images (HD + pixel art)")
     parser.add_argument("--story", type=str, default="A",
                         help="Story ID (default: A)")

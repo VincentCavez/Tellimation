@@ -36,6 +36,7 @@ OLD_ANIMATION_WORDS = re.compile(r"nametag|name tag|ghost|outline|reveal", re.IG
 
 
 def animation_of(stim: dict) -> str:
+    """Animation id of a Study 1 stimulus."""
     return stim.get("target_animation") or stim.get("pipeline_animation_id") or stim["scene_id"].split("_")[1]
 
 
@@ -50,6 +51,7 @@ def apply_overrides(stim: dict, override: dict) -> None:
 
 
 def main() -> None:
+    """Command-line entry point: build the Study 2 stimuli from the Study 1 stimuli, intents and overrides."""
     with open(STUDY1_STIMULI) as f:
         study1 = json.load(f)["stimuli"]
     with open(INTENTS_PATH) as f:

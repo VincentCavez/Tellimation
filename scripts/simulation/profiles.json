@@ -1,0 +1,610 @@
+{
+  "_doc": [
+    "Simulated narrators for pipeline testing (scripts/simulation/simulate_sessions.py).",
+    "These are NOT participants: every log they produce is flagged simulated.",
+    "order: story + condition in play order, '+' = animations on, '-' = baseline (balanced with P1, P2, P10, P16).",
+    "reference: real sessions whose register the child model imitates (never the same story).",
+    "Traits are per-recording probabilities unless noted. Anchors measured on the real sessions:",
+    "  P1 (7, dis)  8 words/recording, grammar error 14%, content error 43%, corrections resolved 52% with animations, 14% spoken over the animation",
+    "  P2 (8, dis)  adult prompts in 57% of recordings, grammar error 68%, content error 74%",
+    "  P10 (8, dis) adult prompts in 71%, one-word answers, 44% spoken over the animation",
+    "  P16 (11, dis) 9 words/recording, grammar error 2%, richer vocabulary (type/token .36 vs .22 for P1)",
+    "self = self-reported dyslexia: oral level slightly above the diagnosed children of the same age.",
+    "len_med: median words spoken by the child per recording. turns_*: mean recordings per scene.",
+    "uptake_*: probability that the child acts on an animation it has seen (an ASSUMPTION, not a finding).",
+    "p_name: probability that such a reaction to the Silhouette animation is a name (the real children never gave one).",
+    "asr: what the recogniser and push-to-talk do to a recording: a mis-heard word, a missed start (clip_head) or end (clip_tail),",
+    "  no final full stop, lower-case start. Anchors: no final stop in 20% (P1), 32% (P10), 12% (P2), 4% (P16) of recordings.",
+    "grammar / disfluency: the patterns this child keeps for the whole session (keys in child.py); grammar_rare: once per session at most.",
+    "len_max: longest recording of the child alone, in words (weak narrators do not produce long clean sentences).",
+    "Each child's own words and habits (labels, fillers, what they look at first...) are drawn in child.py draw_habits().",
+    "habits: overrides one of the habits drawn in draw_habits() for this profile (e.g. pronouns, inserts = the stray words the recogniser adds). style: extra speech rules given to the child model for this profile only.",
+    "p_persist: probability that, after an animation it has seen, the child says the previous sentence again (an ASSUMPTION anchored on one child: P1 28%, P16 0%). Set for N5-N8 only; N1-N4 are left as last sampled.",
+    "echo_guard: when true, a recording that reuses phrases of the written scene description is written again, once (child.py echoes()). Set for N5-N8 only.",
+    "ignore_target: when true, a child who ignores an animation talks about something other than its target. Set for N5-N8 only.",
+    "labels: {story: {entity: word}} replaces the word drawn for a character (plainer than the app's own label).",
+    "picture_only: the child model gets the drawing and no written description (the child's words then come from the picture). N5-N8.",
+    "p_inner: probability that a recording is about what a character wants, thinks or feels, or what will happen (P16's register).",
+    "adult_specific: the adult next to the child talks about this very picture instead of using stock prompts."
+  ],
+  "profiles": [
+    {
+      "id": "SIM-N1",
+      "label": "N1",
+      "diagnosis": "self",
+      "age": 7,
+      "order": [
+        "A+",
+        "D+",
+        "B-",
+        "C-"
+      ],
+      "reference": [
+        "1"
+      ],
+      "note": "Independent narrator, short simple sentences; like P1 with slightly fewer errors.",
+      "traits": {
+        "len_med": 9,
+        "p_grammar": 0.1,
+        "p_slip": 0.25,
+        "p_fragment": 0.08,
+        "p_disfluency": 0.15,
+        "p_adult": 0.0,
+        "p_meta": 0.15,
+        "p_repeat": 0.18,
+        "p_stuck": 0.03,
+        "uptake_correction": 0.5,
+        "uptake_suggestion": 0.2,
+        "p_interrupt": 0.12,
+        "turns_animated": 4.0,
+        "turns_baseline": 2.6,
+        "p_name": 0.1,
+        "asr": {
+          "mishear": 0.09,
+          "clip_tail": 0.1,
+          "clip_head": 0.06,
+          "no_punct": 0.1,
+          "lower": 0.04
+        },
+        "picture_only": true,
+        "p_persist": 0.2,
+        "ignore_target": true,
+        "echo_guard": true
+      },
+      "grammar": [
+        "tense_shift",
+        "no_aux"
+      ],
+      "disfluency": [
+        "restart",
+        "abandon"
+      ],
+      "habits": {
+        "pronouns": "names a character once per picture, then mixes the name and 'he', 'she' or 'they'",
+        "inserts": [
+          "and",
+          "so",
+          "Oh."
+        ]
+      },
+      "style": [
+        "This child talks, and does not write: no 'as' or 'while' clause ('he waves as he walks off'), never two describing words in a row before a noun ('a big old boat'), a plain word for a place, never a dressed-up one, and no detail that only a caption would give (which hand, which way a window faces).",
+        "Each recording is built differently from this child's earlier ones in the story: not the same opening words, and no frame used twice (two recordings that both start 'They will probably', or both shaped 'X looks ... and ...').",
+        "A sentence joined with 'and' stays with one character or one event, never a feeling plus an unrelated detail. Most of this child's recordings name no feeling.",
+        "When this child puts something right after an animation, it is in a roundabout everyday way, a few plain words for what the character does or how it looks, never the one exact word an adult would pick.",
+        "Tells what is happening with 'is ...ing' or in the past ('is smiling', 'got it'), not in the plain present of a storybook ('smiles', 'gets', 'stands').",
+        "This child tells what happens, who does what to whom, and goes for the main event of the picture first: never what people wear or carry, never a posture, never where each thing stands.",
+        "Does not stress a place with 'right' ('right next to', 'right in the middle'): just 'next to', 'in the middle'.",
+        "Speech has short forms: 'doesn't', 'don't', 'isn't', 'can't'. Never 'does not', 'do not', 'is not', 'cannot'."
+      ]
+    },
+    {
+      "id": "SIM-N2",
+      "label": "N2",
+      "diagnosis": "dis",
+      "age": 8,
+      "order": [
+        "C+",
+        "D+",
+        "A-",
+        "B-"
+      ],
+      "reference": [
+        "2",
+        "10"
+      ],
+      "note": "Weak oral level, short simple sentences with bare verbs, and a parent talking next to the child, as for both real 8-year-olds (P2, P10), one notch milder than P2.",
+      "traits": {
+        "len_med": 6,
+        "p_grammar": 0.4,
+        "p_slip": 0.38,
+        "p_fragment": 0.14,
+        "p_disfluency": 0.3,
+        "p_adult": 0.6,
+        "p_meta": 0.08,
+        "p_repeat": 0.18,
+        "p_stuck": 0.1,
+        "uptake_correction": 0.28,
+        "uptake_suggestion": 0.06,
+        "p_interrupt": 0.28,
+        "turns_animated": 3.0,
+        "turns_baseline": 2.3,
+        "p_name": 0.0,
+        "asr": {
+          "mishear": 0.22,
+          "clip_tail": 0.12,
+          "clip_head": 0.12,
+          "no_punct": 0.1,
+          "lower": 0.1
+        },
+        "len_max": 14,
+        "picture_only": true,
+        "p_persist": 0.2,
+        "ignore_target": true,
+        "echo_guard": true,
+        "adult_specific": true
+      },
+      "grammar": [
+        "bare_verb",
+        "no_aux",
+        "he_she"
+      ],
+      "disfluency": [
+        "repeat_word",
+        "restart",
+        "abandon"
+      ],
+      "style": [
+        "Speech has short forms: 'doesn't', 'don't', 'isn't', 'can't'. Never 'does not', 'do not', 'is not', 'cannot'.",
+        "Going on with the story, this child often starts a recording with 'And' or 'Then'."
+      ],
+      "habits": {
+        "inserts": [
+          "Mhm.",
+          "Oh."
+        ]
+      }
+    },
+    {
+      "id": "SIM-N3",
+      "label": "N3",
+      "diagnosis": "dis",
+      "age": 9,
+      "order": [
+        "C-",
+        "D-",
+        "B+",
+        "A+"
+      ],
+      "reference": [
+        "2",
+        "1"
+      ],
+      "note": "Narrates alone most of the time in simple sentences, verb endings often missing; an adult steps in now and then.",
+      "traits": {
+        "len_med": 10,
+        "p_grammar": 0.22,
+        "p_slip": 0.32,
+        "p_fragment": 0.09,
+        "p_disfluency": 0.24,
+        "p_adult": 0.15,
+        "p_meta": 0.1,
+        "p_repeat": 0.18,
+        "p_stuck": 0.06,
+        "uptake_correction": 0.38,
+        "uptake_suggestion": 0.1,
+        "p_interrupt": 0.18,
+        "turns_animated": 3.5,
+        "turns_baseline": 2.6,
+        "p_name": 0.05,
+        "asr": {
+          "mishear": 0.12,
+          "clip_tail": 0.08,
+          "clip_head": 0.06,
+          "no_punct": 0.08,
+          "lower": 0.05
+        },
+        "len_max": 20,
+        "picture_only": true,
+        "p_persist": 0.2,
+        "ignore_target": true,
+        "echo_guard": true,
+        "adult_specific": true
+      },
+      "grammar": [
+        "bare_verb",
+        "plural_is",
+        "no_article"
+      ],
+      "disfluency": [
+        "restart",
+        "abandon"
+      ],
+      "style": [
+        "This child talks, and does not write: no 'as' or 'while' clause ('he waves as he walks off'), never two describing words in a row before a noun ('a big old boat'), a plain word for a place, never a dressed-up one, and no detail that only a caption would give (which hand, which way a window faces).",
+        "Each recording is built differently from this child's earlier ones in the story: not the same opening words, and no frame used twice (two recordings that both start 'They will probably', or both shaped 'X looks ... and ...').",
+        "A sentence joined with 'and' stays with one character or one event, never a feeling plus an unrelated detail. Most of this child's recordings name no feeling.",
+        "When this child puts something right after an animation, it is in a roundabout everyday way, a few plain words for what the character does or how it looks, never the one exact word an adult would pick.",
+        "Tells what is happening with 'is ...ing' or in the past ('is smiling', 'got it'), not in the plain present of a storybook ('smiles', 'gets', 'stands').",
+        "This child tells what happens, who does what to whom, and goes for the main event of the picture first: never what people wear or carry, never a posture, never where each thing stands.",
+        "Does not stress a place with 'right' ('right next to', 'right in the middle'): just 'next to', 'in the middle'.",
+        "Speech has short forms: 'doesn't', 'don't', 'isn't', 'can't'. Never 'does not', 'do not', 'is not', 'cannot'."
+      ],
+      "habits": {
+        "inserts": [
+          "okay",
+          "Yeah."
+        ]
+      }
+    },
+    {
+      "id": "SIM-N4",
+      "label": "N4",
+      "diagnosis": "self",
+      "age": 11,
+      "order": [
+        "D-",
+        "B-",
+        "A+",
+        "C+"
+      ],
+      "reference": [
+        "16"
+      ],
+      "note": "Fluent narrator in P16's register: says what people want, think and feel and what will happen, more than what can be seen; hardly any grammar error.",
+      "traits": {
+        "len_med": 11,
+        "p_grammar": 0.03,
+        "p_slip": 0.15,
+        "p_fragment": 0.02,
+        "p_disfluency": 0.08,
+        "p_adult": 0.0,
+        "p_meta": 0.03,
+        "p_repeat": 0.18,
+        "p_stuck": 0.01,
+        "uptake_correction": 0.35,
+        "uptake_suggestion": 0.12,
+        "p_interrupt": 0.04,
+        "turns_animated": 3.2,
+        "turns_baseline": 2.6,
+        "p_name": 0.08,
+        "asr": {
+          "mishear": 0.06,
+          "clip_tail": 0.06,
+          "clip_head": 0.04,
+          "no_punct": 0.02,
+          "lower": 0.01
+        },
+        "picture_only": true,
+        "p_persist": 0.1,
+        "ignore_target": true,
+        "echo_guard": true,
+        "p_inner": 0.5
+      },
+      "grammar": [
+        "tense_shift"
+      ],
+      "disfluency": [
+        "restart"
+      ],
+      "habits": {
+        "inserts": [
+          "Yeah.",
+          "so"
+        ]
+      },
+      "style": [
+        "This child talks, and does not write: no 'as' or 'while' clause ('he waves as he walks off'), never two describing words in a row before a noun ('a big old boat'), a plain word for a place, never a dressed-up one, and no detail that only a caption would give (which hand, which way a window faces).",
+        "Each recording is built differently from this child's earlier ones in the story: not the same opening words, and no frame used twice (two recordings that both start 'They will probably', or both shaped 'X looks ... and ...').",
+        "A sentence joined with 'and' stays with one character or one event, never a feeling plus an unrelated detail.",
+        "When this child puts something right after an animation, it is in a roundabout everyday way, a few plain words for what the character does or how it looks, never the one exact word an adult would pick.",
+        "Tells what is happening with 'is ...ing' or in the past ('is smiling', 'got it'), not in the plain present of a storybook ('smiles', 'gets', 'stands').",
+        "Does not stress a place with 'right' ('right next to', 'right in the middle'): just 'next to', 'in the middle'.",
+        "Speech has short forms: 'doesn't', 'don't', 'isn't', 'can't'. Never 'does not', 'do not', 'is not', 'cannot'.",
+        "Says 'probably' or 'I think' three or four times in the whole session at most, not in every guess."
+      ]
+    },
+    {
+      "id": "SIM-N5",
+      "label": "N5",
+      "diagnosis": "dis",
+      "age": 10,
+      "order": [
+        "D-",
+        "B-",
+        "C+",
+        "A+"
+      ],
+      "reference": [
+        "16",
+        "1"
+      ],
+      "note": "Good narrator for a diagnosed child, in P16's register: says what people want, think and feel and what will probably happen, more than what can be seen; a few grammar errors.",
+      "traits": {
+        "len_med": 11,
+        "p_grammar": 0.12,
+        "p_slip": 0.26,
+        "p_fragment": 0.05,
+        "p_disfluency": 0.22,
+        "p_adult": 0.0,
+        "p_meta": 0.05,
+        "p_repeat": 0.18,
+        "p_stuck": 0.03,
+        "uptake_correction": 0.3,
+        "uptake_suggestion": 0.1,
+        "p_interrupt": 0.08,
+        "turns_animated": 3.3,
+        "turns_baseline": 2.6,
+        "p_name": 0.05,
+        "asr": {
+          "mishear": 0.09,
+          "clip_tail": 0.09,
+          "clip_head": 0.05,
+          "no_punct": 0.04,
+          "lower": 0.02
+        },
+        "p_persist": 0.2,
+        "echo_guard": true,
+        "ignore_target": true,
+        "picture_only": true,
+        "p_inner": 0.5
+      },
+      "grammar": [
+        "tense_shift",
+        "preposition"
+      ],
+      "disfluency": [
+        "restart",
+        "filler"
+      ],
+      "habits": {
+        "inserts": [
+          "so",
+          "Okay."
+        ]
+      },
+      "style": [
+        "This child talks, and does not write: no 'as' or 'while' clause ('he waves as he walks off'), never two describing words in a row before a noun ('a big old boat'), a plain word for a place, never a dressed-up one, and no detail that only a caption would give (which hand, which way a window faces).",
+        "Each recording is built differently from this child's earlier ones in the story: not the same opening words, and no frame used twice (two recordings that both start 'They will probably', or both shaped 'X looks ... and ...').",
+        "A sentence joined with 'and' stays with one character or one event, never a feeling plus an unrelated detail.",
+        "When this child puts something right after an animation, it is in a roundabout everyday way, a few plain words for what the character does or how it looks, never the one exact word an adult would pick.",
+        "Tells what is happening with 'is ...ing' or in the past ('is smiling', 'got it'), not in the plain present of a storybook ('smiles', 'gets', 'stands').",
+        "Says 'little' for a character once at most in a story: afterwards 'the boy', 'the bird', 'he', 'it'."
+      ],
+      "labels": {
+        "D": {
+          "goose": "the duck"
+        }
+      }
+    },
+    {
+      "id": "SIM-N6",
+      "label": "N6",
+      "diagnosis": "self",
+      "age": 7,
+      "order": [
+        "C-",
+        "A-",
+        "D+",
+        "B+"
+      ],
+      "reference": [
+        "1",
+        "10"
+      ],
+      "note": "Quiet child, very short recordings, sometimes encouraged by an adult.",
+      "traits": {
+        "len_med": 6,
+        "p_grammar": 0.12,
+        "p_slip": 0.25,
+        "p_fragment": 0.12,
+        "p_disfluency": 0.15,
+        "p_adult": 0.18,
+        "p_meta": 0.1,
+        "p_repeat": 0.18,
+        "p_stuck": 0.08,
+        "uptake_correction": 0.45,
+        "uptake_suggestion": 0.15,
+        "p_interrupt": 0.15,
+        "turns_animated": 3.0,
+        "turns_baseline": 2.0,
+        "p_name": 0.08,
+        "asr": {
+          "mishear": 0.08,
+          "clip_tail": 0.08,
+          "clip_head": 0.08,
+          "no_punct": 0.1,
+          "lower": 0.06
+        },
+        "len_max": 14,
+        "p_persist": 0.2,
+        "echo_guard": true,
+        "ignore_target": true,
+        "picture_only": true,
+        "adult_specific": true
+      },
+      "grammar": [
+        "no_article",
+        "no_aux"
+      ],
+      "disfluency": [
+        "abandon",
+        "filler"
+      ],
+      "habits": {
+        "inserts": [
+          "yeah",
+          "Mhm."
+        ],
+        "focus": [
+          "what the characters are doing",
+          "what the animals are doing"
+        ],
+        "meta": [
+          "says that something is wrong or funny with the picture",
+          "just names what the animation played on, with no verb"
+        ]
+      },
+      "style": [
+        "This child talks, and does not write: no 'as' or 'while' clause ('he waves as he walks off'), never two describing words in a row before a noun ('a big old boat'), a plain word for a place, never a dressed-up one, and no detail that only a caption would give (which hand, which way a window faces).",
+        "Each recording is built differently from this child's earlier ones in the story: not the same opening words, and no frame used twice (two recordings that both start 'They will probably', or both shaped 'X looks ... and ...').",
+        "A sentence joined with 'and' stays with one character or one event, never a feeling plus an unrelated detail. Most of this child's recordings name no feeling.",
+        "When this child puts something right after an animation, it is in a roundabout everyday way, a few plain words for what the character does or how it looks, never the one exact word an adult would pick."
+      ]
+    },
+    {
+      "id": "SIM-N7",
+      "label": "N7",
+      "diagnosis": "self",
+      "age": 8,
+      "order": [
+        "A-",
+        "C-",
+        "B+",
+        "D+"
+      ],
+      "reference": [
+        "1",
+        "16"
+      ],
+      "note": "Independent narrator, simple but well-formed sentences.",
+      "traits": {
+        "len_med": 10,
+        "p_grammar": 0.09,
+        "p_slip": 0.22,
+        "p_fragment": 0.06,
+        "p_disfluency": 0.2,
+        "p_adult": 0.0,
+        "p_meta": 0.12,
+        "p_repeat": 0.18,
+        "p_stuck": 0.03,
+        "uptake_correction": 0.5,
+        "uptake_suggestion": 0.2,
+        "p_interrupt": 0.1,
+        "turns_animated": 3.7,
+        "turns_baseline": 2.6,
+        "p_name": 0.1,
+        "asr": {
+          "mishear": 0.1,
+          "clip_tail": 0.1,
+          "clip_head": 0.06,
+          "no_punct": 0.08,
+          "lower": 0.03
+        },
+        "p_persist": 0.2,
+        "echo_guard": true,
+        "ignore_target": true,
+        "picture_only": true
+      },
+      "grammar": [
+        "tense_shift",
+        "preposition"
+      ],
+      "disfluency": [
+        "restart"
+      ],
+      "habits": {
+        "inserts": [
+          "and",
+          "Oh."
+        ],
+        "pronouns": "names a character once per picture, then mixes the name and 'he', 'she' or 'they'"
+      },
+      "style": [
+        "This child talks, and does not write: no 'as' or 'while' clause ('he waves as he walks off'), never two describing words in a row before a noun ('a big old boat'), a plain word for a place, never a dressed-up one, and no detail that only a caption would give (which hand, which way a window faces).",
+        "Each recording is built differently from this child's earlier ones in the story: not the same opening words, and no frame used twice (two recordings that both start 'They will probably', or both shaped 'X looks ... and ...').",
+        "A sentence joined with 'and' stays with one character or one event, never a feeling plus an unrelated detail. Most of this child's recordings name no feeling.",
+        "When this child puts something right after an animation, it is in a roundabout everyday way, a few plain words for what the character does or how it looks, never the one exact word an adult would pick.",
+        "Tells what is happening with 'is ...ing' or in the past ('is smiling', 'got it'), not in the plain present of a storybook ('smiles', 'gets', 'stands').",
+        "This child tells what happens, who does what to whom, and goes for the main event of the picture first: never what people wear or carry, never a posture, never where each thing stands.",
+        "Does not stress a place with 'right' ('right next to', 'right in the middle'): just 'next to', 'in the middle'."
+      ],
+      "labels": {
+        "B": {
+          "bag": "the bag"
+        }
+      }
+    },
+    {
+      "id": "SIM-N8",
+      "label": "N8",
+      "diagnosis": "self",
+      "age": 9,
+      "order": [
+        "B-",
+        "A-",
+        "D+",
+        "C+"
+      ],
+      "reference": [
+        "16",
+        "1"
+      ],
+      "note": "Confident narrator, starts linking events with 'because' and 'so'.",
+      "traits": {
+        "len_med": 10.5,
+        "p_grammar": 0.07,
+        "p_slip": 0.2,
+        "p_fragment": 0.05,
+        "p_disfluency": 0.1,
+        "p_adult": 0.0,
+        "p_meta": 0.08,
+        "p_repeat": 0.18,
+        "p_stuck": 0.02,
+        "uptake_correction": 0.45,
+        "uptake_suggestion": 0.18,
+        "p_interrupt": 0.08,
+        "turns_animated": 3.4,
+        "turns_baseline": 2.6,
+        "p_name": 0.1,
+        "asr": {
+          "mishear": 0.04,
+          "clip_tail": 0.05,
+          "clip_head": 0.03,
+          "no_punct": 0.05,
+          "lower": 0.02
+        },
+        "p_persist": 0.2,
+        "echo_guard": true,
+        "ignore_target": true,
+        "picture_only": true,
+        "p_inner": 0.2
+      },
+      "grammar": [
+        "plural_is",
+        "tense_shift"
+      ],
+      "disfluency": [
+        "abandon",
+        "repeat_phrase"
+      ],
+      "habits": {
+        "inserts": [
+          "okay",
+          "then"
+        ],
+        "focus": [
+          "what the animals are doing",
+          "what is going to happen next"
+        ],
+        "meta": [
+          "says that the character or thing is gone or not there any more",
+          "says that the character or thing looks different now"
+        ]
+      },
+      "style": [
+        "This child talks, and does not write: no 'as' or 'while' clause ('he waves as he walks off'), never two describing words in a row before a noun ('a big old boat'), a plain word for a place, never a dressed-up one, and no detail that only a caption would give (which hand, which way a window faces).",
+        "Each recording is built differently from this child's earlier ones in the story: not the same opening words, and no frame used twice (two recordings that both start 'They will probably', or both shaped 'X looks ... and ...').",
+        "A sentence joined with 'and' stays with one character or one event, never a feeling plus an unrelated detail. Most of this child's recordings name no feeling.",
+        "When this child puts something right after an animation, it is in a roundabout everyday way, a few plain words for what the character does or how it looks, never the one exact word an adult would pick.",
+        "Does not stress a place with 'right' ('right next to', 'right in the middle'): just 'next to', 'in the middle'.",
+        "This child tells what happens, who does what to whom, and goes for the main event of the picture first: never what people wear or carry, never a posture, never where each thing stands."
+      ],
+      "labels": {
+        "C": {
+          "sister": "her sister"
+        }
+      }
+    }
+  ]
+}

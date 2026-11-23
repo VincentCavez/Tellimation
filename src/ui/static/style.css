@@ -985,6 +985,27 @@ a { color: var(--teal); text-decoration: none; }
 .register-form textarea:focus { outline: none; border-color: var(--blue); }
 .register-error { min-height: 1.2em; color: var(--red); font-weight: 700; font-size: 0.9rem; }
 .register-form .btn { align-self: center; padding: 10px 28px; font-size: 1rem; }
+.register-form .btn[hidden] { display: none; }
+.register-hint { font-size: 0.85rem; font-weight: 600; color: #6b6058; }
+.register-google { align-self: center; min-height: 44px; }
+
+/* Signed-in line on the home */
+.home-account {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #6b6058;
+  text-align: center;
+}
+.home-account b { color: #3a302a; }
+.home-account button {
+  font: inherit;
+  color: var(--blue);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
 .register-form .btn:disabled { opacity: 0.6; cursor: default; }
 @media (max-width: 520px) {
   .register-page .register-block { padding: 1.2rem 1rem; }

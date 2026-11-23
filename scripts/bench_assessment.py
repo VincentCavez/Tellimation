@@ -90,6 +90,7 @@ OUT_PATH = PROJECT_ROOT / "data" / "bench_assessment.json"
 # ---------------------------------------------------------------------------
 
 async def _run_correction(api_key: str, stimulus: Dict[str, Any]) -> Dict[str, Any]:
+    """Run the correction assessment on one stimulus and return the validated result with its latency."""
     scene = load_scene(stimulus["scene_id"])["scenes"][0]
     scene_desc = scene.get("scene_description") or scene["full_scene_prompt"]
     entities = scene.get("entities_in_scene", [])
@@ -125,6 +126,7 @@ async def _run_correction(api_key: str, stimulus: Dict[str, Any]) -> Dict[str, A
 
 
 async def _run_suggestion(api_key: str, stimulus: Dict[str, Any]) -> Dict[str, Any]:
+    """Run the suggestion selection and generation on one stimulus and return the validated result with its latency."""
     scene = load_scene(stimulus["scene_id"])["scenes"][0]
     entities = scene.get("entities_in_scene", [])
     misl_targets = get_misl_targets_for_stimulus(
@@ -207,6 +209,7 @@ async def bench_model(
     done = 0
 
     async def one(stimulus: Dict[str, Any]) -> Dict[str, Any]:
+        """Process one stimulus under the concurrency limit; errors are stored in the result instead of aborting the run."""
         nonlocal done
         async with sem:
             try:
@@ -240,6 +243,7 @@ async def bench_model(
 
 
 def summarize(run: Dict[str, Any]) -> Dict[str, Any]:
+    """Aggregate a run into per-condition match rates and latency statistics."""
     rows = run["results"]
     out: Dict[str, Any] = {"model": run["model"]}
     for cond in ("correction", "suggestion", "all"):
@@ -276,6 +280,7 @@ def agreement(run_a: Dict[str, Any], run_b: Dict[str, Any]) -> float:
 
 
 async def main() -> None:
+    """Command-line entry point: benchmark the models on a sample of stimuli and write the results."""
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--models", nargs="+", default=DEFAULT_MODELS)
     ap.add_argument("--n", type=int, default=40, help="stimuli to sample (half of each condition)")

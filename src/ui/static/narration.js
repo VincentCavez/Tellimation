@@ -57,6 +57,9 @@ var NarrationClient = (function() {
     }
   }
 
+  /**
+   * Register the push-to-talk keyboard handlers (Space to record, release to stop).
+   */
   function setupKeyboardListeners() {
     document.addEventListener('keydown', function(e) {
       if (e.code === 'Space' && !e.repeat && !isRecording) {
@@ -88,6 +91,9 @@ var NarrationClient = (function() {
     }
   }
 
+  /**
+   * Start push-to-talk recording: stop reveal/loop animation, signal an interruption if needed, update the UI and start the MediaRecorder.
+   */
   function startRecording() {
     if (!stream) return;
 
@@ -134,6 +140,9 @@ var NarrationClient = (function() {
     mediaRecorder.start();
   }
 
+  /**
+   * Stop recording and reset the recording UI; the recorded blob is sent from the recorder's onstop handler.
+   */
   function stopRecording() {
     if (!mediaRecorder || !isRecording) return;
 
@@ -146,6 +155,9 @@ var NarrationClient = (function() {
     if (pttHintEl) pttHintEl.style.visibility = '';
   }
 
+  /**
+   * Send the recorded audio to the server as a JSON header followed by the binary data.
+   */
   function sendAudio(blob) {
     if (!ws || ws.readyState !== WebSocket.OPEN) return;
 
@@ -368,7 +380,13 @@ var NarrationClient = (function() {
     handleEmptyTranscription: handleEmptyTranscription,
     handleVoiceHeader: handleVoiceHeader,
     handleVoiceBinary: handleVoiceBinary,
+    /**
+     * Public: whether the child is currently recording.
+     */
     isRecording: function() { return isRecording; },
+    /**
+     * Public: mark the pending assessment as finished.
+     */
     assessmentDone: function() { awaitingAssessment = false; },
   };
 })();

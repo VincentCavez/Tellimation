@@ -44,6 +44,7 @@ SCENES = ["A", "B", "C", "D"]
 # ---------------------------------------------------------------------------
 
 def load_csv(path: Path) -> list[dict]:
+    """Read a survey export (delimiter sniffed), keeping the first row per (participant, stimulus)."""
     with open(path, newline="", encoding="utf-8-sig") as f:
         sample = f.read(4096)
         f.seek(0)
@@ -76,10 +77,12 @@ def load_csv(path: Path) -> list[dict]:
 
 
 def scene_letter(row: dict) -> str:
+    """Scene letter at the end of the row's scene id."""
     return row["scene_id"].rsplit("_", 1)[-1]
 
 
 def study_of(row: dict) -> str:
+    """Study prefix ('study1' or 'study2') of the row's stimulus id."""
     return row["stimulus_id"].split("_", 1)[0]  # study1 / study2
 
 
@@ -88,6 +91,7 @@ def study_of(row: dict) -> str:
 # ---------------------------------------------------------------------------
 
 def wilson(k: int, n: int, z: float = 1.959964) -> tuple[float, float, float]:
+    """Wilson score interval for k successes out of n: returns (proportion, lower, upper)."""
     if n == 0:
         return float("nan"), float("nan"), float("nan")
     p = k / n
@@ -98,6 +102,7 @@ def wilson(k: int, n: int, z: float = 1.959964) -> tuple[float, float, float]:
 
 
 def two_proportion_z(k1: int, n1: int, k2: int, n2: int) -> tuple[float, float]:
+    """Two-proportion z test: returns (z, two-sided p)."""
     if min(n1, n2) == 0:
         return float("nan"), float("nan")
     p = (k1 + k2) / (n1 + n2)
@@ -109,12 +114,14 @@ def two_proportion_z(k1: int, n1: int, k2: int, n2: int) -> tuple[float, float]:
 
 
 def fisher(k1: int, n1: int, k2: int, n2: int) -> float:
+    """Two-sided Fisher exact p-value for two success counts."""
     if min(n1, n2) == 0:
         return float("nan")
     return float(fisher_exact([[k1, n1 - k1], [k2, n2 - k2]])[1])
 
 
 def fmt(x: float, nd: int = 2) -> str:
+    """Format a float with `nd` decimals ('nan' for NaN)."""
     return "nan" if x != x else f"{x:.{nd}f}"
 
 
@@ -123,10 +130,12 @@ def fmt(x: float, nd: int = 2) -> str:
 # ---------------------------------------------------------------------------
 
 def accuracy(rows: list[dict]) -> tuple[int, int]:
+    """Number of correct answers (option 'T') and number of rows."""
     return sum(r["selected_option_code"] == "T" for r in rows), len(rows)
 
 
 def by(rows: list[dict], key) -> dict[str, list[dict]]:
+    """Group rows by the value of `key(row)`."""
     out: dict[str, list[dict]] = defaultdict(list)
     for r in rows:
         out[key(r)].append(r)
@@ -134,12 +143,14 @@ def by(rows: list[dict], key) -> dict[str, list[dict]]:
 
 
 def acc_row(label: str, rows: list[dict]) -> dict:
+    """Accuracy summary (counts, proportion, Wilson CI) of rows under a label."""
     k, n = accuracy(rows)
     p, lo, hi = wilson(k, n)
     return {"label": label, "k": k, "n": n, "acc": p, "ci_lo": lo, "ci_hi": hi}
 
 
 def compare(label: str, rows_new: list[dict], rows_base: list[dict]) -> dict:
+    """Compare accuracy between Study 2 rows (new) and Study 1 rows (base) with z and Fisher tests."""
     k1, n1 = accuracy(rows_new)
     k2, n2 = accuracy(rows_base)
     z, pz = two_proportion_z(k1, n1, k2, n2)
@@ -152,6 +163,7 @@ def compare(label: str, rows_new: list[dict], rows_base: list[dict]) -> dict:
 
 
 def print_table(title: str, rows: list[dict], cols: list[str]) -> None:
+    """Print rows as a Markdown table restricted to `cols`."""
     print(f"\n### {title}\n")
     print("| " + " | ".join(cols) + " |")
     print("|" + "---|" * len(cols))
@@ -164,6 +176,7 @@ def print_table(title: str, rows: list[dict], cols: list[str]) -> None:
 
 
 def write_csv(path: Path, rows: list[dict]) -> None:
+    """Write rows to a CSV file, creating the folder; nothing is written when rows is empty."""
     if not rows:
         return
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -178,6 +191,7 @@ def write_csv(path: Path, rows: list[dict]) -> None:
 # ---------------------------------------------------------------------------
 
 def analyse_block1(s1: list[dict], s2: list[dict] | None, out: Path | None) -> None:
+    """Block 1 analysis (accuracy per animation and condition): Study 1 baselines and, when given, the Study 2 comparison; CSVs go to `out`."""
     s1_by_anim = by(s1, lambda r: r["animation_id"])
 
     # Baselines (Study 1)
@@ -289,6 +303,7 @@ def analyse_block1(s1: list[dict], s2: list[dict] | None, out: Path | None) -> N
 
 
 def likert_summary(label: str, rows: list[dict]) -> dict:
+    """Summarise Likert ratings (n, mean, median, count per rating 1-5) of rows under a label."""
     ratings = [r["likert_rating"] for r in rows if isinstance(r.get("likert_rating"), int)]
     dist = Counter(ratings)
     return {"label": label, "n": len(ratings),
@@ -298,6 +313,7 @@ def likert_summary(label: str, rows: list[dict]) -> dict:
 
 
 def analyse_block2(s1: list[dict], s2: list[dict] | None, out: Path | None) -> None:
+    """Block 2 analysis (Likert ratings per target animation and condition) for both studies; CSV goes to `out`."""
     rows = []
     s1_by_anim = by(s1, lambda r: r["animation_id"])
     for a in TARGET_ANIMATIONS:
@@ -319,6 +335,7 @@ def analyse_block2(s1: list[dict], s2: list[dict] | None, out: Path | None) -> N
 
 
 def main() -> None:
+    """Command-line entry point: load the survey exports and run both analyses."""
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--s1-block1", type=Path, required=True)
     parser.add_argument("--s1-block2", type=Path, help="optional: Study 2 has no Likert block")

@@ -9,6 +9,9 @@
 // Section 1: Shared Helpers
 // ═══════════════════════════════════════════════════════════════════
 
+/**
+ * Collect position, color and entity tag of every pixel belonging to the target prefix.
+ */
 function _collectEntityPixels(buf, PW, prefix, sceneMode) {
   var pixels = [];
   for (var i = 0; i < buf.length; i++) {
@@ -25,6 +28,9 @@ function _collectEntityPixels(buf, PW, prefix, sceneMode) {
   return pixels;
 }
 
+/**
+ * Reset the given entity pixels to their stored background color.
+ */
 function _blankEntityPixels(buf, pixels) {
   for (var j = 0; j < pixels.length; j++) {
     var idx = pixels[j].i;
@@ -34,6 +40,9 @@ function _blankEntityPixels(buf, pixels) {
   }
 }
 
+/**
+ * Redraw saved entity pixels offset by (dx, dy), clipped to the buffer.
+ */
 function _redrawEntityPixels(buf, PW, PH, pixels, dx, dy) {
   for (var j = 0; j < pixels.length; j++) {
     var p = pixels[j];
@@ -47,6 +56,9 @@ function _redrawEntityPixels(buf, PW, PH, pixels, dx, dy) {
   }
 }
 
+/**
+ * Bounding box and center of the target entity (uses precomputed HD bounds when available, else scans the buffer).
+ */
 function _computeEntityBounds(buf, PW, prefix, sceneMode) {
   // In HD mode, use pre-computed bounds from hdEntityData when available.
   // These bounds come from the original entity mask (before overlapping entities
@@ -82,14 +94,23 @@ function _computeEntityBounds(buf, PW, prefix, sceneMode) {
   };
 }
 
+/**
+ * Trapezoid envelope: ramps 0 to 1 over easeIn, holds at 1, ramps back to 0 over the last easeOut of t.
+ */
 function _easeEnvelope(t, easeIn, easeOut) {
   if (t < easeIn) return t / easeIn;
   if (t > 1 - easeOut) return (1 - t) / easeOut;
   return 1;
 }
 
+/**
+ * Clamp v to the range [lo, hi].
+ */
 function _clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v; }
 
+/**
+ * Write an RGB color at (x, y) after rounding; ignores out-of-bounds coordinates.
+ */
 function _setPixel(buf, PW, PH, x, y, r, g, b) {
   x = Math.round(x); y = Math.round(y);
   if (x >= 0 && x < PW && y >= 0 && y < PH) {
@@ -98,6 +119,9 @@ function _setPixel(buf, PW, PH, x, y, r, g, b) {
   }
 }
 
+/**
+ * HSL helper: convert one hue-offset channel to its 0-1 RGB component.
+ */
 function _hueChannel(p, q, t) {
   if (t < 0) t += 1; if (t > 1) t -= 1;
   if (t < 1/6) return p + (q - p) * 6 * t;
@@ -105,6 +129,9 @@ function _hueChannel(p, q, t) {
   if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
   return p;
 }
+/**
+ * Convert HSL (each 0-1) to an [r, g, b] array with 0-255 values.
+ */
 function _hslToRgb(h, s, l) {
   if (s === 0) { var v = Math.round(l * 255); return [v, v, v]; }
   var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
@@ -113,6 +140,9 @@ function _hslToRgb(h, s, l) {
           Math.round(_hueChannel(pp, q, h) * 255),
           Math.round(_hueChannel(pp, q, h - 1/3) * 255)];
 }
+/**
+ * Convert RGB (0-255) to a hue in 0-1 (0 for greys).
+ */
 function _rgbToHue(r, g, b) {
   var max = Math.max(r, g, b), min = Math.min(r, g, b);
   if (max === min) return 0;
@@ -315,6 +345,9 @@ function drawText(buf, PW, PH, text, x, y, r, g, b, entityId, scale) {
 // Section 2: Particle System
 // ═══════════════════════════════════════════════════════════════════
 
+/**
+ * Particle emitter configured from cfg (color, size, lifetime, gravity, drag, spread, velocity, jitter, fades, flicker).
+ */
 function ParticleSystem(cfg) {
   this.particles = [];
   this.maxParticles = cfg.maxParticles || 50;
@@ -338,18 +371,27 @@ function ParticleSystem(cfg) {
   };
 }
 
+/**
+ * Spawn up to count particles at (cx, cy), capped by maxParticles.
+ */
 ParticleSystem.prototype.burst = function(cx, cy, count) {
   for (var i = 0; i < count && this.particles.length < this.maxParticles; i++) {
     this._spawn(cx, cy);
   }
 };
 
+/**
+ * Spawn a single particle at (cx, cy) if below maxParticles.
+ */
 ParticleSystem.prototype.spawn = function(cx, cy) {
   if (this.particles.length < this.maxParticles) {
     this._spawn(cx, cy);
   }
 };
 
+/**
+ * Create one particle with randomized offset, velocity and lifetime around the base config.
+ */
 ParticleSystem.prototype._spawn = function(cx, cy) {
   var c = this._cfg;
   var jx = (Math.random() - 0.5) * 2 * c.spreadX;
@@ -365,6 +407,9 @@ ParticleSystem.prototype._spawn = function(cx, cy) {
   });
 };
 
+/**
+ * Advance particle ages and positions by dt (normalized time); removes expired ones.
+ */
 ParticleSystem.prototype.update = function(dt) {
   var c = this._cfg;
   for (var i = this.particles.length - 1; i >= 0; i--) {
@@ -382,6 +427,9 @@ ParticleSystem.prototype.update = function(dt) {
   }
 };
 
+/**
+ * Draw all live particles into the buffer with fade, color interpolation and optional flicker.
+ */
 ParticleSystem.prototype.draw = function(buf, PW, PH) {
   var c = this._cfg;
   for (var i = 0; i < this.particles.length; i++) {
@@ -530,6 +578,9 @@ var ParticlePresets = {
 var AnimationTemplates = {
   registry: {},
 
+  /**
+   * Register a template factory under name with its default duration (ms).
+   */
   register: function(name, factory, defaultDuration) {
     this.registry[name] = { factory: factory, duration: defaultDuration };
   },
@@ -546,6 +597,9 @@ var AnimationTemplates = {
       entry = this.registry['spotlight'] || this.registry['color_pop'];
       if (!entry) {
         return {
+          /**
+           * No-op fallback animation when no template is available.
+           */
           animate: function() {},
           duration_ms: spec.duration_ms || 1200
         };
@@ -578,6 +632,9 @@ var AnimationTemplates = {
     }
 
     return {
+      /**
+       * Run the main animation, then spawn (once) and advance/draw the particle systems.
+       */
       animate: function(buf, PW, PH, t) {
         mainAnimate(buf, PW, PH, t);
 
@@ -601,12 +658,18 @@ var AnimationTemplates = {
 
 // New shared helpers for deduplication
 
+/**
+ * Alpha-blend an RGB color onto the pixel at idx.
+ */
 function _blendPixel(buf, idx, r, g, b, alpha) {
   buf[idx].r = Math.min(255, Math.round(buf[idx].r * (1 - alpha) + r * alpha));
   buf[idx].g = Math.min(255, Math.round(buf[idx].g * (1 - alpha) + g * alpha));
   buf[idx].b = Math.min(255, Math.round(buf[idx].b * (1 - alpha) + b * alpha));
 }
 
+/**
+ * Distance-field array for the prefix (min across entities if '|'-separated), or null.
+ */
 function _getDistField(buf, prefix) {
   if (!buf._distFields) return null;
   if (prefix.indexOf('|') < 0) return buf._distFields[prefix] || null;
@@ -624,6 +687,9 @@ function _getDistField(buf, prefix) {
   return first;
 }
 
+/**
+ * Entity-layer pixel list for the prefix (concatenated across entities if '|'-separated), or null.
+ */
 function _getEntityLayer(buf, prefix) {
   if (!buf._entityLayers) return null;
   if (prefix.indexOf('|') < 0) return buf._entityLayers[prefix] || null;
@@ -665,6 +731,9 @@ function _perTargetWrapper(factory) {
   };
 }
 
+/**
+ * True if entityId equals the prefix or is a sub-entity of it (supports '|'-separated prefixes).
+ */
 function _isEntity(entityId, prefix) {
   if (prefix.indexOf('|') >= 0) {
     var parts = prefix.split('|');
@@ -681,16 +750,25 @@ function _isBgPixel(p) {
   return !p.e || p.e === '' || p.e === 'bg' || p.e.startsWith('bg.');
 }
 
+/**
+ * True if the pixel is the animation target (background in scene mode, else the prefix entity).
+ */
 function _isTargetPixel(p, prefix, sceneMode) {
   if (sceneMode) return _isBgPixel(p);
   return _isEntity(p.e, prefix);
 }
 
+/**
+ * True if the pixel belongs to another entity than the target (non-target foreground).
+ */
 function _isNonTargetPixel(p, prefix, sceneMode) {
   if (sceneMode) return p.e && p.e !== '' && !p.e.startsWith('bg.');
   return p.e && p.e !== '' && !_isEntity(p.e, prefix);
 }
 
+/**
+ * Draw a four- plus four-diagonal-spike star with a filled core at (cx, cy); cardLen/diagLen are spike lengths.
+ */
 function _drawStarBurst(buf, PW, PH, cx, cy, alpha, cardLen, diagLen) {
   // Thickness: scale with spike length for HD visibility
   var thick = Math.max(1, Math.round(cardLen / 6));

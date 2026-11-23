@@ -181,6 +181,7 @@
     const colors = ['#DB0038', '#F7C200', '#519DD9', '#53BAC1', '#EDEDED'];
     const pixelsContainer = document.getElementById('falling-pixels');
     let activePixels = 0;
+    // Spawns one falling pixel in a side margin (random colour, side and duration), capped at maxPixels.
     function createPixel() {
       if (activePixels >= 8) return;
       const pixel = document.createElement('div');

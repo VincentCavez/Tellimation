@@ -257,6 +257,7 @@ var _stopPlayAll = false;
 
 // ── Logging ──
 
+// Prepends a timestamped line to the log panel with the given CSS class (default log-info).
 function log(msg, cls) {
   cls = cls || 'log-info';
   var line = document.createElement('div');
@@ -265,6 +266,7 @@ function log(msg, cls) {
   logEl.prepend(line);
 }
 
+// Sets the status label to `text`, or to Playing/Idle according to the runner when no text is given.
 function updateStatus(text) {
   if (text) {
     statusEl.textContent = text;
@@ -281,6 +283,7 @@ function updateStatus(text) {
 // HD Scene Loading (adapted from study_story.js)
 // ═══════════════════════════════════════════════════════════════════
 
+// Cleans the entity image (drops faint white fringe pixels) and stores its mask, contour, bounds and distance field in hdEntityData.
 function computeEntityContour(entityId, img, w, h) {
   var off = document.createElement('canvas');
   off.width = w;
@@ -366,6 +369,7 @@ function computeEntityContour(entityId, img, w, h) {
   };
 }
 
+// Returns the RGBA pixels of the current canvas (background only) downscaled by HD_SCALE.
 function captureBgPixels(fullW, fullH) {
   var aw = Math.ceil(fullW / HD_SCALE);
   var ah = Math.ceil(fullH / HD_SCALE);
@@ -378,6 +382,7 @@ function captureBgPixels(fullW, fullH) {
   return offCtx.getImageData(0, 0, aw, ah).data;
 }
 
+// Builds the low-resolution PixelBuffer from the canvas, tagging each pixel with its entity (or 'bg') from the downscaled entity masks.
 function buildHDPixelBuffer(fullW, fullH, bgPixels) {
   var aw = Math.ceil(fullW / HD_SCALE);
   var ah = Math.ceil(fullH / HD_SCALE);
@@ -519,6 +524,7 @@ function buildHDPixelBuffer(fullW, fullH, bgPixels) {
   return hdBuf;
 }
 
+// Returns a renderer that draws a PixelBuffer onto the main canvas, upscaled to full size.
 function createHDRenderer(fullW, fullH) {
   var aw = Math.ceil(fullW / HD_SCALE);
   var ah = Math.ceil(fullH / HD_SCALE);
@@ -531,6 +537,7 @@ function createHDRenderer(fullW, fullH) {
   return {
     canvas: canvas,
     buf: null,
+    // Copies the pixel buffer to the canvas.
     render: function() {
       var b = this.buf;
       if (!b) return;
@@ -555,6 +562,7 @@ function createHDRenderer(fullW, fullH) {
 // Load Scene
 // ═══════════════════════════════════════════════════════════════════
 
+// Fetches the scene from /api/study/scene and renders it.
 function loadScene() {
   statusEl.textContent = 'Loading scene...';
   statusEl.className = 'status-loading';
@@ -577,6 +585,7 @@ function loadScene() {
     });
 }
 
+// Draws the background and entity layers on the canvas, computes entity contours, then sets up the animation buffers.
 function renderSceneHD(scene) {
   var ctx = canvas.getContext('2d');
 
@@ -634,6 +643,7 @@ function renderSceneHD(scene) {
   bgImg.src = scene.background_url;
 }
 
+// Creates the pixel buffer, renderer and AnimationRunner (24 fps) for the loaded scene.
 function setupAnimations(w, h, bgPixels) {
   var aw = Math.ceil(w / HD_SCALE);
   var ah = Math.ceil(h / HD_SCALE);
@@ -649,6 +659,7 @@ function setupAnimations(w, h, bgPixels) {
   updateStatus();
 }
 
+// Stops any animation and play-all loop, then reloads the scene.
 function reloadScene() {
   if (runner) runner.stop();
   _stopPlayAll = true;
@@ -707,6 +718,7 @@ var TEMPLATE_CONFIG = {
 // Play
 // ═══════════════════════════════════════════════════════════════════
 
+// Builds the animation spec (template, params, duration) for a template from the target and option fields; null if unknown.
 function buildSpec(templateName) {
   var cfg = TEMPLATE_CONFIG[templateName];
   if (!cfg) { log('Unknown template: ' + templateName, 'log-err'); return null; }
@@ -744,6 +756,7 @@ function buildSpec(templateName) {
   return { template: templateName, params: params, duration_ms: cfg.duration };
 }
 
+// Plays one template with the spec built from the form and logs the result.
 async function playT(templateName) {
   if (!runner) { log('Not ready yet', 'log-warn'); return; }
   var spec = buildSpec(templateName);
@@ -764,6 +777,7 @@ async function playT(templateName) {
   log(templateName + ' done.', 'log-ok');
 }
 
+// Plays every template in TEMPLATE_ORDER in sequence, 3 s apart, until stopped.
 async function playAll() {
   if (!runner) { log('Not ready yet', 'log-warn'); return; }
   _stopPlayAll = false;
@@ -789,6 +803,7 @@ async function playAll() {
   log('=== All animations complete ===', 'log-ok');
 }
 
+// Stops the play-all loop and the running animation.
 function stopAnim() {
   _stopPlayAll = true;
   if (runner) runner.stop();

@@ -393,6 +393,7 @@ async def generate_scene_assets(
     client = genai.Client(api_key=api_key)
 
     async def _notify(step: str) -> None:
+        """Report a generation step to the progress callback, ignoring callback errors."""
         if progress_callback:
             try:
                 await progress_callback(step)

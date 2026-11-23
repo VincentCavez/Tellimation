@@ -58,6 +58,7 @@ def _misl_labels() -> Dict[str, str]:
 
 
 def _macro_codes() -> List[str]:
+    """Return the macrostructure codes extracted from the MACROSTRUCTURE labels."""
     codes = []
     for spec in MACROSTRUCTURE.values():
         m = re.search(r"\((\w+)\)", spec.get("label", ""))
@@ -91,6 +92,7 @@ def _story_names() -> Dict[str, str]:
 
 
 def _anim_label(anim_id: Optional[str], names: Dict[str, str]) -> str:
+    """Return a readable name for an animation id, falling back to the raw id or a generic phrase."""
     if not anim_id:
         return "an animation"
     return names.get(anim_id.split("_", 1)[0], anim_id.replace("_", " "))
@@ -166,6 +168,7 @@ def _collect_scenes(participant_id: str) -> List[Dict[str, Any]]:
 # ---------------------------------------------------------------------------
 
 def _styles() -> Dict[str, ParagraphStyle]:
+    """Return the paragraph styles used throughout the analysis PDF."""
     base = getSampleStyleSheet()
     return {
         "title": ParagraphStyle("t", parent=base["Title"], textColor=_RED, fontSize=22, spaceAfter=4),
@@ -180,6 +183,7 @@ def _styles() -> Dict[str, ParagraphStyle]:
 
 
 def _table(rows: List[List[Any]], widths: List[float]) -> Table:
+    """Build a styled table with a bold header row from the given rows and column widths."""
     t = Table(rows, colWidths=widths, hAlign="LEFT")
     t.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), _BEIGE),
@@ -339,6 +343,7 @@ def build_analysis_pdf(participant_id: str) -> bytes:
 
 
 def _render(flowables: List[Any]) -> bytes:
+    """Render the flowables into an A4 PDF and return its bytes."""
     buf = io.BytesIO()
     doc = SimpleDocTemplate(
         buf, pagesize=A4, title="My SHIELD analysis",

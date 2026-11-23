@@ -67,6 +67,7 @@ def _load_all_stories() -> list[dict]:
 
 
 def _image_path(story_id: str, scene_number: int) -> Path:
+    """Return the path of the full-size HD image of a scene."""
     return STUDY_GEN_DIR / story_id / "hd" / f"scene_{scene_number}_full.png"
 
 
@@ -152,11 +153,13 @@ Return ONLY valid JSON:
 
 @app.get("/", response_class=HTMLResponse)
 async def index():
+    """Serve the enrichment tool page."""
     return HTML_PAGE
 
 
 @app.get("/api/stories")
 async def api_stories():
+    """Return all stories with their scenes."""
     stories = _load_all_stories()
     result = []
     for story in stories:
@@ -184,6 +187,7 @@ async def api_stories():
 
 @app.post("/api/enrich")
 async def api_enrich(request: Request):
+    """Enrich a scene description from the request body and return the result."""
     body = await request.json()
     story_path = body["story_path"]
     scene_number = body["scene_number"]
@@ -250,6 +254,7 @@ async def api_enrich(request: Request):
 
 @app.post("/api/save")
 async def api_save(request: Request):
+    """Save the edited scene description to the story file."""
     body = await request.json()
     story_path = body["story_path"]
     scene_number = body["scene_number"]

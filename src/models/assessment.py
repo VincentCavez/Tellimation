@@ -69,6 +69,7 @@ class SceneStoryEntry(BaseModel):
 
 
 def _default_mention_counts() -> Dict[str, int]:
+    """Return a zeroed mention counter for every MISL code."""
     from config.misl import ALL_MISL_CODES
     return {code: 0 for code in ALL_MISL_CODES}
 

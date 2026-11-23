@@ -54,6 +54,7 @@ def _parse_traits(traits_str: str) -> dict[str, str]:
 
 
 def build_parser() -> argparse.ArgumentParser:
+    """Build the argument parser for the generation CLI."""
     parser = argparse.ArgumentParser(
         description="Tellimations generation pipeline CLI",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -193,6 +194,7 @@ async def async_main(args: argparse.Namespace) -> None:
 
 
 def main() -> None:
+    """Parse the command-line arguments and run the selected generation command."""
     parser = build_parser()
     args = parser.parse_args()
 
